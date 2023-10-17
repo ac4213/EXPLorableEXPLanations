@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+    <script src="sketchMulti.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+      <title>4000ME - Week03-05</title>
+      <h2>Simply Supported Beam - Reactions</h2>
+      <div id='FBD_SimplySupported'></div>
+      <h2>Cantilever Beam - Reactions</h2>
+      <div id='FBD_Cantilever'></div>
+      <h2>Simply Supported Beam - INTERNAL LOADS</h2>
+      <div id='INTF_SimplySupported'></div>
+      <h2>Cantilever Beam - INTERNAL LOADS</h2>
+      <div id='INTF_Cantilever'></div>
+    </main>
+    
+    <script>
+      new p5(sketch1, 'FBD_SimplySupported');
+      new p5(sketch2, 'FBD_Cantilever');
+      new p5(sketch3, 'INTF_SimplySupported');
+      new p5(sketch4, 'INTF_Cantilever');
+    </script>
+  </body>
+</html>
