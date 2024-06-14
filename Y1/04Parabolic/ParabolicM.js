@@ -30,7 +30,8 @@ let obstacleColor;
 let isFired = false;
 
 function setup() {
-  createCanvas(700, 600);
+  cnv = createCanvas(800, 600);
+  cnv.parent('sketch-holder');
   
   textSize(12);
   rectMode(CENTER);
@@ -40,6 +41,7 @@ function setup() {
 
   //GUI
 	button = createButton('RESET');
+  button.parent('button-container')
   button.mousePressed(reset);
 
   ballColor=color(255,204,84);
