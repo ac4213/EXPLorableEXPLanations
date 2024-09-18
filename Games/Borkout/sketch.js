@@ -1,0 +1,193 @@
+let ball;
+let paddle;
+let bricks = [];
+let rows = 14;
+let cols = 13;
+let brickWidth;
+let brickHeight;
+let score = 0;
+let lives = 3;
+let ballIsMoving = false;
+
+function setup() {
+    createCanvas(windowWidth, windowHeight);
+    
+    // Initialize paddle
+    paddle = new Paddle();
+    
+    // Initialize ball
+    ball = new Ball();
+    
+    // Calculate brick dimensions based on canvas size
+    brickWidth = width / cols;
+    brickHeight = height / (rows + 10);  // 10 extra rows for the game area
+    
+    // Initialize bricks based on 13x13 matrix
+    let level = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+    
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            if (level[row][col] == 1) {
+                bricks.push(new Brick(col * brickWidth, row * brickHeight));
+            }
+        }
+    }
+}
+
+function draw() {
+    background(0);
+    
+    // Display and update paddle
+    paddle.display();
+    paddle.move();
+    
+    // Display and update ball
+    ball.display();
+    if (ballIsMoving) {
+        ball.move();
+        ball.checkPaddleCollision(paddle);
+    } else {
+        ball.resetOnPaddle(paddle);
+    }
+    
+    // Display and update bricks
+    for (let i = bricks.length - 1; i >= 0; i--) {
+        bricks[i].display();
+        if (ball.checkBrickCollision(bricks[i])) {
+            bricks.splice(i, 1);
+            score += 10;
+        }
+    }
+    
+    // Display score and lives
+    fill(255);
+    textSize(24);
+    text("Score: " + score, 10, height - 30);
+    text("Lives: " + lives, 10, height - 10);
+    
+    // Check if ball is lost
+    if (ball.y > height) {
+        lives--;
+        ballIsMoving = false; // Stop the ball
+        if (lives > 0) {
+            ball.resetOnPaddle(paddle);
+        } else {
+            noLoop();
+            textSize(36);
+            textAlign(CENTER);
+            text("Game Over! Final Score: " + score, width / 2, height / 2);
+        }
+    }
+}
+
+// Ball class
+class Ball {
+    constructor() {
+        this.r = 10;
+        this.resetOnPaddle(paddle);
+        this.xSpeed = 5;
+        this.ySpeed = -5;
+    }
+    
+    resetOnPaddle(paddle) {
+        this.x = paddle.x + paddle.w / 2;
+        this.y = paddle.y - this.r;
+    }
+    
+    display() {
+        fill(255);
+        ellipse(this.x, this.y, this.r * 2);
+    }
+    
+    move() {
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+        
+        // Wall collision
+        if (this.x < 0 || this.x > width) {
+            this.xSpeed *= -1;
+        }
+        if (this.y < 0) {
+            this.ySpeed *= -1;
+        }
+    }
+    
+    checkPaddleCollision(paddle) {
+        if (this.y + this.r > paddle.y && this.x > paddle.x && this.x < paddle.x + paddle.w) {
+            this.ySpeed *= -1;
+            this.y = paddle.y - this.r; // Avoid sticking to the paddle
+        }
+    }
+    
+    checkBrickCollision(brick) {
+        if (this.x + this.r > brick.x && this.x - this.r < brick.x + brick.w &&
+            this.y + this.r > brick.y && this.y - this.r < brick.y + brick.h) {
+            this.ySpeed *= -1;
+            return true;
+        }
+        return false;
+    }
+}
+
+// Paddle class
+class Paddle {
+    constructor() {
+        this.w = 120;
+        this.h = 20;
+        this.x = (width - this.w) / 2;
+        this.y = height - this.h - 30;
+        this.speed = 10;
+    }
+    
+    display() {
+        fill(255);
+        rect(this.x, this.y, this.w, this.h);
+    }
+    
+    move() {
+        // Move paddle with mouse or touch input
+        this.x = mouseX - this.w / 2;
+        this.x = constrain(this.x, 0, width - this.w);
+    }
+}
+
+// Brick class
+class Brick {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.w = brickWidth;
+        this.h = brickHeight;
+    }
+    
+    display() {
+        fill(255, 0, 0);
+        rect(this.x, this.y, this.w, this.h);
+    }
+}
+
+function mousePressed() {
+    if (!ballIsMoving) {
+        ballIsMoving = true;
+    }
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight);
+    paddle.y = height - paddle.h - 30; // Adjust paddle position
+}

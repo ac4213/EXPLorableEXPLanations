@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Emergent Material Properties</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+    <script src="sketch.js"></script>
+</head>
+<body>
+    <div id="simulation-container">
+        <div id="canvas-container"></div>
+        <div id="controls-container">
+            <div class="slider-container">
+                <label for="force-slider">Force: <span id="force-value">0%</span></label>
+                <input type="range" id="force-slider" class="slider" min="0" max="100" value="0">
+            </div>
+            <div class="slider-container">
+                <label for="temp-slider">Temperature: <span id="temp-value">0%</span></label>
+                <input type="range" id="temp-slider" class="slider" min="0" max="100" value="0">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
