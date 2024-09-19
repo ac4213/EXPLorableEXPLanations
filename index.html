@@ -3,87 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorable Explanations - Dr. Arnaldo Delli Carri</title>
+    <title>Arn - Explorable Explanations</title>
     <style>
+        :root {
+            --primary-color: #ffd700;
+            --secondary-color: #ffb300;
+            --text-color: #333;
+            --background-color: #fffbeb;
+            --link-color: #cc9900;
+            --link-hover-color: #1c01b8;
+        }
+        
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             line-height: 1.6;
-            padding: 20px;
+            color: var(--text-color);
             max-width: 1200px;
             margin: 0 auto;
-            background-color: #FFFEF0;
-            color: #333;
-        }
-        h1, h2, h3 {
-            color: #333;
-        }
-        .intro {
-            background-color: #FFFF99;
-            border-radius: 8px;
             padding: 20px;
-            margin-bottom: 20px;
+            background-color: var(--background-color);
         }
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
         }
-        .section {
-            flex: 1 1 300px;
-            margin: 10px;
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-variant: small-caps;
         }
+        
+        nav {
+            background-color: var(--secondary-color);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
         nav ul {
             list-style-type: none;
             padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
         }
+        
         nav ul li {
-            display: inline;
-            margin-right: 10px;
+            margin: 5px 10px;
         }
-        a {
-            color: #0000EE;
+        
+        nav ul li a {
+            color: var(--text-color);
             text-decoration: none;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
         }
-        a:hover {
+        
+        nav ul li a:hover, nav ul li a:focus {
+            background-color: var(--primary-color);
+            outline: none;
+        }
+        
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        section {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: calc(33.33% - 20px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .small-caps {
+            font-variant: small-caps;
+        }
+        
+        h2 {
+            color: #b38600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        
+        ul {
+            padding-left: 20px;
+        }
+        
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        a:hover, a:focus {
             text-decoration: underline;
+            color: var(--link-hover-color);
+            outline: none;
         }
-        @media (max-width: 768px) {
-            .section {
-                flex: 1 1 100%;
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            section {
+                width: 100%;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav ul li {
+                margin: 5px 0;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Explorable Explanations</h1>
-    <p>Dr. Arnaldo Delli Carri</p>
-
-    <div class="intro">
-        <h2>Welcome to Explorable Explanation</h2>
-        <p>Dive into the world of engineering and materials science through interactive learning!</p>
-        <h3>What We Offer</h3>
-        <p>At Explorable Explanation, we believe that the best way to understand complex concepts is to interact with them. Our suite of applets provides a unique, hands-on approach to learning key principles in engineering and materials science.</p>
-        <h3>Active Learning Through Virtual Exploration</h3>
-        <p>Our applets are designed to help students:</p>
-        <ul>
-            <li>Visualize abstract concepts</li>
-            <li>Experiment with variables in real-time</li>
-            <li>Develop intuition for complex systems</li>
-            <li>Master "threshold concepts" crucial for advanced understanding</li>
-        </ul>
-    </div>
-
+    <header>
+        <h1>explorable explanations</h1>
+        <p class="small-caps">discovering engineering through interactive learning</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+        
+    </header>
     <nav>
         <ul>
             <li><a href="#mechanical-science">Mechanical Science</a></li>
             <li><a href="#solid-mechanics">Solid Mechanics and Dynamics</a></li>
             <li><a href="#stress-analysis">Stress Analysis and Structural Dynamics</a></li>
             <li><a href="#materials-science">Materials Science</a></li>
-            <li><a href="#games">Games</a></li>
+            <li><a href="#games">Games!!!</a></li>
         </ul>
     </nav>
-
-    <div class="main-content" role="main">
-        <div id="mechanical-science" class="section">
+    <main>
+        <div class="intro">
+            <h2>Welcome to Explorable Explanations</h2>
+            <p>The best way to understand complex concepts is to interact with them.</p> 
+            <p>This suite of applets provides a unique, hands-on approach to learning key principles in engineering and materials science.</p>
+            <h3>Active Learning through Virtual Exploration</h3>
+            <p>These applets are designed to help students:</p>
+            <ul>
+                <li>Visualize abstract concepts</li>
+                <li>Experiment with variables in real-time</li>
+                <li>Develop intuition for complex systems</li>
+                <li>Master "threshold concepts" crucial for advanced understanding</li>
+            </ul>
+        </div>
+        <section id="mechanical-science">
             <h2>Mechanical Science</h2>
             <h3>Statics of Rigid Bodies</h3>
             <ul>
@@ -100,9 +203,8 @@
                 <li>Principle of Work and Energy</li>
                 <li>Principle of Impulse and Momentum</li>
             </ul>
-        </div>
-
-        <div id="solid-mechanics" class="section">
+        </section>
+        <section id="solid-mechanics">
             <h2>Solid Mechanics and Dynamics</h2>
             <h3>Solid Mechanics</h3>
             <ul>
@@ -116,9 +218,8 @@
                 <li>Balance of Rotating Masses</li>
                 <li>Kinematics of Mechanisms</li>
             </ul>
-        </div>
-
-        <div id="stress-analysis" class="section">
+        </section>
+        <section id="stress-analysis">
             <h2>Stress Analysis and Structural Dynamics</h2>
             <h3>Stress Analysis</h3>
             <ul>
@@ -130,9 +231,8 @@
                 <li>Tuned Mass Damper</li>
                 <li>MDOF Vibrations</li>
             </ul>
-        </div>
-
-        <div id="materials-science" class="section">
+        </section>
+        <section id="materials-science">
             <h2>Materials Science</h2>
             <h3>General</h3>
             <ul>
@@ -144,19 +244,17 @@
                 <li><a href="./MatSci/02Crystals/index.html">Crystal Lattices</a></li>
                 <li><a href="./MatSci/04MillerIdx/index.html">Miller Indices</a></li>
             </ul>
-        </div>
-
-        <div id="games" class="section">
+        </section>
+        <section id="games">
             <h2>Games</h2>
             <ul>
-                <li><a href="./Games/FlappyBork/index.html">Flappy Bork</a></li>
+                <li><a href="./Games/FlappyBork/index.html">Flappy Bork</a> </li>
                 <li><a href="./Games/Borkout/index.html">Borkout</a></li>
             </ul>
-        </div>
-    </div>
-
+        </section>
+    </main>
     <footer>
-        <p>© Dr. Arnaldo Delli-Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
     </footer>
 </body>
 </html>

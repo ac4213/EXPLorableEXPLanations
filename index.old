@@ -1,260 +1,154 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arn - Explorable Explanations</title>
-    <style>
-        :root {
-            --primary-color: #ffd700;
-            --secondary-color: #ffb300;
-            --text-color: #333;
-            --background-color: #fffbeb;
-            --link-color: #cc9900;
-            --link-hover-color: #1c01b8;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background-color);
-        }
-        
-        header {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            text-align: center;
-            padding: 1rem;
-            border-radius: 5px;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-variant: small-caps;
-        }
-        
-        nav {
-            background-color: var(--secondary-color);
-            padding: 0.5rem;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        nav ul li {
-            margin: 5px 10px;
-        }
-        
-        nav ul li a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 3px;
-            transition: background-color 0.3s;
-        }
-        
-        nav ul li a:hover, nav ul li a:focus {
-            background-color: var(--primary-color);
-            outline: none;
-        }
-        
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        section {
-            background-color: white;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-            width: calc(33.33% - 20px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .small-caps {
-            font-variant: small-caps;
-        }
-        
-        h2 {
-            color: #b38600;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-        
-        ul {
-            padding-left: 20px;
-        }
-        
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        a:hover, a:focus {
-            text-decoration: underline;
-            color: var(--link-hover-color);
-            outline: none;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-        
-        @media screen and (max-width: 768px) {
-            section {
-                width: 100%;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            nav ul li {
-                margin: 5px 0;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-        }
-        
-        @media screen and (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            h2 {
-                font-size: 1.5em;
-            }
-        }
-    </style>
+    <title>Arn's applets</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+    <link rel="stylesheet" href="./assets/css/mainArn.css" />
+    <!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+
+    <!--HERE BE SCRIPTS-->
+
+    <!--p5 library-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.dom.js"></script> -->
+
+    <!--MathJax library-->
+    <script type="text/x-mathjax-config">
+          // <![CDATA[
+          MathJax.Hub.Config({
+              TeX: {extensions: ["AMSmath.js", "AMSsymbols.js"]},
+              extensions: ["tex2jax.js"],
+              jax: ["input/TeX", "output/HTML-CSS"],
+              showProcessingMessages : false,
+              messageStyle : "none" ,
+              showMathMenu: false ,
+              tex2jax: {
+                  processEnvironments: true,
+                  inlineMath: [ ['$','$'] ],
+                  displayMath: [ ['$$','$$'] ],
+                  preview : "none",
+                  processEscapes: true
+              },
+              "HTML-CSS": { linebreaks: { automatic:true, width: "latex-container"} }
+          });
+          // ]]> </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+
+    <!--Chart library-->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script> -->
+
+    <!--arnarrow function-->
+    <!--<script src="/Users/Arn/Dropbox/UCov/Applets/206MAE/PlaneStress/arrow.js" ></script>-->
+
+    <!--WHAT HAPPENS IF YOU DON'T HAVE JS?-->
+    <noscript> Sorry... JavaScript must be enabled in your browser. </noscript>
 </head>
+
 <body>
-    <header>
-        <h1>explorable explanations</h1>
-        <p class="small-caps">discovering engineering through interactive learning</p>
-        <p>Dr. Arnaldo Delli Carri</p>
-        
-    </header>
-    <nav>
-        <ul>
-            <li><a href="#mechanical-science">Mechanical Science</a></li>
-            <li><a href="#solid-mechanics">Solid Mechanics and Dynamics</a></li>
-            <li><a href="#stress-analysis">Stress Analysis and Structural Dynamics</a></li>
-            <li><a href="#materials-science">Materials Science</a></li>
-            <li><a href="#games">Games!!!</a></li>
-        </ul>
-    </nav>
-    <main>
-        <div class="intro">
-            <h2>Welcome to Explorable Explanations</h2>
-            <p>The best way to understand complex concepts is to interact with them.</p> 
-            <p>This suite of applets provides a unique, hands-on approach to learning key principles in engineering and materials science.</p>
-            <h3>Active Learning through Virtual Exploration</h3>
-            <p>These applets are designed to help students:</p>
+    <!-- Header -->
+    <section id="header">
+        <header>
+            <h1 id="logo"> Arn </h1>
+            EXPLORABLE EXPLANATIONS
+            <p>&lt;NAVIGATION&gt;</p>
+            <p>select a topic below</p>
+        </header>
+
+        <nav id="nav">
             <ul>
-                <li>Visualize abstract concepts</li>
-                <li>Experiment with variables in real-time</li>
-                <li>Develop intuition for complex systems</li>
-                <li>Master "threshold concepts" crucial for advanced understanding</li>
+                <li>
+                    <a href="#4000ME">Mechanical Science</a>
+                </li>
+                <li>
+                    <a href="#5035MAA">Solid Mechanics and Dynamics</a>
+                </li>
+                <li>
+                    <a href="#6056MAA">Stress Analysis and Structural Dynamics</a>
+                </li>
             </ul>
+        </nav>
+    </section>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Main -->
+        <div id="main">
+            <!-- One -->
+            <section id="4000ME">
+                <div class="container">
+                    <h2>MECHANICAL SCIENCE</h2>
+                    <h3>Statics of Rigid Bodies</h3>
+                    <ul>
+                        <li><a href="./Y1/01VectorAlgebra/VecAlgebra.html">Vector Algebra - forces as vectors</a></li>
+                        <li>Free Body Diagrams</li>
+                        <li><a href="./Y1/02FBD/FBD.html">Internal Loads (SFD, BMD)</a></li>
+                        <li><a href="./Y1/03SecMomArea/SecMomArea.html">Second Moment of Area</a></li>
+                    </ul>
+                    <h3>Dynamics of Rigid Bodies</h3>
+                    <ul>
+                        <li>Kinematics of Linear Motion</li>
+                        <li><a href="./Y1/04Parabolic/ParabolicM.html">Kinematics of Parabolic Motion</a></li>
+                        <li>Kinematics of Relative Motion</li>
+                        <li>Principle of Work and Energy</li>
+                        <li>Principle of Impulse and Momentum</li>
+                        <li>(more...)</li>
+                    </ul>
+                </div>
+            </section>
+            <!-- Two -->
+            <section id="5035MAA">
+                <div class="container">
+                    <h2>SOLID MECHANICS AND DYNAMICS</h2>
+                    <h3>Solid Mechanics</h3>
+                    <ul>
+                        <li>Direct Shear Stress on a T-Section</li>
+                        <li>Macaulay's Method</li>
+                        <li>
+                            <a href="./Y2/PlaneStress/planestress.html">2D-Stress Transformations (Mohr's Circle)</a>
+                        </li>
+                        <li>(more...)</li>
+                    </ul>
+                    <h3>Dynamics of Machines</h3>
+                    <ul>
+                        <li>
+                            <a href="./Y2/01SDOFvib/SDOFvib.html">SDOF Vibrations</a>
+                        </li>
+                        <li>Balance of Rotating Masses</li>
+                        <li>Kinematics of Mechanisms</li>
+                        <li>(more...)</li>
+                    </ul>
+                </div>
+            </section>
+            <!-- Three -->
+            <section id="6056MAA">
+                <div class="container">
+                    <h2>STRESS ANALYSIS AND STRUCTURAL DYNAMICS</h2>
+                    <h3>Stress Analysis</h3>
+                    <ul>
+                        <li>3D-Stress Transformations</li>
+                        <li>Plasticity in Bending of a T-Section</li>
+                        <li>(more...)</li>
+                    </ul>
+                    <h3>Structural Dynamics</h3>
+                    <ul>
+                        <li>Tuned Mass Damper</li>
+                        <li>MDOF Vibrations</li>
+                        <li>(more...)</li>
+                    </ul>
+                </div>
+            </section>
         </div>
-        <section id="mechanical-science">
-            <h2>Mechanical Science</h2>
-            <h3>Statics of Rigid Bodies</h3>
-            <ul>
-                <li><a href="./Y1/01VectorAlgebra/VecAlgebra.html">Vector Algebra - forces as vectors</a></li>
-                <li>Free Body Diagrams</li>
-                <li><a href="./Y1/02FBD/FBD.html">Internal Loads (SFD, BMD)</a></li>
-                <li><a href="./Y1/03SecMomArea/SecMomArea.html">Second Moment of Area</a></li>
-            </ul>
-            <h3>Dynamics of Rigid Bodies</h3>
-            <ul>
-                <li>Kinematics of Linear Motion</li>
-                <li><a href="./Y1/04Parabolic/ParabolicM.html">Kinematics of Parabolic Motion</a></li>
-                <li>Kinematics of Relative Motion</li>
-                <li>Principle of Work and Energy</li>
-                <li>Principle of Impulse and Momentum</li>
-            </ul>
+
+        <!-- Footer -->
+        <section id="footer">
+            <div class="copyright"> &copy; Dr. Arnaldo Delli-Carri Ph.D. CEng MIMechE SFHEA </div>
         </section>
-        <section id="solid-mechanics">
-            <h2>Solid Mechanics and Dynamics</h2>
-            <h3>Solid Mechanics</h3>
-            <ul>
-                <li>Direct Shear Stress on a T-Section</li>
-                <li>Macaulay's Method</li>
-                <li><a href="./Y2/PlaneStress/planestress.html">2D-Stress Transformations (Mohr's Circle)</a></li>
-            </ul>
-            <h3>Dynamics of Machines</h3>
-            <ul>
-                <li><a href="./Y2/01SDOFvib/SDOFvib.html">SDOF Vibrations</a></li>
-                <li>Balance of Rotating Masses</li>
-                <li>Kinematics of Mechanisms</li>
-            </ul>
-        </section>
-        <section id="stress-analysis">
-            <h2>Stress Analysis and Structural Dynamics</h2>
-            <h3>Stress Analysis</h3>
-            <ul>
-                <li>3D-Stress Transformations</li>
-                <li>Plasticity in Bending of a T-Section</li>
-            </ul>
-            <h3>Structural Dynamics</h3>
-            <ul>
-                <li>Tuned Mass Damper</li>
-                <li>MDOF Vibrations</li>
-            </ul>
-        </section>
-        <section id="materials-science">
-            <h2>Materials Science</h2>
-            <h3>General</h3>
-            <ul>
-                <li><a href="./MatSci/01EmergProps/index.html">Emergent Material Properties</a></li>
-                <li><a href="./MatSci/03PolyVacancy/index.html">Nucleation of Polycrystals and Vacancies</a></li>
-            </ul>
-            <h3>Crystallography</h3>
-            <ul>
-                <li><a href="./MatSci/02Crystals/index.html">Crystal Lattices</a></li>
-                <li><a href="./MatSci/04MillerIdx/index.html">Miller Indices</a></li>
-            </ul>
-        </section>
-        <section id="games">
-            <h2>Games</h2>
-            <ul>
-                <li><a href="./Games/FlappyBork/index.html">Flappy Bork</a> </li>
-                <li><a href="./Games/Borkout/index.html">Borkout</a></li>
-            </ul>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-    </footer>
+    </div>
 </body>
+
 </html>
