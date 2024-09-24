@@ -12,14 +12,14 @@ let isDragging = false;
 let originTranslation;
 let lastTouchDistance = 0;
 let lastClickTime = 0;
-const clickDelay = 300; // Minimum time between clicks in milliseconds
+const clickDelay = 100; // Minimum time between clicks in milliseconds
 
 function setup() {
   let containerDiv = createDiv();
   containerDiv.id('container');
   containerDiv.parent('canvas-container');
 
-  canvasSize = min(windowWidth, windowHeight - 150) - 20; // Increased space for controls
+  canvasSize = min(windowWidth, windowHeight - 150) - 80; // Increased space for controls
   let canvas = createCanvas(canvasSize, canvasSize, WEBGL);
   canvas.parent(containerDiv);
 
@@ -158,7 +158,7 @@ function drawPlane() {
   
   if (hVal === 0 && kVal === 0 && lVal === 0) return;
   
-  let points = calculatePlanePoints(hVal, kVal, lVal);
+  let points = calculatePlanePoints(kVal, hVal, lVal); //TODO: change k and h for right-handed coordinate frame
   
   if (points.length > 0) {
     beginShape();
@@ -233,10 +233,10 @@ function calculatePlanePoints(h, k, l) {
 function drawAxes() {
   strokeWeight(3);
   
-  stroke(255, 0, 0);
+  stroke(0, 255, 0);
   line(0, 0, 0, axisLength, 0, 0);
   
-  stroke(0, 255, 0);
+  stroke(255, 0, 0);
   line(0, 0, 0, 0, axisLength, 0);
   
   stroke(0, 0, 255);
