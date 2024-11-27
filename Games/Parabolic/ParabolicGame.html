@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Parabolic Motion Game</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    
+    <style>
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            overscroll-behavior: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: fit-content;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #control-strip {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        #score-container {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+
+        #sketch-holder {
+            touch-action: none;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+            width: 100%;
+            position: relative;
+        }
+
+        #congratulations {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        canvas {
+            touch-action: none;
+            display: block;
+        }
+
+        .game-button {
+            padding: 8px 16px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            touch-action: manipulation;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            transition: transform 0.1s, filter 0.1s;
+            will-change: transform;
+        }
+
+        .game-button:active {
+            transform: scale(0.95);
+        }
+
+        #reset-button {
+            background-color: #FFD700;
+        }
+
+        #fire-button {
+            background-color: #FF4444;
+            display: none;
+        }
+
+        .game-button:hover {
+            filter: brightness(110%);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            pointer-events: none;
+        }
+
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+            pointer-events: auto;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .game-button {
+                padding: 6px 12px;
+                font-size: 0.9rem;
+            }
+        }
+
+    .continue-text {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-top: 10px;
+        display: block;
+    }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="control-strip">
+            <button id="reset-button" class="game-button">RESET</button>
+            <div id="score-container">Streak: 0</div>
+            <button id="fire-button" class="game-button">FIRE!</button>
+        </div>
+        <div id="sketch-holder">
+            <div id="congratulations">
+                Congratulations! 🎉<br>5 in a row!<br>
+                <span class="continue-text">(Click to reset)</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=Bug%20Report%20-%20Parabolic%20Motion%20Game">Let me know!</a></p>
+        <p>Designed and implemented by<br>
+        <a href="mailto:ac4213@coventry.ac.uk">Dr. Arnaldo Delli Carri</a><br>
+        Coventry University<br>
+        United Kingdom</p>
+    </div>
+
+    <script src="ParabolicGame.js"></script>
+</body>
+</html>
