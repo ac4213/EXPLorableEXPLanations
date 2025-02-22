@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tuned Mass Damper Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: white;
+        }
+        .app-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .constants {
+            font-size: 12px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .animation-container {
+            background: #f5f5f5;
+            padding: 20px;
+            border: 1px solid #ddd;
+            height: 300px;
+        }
+        .plots {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 60px);
+        }
+        .plot-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        canvas {
+            display: block;
+        }
+        .plot-title {
+            font-size: 12px;
+            margin: 5px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="left-panel">
+            <div class="controls">
+                <h3>TUNED MASS DAMPER</h3>
+                
+                <div class="constants">
+                    <div>main mass = 500 kg</div>
+                    <div>main stiffness = 100000 N/m</div>
+                    <div>main pulsation = 14.14 rad/s</div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>TMD mass ratio μ = m₂/m₁</span>
+                        <span id="tmdMassValue">0.05</span>
+                    </div>
+                    <input type="range" id="tmdMassSlider" min="0" max="0.2" value="0.05" step="0.001">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Damping ratio</span>
+                        <span id="dampingValue">0.01</span>
+                    </div>
+                    <input type="range" id="dampingSlider" min="0" max="0.1" value="0.01" step="0.01">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>Forcing pulsation [rad/s]</span>
+                        <span id="forcingValue">14.14</span>
+                    </div>
+                    <input type="range" id="forcingSlider" min="0" max="30" value="14.14" step="0.1">
+                </div>
+
+                <button id="animateButton">Animate</button>
+            </div>
+            <div id="animationContainer" class="animation-container"></div>
+        </div>
+
+        <div class="plots">
+            <div id="mainMassFRF" class="plot-container">
+                <div class="plot-title">main mass FRF</div>
+            </div>
+            <div id="tmdMassFRF" class="plot-container">
+                <div class="plot-title">TMD mass FRF</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const globals = {
+            time: 0,
+            animating: false,
+            mainMass: 500,
+            mainStiffness: 100000,
+            mainPulsation: Math.sqrt(100000/500),
+            massRatio: 0.05,
+            dampingRatio: 0.01,
+            forcingPulsation: 14.14
+        };
+
+        function calculateMainMassFRF(w, protected) {
+            if(!protected) {
+                // Unprotected SDOF system
+                const freq_ratio = w/globals.mainPulsation;
+                return 1/Math.sqrt(Math.pow(1 - Math.pow(freq_ratio, 2), 2) + 
+                    Math.pow(2*globals.dampingRatio*freq_ratio, 2));
+            } else {
+                // Protected system using the exact equation from the image
+                const freq_ratio = w/globals.mainPulsation;
+                const k2_k1 = globals.massRatio;  // Since we keep ω₂ₙ = ω₁ₙ, k₂/k₁ = μ
+                
+                const numerator = Math.abs(1 - Math.pow(freq_ratio, 2));
+                const denominator = Math.abs(
+                    (1 + k2_k1 - Math.pow(freq_ratio, 2)) * 
+                    (1 - Math.pow(freq_ratio, 2)) - 
+                    k2_k1
+                );
+                
+                return numerator/denominator;
+            }
+        }
+
+        function calculateTMDMassFRF(w) {
+            const freq_ratio = w/globals.mainPulsation;
+            const k2_k1 = globals.massRatio;
+            
+            const denominator = Math.abs(
+                (1 + k2_k1 - Math.pow(freq_ratio, 2)) * 
+                (1 - Math.pow(freq_ratio, 2)) - 
+                k2_k1
+            );
+            
+            return 1/denominator;
+        }
+
+        function mainMassPlot(p) {
+            p.setup = function() {
+                p.createCanvas(800, 400);
+            }
+
+            p.draw = function() {
+                p.background(255);
+                drawLogGrid(p);
+                drawMainMassFRF(p);
+                drawPlotLabels(p);
+                // Draw forcing frequency indicator
+                const xPos = p.map(globals.forcingPulsation, 0, 30, 50, p.width - 20);
+                p.stroke(100, 100, 255, 150);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.line(xPos, 20, xPos, p.height - 20);
+                p.drawingContext.setLineDash([]);
+            }
+        }
+
+        function tmdMassPlot(p) {
+            p.setup = function() {
+                p.createCanvas(800, 400);
+            }
+
+            p.draw = function() {
+                p.background(255);
+                drawLogGrid(p);
+                drawTMDMassFRF(p);
+                drawPlotLabels(p);
+                // Draw forcing frequency indicator
+                const xPos = p.map(globals.forcingPulsation, 0, 30, 50, p.width - 20);
+                p.stroke(100, 100, 255, 150);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.line(xPos, 20, xPos, p.height - 20);
+                p.drawingContext.setLineDash([]);
+            }
+        }
+
+        function drawMainMassFRF(p) {
+            // Draw unprotected system (black)
+            p.stroke(0);
+            p.strokeWeight(2);
+            p.noFill();
+            p.beginShape();
+            for(let w = 0.1; w <= 30; w += 0.1) {
+                const x = p.map(w, 0, 30, 50, p.width - 20);
+                const mag = calculateMainMassFRF(w, false);
+                const y = p.map(p.log(mag)/p.log(10), -10, 2, p.height - 20, 20);
+                if(y > 0 && y < p.height) p.vertex(x, y);
+            }
+            p.endShape();
+
+            // Draw protected system (red)
+            p.stroke(255, 0, 0);
+            p.beginShape();
+            for(let w = 0.1; w <= 30; w += 0.1) {
+                const x = p.map(w, 0, 30, 50, p.width - 20);
+                const mag = calculateMainMassFRF(w, true);
+                const y = p.map(p.log(mag)/p.log(10), -10, 2, p.height - 20, 20);
+                if(y > 0 && y < p.height) p.vertex(x, y);
+            }
+            p.endShape();
+        }
+
+        function drawTMDMassFRF(p) {
+            p.stroke(255, 0, 0);
+            p.strokeWeight(2);
+            p.noFill();
+            p.beginShape();
+            for(let w = 0.1; w <= 30; w += 0.1) {
+                const x = p.map(w, 0, 30, 50, p.width - 20);
+                const mag = calculateTMDMassFRF(w);
+                const y = p.map(p.log(mag)/p.log(10), -10, 2, p.height - 20, 20);
+                if(y > 0 && y < p.height) p.vertex(x, y);
+            }
+            p.endShape();
+        }
+
+        function drawLogGrid(p) {
+            p.stroke(200);
+            p.strokeWeight(0.5);
+
+            // Draw vertical grid lines (frequency axis)
+            for(let x = 0; x <= 30; x += 2) {
+                const xPos = p.map(x, 0, 30, 50, p.width - 20);
+                p.line(xPos, 20, xPos, p.height - 20);
+                
+                // Add frequency labels
+                if(x % 4 === 0) {
+                    p.noStroke();
+                    p.fill(0);
+                    p.textSize(8);
+                    p.textAlign(p.CENTER);
+                    p.text(x, xPos, p.height - 5);
+                }
+            }
+
+            // Draw horizontal grid lines (logarithmic amplitude axis)
+            for(let i = -10; i <= 2; i++) {
+                const yPos = p.map(i, -10, 2, p.height - 20, 20);
+                p.stroke(200);
+                p.line(50, yPos, p.width - 20, yPos);
+                
+                // Add amplitude labels
+                p.noStroke();
+                p.fill(0);
+                p.textSize(8);
+                p.textAlign(p.RIGHT);
+                p.text(`10^${i}`, 45, yPos + 3);
+            }
+        }
+
+        function drawPlotLabels(p) {
+            p.noStroke();
+            p.fill(0);
+            p.textSize(10);
+            p.textAlign(p.CENTER);
+            p.text('ω [rad/s]', p.width/2, p.height - 5);
+            p.push();
+            p.translate(15, p.height/2);
+            p.rotate(-p.PI/2);
+            p.text('Amplitude [m/N]', 0, 0);
+            p.pop();
+        }
+
+        function animation(p) {
+            let baseY;
+            
+            p.setup = function() {
+                p.createCanvas(260, 260);
+                baseY = p.height * 0.8;
+            }
+
+            p.draw = function() {
+                p.background(255);
+                
+                if (globals.animating) {
+                    globals.time += 0.05;
+                }
+
+                // Draw base line
+                p.stroke(0);
+                p.line(0, baseY, p.width, baseY);
+
+                // Draw systems side by side
+                drawSystem(p, p.width/3, baseY, false);
+                drawSystem(p, 2*p.width/3, baseY, true);
+            }
+        }
+
+        function drawSystem(p, x, baseY, protected) {
+            // Get the current FRF values at forcing frequency
+            const unprotectedFRF = calculateMainMassFRF(globals.forcingPulsation, false);
+            const protectedMainFRF = calculateMainMassFRF(globals.forcingPulsation, true);
+            const tmdFRF = calculateTMDMassFRF(globals.forcingPulsation);
+            
+            // Animation speed factor (lower = slower)
+            const timeScale = 0.2;
+            
+            // Simple amplitude scaling for visualization
+            const scaleFactor = 1;
+            
+            if (!protected) {
+                // Unprotected system (black)
+                const amplitude = unprotectedFRF * scaleFactor;
+                const massDisp = amplitude * p.sin(globals.forcingPulsation * globals.time * timeScale);
+                
+                drawSpring(p, x, baseY, x, baseY - 100 + massDisp, p.color(0));
+                p.fill(0);
+                p.stroke(0);
+                p.rect(x - 20, baseY - 120 + massDisp, 40, 40);
+            } else {
+                // Protected system (red)
+                const mainAmplitude = protectedMainFRF * scaleFactor;
+                const mainDisp = mainAmplitude * p.sin(globals.forcingPulsation * globals.time * timeScale);
+                
+                const tmdAmplitude = tmdFRF * scaleFactor;
+                const tmdDisp = mainDisp + tmdAmplitude * p.sin(globals.forcingPulsation * globals.time * timeScale + p.PI);
+                
+                // Draw main mass and its spring
+                drawSpring(p, x, baseY, x, baseY - 100 + mainDisp, p.color(255, 0, 0));
+                p.fill(255, 0, 0);
+                p.stroke(255, 0, 0);
+                p.rect(x - 20, baseY - 120 + mainDisp, 40, 40);
+                
+                // Draw TMD and its spring
+                const tmdSize = 15 + 15 * globals.massRatio;
+                drawSpring(p, x, baseY - 120 + mainDisp, x, baseY - 160 + tmdDisp, p.color(255, 0, 0));
+                p.rect(x - tmdSize/2, baseY - 175 + tmdDisp, tmdSize, tmdSize);
+            }
+        }
+
+        function drawSpring(p, x1, y1, x2, y2, color) {
+            p.stroke(color);
+            p.noFill();
+            p.beginShape();
+            const segments = 12;
+            const amplitude = 8;
+            for (let i = 0; i <= segments; i++) {
+                const y = p.map(i, 0, segments, y1, y2);
+                const x = x1 + p.sin(i * p.PI) * amplitude;
+                p.vertex(x, y);
+            }
+            p.endShape();
+        }
+
+        // Event Listeners
+        document.getElementById('tmdMassSlider').addEventListener('input', function(e) {
+            globals.massRatio = parseFloat(e.target.value);
+            document.getElementById('tmdMassValue').textContent = globals.massRatio.toFixed(3);
+        });
+
+        document.getElementById('dampingSlider').addEventListener('input', function(e) {
+            globals.dampingRatio = parseFloat(e.target.value);
+            document.getElementById('dampingValue').textContent = globals.dampingRatio.toFixed(3);
+        });
+
+        document.getElementById('forcingSlider').addEventListener('input', function(e) {
+            globals.forcingPulsation = parseFloat(e.target.value);
+            document.getElementById('forcingValue').textContent = globals.forcingPulsation.toFixed(2);
+        });
+
+        document.getElementById('animateButton').addEventListener('click', function() {
+            globals.animating = !globals.animating;
+            this.textContent = globals.animating ? 'Stop' : 'Animate';
+            globals.time = 0;
+        });
+
+        // Create p5.js instances
+        new p5(mainMassPlot, 'mainMassFRF');
+        new p5(tmdMassPlot, 'tmdMassFRF');
+        new p5(animation, 'animationContainer');
+    </script>
+</body>
+</html>
