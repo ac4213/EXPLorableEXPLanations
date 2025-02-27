@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MDOF Vibration Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .cell {
+            margin: 5px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        canvas {
+            margin-top: 5px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="margin-bottom: 5px;">2DOFs Free Vibration Visualisation</h1>
+        <button id="animateBtn" style="margin-top: 5px; margin-bottom: 10px;">Start Animation</button>
+        <div id="sketch-holder"></div>
+    </div>
+
+    <script>
+        // Animation variables
+        let animating = false;
+        let t = 0;
+        let dt = 0.01;
+        let timeArray = [];
+        let maxTime = 2;
+        let animationSpeed = 0.67; // Slows down animation to take 3 seconds
+        
+        // Layout variables
+        let boxSize = 40;
+        let boxSpacing = 150; // Increased spacing between boxes
+        let yPosition = 120;  // Reduced vertical position of first row
+        let rowSpacing = 200; // Increased spacing between rows
+        let plotWidth = 300;
+        let plotHeight = 150;
+        
+        // System parameters
+        let m1 = 1; // kg
+        let m2 = 1; // kg
+        let k1 = 1000; // N/m
+        let k2 = 1000; // N/m
+        
+        // Compute eigenvalues and eigenvectors
+        let M, K, Omegan, X;
+        let mode1Data = [];
+        let mode2Data = [];
+        let freeVibData1 = [];
+        let freeVibData2 = [];
+        
+        function setupSystem() {
+            // Mass matrix
+            M = [[m1, 0], [0, m2]];
+            
+            // Stiffness matrix
+            K = [[k1 + k2, -k2], [-k2, k2]];
+            
+            // Natural frequencies (rad/s)
+            Omegan = [Math.sqrt(1000), Math.sqrt(2000)];
+            
+            // Mode shapes (eigenvectors) - normalized
+            X = [
+                [1, 1],       // First mass, modes 1 & 2
+                [1, -1]       // Second mass, modes 1 & 2
+            ];
+            
+            // Initial conditions
+            let x0 = [0, 1];
+            let xdot0 = [0, 0];
+            
+            // Transform to modal coordinates
+            let q0 = solveSystem([[X[0][0], X[0][1]], [X[1][0], X[1][1]]], x0);
+            let p0 = solveSystem([[X[0][0], X[0][1]], [X[1][0], X[1][1]]], xdot0);
+            
+            // Modal parameters
+            let A = [p0[0]/Omegan[0], p0[1]/Omegan[1]];
+            let B = [q0[0], q0[1]];
+            
+            // Precompute data for plots
+            timeArray = [];
+            mode1Data = [];
+            mode2Data = [];
+            freeVibData1 = [];
+            freeVibData2 = [];
+            
+            for (let t = 0; t <= maxTime; t += dt) {
+                timeArray.push(t);
+                
+                // Modal solutions
+                let q1 = A[0] * Math.sin(Omegan[0] * t) + B[0] * Math.cos(Omegan[0] * t);
+                let q2 = A[1] * Math.sin(Omegan[1] * t) + B[1] * Math.cos(Omegan[1] * t);
+                
+                mode1Data.push(q1);
+                mode2Data.push(q2);
+                
+                // Physical solutions
+                let x1 = X[0][0] * q1 + X[0][1] * q2;
+                let x2 = X[1][0] * q1 + X[1][1] * q2;
+                
+                freeVibData1.push(x1);
+                freeVibData2.push(x2);
+            }
+        }
+        
+        // Helper function to solve a 2x2 system
+        function solveSystem(A, b) {
+            let det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+            let x = [(A[1][1] * b[0] - A[0][1] * b[1]) / det, (-A[1][0] * b[0] + A[0][0] * b[1]) / det];
+            return x;
+        }
+        
+        function setup() {
+            setupSystem();
+            
+            let canvas = createCanvas(900, 750); // Increased canvas width and height
+            canvas.parent('sketch-holder');
+            
+            // Setup animate button
+            let animateBtn = document.getElementById('animateBtn');
+            animateBtn.addEventListener('click', function() {
+                animating = !animating;
+                if (animating) {
+                    animateBtn.textContent = 'Stop Animation';
+                } else {
+                    animateBtn.textContent = 'Start Animation';
+                }
+            });
+        }
+        
+        function draw() {
+            background(255);
+            
+            if (animating) {
+                t += dt * animationSpeed;
+                if (t > maxTime) t = 0;
+            }
+            
+            let timeIndex = Math.floor(t / dt);
+            if (timeIndex >= timeArray.length) timeIndex = timeArray.length - 1;
+            
+            // Scale factor for visualization
+            let sf = 30;
+            
+            // Mode 1 visualization
+            drawModeVisualization(1, yPosition, "Mode #1", sf * X[0][0] * Math.sin(Omegan[0] * t), sf * X[1][0] * Math.sin(Omegan[0] * t), 'blue');
+            drawTimePlot(430, yPosition, "Mode #1 Time History", timeArray, mode1Data, t, 'blue');
+            
+            // Mode 2 visualization
+            drawModeVisualization(1, yPosition + rowSpacing, "Mode #2", sf * X[0][1] * Math.sin(Omegan[1] * t), sf * X[1][1] * Math.sin(Omegan[1] * t), 'red');
+            drawTimePlot(430, yPosition + rowSpacing, "Mode #2 Time History", timeArray, mode2Data, t, 'red');
+            
+            // Free vibration visualization
+            drawModeVisualization(1, yPosition + 2 * rowSpacing, "Free Vibration I.C. x₁=0, x₂=1", sf * freeVibData1[timeIndex], sf * freeVibData2[timeIndex], 'magenta', 'black');
+            
+            // Special case for the third row - with consistent title format
+            push();
+            translate(430, yPosition + 2 * rowSpacing);
+            
+            // Title well above the plot - same style as other plots
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text("Free Vibration Time History", plotWidth/2, -plotHeight/2 - 30);
+            text("t=" + t.toFixed(4), plotWidth/2, -plotHeight/2 - 10);
+            
+            // Draw axes
+            stroke(0);
+            strokeWeight(1);
+            line(0, 0, plotWidth, 0);  // x-axis
+            line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+            
+            // Draw ticks and labels on x-axis
+            textSize(10); // Smaller text for axis labels
+            for (let i = 0; i <= maxTime; i += 0.5) {
+                let xPos = map(i, 0, maxTime, 0, plotWidth);
+                line(xPos, -3, xPos, 3);
+                text(i.toFixed(1), xPos, 15);
+            }
+            
+            // Draw ticks and labels on y-axis
+            for (let i = -1; i <= 1; i += 0.5) {
+                let yPos = map(i, -1, 1, plotHeight/2, -plotHeight/2);
+                line(-3, yPos, 3, yPos);
+                text(i.toFixed(1), -15, yPos + 3);
+            }
+            
+            // Draw first dataset
+            noFill();
+            stroke('magenta');
+            strokeWeight(1.5);
+            beginShape();
+            for (let i = 0; i < timeArray.length; i++) {
+                let xPos = map(timeArray[i], 0, maxTime, 0, plotWidth);
+                let yPos = map(freeVibData1[i], -1, 1, plotHeight/2, -plotHeight/2);
+                vertex(xPos, yPos);
+            }
+            endShape();
+            
+            // Draw second dataset
+            stroke('black');
+            beginShape();
+            for (let i = 0; i < timeArray.length; i++) {
+                let xPos = map(timeArray[i], 0, maxTime, 0, plotWidth);
+                let yPos = map(freeVibData2[i], -1, 1, plotHeight/2, -plotHeight/2);
+                vertex(xPos, yPos);
+            }
+            endShape();
+            
+            // Draw vertical time indicator
+            stroke(0);
+            strokeWeight(2);
+            drawingContext.setLineDash([5, 5]);
+            let timePos = map(t, 0, maxTime, 0, plotWidth);
+            line(timePos, -plotHeight/2, timePos, plotHeight/2);
+            drawingContext.setLineDash([]);
+            pop();
+        }
+        
+        function drawModeVisualization(x, y, title, disp1, disp2, color1, color2 = null) {
+            push();
+            translate(x, y);
+            
+            // Title - moved much higher
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text(title, 150, -50);
+            
+            // Draw coordinate system
+            stroke(0);
+            strokeWeight(1);
+            line(0, 0, 350, 0);
+            line(0, -100, 0, 100);
+            
+            // Base positions for boxes
+            let box1BaseX = boxSize + 10;
+            let box2BaseX = boxSize + 10 + boxSpacing;
+            
+            // Draw static boxes (dashed)
+            drawDashedRect(box1BaseX, -boxSize/2, boxSize, boxSize);
+            drawDashedRect(box2BaseX, -boxSize/2, boxSize, boxSize);
+            
+            // Calculate displacements
+            let x1Disp = Number(disp1) || 0;
+            let x2Disp = Number(disp2) || 0;
+            
+            // Draw dynamic boxes - ensuring all values are numeric
+            if (color2 === null) {
+                // Single color mode for both boxes
+                stroke(color1);
+                strokeWeight(2);
+                noFill();
+                
+                // First box
+                rect(box1BaseX + x1Disp, -boxSize/2, boxSize, boxSize);
+                
+                // Second box
+                rect(box2BaseX + x2Disp, -boxSize/2, boxSize, boxSize);
+            } else {
+                // Two color mode
+                // First box
+                stroke(color1);
+                strokeWeight(2);
+                noFill();
+                rect(box1BaseX + x1Disp, -boxSize/2, boxSize, boxSize);
+                
+                // Second box
+                stroke(color2);
+                strokeWeight(2);
+                noFill();
+                rect(box2BaseX + x2Disp, -boxSize/2, boxSize, boxSize);
+            }
+            
+            pop();
+        }
+        
+        function drawTimePlot(x, y, title, timeData, valueData, currentTime, color, valueData2 = null, color2 = null) {
+            push();
+            translate(x, y);
+            
+            // Title - moved much higher
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text(title, plotWidth/2, -50); 
+            
+            // Draw axes
+            stroke(0);
+            strokeWeight(1);
+            line(0, 0, plotWidth, 0);  // x-axis
+            line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+            
+            // Draw ticks and labels on x-axis
+            textSize(10); // Smaller text for axis labels
+            for (let i = 0; i <= maxTime; i += 0.5) {
+                let xPos = map(i, 0, maxTime, 0, plotWidth);
+                line(xPos, -3, xPos, 3);
+                text(i.toFixed(1), xPos, 15);
+            }
+            
+            // Draw ticks and labels on y-axis
+            for (let i = -1; i <= 1; i += 0.5) {
+                let yPos = map(i, -1, 1, plotHeight/2, -plotHeight/2);
+                line(-3, yPos, 3, yPos);
+                text(i.toFixed(1), -15, yPos + 3);
+            }
+            
+            // Draw data before the vertical line to ensure line is on top
+            noFill();
+            
+            // Draw first dataset
+            stroke(color);
+            strokeWeight(1.5);
+            beginShape();
+            for (let i = 0; i < timeData.length; i++) {
+                let xPos = map(timeData[i], 0, maxTime, 0, plotWidth);
+                let yPos = map(valueData[i], -1, 1, plotHeight/2, -plotHeight/2);
+                vertex(xPos, yPos);
+            }
+            endShape();
+            
+            // Draw second dataset if provided
+            if (valueData2 !== null && color2 !== null) {
+                stroke(color2);
+                beginShape();
+                for (let i = 0; i < timeData.length; i++) {
+                    let xPos = map(timeData[i], 0, maxTime, 0, plotWidth);
+                    let yPos = map(valueData2[i], -1, 1, plotHeight/2, -plotHeight/2);
+                    vertex(xPos, yPos);
+                }
+                endShape();
+            }
+            
+            // Draw vertical time indicator
+            stroke(0);
+            strokeWeight(2);
+            drawingContext.setLineDash([5, 5]);
+            let timePos = map(currentTime, 0, maxTime, 0, plotWidth);
+            line(timePos, -plotHeight/2, timePos, plotHeight/2);
+            drawingContext.setLineDash([]);
+            pop();
+        }
+        
+        function drawDashedRect(x, y, w, h) {
+            push();
+            stroke(0);
+            strokeWeight(1);
+            drawingContext.setLineDash([5, 5]);
+            noFill();
+            rect(x, y, w, h);
+            drawingContext.setLineDash([]);
+            pop();
+        }
+    </script>
+</body>
+</html>
