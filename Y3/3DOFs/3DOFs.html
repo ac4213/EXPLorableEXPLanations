@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive 3DOFs Free Damped Vibration</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .control-group {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .control-group h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .slider-container {
+            margin-bottom: 5px;
+        }
+        .slider-container label {
+            display: inline-block;
+            width: 100%;
+            font-size: 12px;
+        }
+        .slider-container input {
+            width: 100%;
+        }
+        .value-display {
+            display: inline-block;
+            font-size: 12px;
+            width: 50px;
+            text-align: right;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 0 auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive 3DOFs Free Damped Vibration</h1>
+        
+        <div class="control-panel">
+            <div class="control-group">
+                <h3>Masses (kg)</h3>
+                <div class="slider-container">
+                    <label for="m1">m₁: <span id="m1-value" class="value-display">3.0</span></label>
+                    <input type="range" id="m1" min="0.1" max="10" step="0.1" value="3.0">
+                </div>
+                <div class="slider-container">
+                    <label for="m2">m₂: <span id="m2-value" class="value-display">1.0</span></label>
+                    <input type="range" id="m2" min="0.1" max="10" step="0.1" value="1.0">
+                </div>
+                <div class="slider-container">
+                    <label for="m3">m₃: <span id="m3-value" class="value-display">2.0</span></label>
+                    <input type="range" id="m3" min="0.1" max="10" step="0.1" value="2.0">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Spring Stiffnesses (N/m)</h3>
+                <div class="slider-container">
+                    <label for="k1">k₁: <span id="k1-value" class="value-display">100000</span></label>
+                    <input type="range" id="k1" min="10000" max="500000" step="10000" value="100000">
+                </div>
+                <div class="slider-container">
+                    <label for="k2">k₂: <span id="k2-value" class="value-display">200000</span></label>
+                    <input type="range" id="k2" min="10000" max="500000" step="10000" value="200000">
+                </div>
+                <div class="slider-container">
+                    <label for="k3">k₃: <span id="k3-value" class="value-display">200000</span></label>
+                    <input type="range" id="k3" min="10000" max="500000" step="10000" value="200000">
+                </div>
+                <div class="slider-container">
+                    <label for="k4">k₄: <span id="k4-value" class="value-display">100000</span></label>
+                    <input type="range" id="k4" min="10000" max="500000" step="10000" value="100000">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Initial Conditions & Damping</h3>
+                <div class="slider-container">
+                    <label for="x1">x₁(0): <span id="x1-value" class="value-display">1.0</span></label>
+                    <input type="range" id="x1" min="-1" max="1" step="0.1" value="1.0">
+                </div>
+                <div class="slider-container">
+                    <label for="x2">x₂(0): <span id="x2-value" class="value-display">0.0</span></label>
+                    <input type="range" id="x2" min="-1" max="1" step="0.1" value="0.0">
+                </div>
+                <div class="slider-container">
+                    <label for="x3">x₃(0): <span id="x3-value" class="value-display">0.0</span></label>
+                    <input type="range" id="x3" min="-1" max="1" step="0.1" value="0.0">
+                </div>
+                <div class="slider-container">
+                    <label for="beta">Damping (β): <span id="beta-value" class="value-display">0.001</span></label>
+                    <input type="range" id="beta" min="0" max="0.01" step="0.0001" value="0.001">
+                </div>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="animate-btn">Start Animation</button>
+            <button id="reset-btn">Reset</button>
+            <button id="recalculate-btn">Recalculate</button>
+        </div>
+        
+        <div id="sketch-container"></div>
+    </div>
+
+    <script>
+        // Global sketch variables
+        let sketch = new p5(function(p) {
+            // Animation variables
+            let animating = false;
+            let t = 0;
+            let dt = 0.001;
+            let maxTime = 0.25;
+            let animationSpeed = 0.5;
+            
+            // System parameters
+            let m1 = 3.0;
+            let m2 = 1.0;
+            let m3 = 2.0;
+            let k1 = 100000;
+            let k2 = 200000;
+            let k3 = 200000;
+            let k4 = 100000;
+            let beta = 0.001;
+            let x0 = [1.0, 0.0, 0.0];
+            let v0 = [0.0, 0.0, 0.0];
+            
+            // Layout variables
+            let canvasWidth = 950;
+            let canvasHeight = 700;
+            let boxSize = 40;
+            let boxSpacing = 100;
+            let yPosition = 100;
+            let plotWidth = 400;
+            let plotHeight = 200;
+            
+            // Solution data
+            let timeArray = [];
+            let Omegan = [];
+            let Omegad = [];
+            let zeta = [];
+            let X = [];
+            let modalA = [];
+            let modalB = [];
+            let modalData = [[], [], []];
+            let physicalData = [[], [], []];
+            let needsRecalculation = true;
+            
+            p.setup = function() {
+                p.createCanvas(canvasWidth, canvasHeight);
+                setupSliders();
+                setupButtons();
+                setupSystem();
+            };
+            
+            p.draw = function() {
+                p.background(255);
+                
+                if (needsRecalculation) {
+                    setupSystem();
+                    needsRecalculation = false;
+                }
+                
+                if (animating) {
+                    t += dt * animationSpeed;
+                    if (t > maxTime) t = 0;
+                }
+                
+                let timeIndex = Math.floor(t / dt);
+                if (timeIndex >= timeArray.length) timeIndex = timeArray.length - 1;
+                
+                // Scale factor for animation
+                let sf = 150;
+                
+                try {
+                    // Modal plot (top left)
+                    drawModalPlot(50, yPosition, timeArray, modalData, t);
+                    
+                    // Physical plot (top right)
+                    drawPhysicalPlot(500, yPosition, timeArray, physicalData, t);
+                    
+                    // Animation (bottom)
+                    drawAnimation(50, 350, sf * physicalData[0][timeIndex], 
+                                     sf * physicalData[1][timeIndex], 
+                                     sf * physicalData[2][timeIndex]);
+                } catch (error) {
+                    console.error("Error in draw:", error);
+                    p.fill(255, 0, 0);
+                    p.textSize(14);
+                    p.text("Error: " + error.message, 20, 20);
+                }
+            };
+            
+            function setupButtons() {
+                document.getElementById("animate-btn").addEventListener("click", function() {
+                    animating = !animating;
+                    this.textContent = animating ? "Stop Animation" : "Start Animation";
+                });
+                
+                document.getElementById("reset-btn").addEventListener("click", function() {
+                    t = 0;
+                });
+                
+                document.getElementById("recalculate-btn").addEventListener("click", function() {
+                    needsRecalculation = true;
+                });
+            }
+            
+            function setupSliders() {
+                // Mass sliders
+                document.getElementById("m1").addEventListener("input", function() {
+                    m1 = parseFloat(this.value);
+                    document.getElementById("m1-value").textContent = m1.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("m2").addEventListener("input", function() {
+                    m2 = parseFloat(this.value);
+                    document.getElementById("m2-value").textContent = m2.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("m3").addEventListener("input", function() {
+                    m3 = parseFloat(this.value);
+                    document.getElementById("m3-value").textContent = m3.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                // Stiffness sliders
+                document.getElementById("k1").addEventListener("input", function() {
+                    k1 = parseFloat(this.value);
+                    document.getElementById("k1-value").textContent = k1.toFixed(0);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("k2").addEventListener("input", function() {
+                    k2 = parseFloat(this.value);
+                    document.getElementById("k2-value").textContent = k2.toFixed(0);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("k3").addEventListener("input", function() {
+                    k3 = parseFloat(this.value);
+                    document.getElementById("k3-value").textContent = k3.toFixed(0);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("k4").addEventListener("input", function() {
+                    k4 = parseFloat(this.value);
+                    document.getElementById("k4-value").textContent = k4.toFixed(0);
+                    needsRecalculation = true;
+                });
+                
+                // Initial conditions sliders
+                document.getElementById("x1").addEventListener("input", function() {
+                    x0[0] = parseFloat(this.value);
+                    document.getElementById("x1-value").textContent = x0[0].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("x2").addEventListener("input", function() {
+                    x0[1] = parseFloat(this.value);
+                    document.getElementById("x2-value").textContent = x0[1].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("x3").addEventListener("input", function() {
+                    x0[2] = parseFloat(this.value);
+                    document.getElementById("x3-value").textContent = x0[2].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                // Damping slider
+                document.getElementById("beta").addEventListener("input", function() {
+                    beta = parseFloat(this.value);
+                    document.getElementById("beta-value").textContent = beta.toFixed(4);
+                    needsRecalculation = true;
+                });
+            }
+            
+            function setupSystem() {
+                // Reset previous data
+                timeArray = [];
+                modalData = [[], [], []];
+                physicalData = [[], [], []];
+                t = 0;
+                
+                try {
+                    // Mass matrix
+                    const M = [
+                        [m1, 0, 0],
+                        [0, m2, 0],
+                        [0, 0, m3]
+                    ];
+                    
+                    // Stiffness matrix
+                    const K = [
+                        [k1 + k2, -k2, 0],
+                        [-k2, k2 + k3, -k3],
+                        [0, -k3, k3 + k4]
+                    ];
+                    
+                    // Solve eigenvalue problem
+                    const Msqrt_inv = [
+                        [1/Math.sqrt(M[0][0]), 0, 0],
+                        [0, 1/Math.sqrt(M[1][1]), 0],
+                        [0, 0, 1/Math.sqrt(M[2][2])]
+                    ];
+                    
+                    const A1 = numeric.dot(Msqrt_inv, K);
+                    const A = numeric.dot(A1, Msqrt_inv);
+                    
+                    // Get eigenvalues and eigenvectors
+                    const eig = numeric.eig(A);
+                    
+                    // Sort eigenvalues and eigenvectors
+                    const indices = [0, 1, 2];
+                    indices.sort((a, b) => eig.lambda.x[a] - eig.lambda.x[b]);
+                    
+                    // Extract sorted eigenvalues (natural frequencies squared)
+                    const omega_squared = indices.map(i => eig.lambda.x[i]);
+                    Omegan = omega_squared.map(w2 => Math.sqrt(Math.abs(w2)));
+                    
+                    // Calculate damping ratios
+                    zeta = Omegan.map(omega => beta * omega / 2);
+                    
+                    // Calculate damped natural frequencies
+                    Omegad = Omegan.map((omega, i) => omega * Math.sqrt(1 - zeta[i] * zeta[i]));
+                    
+                    // Extract eigenvectors and transform them back to physical coordinates
+                    X = [[], [], []];
+                    for (let i = 0; i < 3; i++) {
+                        X[i] = [];
+                        for (let j = 0; j < 3; j++) {
+                            const eigenvectorIdx = indices[j];
+                            X[i][j] = eig.E.x[i][eigenvectorIdx] * Msqrt_inv[i][i];
+                        }
+                    }
+                    
+                    // Normalize eigenvectors
+                    for (let j = 0; j < 3; j++) {
+                        // Calculate norm
+                        let norm = Math.sqrt(X[0][j]*X[0][j] + X[1][j]*X[1][j] + X[2][j]*X[2][j]);
+                        
+                        // Normalize
+                        X[0][j] /= norm;
+                        X[1][j] /= norm;
+                        X[2][j] /= norm;
+                        
+                        // Ensure first mass entry is negative (convention)
+                        if (X[0][j] > 0) {
+                            X[0][j] *= -1;
+                            X[1][j] *= -1;
+                            X[2][j] *= -1;
+                        }
+                    }
+                    
+                    // Compute inverse of X for modal initial conditions
+                    const X_array = numeric.transpose(X);
+                    const X_inv = numeric.inv(X_array);
+                    
+                    // Transform initial conditions to modal coordinates
+                    const q0 = numeric.dot(X_inv, x0);
+                    const p0 = numeric.dot(X_inv, v0);
+                    
+                    // Modal parameters for damped free oscillation
+                    modalA = [];
+                    modalB = [];
+                    for (let i = 0; i < 3; i++) {
+                        modalA.push((p0[i] + zeta[i] * Omegan[i] * q0[i]) / Omegad[i]);
+                        modalB.push(q0[i]);
+                    }
+                    
+                    // Precompute data for plots
+                    for (let time = 0; time <= maxTime; time += dt) {
+                        timeArray.push(time);
+                        
+                        // Modal solutions
+                        const q_t = [0, 0, 0];
+                        for (let i = 0; i < 3; i++) {
+                            // For underdamped case (zeta < 1)
+                            q_t[i] = modalB[i] * Math.exp(-zeta[i] * Omegan[i] * time) * Math.cos(Omegad[i] * time) + 
+                                    modalA[i] * Math.exp(-zeta[i] * Omegan[i] * time) * Math.sin(Omegad[i] * time);
+                            
+                            modalData[i].push(q_t[i]);
+                        }
+                        
+                        // Physical solutions - x(t) = X * q(t)
+                        const x_t = numeric.dot(X, q_t);
+                        
+                        for (let i = 0; i < 3; i++) {
+                            physicalData[i].push(x_t[i]);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error in setupSystem:", error);
+                }
+            }
+            
+            function drawModalPlot(x, y, timeData, valueData, currentTime) {
+                p.push();
+                p.translate(x, y);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Modal Solution", plotWidth/2, -50);
+                
+                // Draw plot background
+                p.fill(240);
+                p.rect(0, -plotHeight/2, plotWidth, plotHeight);
+                
+                // Y-axis limits
+                let yMin = -1.5;
+                let yMax = 1.0;
+                
+                // Draw grid
+                p.stroke(200);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, -plotHeight/2, xPos, plotHeight/2);
+                }
+                for (let i = Math.floor(yMin); i <= Math.ceil(yMax); i++) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(0, yPos, plotWidth, yPos);
+                }
+                
+                // Draw axes - x-axis at bottom
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, plotHeight/2, plotWidth, plotHeight/2);  // x-axis
+                p.line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+                
+                // Draw ticks and labels on x-axis
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, plotHeight/2 - 3, xPos, plotHeight/2 + 3);
+                    p.text((i * 0.025).toFixed(2), xPos, plotHeight/2 + 15);
+                }
+                
+                // Draw ticks and labels on y-axis
+                p.textAlign(p.RIGHT);
+                p.fill(0);
+                for (let i = -1.5; i <= 1.0; i += 0.5) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i.toFixed(1), -8, yPos + 3);
+                }
+                
+                // Draw data lines
+                const colors = ['blue', 'red', 'green'];
+                
+                for (let i = 0; i < valueData.length; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let j = 0; j < timeData.length; j++) {
+                        let xPos = p.map(timeData[j], 0, maxTime, 0, plotWidth);
+                        let yPos = p.map(valueData[i][j], yMin, yMax, plotHeight/2, -plotHeight/2);
+                        p.vertex(xPos, yPos);
+                    }
+                    p.endShape();
+                }
+                
+                // Draw legend
+                const legendLabels = ['q₁(t)', 'q₂(t)', 'q₃(t)'];
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                
+                const legendX = plotWidth - 80;
+                const legendY = -plotHeight/2 + 20;
+                
+                for (let i = 0; i < 3; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.line(legendX, legendY + i * 15, legendX + 20, legendY + i * 15);
+                    p.fill(0);
+                    p.noStroke();
+                    p.text(legendLabels[i], legendX + 25, legendY + i * 15 + 3);
+                }
+                
+                // Draw vertical time indicator
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                let timePos = p.map(currentTime, 0, maxTime, 0, plotWidth);
+                p.line(timePos, -plotHeight/2, timePos, plotHeight/2);
+                p.drawingContext.setLineDash([]);
+                
+                p.pop();
+            }
+            
+            function drawPhysicalPlot(x, y, timeData, valueData, currentTime) {
+                p.push();
+                p.translate(x, y);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Physical Solution", plotWidth/2, -50);
+                
+                // Draw plot background
+                p.fill(240);
+                p.rect(0, -plotHeight/2, plotWidth, plotHeight);
+                
+                // Y-axis limits
+                let yMin = -0.6;
+                let yMax = 1.0;
+                
+                // Draw grid
+                p.stroke(200);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, -plotHeight/2, xPos, plotHeight/2);
+                }
+                for (let i = Math.floor(yMin); i <= Math.ceil(yMax); i++) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(0, yPos, plotWidth, yPos);
+                }
+                
+                // Draw axes - x-axis at bottom
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, plotHeight/2, plotWidth, plotHeight/2);  // x-axis
+                p.line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+                
+                // Draw ticks and labels on x-axis
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, plotHeight/2 - 3, xPos, plotHeight/2 + 3);
+                    p.text((i * 0.025).toFixed(2), xPos, plotHeight/2 + 15);
+                }
+                
+                // Draw ticks and labels on y-axis
+                p.textAlign(p.RIGHT);
+                p.fill(0);
+                for (let i = -0.6; i <= 1.0; i += 0.2) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i.toFixed(1), -8, yPos + 3);
+                }
+                
+                // Draw data lines
+                const colors = ['#D42323', '#FF8A00', '#7840CC']; // Red, Orange, Purple
+                
+                for (let i = 0; i < valueData.length; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let j = 0; j < timeData.length; j++) {
+                        let xPos = p.map(timeData[j], 0, maxTime, 0, plotWidth);
+                        let yPos = p.map(valueData[i][j], yMin, yMax, plotHeight/2, -plotHeight/2);
+                        p.vertex(xPos, yPos);
+                    }
+                    p.endShape();
+                }
+                
+                // Draw legend
+                const legendLabels = ['x₁(t)', 'x₂(t)', 'x₃(t)'];
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                
+                const legendX = plotWidth - 80;
+                const legendY = -plotHeight/2 + 20;
+                
+                for (let i = 0; i < 3; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.line(legendX, legendY + i * 15, legendX + 20, legendY + i * 15);
+                    p.fill(0);
+                    p.noStroke();
+                    p.text(legendLabels[i], legendX + 25, legendY + i * 15 + 3);
+                }
+                
+                // Draw vertical time indicator
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                let timePos = p.map(currentTime, 0, maxTime, 0, plotWidth);
+                p.line(timePos, -plotHeight/2, timePos, plotHeight/2);
+                p.drawingContext.setLineDash([]);
+                
+                p.pop();
+            }
+            
+            function drawAnimation(x, y, disp1, disp2, disp3) {
+                p.push();
+                p.translate(x, y);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Animation with Current I.C.", 400, -30);
+                
+                // Draw coordinate system
+                p.stroke(200);
+                p.strokeWeight(1);
+                
+                // Draw grid
+                for (let i = 0; i <= 20; i += 2) {
+                    p.line(i * 40, -150, i * 40, 150);
+                }
+                for (let i = -3; i <= 3; i++) {
+                    p.line(0, i * 50, 800, i * 50);
+                }
+                
+                // Draw main axes
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, 0, 800, 0);  // x-axis
+                p.line(0, -150, 0, 150);  // y-axis
+                
+                // Draw ticks and labels
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 20; i += 2) {
+                    let xPos = i * 40;
+                    p.line(xPos, -3, xPos, 3);
+                    p.text(i, xPos, 15);
+                }
+                
+                p.textAlign(p.RIGHT);
+                for (let i = -3; i <= 3; i++) {
+                    let yPos = i * 50;
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i, -8, yPos + 3);
+                }
+                
+                // Base positions for boxes
+                let baseX1 = 80;
+                let baseX2 = 280;
+                let baseX3 = 480;
+                let baseY = -20;
+                
+                // Display system parameters
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text("m₁=" + m1.toFixed(1) + " kg", baseX1 + boxSize/2, baseY - 20);
+                p.text("m₂=" + m2.toFixed(1) + " kg", baseX2 + boxSize/2, baseY - 20);
+                p.text("m₃=" + m3.toFixed(1) + " kg", baseX3 + boxSize/2, baseY - 20);
+                
+                p.text("k₁=" + (k1/1000).toFixed(0) + " kN/m", baseX1/2, baseY + 20);
+                p.text("k₂=" + (k2/1000).toFixed(0) + " kN/m", (baseX1 + boxSize + baseX2)/2, baseY + 20);
+                p.text("k₃=" + (k3/1000).toFixed(0) + " kN/m", (baseX2 + boxSize + baseX3)/2, baseY + 20);
+                p.text("k₄=" + (k4/1000).toFixed(0) + " kN/m", baseX3 + boxSize + 60, baseY + 20);
+                
+                // Draw static boxes (dashed)
+                drawDashedRect(baseX1, baseY, boxSize, boxSize);
+                drawDashedRect(baseX2, baseY, boxSize, boxSize);
+                drawDashedRect(baseX3, baseY, boxSize, boxSize);
+                
+                // Draw springs
+                drawSpring(0, 0, baseX1, 0);
+                drawSpring(baseX1 + boxSize, 0, baseX2, 0);
+                drawSpring(baseX2 + boxSize, 0, baseX3, 0);
+                drawSpring(baseX3 + boxSize, 0, 800, 0);
+                
+                // Draw dynamic boxes
+                // First mass (red)
+                p.stroke(p.color(212, 35, 35));
+                p.strokeWeight(2);
+                p.noFill();
+                p.rect(baseX1 + disp1, baseY, boxSize, boxSize);
+                
+                // Second mass (orange)
+                p.stroke(p.color(255, 138, 0));
+                p.rect(baseX2 + disp2, baseY, boxSize, boxSize);
+                
+                // Third mass (purple)
+                p.stroke(p.color(120, 64, 204));
+                p.rect(baseX3 + disp3, baseY, boxSize, boxSize);
+                
+                // Add small labels
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text("m₁", baseX1 + boxSize/2 + disp1, baseY + boxSize + 15);
+                p.text("m₂", baseX2 + boxSize/2 + disp2, baseY + boxSize + 15);
+                p.text("m₃", baseX3 + boxSize/2 + disp3, baseY + boxSize + 15);
+                
+                // Display natural frequencies and damping ratios
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                let infoX = 650;
+                let infoY = -120;
+                p.text("Natural Frequencies:", infoX, infoY);
+                p.text("ω₁ = " + Omegan[0].toFixed(2) + " rad/s, ζ₁ = " + zeta[0].toFixed(4), infoX, infoY + 20);
+                p.text("ω₂ = " + Omegan[1].toFixed(2) + " rad/s, ζ₂ = " + zeta[1].toFixed(4), infoX, infoY + 40);
+                p.text("ω₃ = " + Omegan[2].toFixed(2) + " rad/s, ζ₃ = " + zeta[2].toFixed(4), infoX, infoY + 60);
+                
+                p.pop();
+            }
+            
+            function drawDashedRect(x, y, w, h) {
+                p.push();
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.noFill();
+                p.rect(x, y, w, h);
+                p.drawingContext.setLineDash([]);
+                p.pop();
+            }
+            
+            function drawSpring(x1, y1, x2, y2) {
+                p.push();
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.noFill();
+                
+                let len = x2 - x1;
+                let steps = Math.ceil(len / 10);
+                let stepSize = len / steps;
+                
+                p.beginShape();
+                p.vertex(x1, y1);
+                
+                for (let i = 0; i < steps; i++) {
+                    let x = x1 + i * stepSize;
+                    let y = y1 + ((i % 2) * 2 - 1) * 10;
+                    p.vertex(x, y);
+                }
+                
+                p.vertex(x2, y2);
+                p.endShape();
+                p.pop();
+            }
+        }, 'sketch-container');
+    </script>
+</body>
+</html>
