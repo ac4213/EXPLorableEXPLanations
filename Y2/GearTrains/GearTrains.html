@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gear Trains - Interactive Lecture</title>
+    <!-- Import p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="gear-trains-styles.css">
+    <!-- Gear profiles script -->
+    <script src="gear-tooth-profile.js"></script>
+    <!-- Main script (load after p5.js and tooth profile script) -->
+    <script src="gear-trains.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Gear Trains</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="container">
+        <nav class="simulation-nav">
+            <ul>
+                <li><a href="#types-of-gears" class="active">Types of Gears</a></li>
+                <li><a href="#gear-tooth-profiles">Gear Tooth Profiles</a></li>
+                <li><a href="#simple-gear-train">Simple Gear Train</a></li>
+                <li><a href="#compound-gear-train">Compound Gear Train</a></li>
+                <li><a href="#epicyclic-gear-train">Epicyclic Gear Train</a></li>
+                <li><a href="#applications">Applications</a></li>
+            </ul>
+        </nav>
+
+        <div id="types-of-gears" class="section active">
+            <h2>Types of Gears</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>Gears are mechanical components with teeth that mesh with other gears to transmit rotational motion and power. Here are the main types of gears used in engineering:</p>
+                    
+                    <div class="key-point">
+                        <p>Gears transfer rotational motion between shafts while maintaining a precise speed ratio.</p>
+                    </div>
+                    
+                    <ul class="gear-types">
+                        <li>
+                            <h3>Spur Gears</h3>
+                            <p>The simplest type with straight teeth parallel to the axis of rotation. Used for parallel shaft applications.</p>
+                            <ul>
+                                <li>Advantages: Simple design, high efficiency, cost-effective</li>
+                                <li>Disadvantages: Noisy at high speeds, cannot transmit motion between non-parallel shafts</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3>Helical Gears</h3>
+                            <p>Teeth are cut at an angle to the axis, creating a helix. This enables smoother, quieter operation.</p>
+                            <ul>
+                                <li>Advantages: Quiet operation, higher load capacity, gradual tooth engagement</li>
+                                <li>Disadvantages: Creates axial thrust, lower efficiency than spur gears</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3>Bevel Gears</h3>
+                            <p>Conical-shaped gears used to transmit motion between intersecting shafts, typically at 90° angles.</p>
+                            <ul>
+                                <li>Advantages: Can change the axis of rotation, various subtypes available</li>
+                                <li>Disadvantages: Complex manufacturing, requires precise alignment</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3>Worm Gears</h3>
+                            <p>Consists of a screw-like worm that meshes with a worm wheel. High reduction ratios possible.</p>
+                            <ul>
+                                <li>Advantages: Very high ratio in compact space, self-locking capability</li>
+                                <li>Disadvantages: Lower efficiency, generates heat, usually irreversible</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <h3>Rack and Pinion</h3>
+                            <p>A pinion (circular gear) meshes with a rack (straight bar with teeth), converting rotational motion to linear motion.</p>
+                            <ul>
+                                <li>Advantages: Simple conversion between rotary and linear motion</li>
+                                <li>Disadvantages: Limited travel distance, requires proper support</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Interactive Gear Type Viewer</h3>
+                    <div id="gear-types-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="gear-type-selector">Select Gear Type:</label>
+                            <select id="gear-type-selector">
+                                <option value="spur">Spur Gear</option>
+                                <option value="helical">Helical Gear</option>
+                                <option value="bevel">Bevel Gear</option>
+                                <option value="worm">Worm Gear</option>
+                                <option value="rack">Rack and Pinion</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="rotation-speed">Rotation Speed:</label>
+                            <input type="range" id="rotation-speed" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gear-tooth-profiles" class="section">
+            <h2>Gear Tooth Profiles</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>The shape of gear teeth is critical for smooth operation, power transmission, and durability. The most common tooth profile is the involute profile.</p>
+                    
+                    <div class="key-point">
+                        <p>The involute profile ensures constant velocity ratio during meshing, reducing vibration and noise.</p>
+                    </div>
+                    
+                    <h3>Involute Tooth Profile</h3>
+                    <p>An involute curve is generated by the path traced by a point on a string as it unwraps from a base circle. This profile has several advantages:</p>
+                    <ul>
+                        <li>Maintains constant velocity ratio throughout engagement</li>
+                        <li>Tolerates small variations in centre distance without affecting the velocity ratio</li>
+                        <li>Simpler to manufacture than other profiles</li>
+                        <li>Creates a pressure angle that remains constant during tooth engagement</li>
+                    </ul>
+                    
+                    <h3>Key Terms in Gear Tooth Geometry</h3>
+                    <div class="equation-box">
+                        <p>Module (\(m\)): \(m = \frac{d}{z}\) where \(d\) is the pitch diameter and \(z\) is the number of teeth</p>
+                        <p>Pitch Circle: The theoretical circle where gear teeth actually mesh</p>
+                        <p>Pressure Angle: The angle between the line of action and a line perpendicular to the line of centres</p>
+                        <p>Addendum: The radial distance from the pitch circle to the top of the tooth</p>
+                        <p>Dedendum: The radial distance from the pitch circle to the bottom of the tooth</p>
+                    </div>
+                    
+                    <h3>Gear Design Considerations</h3>
+                    <p>Standard pressure angles are typically 14.5°, 20°, or 25°. Higher pressure angles provide:</p>
+                    <ul>
+                        <li>Stronger teeth at the base</li>
+                        <li>Better load carrying capacity</li>
+                        <li>But increased radial forces on bearings</li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Interactive Tooth Profile Generator</h3>
+                    <div id="tooth-profile-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="number-of-teeth">Number of Teeth:</label>
+                            <input type="range" id="number-of-teeth" min="8" max="60" value="20">
+                            <span id="teeth-value">20</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="pressure-angle">Pressure Angle (degrees):</label>
+                            <select id="pressure-angle">
+                                <option value="14.5">14.5°</option>
+                                <option value="20" selected>20°</option>
+                                <option value="25">25°</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="show-involute">Show Involute Generation:</label>
+                            <input type="checkbox" id="show-involute">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="simple-gear-train" class="section">
+            <h2>Simple Gear Train</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>A simple gear train consists of two or more gears in a series, with each gear on its own shaft. These trains are used to change speed, direction, or torque.</p>
+                    
+                    <div class="key-point">
+                        <p>The gear ratio of a simple gear train is calculated by dividing the number of teeth on the driven gear by the number of teeth on the driving gear.</p>
+                    </div>
+                    
+                    <h3>Velocity Ratio Calculation</h3>
+                    <div class="equation-box">
+                        <p>For two meshing gears:</p>
+                        <p>\(\frac{\omega_1}{\omega_2} = \frac{N_2}{N_1}\)</p>
+                        <p>where \(\omega\) is angular velocity and \(N\) is number of teeth</p>
+                    </div>
+                    
+                    <h3>Direction of Rotation</h3>
+                    <p>In a simple gear train:</p>
+                    <ul>
+                        <li>Adjacent gears rotate in opposite directions</li>
+                        <li>The direction of the output gear depends on whether there is an odd or even number of gears</li>
+                        <li>An idler gear changes the direction without affecting the overall ratio</li>
+                    </ul>
+                    
+                    <h3>Using Idler Gears</h3>
+                    <p>Idler gears serve several purposes:</p>
+                    <ul>
+                        <li>Reversing the direction of rotation</li>
+                        <li>Bridging large distances between input and output shafts</li>
+                        <li>Providing intermediate support in long trains</li>
+                    </ul>
+                    
+                    <p>The velocity ratio formula for a simple train with an idler:</p>
+                    <div class="equation-box">
+                        <p>\(\frac{\omega_1}{\omega_3} = \frac{N_3}{N_1}\)</p>
+                        <p>Note that the idler gear (\(N_2\)) does not affect the overall ratio</p>
+                    </div>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Simple Gear Train Simulator</h3>
+                    <div id="simple-gear-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="driver-teeth">Driver Teeth:</label>
+                            <input type="range" id="driver-teeth" min="8" max="60" value="20">
+                            <span id="driver-teeth-value">20</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="driven-teeth">Driven Teeth:</label>
+                            <input type="range" id="driven-teeth" min="8" max="60" value="40">
+                            <span id="driven-teeth-value">40</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="include-idler">Include Idler Gear:</label>
+                            <input type="checkbox" id="include-idler">
+                        </div>
+                        <div class="control-group">
+                            <label for="idler-teeth">Idler Teeth:</label>
+                            <input type="range" id="idler-teeth" min="8" max="30" value="15" disabled>
+                            <span id="idler-teeth-value">15</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="driver-speed">Driver Speed (RPM):</label>
+                            <input type="range" id="driver-speed" min="5" max="60" value="30">
+                            <span id="driver-speed-value">30</span>
+                        </div>
+                        <div class="results">
+                            <p>Gear Ratio: <span id="simple-ratio">2.00</span></p>
+                            <p>Output Speed: <span id="output-speed">15.00 RPM</span></p>
+                            <p>Output Direction: <span id="output-direction">Counterclockwise</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="compound-gear-train" class="section">
+            <h2>Compound Gear Train</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>A compound gear train consists of multiple gears where at least one shaft carries two gears. This arrangement is used to achieve higher gear ratios in a compact space.</p>
+                    
+                    <div class="key-point">
+                        <p>Compound gear trains can achieve much larger transmission ratios than simple gear trains while maintaining a compact design.</p>
+                    </div>
+                    
+                    <h3>Velocity Ratio Calculation</h3>
+                    <div class="equation-box">
+                        <p>For a compound gear train with multiple pairs:</p>
+                        <p>\(\frac{\omega_\text{input}}{\omega_\text{output}} = \frac{N_2}{N_1} \times \frac{N_4}{N_3} \times \frac{N_6}{N_5} \times \ldots\)</p>
+                        <p>= Product of the driven teeth ÷ Product of the driver teeth</p>
+                    </div>
+                    
+                    <h3>Advantages of Compound Trains</h3>
+                    <ul>
+                        <li>Achieve large speed ratios while keeping gear sizes reasonable</li>
+                        <li>More compact than equivalent simple gear trains</li>
+                        <li>Distribute loads across multiple gear meshes</li>
+                        <li>More efficient than single-stage high-ratio alternatives like worm gears</li>
+                    </ul>
+                    
+                    <h3>Applications</h3>
+                    <p>Compound gear trains are commonly used in:</p>
+                    <ul>
+                        <li>Machine tools like lathes and milling machines</li>
+                        <li>Automotive transmissions</li>
+                        <li>Industrial equipment requiring precise speed control</li>
+                        <li>Clock mechanisms</li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Compound Gear Train Simulator</h3>
+                    <div id="compound-gear-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="first-driver-teeth">First Driver Teeth:</label>
+                            <input type="range" id="first-driver-teeth" min="8" max="30" value="15">
+                            <span id="first-driver-teeth-value">15</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="first-driven-teeth">First Driven Teeth:</label>
+                            <input type="range" id="first-driven-teeth" min="10" max="60" value="45">
+                            <span id="first-driven-teeth-value">45</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="second-driver-teeth">Second Driver Teeth:</label>
+                            <input type="range" id="second-driver-teeth" min="8" max="30" value="10">
+                            <span id="second-driver-teeth-value">10</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="second-driven-teeth">Second Driven Teeth:</label>
+                            <input type="range" id="second-driven-teeth" min="10" max="60" value="50">
+                            <span id="second-driven-teeth-value">50</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="compound-input-speed">Input Speed (RPM):</label>
+                            <input type="range" id="compound-input-speed" min="10" max="100" value="50">
+                            <span id="compound-input-speed-value">50</span>
+                        </div>
+                        <div class="results">
+                            <p>Overall Gear Ratio: <span id="compound-ratio">15.00</span></p>
+                            <p>Intermediate Speed: <span id="intermediate-speed">16.67 RPM</span></p>
+                            <p>Output Speed: <span id="compound-output-speed">3.33 RPM</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="epicyclic-gear-train" class="section">
+            <h2>Epicyclic Gear Train</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>Epicyclic (or planetary) gear trains have one or more gears rotating around another gear. The central gear is called the sun gear, the outer ring is the annular gear, and the rotating gears between them are planet gears mounted on a carrier.</p>
+                    
+                    <div class="key-point">
+                        <p>Epicyclic gear trains can achieve complex motion and high gear ratios in an extremely compact space with balanced load distribution.</p>
+                    </div>
+                    
+                    <h3>Components of an Epicyclic Gear Train</h3>
+                    <ul>
+                        <li><strong>Sun gear</strong>: The central gear</li>
+                        <li><strong>Planet gears</strong>: Multiple gears that mesh with both the sun and ring gears</li>
+                        <li><strong>Planet carrier</strong>: The arm that holds the planet gears</li>
+                        <li><strong>Ring gear</strong>: The outer gear with internal teeth</li>
+                    </ul>
+                    
+                    <h3>Analytical Method</h3>
+                    <p>The relationship between the angular velocities in an epicyclic gear train is often analysed using the Willis equation:</p>
+                    <div class="equation-box">
+                        <p>\(\frac{\omega_s - \omega_c}{\omega_r - \omega_c} = -\frac{N_r}{N_s}\)</p>
+                        <p>where:</p>
+                        <p>\(\omega_s\) = angular velocity of sun gear</p>
+                        <p>\(\omega_r\) = angular velocity of ring gear</p>
+                        <p>\(\omega_c\) = angular velocity of carrier</p>
+                        <p>\(N_s\) = number of teeth on sun gear</p>
+                        <p>\(N_r\) = number of teeth on ring gear</p>
+                    </div>
+                    
+                    <h3>Operating Modes</h3>
+                    <p>Epicyclic gear trains can operate in different modes depending on which component is fixed:</p>
+                    <ul>
+                        <li><strong>Fixed ring gear</strong>: Often used for speed reduction</li>
+                        <li><strong>Fixed sun gear</strong>: Used in some differential applications</li>
+                        <li><strong>Fixed carrier</strong>: Creates a reversal of direction</li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Epicyclic Gear Train Simulator</h3>
+                    <div id="epicyclic-gear-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="sun-teeth">Sun Gear Teeth:</label>
+                            <input type="range" id="sun-teeth" min="12" max="30" value="20">
+                            <span id="sun-teeth-value">20</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="planet-teeth">Planet Gear Teeth:</label>
+                            <input type="range" id="planet-teeth" min="8" max="25" value="15">
+                            <span id="planet-teeth-value">15</span>
+                        </div>
+                        <div class="control-group">
+                            <label for="number-of-planets">Number of Planet Gears:</label>
+                            <select id="number-of-planets">
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="fixed-component">Fixed Component:</label>
+                            <select id="fixed-component">
+                                <option value="ring">Ring Gear</option>
+                                <option value="sun">Sun Gear</option>
+                                <option value="carrier">Carrier</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="input-component">Input Component:</label>
+                            <select id="input-component">
+                                <option value="sun">Sun Gear</option>
+                                <option value="ring">Ring Gear</option>
+                                <option value="carrier">Carrier</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="epicyclic-input-speed">Input Speed (RPM):</label>
+                            <input type="range" id="epicyclic-input-speed" min="10" max="100" value="50">
+                            <span id="epicyclic-input-speed-value">50</span>
+                        </div>
+                        <div class="results">
+                            <p>Sun Speed: <span id="sun-speed">50 RPM</span></p>
+                            <p>Carrier Speed: <span id="carrier-speed">15.38 RPM</span></p>
+                            <p>Ring Speed: <span id="ring-speed">0 RPM (Fixed)</span></p>
+                            <p>Gear Ratio: <span id="epicyclic-ratio">3.25</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="applications" class="section">
+            <h2>Applications of Epicyclic Gear Trains</h2>
+            <div class="section-content">
+                <div class="text-content">
+                    <p>Epicyclic gear trains are highly versatile and find applications in numerous fields due to their compact size and ability to transmit high torque.</p>
+                    
+                    <h3>Automotive Applications</h3>
+                    <ul>
+                        <li><strong>Automatic Transmissions</strong>: Multiple planetary sets provide various gear ratios</li>
+                        <li><strong>Differential Mechanisms</strong>: Allow wheels to rotate at different speeds during turns</li>
+                        <li><strong>Hybrid Powertrains</strong>: Combine power from multiple sources (engine/electric motors)</li>
+                    </ul>
+                    
+                    <div class="key-point">
+                        <p>Modern automatic transmissions use epicyclic gear systems combined with clutches and brakes to achieve 6-10 forward speeds efficiently.</p>
+                    </div>
+                    
+                    <h3>Industrial Applications</h3>
+                    <ul>
+                        <li><strong>Wind Turbines</strong>: High-torque gearboxes that step up the slow rotation of blades</li>
+                        <li><strong>Heavy Machinery</strong>: Compact reduction gears for cranes, excavators, etc.</li>
+                        <li><strong>Machine Tools</strong>: Precision control in milling machines and lathes</li>
+                        <li><strong>Robotics</strong>: Compact joint actuators with high reduction ratios</li>
+                    </ul>
+                    
+                    <h3>Aerospace Applications</h3>
+                    <ul>
+                        <li><strong>Helicopter Transmissions</strong>: Transfer power from engines to rotors</li>
+                        <li><strong>Aircraft Propeller Reduction Gears</strong>: Optimize engine and propeller speeds</li>
+                        <li><strong>Control Surface Actuators</strong>: Precise movement control</li>
+                    </ul>
+                    
+                    <h3>Consumer Products</h3>
+                    <ul>
+                        <li><strong>Power Tools</strong>: Cordless drills with multiple speed settings</li>
+                        <li><strong>Watches</strong>: Mechanical timepieces use tiny epicyclic systems</li>
+                        <li><strong>Bicycles</strong>: Internal hub gears for multi-speed bicycles</li>
+                    </ul>
+                </div>
+                
+                <div class="simulation-container">
+                    <h3>Epicyclic Application Simulator</h3>
+                    <div id="application-simulation" class="simulation"></div>
+                    <div class="controls">
+                        <div class="control-group">
+                            <label for="application-type">Application Type:</label>
+                            <select id="application-type">
+                                <option value="transmission">Automotive Transmission</option>
+                                <option value="differential">Automotive Differential</option>
+                                <option value="windturbine">Wind Turbine Gearbox</option>
+                                <option value="watchgears">Watch Mechanism</option>
+                            </select>
+                        </div>
+                        <div class="control-group application-specific" id="transmission-controls">
+                            <label for="transmission-gear">Select Gear:</label>
+                            <select id="transmission-gear">
+                                <option value="1">1st Gear</option>
+                                <option value="2">2nd Gear</option>
+                                <option value="3">3rd Gear</option>
+                                <option value="4">4th Gear</option>
+                                <option value="R">Reverse</option>
+                            </select>
+                        </div>
+                        <div class="control-group application-specific" id="differential-controls">
+                            <label for="turning-angle">Turning Angle:</label>
+                            <input type="range" id="turning-angle" min="0" max="45" value="0">
+                            <span id="turning-angle-value">0°</span>
+                        </div>
+                        <div class="control-group application-specific" id="windturbine-controls">
+                            <label for="wind-speed">Wind Speed (m/s):</label>
+                            <input type="range" id="wind-speed" min="3" max="25" value="8">
+                            <span id="wind-speed-value">8 m/s</span>
+                        </div>
+                        <div class="control-group application-specific" id="watch-controls">
+                            <label for="watch-speed">Time Scale:</label>
+                            <input type="range" id="watch-speed" min="1" max="100" value="60">
+                            <span id="watch-speed-value">60x</span>
+                        </div>
+                        <div class="application-info">
+                            <p id="application-description">This simulation demonstrates how planetary gear systems are used in automotive automatic transmissions to achieve different gear ratios by selectively engaging clutches and brakes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h2>Practice Problems</h2>
+        
+        <div class="problem">
+            <h3>Problem 1: Simple Gear Train</h3>
+            <p>A simple gear train consists of a driver gear with 25 teeth and a driven gear with 75 teeth. The driver rotates at 1200 RPM. Calculate:</p>
+            <ol type="a">
+                <li>The speed of the driven gear</li>
+                <li>The gear ratio</li>
+                <li>If the driving torque is 50 Nm, what is the torque on the driven gear (assuming 100% efficiency)?</li>
+            </ol>
+            <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
+            <div class="solution" id="solution1">
+                <p>a) Speed of driven gear:</p>
+                <p>\( \frac{\omega_1}{\omega_2} = \frac{N_2}{N_1} \)</p>
+                <p>\( \omega_2 = \omega_1 \times \frac{N_1}{N_2} = 1200 \times \frac{25}{75} = 400 \text{ RPM} \)</p>
+                
+                <p>b) Gear ratio:</p>
+                <p>\( \text{Gear ratio} = \frac{N_2}{N_1} = \frac{75}{25} = 3:1 \)</p>
+                
+                <p>c) Torque on driven gear:</p>
+                <p>\( \text{Output torque} = \text{Input torque} \times \text{Gear ratio} \)</p>
+                <p>\( T_2 = T_1 \times \frac{N_2}{N_1} = 50 \times 3 = 150 \text{ Nm} \)</p>
+            </div>
+        </div>
+        
+        <div class="problem">
+            <h3>Problem 2: Compound Gear Train</h3>
+            <p>A compound gear train has the following configuration:</p>
+            <ul>
+                <li>First driver: 15 teeth, rotates at 900 RPM</li>
+                <li>First driven: 45 teeth</li>
+                <li>Second driver (on same shaft as first driven): 20 teeth</li>
+                <li>Second driven: 60 teeth</li>
+            </ul>
+            <p>Calculate:</p>
+            <ol type="a">
+                <li>The overall gear ratio</li>
+                <li>The speed of the output shaft</li>
+                <li>If an idler gear with 30 teeth is added between the second driver and second driven gears, how does this affect the output speed?</li>
+            </ol>
+            <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
+            <div class="solution" id="solution2">
+                <p>a) Overall gear ratio:</p>
+                <p>\( \text{Gear ratio} = \frac{N_2}{N_1} \times \frac{N_4}{N_3} = \frac{45}{15} \times \frac{60}{20} = 3 \times 3 = 9:1 \)</p>
+                
+                <p>b) Speed of output shaft:</p>
+                <p>\( \omega_\text{output} = \omega_\text{input} \times \frac{1}{\text{Gear ratio}} = 900 \times \frac{1}{9} = 100 \text{ RPM} \)</p>
+                
+                <p>c) Effect of idler gear:</p>
+                <p>An idler gear does not change the overall gear ratio in a train; it only changes the direction of rotation. The idler simply transmits motion and the gear ratio is still determined by the first and last gears in each mesh. Therefore, the output speed remains 100 RPM, but the direction of rotation would be reversed.</p>
+            </div>
+        </div>
+        
+        <div class="problem">
+            <h3>Problem 3: Epicyclic Gear Train</h3>
+            <p>An epicyclic gear train has the following components:</p>
+            <ul>
+                <li>Sun gear: 20 teeth</li>
+                <li>Planet gears: 3 planets, each with 30 teeth</li>
+                <li>Ring gear: 80 teeth (internal)</li>
+            </ul>
+            <p>If the ring gear is fixed and the sun gear rotates at 300 RPM clockwise, calculate:</p>
+            <ol type="a">
+                <li>The speed of the carrier</li>
+                <li>The gear ratio between the sun and the carrier</li>
+                <li>If the ring gear is released and the carrier is fixed instead, what would be the speed of the ring gear when the sun rotates at 300 RPM clockwise?</li>
+            </ol>
+            <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
+            <div class="solution" id="solution3">
+                <p>a) Using the fundamental equation for epicyclic gears with fixed ring:</p>
+                <p>\( \omega_c = \frac{\omega_s}{1 + \frac{N_r}{N_s}} \)</p>
+                <p>\( \omega_c = \frac{300}{1 + \frac{80}{20}} = \frac{300}{1 + 4} = \frac{300}{5} = 60 \text{ RPM clockwise} \)</p>
+                
+                <p>b) Gear ratio between sun and carrier:</p>
+                <p>\( \text{Gear ratio} = \frac{\omega_s}{\omega_c} = \frac{300}{60} = 5:1 \)</p>
+                
+                <p>c) With fixed carrier and rotating sun:</p>
+                <p>We can use the relationship: \(\omega_s + \omega_r \times \frac{N_r}{N_s} = 0\) (when carrier is fixed)</p>
+                <p>\( \omega_r = -\omega_s \times \frac{N_s}{N_r} = -300 \times \frac{20}{80} = -300 \times \frac{1}{4} = -75 \text{ RPM} \)</p>
+                <p>The negative sign indicates the ring gear would rotate at 75 RPM counterclockwise.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="quiz-container">
+        <h2>Self-Assessment Quiz</h2>
+        
+        <div class="quiz-question">
+            <p><strong>Question 1:</strong> Which type of gear is best suited for transmitting motion between perpendicular shafts?</p>
+            <form id="q1">
+                <input type="radio" id="q1a" name="q1" value="a">
+                <label for="q1a">a) Spur gear</label><br>
+                <input type="radio" id="q1b" name="q1" value="b">
+                <label for="q1b">b) Helical gear</label><br>
+                <input type="radio" id="q1c" name="q1" value="c">
+                <label for="q1c">c) Bevel gear</label><br>
+                <input type="radio" id="q1d" name="q1" value="d">
+                <label for="q1d">d) Rack and pinion</label><br>
+                <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
+            </form>
+            <div id="q1-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+            <p><strong>Question 2:</strong> In a simple gear train, if the driver has 25 teeth and rotates at 1200 RPM, how many teeth should the driven gear have to rotate at 400 RPM?</p>
+            <form id="q2">
+                <input type="radio" id="q2a" name="q2" value="a">
+                <label for="q2a">a) 75 teeth</label><br>
+                <input type="radio" id="q2b" name="q2" value="b">
+                <label for="q2b">b) 50 teeth</label><br>
+                <input type="radio" id="q2c" name="q2" value="c">
+                <label for="q2c">c) 25 teeth</label><br>
+                <input type="radio" id="q2d" name="q2" value="d">
+                <label for="q2d">d) 8.33 teeth</label><br>
+                <button type="button" onclick="checkAnswer('q2', 'a')">Check Answer</button>
+            </form>
+            <div id="q2-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+            <p><strong>Question 3:</strong> The primary purpose of an idler gear in a simple gear train is to:</p>
+            <form id="q3">
+                <input type="radio" id="q3a" name="q3" value="a">
+                <label for="q3a">a) Increase the gear ratio</label><br>
+                <input type="radio" id="q3b" name="q3" value="b">
+                <label for="q3b">b) Decrease the gear ratio</label><br>
+                <input type="radio" id="q3c" name="q3" value="c">
+                <label for="q3c">c) Change the direction of rotation</label><br>
+                <input type="radio" id="q3d" name="q3" value="d">
+                <label for="q3d">d) Increase torque</label><br>
+                <button type="button" onclick="checkAnswer('q3', 'c')">Check Answer</button>
+            </form>
+            <div id="q3-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+            <p><strong>Question 4:</strong> In an epicyclic gear train, which component carries the planet gears?</p>
+            <form id="q4">
+                <input type="radio" id="q4a" name="q4" value="a">
+                <label for="q4a">a) Sun gear</label><br>
+                <input type="radio" id="q4b" name="q4" value="b">
+                <label for="q4b">b) Ring gear</label><br>
+                <input type="radio" id="q4c" name="q4" value="c">
+                <label for="q4c">c) Planet carrier</label><br>
+                <input type="radio" id="q4d" name="q4" value="d">
+                <label for="q4d">d) Idler gear</label><br>
+                <button type="button" onclick="checkAnswer('q4', 'c')">Check Answer</button>
+            </form>
+            <div id="q4-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+            <p><strong>Question 5:</strong> What is the primary advantage of an epicyclic gear train compared to a simple gear train?</p>
+            <form id="q5">
+                <input type="radio" id="q5a" name="q5" value="a">
+                <label for="q5a">a) Simpler construction</label><br>
+                <input type="radio" id="q5b" name="q5" value="b">
+                <label for="q5b">b) Lower cost</label><br>
+                <input type="radio" id="q5c" name="q5" value="c">
+                <label for="q5c">c) Easier maintenance</label><br>
+                <input type="radio" id="q5d" name="q5" value="d">
+                <label for="q5d">d) Compact design with high power transmission</label><br>
+                <button type="button" onclick="checkAnswer('q5', 'd')">Check Answer</button>
+            </form>
+            <div id="q5-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p>Coventry University, United Kingdom</p>
+        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
+        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
+    </footer>
+
+    <script>
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.simulation-nav a');
+            const sections = document.querySelectorAll('.section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    
+                    // Hide all sections and deactivate all links
+                    sections.forEach(section => section.classList.remove('active'));
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    
+                    // Show target section and activate clicked link
+                    document.querySelector(targetId).classList.add('active');
+                    this.classList.add('active');
+                });
+            });
+            
+            // Practice problem solution toggle
+            window.toggleSolution = function(id) {
+                const solution = document.getElementById(id);
+                if (solution.style.display === "block") {
+                    solution.style.display = "none";
+                    document.querySelector(`[onclick="toggleSolution('${id}')"]`).textContent = "Show Solution";
+                } else {
+                    solution.style.display = "block";
+                    document.querySelector(`[onclick="toggleSolution('${id}')"]`).textContent = "Hide Solution";
+                }
+            };
+            
+            // Quiz functionality
+            window.checkAnswer = function(questionId, correctAnswer) {
+                const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+                const feedbackElement = document.getElementById(`${questionId}-feedback`);
+                
+                if (!selectedOption) {
+                    feedbackElement.innerHTML = "Please select an answer.";
+                    feedbackElement.className = "feedback";
+                    return;
+                }
+                
+                if (selectedOption.value === correctAnswer) {
+                    feedbackElement.innerHTML = "Correct! Well done.";
+                    feedbackElement.className = "feedback correct";
+                } else {
+                    feedbackElement.innerHTML = "Incorrect. Try again!";
+                    feedbackElement.className = "feedback incorrect";
+                }
+            };
+            
+            // Idler gear checkbox functionality
+            const idlerCheckbox = document.getElementById('include-idler');
+            const idlerTeethSlider = document.getElementById('idler-teeth');
+            
+            idlerCheckbox.addEventListener('change', function() {
+                idlerTeethSlider.disabled = !this.checked;
+                updateSimpleGearCalculations();
+            });
+            
+            // Update value displays for sliders
+            const sliders = document.querySelectorAll('input[type="range"]');
+            sliders.forEach(slider => {
+                const valueSpan = document.getElementById(`${slider.id}-value`);
+                if (valueSpan) {
+                    slider.addEventListener('input', function() {
+                        valueSpan.textContent = this.value;
+                        
+                        // Update calculations based on which slider was changed
+                        if (this.id.includes('simple-gear')) {
+                            updateSimpleGearCalculations();
+                        } else if (this.id.includes('compound')) {
+                            updateCompoundGearCalculations();
+                        } else if (this.id.includes('epicyclic')) {
+                            updateEpicyclicGearCalculations();
+                        }
+                    });
+                }
+            });
+            
+            // Application selector functionality
+            const appSelector = document.getElementById('application-type');
+            const appControls = document.querySelectorAll('.application-specific');
+            
+            appSelector.addEventListener('change', function() {
+                // Hide all application-specific controls
+                appControls.forEach(control => {
+                    control.style.display = 'none';
+                });
+                
+                // Show only the relevant controls
+                const selectedApp = this.value;
+                document.getElementById(`${selectedApp}-controls`).style.display = 'block';
+                
+                // Update description
+                updateApplicationDescription(selectedApp);
+            });
+            
+            // Initialize with only the first application's controls visible
+            appControls.forEach(control => {
+                control.style.display = 'none';
+            });
+            document.getElementById('transmission-controls').style.display = 'block';
+            
+            // Function to update simple gear calculations
+            function updateSimpleGearCalculations() {
+                const driverTeeth = parseInt(document.getElementById('driver-teeth').value);
+                const drivenTeeth = parseInt(document.getElementById('driven-teeth').value);
+                const idlerIncluded = document.getElementById('include-idler').checked;
+                const driverSpeed = parseInt(document.getElementById('driver-speed').value);
+                
+                let ratio = drivenTeeth / driverTeeth;
+                document.getElementById('simple-ratio').textContent = ratio.toFixed(2);
+                
+                let outputSpeed = driverSpeed / ratio;
+                document.getElementById('output-speed').textContent = outputSpeed.toFixed(2) + " RPM";
+                
+                let direction = idlerIncluded ? "Clockwise" : "Counterclockwise";
+                document.getElementById('output-direction').textContent = direction;
+            }
+            
+            // Function to update compound gear calculations
+            function updateCompoundGearCalculations() {
+                const firstDriverTeeth = parseInt(document.getElementById('first-driver-teeth').value);
+                const firstDrivenTeeth = parseInt(document.getElementById('first-driven-teeth').value);
+                const secondDriverTeeth = parseInt(document.getElementById('second-driver-teeth').value);
+                const secondDrivenTeeth = parseInt(document.getElementById('second-driven-teeth').value);
+                const inputSpeed = parseInt(document.getElementById('compound-input-speed').value);
+                
+                const firstRatio = firstDrivenTeeth / firstDriverTeeth;
+                const secondRatio = secondDrivenTeeth / secondDriverTeeth;
+                const overallRatio = firstRatio * secondRatio;
+                
+                document.getElementById('compound-ratio').textContent = overallRatio.toFixed(2);
+                
+                const intermediateSpeed = inputSpeed / firstRatio;
+                document.getElementById('intermediate-speed').textContent = intermediateSpeed.toFixed(2) + " RPM";
+                
+                const outputSpeed = inputSpeed / overallRatio;
+                document.getElementById('compound-output-speed').textContent = outputSpeed.toFixed(2) + " RPM";
+            }
+            
+            // Function to update epicyclic gear calculations
+            function updateEpicyclicGearCalculations() {
+                const sunTeeth = parseInt(document.getElementById('sun-teeth').value);
+                const planetTeeth = parseInt(document.getElementById('planet-teeth').value);
+                const ringTeeth = sunTeeth + 2 * planetTeeth; // Ring teeth calculated based on geometry
+                const fixedComponent = document.getElementById('fixed-component').value;
+                const inputComponent = document.getElementById('input-component').value;
+                const inputSpeed = parseInt(document.getElementById('epicyclic-input-speed').value);
+                
+                // Calculate speeds based on which component is fixed
+                let sunSpeed = 0, carrierSpeed = 0, ringSpeed = 0, ratio = 0;
+                
+                if (fixedComponent === 'ring') {
+                    // Fixed ring calculation
+                    if (inputComponent === 'sun') {
+                        sunSpeed = inputSpeed;
+                        carrierSpeed = sunSpeed / (1 + ringTeeth/sunTeeth);
+                        ringSpeed = 0;
+                        ratio = sunSpeed / carrierSpeed;
+                    } else { // input is carrier
+                        carrierSpeed = inputSpeed;
+                        sunSpeed = carrierSpeed * (1 + ringTeeth/sunTeeth);
+                        ringSpeed = 0;
+                        ratio = sunSpeed / carrierSpeed;
+                    }
+                } else if (fixedComponent === 'sun') {
+                    // Fixed sun calculation
+                    if (inputComponent === 'ring') {
+                        ringSpeed = inputSpeed;
+                        carrierSpeed = ringSpeed / (1 + sunTeeth/ringTeeth);
+                        sunSpeed = 0;
+                        ratio = ringSpeed / carrierSpeed;
+                    } else { // input is carrier
+                        carrierSpeed = inputSpeed;
+                        ringSpeed = carrierSpeed * (1 + sunTeeth/ringTeeth);
+                        sunSpeed = 0;
+                        ratio = ringSpeed / carrierSpeed;
+                    }
+                } else { // fixed carrier
+                    // Fixed carrier calculation
+                    if (inputComponent === 'sun') {
+                        sunSpeed = inputSpeed;
+                        ringSpeed = -sunSpeed * (sunTeeth/ringTeeth);
+                        carrierSpeed = 0;
+                        ratio = sunSpeed / Math.abs(ringSpeed);
+                    } else { // input is ring
+                        ringSpeed = inputSpeed;
+                        sunSpeed = -ringSpeed * (ringTeeth/sunTeeth);
+                        carrierSpeed = 0;
+                        ratio = Math.abs(sunSpeed) / ringSpeed;
+                    }
+                }
+                
+                // Update UI with calculated values
+                document.getElementById('sun-speed').textContent = 
+                    fixedComponent === 'sun' ? "0 RPM (Fixed)" : sunSpeed.toFixed(2) + " RPM";
+                
+                document.getElementById('carrier-speed').textContent = 
+                    fixedComponent === 'carrier' ? "0 RPM (Fixed)" : carrierSpeed.toFixed(2) + " RPM";
+                
+                document.getElementById('ring-speed').textContent = 
+                    fixedComponent === 'ring' ? "0 RPM (Fixed)" : ringSpeed.toFixed(2) + " RPM";
+                
+                document.getElementById('epicyclic-ratio').textContent = ratio.toFixed(2);
+            }
+            
+            // Function to update application description
+            function updateApplicationDescription(appType) {
+                const descriptions = {
+                    'transmission': "This simulation demonstrates how planetary gear systems are used in automotive automatic transmissions to achieve different gear ratios by selectively engaging clutches and brakes.",
+                    'differential': "This simulation shows how an epicyclic differential allows wheels to rotate at different speeds during turns while distributing torque between the wheels.",
+                    'windturbine': "This simulation illustrates how wind turbines use epicyclic gearboxes to convert the slow rotation of large blades into high-speed rotation needed for electricity generation.",
+                    'watchgears': "This simulation demonstrates the precision epicyclic gear trains found in mechanical watches that track hours, minutes, and seconds with a single power source."
+                };
+                
+                document.getElementById('application-description').textContent = descriptions[appType];
+            }
+            
+            // Initialize calculations
+            updateSimpleGearCalculations();
+            updateCompoundGearCalculations();
+            updateEpicyclicGearCalculations();
+        });
+    </script>
+</body>
+<footer>
+    <script src="/common/footer.js"></script>
+  </footer>
+</html>

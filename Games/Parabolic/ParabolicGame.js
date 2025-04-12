@@ -149,7 +149,7 @@ function reset(input) {
       consecutiveHits++;
       scoreContainer.html('Streak: ' + consecutiveHits);
       
-      if (consecutiveHits === 5) {
+      if (consecutiveHits === 3) {
         congratsElement.style('display', 'block');
         gamePaused = true;
       }

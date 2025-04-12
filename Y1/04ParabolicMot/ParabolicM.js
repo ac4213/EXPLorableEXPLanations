@@ -1,0 +1,405 @@
+// Define the initial position, velocity, and acceleration
+let initialPosition;
+let position;
+let finalPositions = [];
+let velocity;
+let acceleration;
+let scalefac = 10; //scale factor for physics
+
+// Define the gravity and launch angle
+let gravity; //gravity vector
+let g = 9.81 / scalefac;
+let angle; // Launch angle in degrees
+let ballSize = 10; // projectile diameter in pixels
+
+// Define the obstacles
+let obstacles = [];
+let numObstacles = 2;
+
+// Define the target
+let target;
+let targetMinSize = 5;
+let targetMaxSize = 30;
+
+// Define GUI
+let button;
+let ballColor;
+let obstacleColor;
+
+// Define the state of the game
+let isFired = false;
+
+// Add variables for trajectory prediction
+let trajectoryPoints = [];
+let showPrediction = true;
+
+// Add variables for data display
+let flightData = {
+  initialVelocity: 0,
+  angle: 0,
+  maxHeight: 0,
+  range: 0,
+  timeOfFlight: 0,
+  currentTime: 0
+};
+
+function setup() {
+  cnv = createCanvas(800, 600);
+  cnv.parent('sketch-holder');
+  
+  textSize(12);
+  rectMode(CENTER);
+  
+  initialPosition = createVector(0, height);
+  reset();
+
+  // GUI
+  button = createButton('RESET');
+  button.parent('button-container')
+  button.mousePressed(reset);
+  
+  // Add toggle button for trajectory prediction
+  let predictButton = createButton('TOGGLE PREDICTION');
+  predictButton.parent('button-container');
+  predictButton.mousePressed(() => {
+    showPrediction = !showPrediction;
+  });
+
+  ballColor = color(255, 204, 84);
+  obstacleColor = color(72, 65, 192);
+}
+
+function reset() {
+  // Initialize position at the bottom left of the screen
+  position = initialPosition.copy();
+  gravity = createVector(0, g);
+  finalPositions = [];
+  trajectoryPoints = [];
+  
+  // Reset flight data
+  flightData = {
+    initialVelocity: 0,
+    angle: 0,
+    maxHeight: 0,
+    range: 0,
+    timeOfFlight: 0,
+    currentTime: 0
+  };
+  
+  createObstacles();
+  createTarget();
+}
+
+function refire() {
+  isFired = false;
+  position = initialPosition.copy();
+  flightData.currentTime = 0;
+}
+
+function draw() {
+  // Clear background
+  background(233, 216, 177);
+  
+  drawGrid();
+  
+  // Draw the ground
+  push();
+  stroke(0);
+  strokeWeight(3);
+  line(0, height, width, height);
+  pop();
+  
+  drawObstacles();
+  drawTarget();
+  
+  let x0 = initialPosition.x;
+  let y0 = initialPosition.y;
+  let x1 = mouseX; // Current mouse x-coordinate
+  let y1 = mouseY; // Current mouse y-coordinate
+
+  // Draw the main line of the arrow + arrowhead
+  line(x0, y0, x1, y1);
+  drawArrowhead(x0, y0, x1, y1);
+
+  // Calculate the angle based on the mouse position
+  let angle = atan2(y1 - y0, x1 - x0);
+  // Calculate the initial velocity (magnitude of mouse)
+  let initialSpeed = dist(x0, y0, x1, y1) / scalefac;
+
+  // Update flight data
+  flightData.initialVelocity = initialSpeed;
+  flightData.angle = -degrees(angle);
+  
+  // Calculate predicted maximum height and range
+  let vSinTheta = initialSpeed * sin(-angle);
+  let vCosTheta = initialSpeed * cos(-angle);
+  flightData.maxHeight = (vSinTheta * vSinTheta) / (2 * g);
+  flightData.range = (initialSpeed * initialSpeed * sin(2 * -angle)) / g;
+  flightData.timeOfFlight = (2 * vSinTheta) / g;
+
+  // Text to display
+  let angleDeg = degrees(-angle).toFixed(2);
+  let initSpeed = initialSpeed.toFixed(2);
+  
+  // Draw the data at arrowtip
+  fill(0);
+  textSize(12);
+  if (x1 > 50 && y1 > 50) {
+    textAlign(RIGHT, CENTER);
+    text(`θ= ${angleDeg}°`, x1 - 10, y1 - 20);
+    text(`v₀= ${initSpeed}`, x1 - 10, y1);
+  }
+  if (x1 < 50 && y1 > 50) {
+    textAlign(LEFT, BOTTOM);
+    text(`θ= ${angleDeg}°`, x1, y1 - 20);
+    text(`v₀= ${initSpeed}`, x1, y1);
+  }
+  if (x1 < 50 && y1 < 50) {
+    textAlign(LEFT, TOP);
+    text(`θ= ${angleDeg}°`, x1 + 10, y1);
+    text(`v₀= ${initSpeed}`, x1 + 10, y1 + 20);
+  }
+  if (x1 > 50 && x1 < (width - 100) && y1 < 50) {
+    textAlign(LEFT, TOP);
+    text(`θ= ${angleDeg}°`, x1 + 10, y1);
+    text(`v₀= ${initSpeed}`, x1 + 10, y1 + 20);
+  }
+  if (x1 > 50 && x1 > (width - 100) && y1 < 50) {
+    textAlign(RIGHT, TOP);
+    text(`θ= ${angleDeg}°`, x1 - 10, y1);
+    text(`v₀= ${initSpeed}`, x1 - 10, y1 + 20);
+  }
+
+  // If the ball has not been fired yet, define initial velocity and show trajectory prediction
+  if (!isFired) {
+    velocity = p5.Vector.fromAngle(angle); // unitvect direction
+    velocity.mult(initialSpeed); // magnitude
+    
+    // Calculate and draw predicted trajectory
+    if (showPrediction) {
+      calculateTrajectory(initialPosition.copy(), velocity.copy());
+      drawTrajectoryPrediction();
+    }
+  } else { // Otherwise, evolve the trajectory
+    // Apply gravity to the velocity
+    velocity.add(gravity);
+    // Apply velocity to the position
+    position.add(velocity);
+    
+    // Update flight data
+    flightData.currentTime += 1/60; // Assuming 60fps
+  }
+
+  // Draw the ball
+  drawBall(position.x, position.y, ballColor);
+
+  // FLIGHT DATA DISPLAY
+  drawFlightData();
+
+  // CHECK COLLISIONS
+  // If the ball hits the ground
+  if (position.y >= height) {
+    finalPositions.push({xf: position.x, yf: height});
+    refire();
+  }
+  // If the ball hits the vertical edge
+  if (position.x >= width) {
+    finalPositions.push({xf: width, yf: position.y});
+    refire();
+  }
+  // If the ball hits an obstacle
+  for (let i = 0; i < obstacles.length; i++) {
+    hasCollided = checkCircleRectCollision(
+      position.x, position.y, ballSize / 2, 
+      obstacles[i].x, obstacles[i].y, obstacles[i].w, obstacles[i].h, 0
+    );
+    if (hasCollided) {
+      finalPositions.push({xf: position.x, yf: position.y});
+      refire();
+    }
+  }
+  
+  // Draw final positions for this round
+  drawFinalPositions();
+}
+
+function drawBall(x, y, c) {
+  // Draw the ball
+  push();
+  stroke(0);
+  fill(c);
+  ellipse(x, y, ballSize);
+  pop();
+}
+
+function drawFinalPositions() {
+  for (let i = 0; i < finalPositions.length; i++) {
+    drawBall(finalPositions[i].xf, finalPositions[i].yf, color(255, 150, 84, 150));
+  }
+}
+
+function calculateTrajectory(startPos, startVel) {
+  trajectoryPoints = [];
+  let pos = startPos.copy();
+  let vel = startVel.copy();
+  let grav = createVector(0, g);
+  
+  // Calculate 100 points along the trajectory or until it hits the ground
+  for (let i = 0; i < 200; i++) {
+    trajectoryPoints.push(pos.copy());
+    vel.add(grav);
+    pos.add(vel);
+    
+    // Check if trajectory hits ground or goes off-screen
+    if (pos.y >= height || pos.x >= width) {
+      trajectoryPoints.push(pos.copy());
+      break;
+    }
+    
+    // Check if trajectory hits an obstacle
+    let hitObstacle = false;
+    for (let j = 0; j < obstacles.length; j++) {
+      if (checkCircleRectCollision(
+        pos.x, pos.y, ballSize / 2, 
+        obstacles[j].x, obstacles[j].y, obstacles[j].w, obstacles[j].h, 0
+      )) {
+        hitObstacle = true;
+        break;
+      }
+    }
+    if (hitObstacle) {
+      trajectoryPoints.push(pos.copy());
+      break;
+    }
+  }
+}
+
+function drawTrajectoryPrediction() {
+  push();
+  stroke(128, 128, 255, 150);
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  for (let i = 0; i < trajectoryPoints.length; i++) {
+    vertex(trajectoryPoints[i].x, trajectoryPoints[i].y);
+  }
+  endShape();
+  
+  // Draw dots along the path
+  for (let i = 0; i < trajectoryPoints.length; i += 10) {
+    fill(128, 128, 255, 150);
+    noStroke();
+    ellipse(trajectoryPoints[i].x, trajectoryPoints[i].y, 5, 5);
+  }
+  pop();
+}
+
+function drawFlightData() {
+  // Function is now empty - flight data box has been removed
+}
+
+function drawArrowhead(x0, y0, x1, y1) {
+  let angle = atan2(y1 - y0, x1 - x0); // Calculate the angle
+  let arrowSize = 10; // Size of the arrowhead
+
+  push();
+  translate(x1, y1); // Move to the end of the line
+  rotate(angle); // Rotate to match the angle of the line
+  fill(0); // Set the fill color for the arrowhead
+  noStroke(); // Disable the stroke for the arrowhead
+  beginShape();
+  vertex(0, 0);
+  vertex(-arrowSize, -arrowSize / 2);
+  vertex(-arrowSize, arrowSize / 2);
+  endShape(CLOSE);
+  pop();
+}
+
+function drawGrid() {
+  stroke(200); // Gray color, minor grid
+  for (let x = 0; x < width; x += 10) {
+    line(x, 0, x, height);
+  }
+  for (let y = 0; y < height; y += 10) {
+    line(0, y, width, y);
+  }
+  
+  stroke(100); // Gray color, major grid
+  fill(100);
+  for (let x = 50; x < width; x += 50) {
+    line(x, 0, x, height);
+    textAlign(CENTER, TOP);
+    text((x / scalefac).toFixed(0), x, 0);
+  }
+  for (let y = 50; y < height; y += 50) {
+    line(0, y, width, y);
+    textAlign(LEFT, CENTER);
+    text((height - y) / scalefac.toFixed(0), 0, y);
+  }
+}
+
+function createObstacles() {
+  // Create random obstacles
+  obstacles = [];
+  for (let i = 0; i < numObstacles; i++) {
+    let x = random(width);
+    let y = random(height);
+    let w = random(20, 70);
+    let h = random(20, 50);
+    obstacles.push({
+      x,
+      y,
+      w,
+      h
+    });
+  }
+}
+
+function drawObstacles() {
+  // Draw the obstacles
+  for (let obs of obstacles) {
+    push();
+    stroke(0);
+    fill(obstacleColor);
+    rect(obs.x, obs.y, obs.w, obs.h);
+    pop();
+  }
+}
+
+function createTarget() {
+  let targetPos = random(50, width);
+  let targetSize = random(targetMinSize, targetMaxSize);
+  target = createVector(targetPos, targetPos + targetSize)
+}
+
+function drawTarget() {
+  push();
+  stroke(0, 200, 50);
+  strokeWeight(10);
+  line(target.x, height, target.y, height);
+  pop();
+}
+
+function checkCircleRectCollision(cx, cy, cr, rx, ry, rw, rh, ra) {
+  // Translate circle position to rectangle's local space
+  let localCircle = createVector(cx - rx, cy - ry).rotate(-ra);
+
+  // Find the nearest point on the rectangle to the circle
+  let nearestX = max(-rw / 2, min(localCircle.x, rw / 2));
+  let nearestY = max(-rh / 2, min(localCircle.y, rh / 2));
+
+  // Calculate distance from the circle's center to the nearest point
+  let distance = dist(localCircle.x, localCircle.y, nearestX, nearestY);
+
+  // Check if the distance is less than the circle's radius
+  return distance <= cr;
+}
+
+// When the mouse is clicked, fire the ball
+function mouseClicked() {
+  if (mouseX < width && mouseY < height) {
+    if (!isFired) {
+      isFired = true;
+    }
+  }
+}

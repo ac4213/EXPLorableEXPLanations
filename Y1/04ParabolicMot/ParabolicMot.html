@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parabolic Motion - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- Import React and ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- Import Recharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.min.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="parabolic-motion-styles.css">
+    <!-- Your script goes here -->
+    <script src="ParabolicM.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Parabolic Motion</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div id="react-visualizer"></div>
+    
+        <div class="content-section">
+            <h2>Understanding Projectile Motion</h2>
+            <p>Projectile motion is a form of motion where an object moves in a parabolic path under the influence of gravity. This kind of motion is a combination of:</p>
+            <ul>
+                <li>Horizontal motion with constant velocity</li>
+                <li>Vertical motion with constant acceleration due to gravity</li>
+            </ul>
+
+            <div class="key-point">
+                <p>A projectile is any object that is thrown or launched into the air and is subject only to:</p>
+                <ul>
+                    <li>The acceleration of gravity</li>
+                    <li>Air resistance (which we often neglect in basic models)</li>
+                </ul>
+            </div>
+
+            <h3>Key Equations of Projectile Motion</h3>
+            <div class="equation-box">
+                <p>For an object launched with an initial velocity \(v_0\) at an angle \(\theta\) with the horizontal:</p>
+                <p>Horizontal position: \(x = (v_0 \cos \theta) \cdot t\)</p>
+                <p>Vertical position: \(y = (v_0 \sin \theta) \cdot t - \frac{1}{2}gt^2\)</p>
+                <p>Horizontal velocity: \(v_x = v_0 \cos \theta\) (constant)</p>
+                <p>Vertical velocity: \(v_y = v_0 \sin \theta - gt\)</p>
+            </div>
+
+            <h3>Properties of Projectile Motion</h3>
+            <p>The path of a projectile is always a parabola when:</p>
+            <ul>
+                <li>Gravity is constant</li>
+                <li>Air resistance is neglected</li>
+                <li>The Earth's curvature is neglected (for short-range projectiles)</li>
+            </ul>
+
+            <h3>Maximum Height</h3>
+            <div class="equation-box">
+                <p>The maximum height reached by a projectile is given by:</p>
+                <p>\(h_{max} = \frac{(v_0 \sin \theta)^2}{2g}\)</p>
+            </div>
+
+            <h3>Range of the Projectile</h3>
+            <div class="equation-box">
+                <p>The horizontal distance traveled before returning to the launch height is:</p>
+                <p>\(R = \frac{v_0^2 \sin(2\theta)}{g}\)</p>
+                <p>The maximum range occurs at \(\theta = 45°\)</p>
+            </div>
+
+            <div class="key-point">
+                <p><strong>Interesting Fact:</strong> For a given initial speed, the maximum range is achieved at a launch angle of 45° (assuming the projectile lands at the same height it was launched from).</p>
+            </div>
+
+            <h3>Time of Flight</h3>
+            <div class="equation-box">
+                <p>The total time the projectile is in the air:</p>
+                <p>\(t_{flight} = \frac{2v_0 \sin \theta}{g}\)</p>
+            </div>
+        </div>
+
+        <div class="simulation-section">
+            <h2>Interactive Simulation</h2>
+            <p>Use your mouse to set the angle and initial velocity of the projectile. Click to launch!</p>
+            <div id="sketch-holder">
+                <!-- Our sketch will go here! -->
+            </div>
+            <div id="button-container">
+                <!-- Our GUI goes here-->
+            </div>
+
+            <h3>Simulation Instructions</h3>
+            <ul>
+                <li>Position the mouse to set the launch angle and initial velocity</li>
+                <li>Click to launch the projectile</li>
+                <li>The trajectory follows the parabolic path defined by our equations</li>
+                <li>Avoid obstacles to see the full projectile path</li>
+                <li>Click RESET to clear all trajectories and create new obstacles</li>
+            </ul>
+
+            <h3>Real-world Applications</h3>
+            <p>Understanding projectile motion is crucial for:</p>
+            <ul>
+                <li><strong>Sports:</strong> Optimizing trajectories in basketball, football, golf, javelin, shot put, and archery</li>
+                <li><strong>Engineering:</strong> Ballistics, trajectory planning, water fountain design</li>
+                <li><strong>Military applications:</strong> Artillery aiming, missile guidance systems</li>
+                <li><strong>Space exploration:</strong> Launch trajectories, orbital mechanics (which builds on these concepts)</li>
+                <li><strong>Entertainment:</strong> Roller coaster design, stunt choreography</li>
+            </ul>
+            
+            <div class="key-point">
+                <p><strong>Engineering Insight:</strong> Engineers must account for both ideal and non-ideal conditions when designing systems involving projectile motion. While the parabolic model provides a useful starting point, real-world factors like air resistance, wind, and varying gravitational fields often require more complex calculations or computer simulations.</p>
+            </div>
+        </div>
+
+    <div class="content-section">
+        <h2>Historical Perspective</h2>
+        <p>The understanding of projectile motion has evolved significantly throughout history:</p>
+        
+        <h3>Aristotelian View (4th century BCE)</h3>
+        <p>Aristotle believed that objects moved only as long as a force acted upon them. He proposed that projectiles continued moving after leaving the thrower's hand because the air behind them pushed them forward—a theory that persisted for nearly 2,000 years.</p>
+        
+        <h3>Impetus Theory (6th-14th centuries)</h3>
+        <p>Scholars like John Philoponus and Jean Buridan developed the "impetus" theory, suggesting that objects were imbued with a temporary force or "impetus" that gradually dissipated.</p>
+        
+        <h3>Galileo's Breakthrough (Early 17th century)</h3>
+        <div class="key-point">
+            <p>Galileo Galilei revolutionized our understanding by demonstrating that projectile motion could be separated into two independent components: horizontal motion at constant velocity and vertical motion with constant acceleration. He was the first to prove mathematically that the path of a projectile is a parabola.</p>
+        </div>
+        
+        <p>Galileo's experiments with inclined planes helped him understand acceleration due to gravity, laying the groundwork for Newton's laws of motion, which would later provide a comprehensive framework for explaining projectile motion.</p>
+        
+        <h3>Newton's Laws (Late 17th century)</h3>
+        <p>Isaac Newton's laws of motion and universal gravitation provided the complete mathematical foundation for understanding projectile motion that we still use today.</p>
+        
+        <h2>Advanced Concepts in Projectile Motion</h2>
+        
+        <h3>Air Resistance</h3>
+        <p>In real-world scenarios, air resistance significantly affects projectile motion. When air resistance is considered:</p>
+        <div class="equation-box">
+            <p>The drag force is proportional to the square of velocity:</p>
+            <p>\(F_d = -\frac{1}{2}C_d \rho A v^2\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(C_d\) is the drag coefficient</li>
+                <li>\(\rho\) is the air density</li>
+                <li>\(A\) is the cross-sectional area</li>
+                <li>\(v\) is the velocity</li>
+            </ul>
+        </div>
+        
+        <div class="key-point">
+            <p>With air resistance:</p>
+            <ul>
+                <li>The path is no longer a perfect parabola</li>
+                <li>The maximum range angle is less than 45° (typically around 30-35°)</li>
+                <li>The trajectory becomes asymmetric</li>
+            </ul>
+        </div>
+        
+        <h3>Projectile Motion on Different Planets</h3>
+        <p>The acceleration due to gravity varies on different celestial bodies, affecting projectile motion:</p>
+        <ul>
+            <li>Earth: 9.81 m/s²</li>
+            <li>Moon: 1.62 m/s²</li>
+            <li>Mars: 3.72 m/s²</li>
+            <li>Jupiter: 24.79 m/s²</li>
+        </ul>
+        <p>For the same initial velocity and angle, a projectile on the Moon would travel about 6 times farther than on Earth!</p>
+        
+        <h3>Projectiles Launched from Height</h3>
+        <div class="equation-box">
+            <p>When a projectile is launched from height \(h\) above the ground:</p>
+            <p>Time of flight: \(t_{flight} = \frac{v_0\sin\theta + \sqrt{(v_0\sin\theta)^2 + 2gh}}{g}\)</p>
+            <p>Range: \(R = v_0\cos\theta \cdot t_{flight}\)</p>
+        </div>
+        
+        <h2>Applications & Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Calculating Range</h3>
+            <p>A ball is thrown with an initial velocity of 15 m/s at an angle of 30° with the horizontal. Calculate:</p>
+            <ol>
+                <li>The maximum height reached by the ball</li>
+                <li>The horizontal range of the ball</li>
+                <li>The time of flight</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(v_0 = 15 \text{ m/s}, \theta = 30°, g = 9.81 \text{ m/s}^2\)</p>
+                
+                <p>a) Maximum height:</p>
+                <p>\(h_{max} = \frac{(v_0 \sin \theta)^2}{2g} = \frac{(15 \sin 30°)^2}{2 \times 9.81} = \frac{(15 \times 0.5)^2}{19.62} = \frac{56.25}{19.62} = 2.87 \text{ m}\)</p>
+                
+                <p>b) Horizontal range:</p>
+                <p>\(R = \frac{v_0^2 \sin(2\theta)}{g} = \frac{15^2 \sin(60°)}{9.81} = \frac{225 \times 0.866}{9.81} = 19.87 \text{ m}\)</p>
+                
+                <p>c) Time of flight:</p>
+                <p>\(t_{flight} = \frac{2v_0 \sin \theta}{g} = \frac{2 \times 15 \times 0.5}{9.81} = \frac{15}{9.81} = 1.53 \text{ s}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Initial Velocity Required</h3>
+            <p>A football player wants to kick a ball to reach a maximum height of 20 meters. If the ball is kicked at an angle of 60° to the horizontal, what initial velocity is required?</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(h_{max} = 20 \text{ m}, \theta = 60°, g = 9.81 \text{ m/s}^2\)</p>
+                
+                <p>Using the equation for maximum height:</p>
+                <p>\(h_{max} = \frac{(v_0 \sin \theta)^2}{2g}\)</p>
+                
+                <p>Rearranging to solve for \(v_0\):</p>
+                <p>\(v_0 = \sqrt{\frac{2g \times h_{max}}{\sin^2 \theta}} = \sqrt{\frac{2 \times 9.81 \times 20}{\sin^2 60°}} = \sqrt{\frac{392.4}{0.75}} = \sqrt{523.2} = 22.87 \text{ m/s}\)</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 3: Hitting a Target</h3>
+            <p>A cannon is positioned 20 meters below a target on a cliff. If the cannon can fire a projectile at 50 m/s, at what angle should it be fired to hit the target, which is 100 meters away horizontally?</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: \(v_0 = 50 \text{ m/s}, \Delta x = 100 \text{ m}, \Delta y = 20 \text{ m}, g = 9.81 \text{ m/s}^2\)</p>
+                
+                <p>Using the parametric equations:</p>
+                <p>\(x = (v_0 \cos \theta) \cdot t\)</p>
+                <p>\(y = (v_0 \sin \theta) \cdot t - \frac{1}{2}gt^2\)</p>
+                
+                <p>First, we find the time it takes to travel the horizontal distance:</p>
+                <p>\(t = \frac{\Delta x}{v_0 \cos \theta} = \frac{100}{50 \cos \theta} = \frac{2}{\cos \theta}\)</p>
+                
+                <p>Substituting this into the vertical equation and setting \(y = 20\):</p>
+                <p>\(20 = (50 \sin \theta) \cdot \frac{2}{\cos \theta} - \frac{1}{2} \cdot 9.81 \cdot \left(\frac{2}{\cos \theta}\right)^2\)</p>
+                <p>\(20 = 100 \tan \theta - 19.62 \cdot \frac{4}{\cos^2 \theta}\)</p>
+                <p>\(20 = 100 \tan \theta - 78.48 \sec^2 \theta\)</p>
+                
+                <p>This is a quadratic equation in \(\tan \theta\). Solving it:</p>
+                <p>The positive solution is \(\theta = 11.2°\)</p>
+            </div>
+        </div>
+        
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: A projectile is launched with an initial velocity of 40 m/s at an angle of 30° to the horizontal. What is its maximum height?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 20.4 m</label>
+                    <label><input type="radio" name="q1" value="b"> b) 40.8 m</label>
+                    <label><input type="radio" name="q1" value="c"> c) 81.6 m</label>
+                    <label><input type="radio" name="q1" value="d"> d) 10.2 m</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: What happens to the range of a projectile on the Moon compared to Earth (assuming the same initial velocity and angle)?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) The range decreases</label>
+                    <label><input type="radio" name="q2" value="b"> b) The range increases approximately 6 times</label>
+                    <label><input type="radio" name="q2" value="c"> c) The range remains the same</label>
+                    <label><input type="radio" name="q2" value="d"> d) The projectile follows a circular path</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: Which of the following factors does NOT affect the range of a projectile launched on level ground?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) The mass of the projectile (in the absence of air resistance)</label>
+                    <label><input type="radio" name="q3" value="b"> b) The initial velocity</label>
+                    <label><input type="radio" name="q3" value="c"> c) The launch angle</label>
+                    <label><input type="radio" name="q3" value="d"> d) The acceleration due to gravity</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: For a projectile launched from and returning to the same horizontal level, which angle gives the maximum range?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) 30°</label>
+                    <label><input type="radio" name="q4" value="b"> b) 45°</label>
+                    <label><input type="radio" name="q4" value="c"> c) 60°</label>
+                    <label><input type="radio" name="q4" value="d"> d) 90°</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: A ball is thrown horizontally from a height of 20m with an initial velocity of 15 m/s. How far horizontally does it travel before hitting the ground?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 15 m</label>
+                    <label><input type="radio" name="q5" value="b"> b) 30 m</label>
+                    <label><input type="radio" name="q5" value="c"> c) 45 m</label>
+                    <label><input type="radio" name="q5" value="d"> d) 60 m</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2>Summary: Key Equations Reference</h2>
+        
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Equation</th>
+                        <th>Variables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Horizontal Position</td>
+                        <td>\(x = (v_0 \cos \theta) \cdot t\)</td>
+                        <td>\(v_0\) = initial velocity<br>\(\theta\) = launch angle<br>\(t\) = time</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical Position</td>
+                        <td>\(y = (v_0 \sin \theta) \cdot t - \frac{1}{2}gt^2\)</td>
+                        <td>\(g\) = gravitational acceleration</td>
+                    </tr>
+                    <tr>
+                        <td>Horizontal Velocity</td>
+                        <td>\(v_x = v_0 \cos \theta\)</td>
+                        <td>Constant throughout motion</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical Velocity</td>
+                        <td>\(v_y = v_0 \sin \theta - gt\)</td>
+                        <td>Decreases linearly with time</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Height</td>
+                        <td>\(h_{max} = \frac{(v_0 \sin \theta)^2}{2g}\)</td>
+                        <td>Height at which \(v_y = 0\)</td>
+                    </tr>
+                    <tr>
+                        <td>Range (same height)</td>
+                        <td>\(R = \frac{v_0^2 \sin(2\theta)}{g}\)</td>
+                        <td>Horizontal distance traveled</td>
+                    </tr>
+                    <tr>
+                        <td>Time of Flight</td>
+                        <td>\(t_{flight} = \frac{2v_0 \sin \theta}{g}\)</td>
+                        <td>Total time in air</td>
+                    </tr>
+                    <tr>
+                        <td>Time to Maximum Height</td>
+                        <td>\(t_{max} = \frac{v_0 \sin \theta}{g}\)</td>
+                        <td>Time to reach highest point</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="key-point">
+            <h3>Conclusion</h3>
+            <p>Understanding projectile motion is fundamental to classical mechanics and has numerous practical applications. The key insights to remember are:</p>
+            <ol>
+                <li>The horizontal and vertical components of motion are independent</li>
+                <li>Horizontal velocity remains constant (neglecting air resistance)</li>
+                <li>Vertical motion undergoes constant acceleration due to gravity</li>
+                <li>The resulting path is a parabola</li>
+                <li>The maximum range on level ground occurs at a 45° launch angle</li>
+            </ol>
+            <p>These principles form the foundation for understanding more complex motion in engineering, sports, and natural phenomena.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p>Coventry University, United Kingdom</p>
+        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
+        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
+    </footer>
+
+    <script>
+        // Function to toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+        
+        // Function to render the React component
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if React and ReactDOM are available
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && 
+                typeof document.getElementById('react-visualizer') !== 'undefined') {
+                // Create a placeholder message
+                const placeholder = document.createElement('div');
+                placeholder.innerHTML = '<h2 style="text-align: center; padding: 20px;">Interactive Data Visualization</h2>' + 
+                                        '<p style="text-align: center;">Explore how changing the initial velocity, angle, and gravity affects projectile motion.</p>' +
+                                        '<p style="text-align: center; margin-top: 20px;"><em>Use the simulation below to experiment with these concepts in real-time.</em></p>';
+                document.getElementById('react-visualizer').appendChild(placeholder);
+            }
+        });
+        
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'a', // 20.4 m
+                        q2: 'b', // Range increases 6 times
+                        q3: 'a', // Mass doesn't affect range without air resistance
+                        q4: 'b', // 45 degrees
+                        q5: 'b'  // 30 m
+                    };
+                    
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+                    
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+                    
+                    feedback += `<p>Your score: ${score}/5</p>`;
+                    
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
+
+</body>
+<footer>
+    <script src="/common/footer.js"></script>
+  </footer>
+</html>

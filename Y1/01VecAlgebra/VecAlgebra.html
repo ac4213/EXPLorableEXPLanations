@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
+  <script src="https://tikzjax.com/v1/tikzjax.js"></script>
+  <script src="sketchMulti2.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <main>
+    <title>Vector Algebra</title>
+    <h1>FORCES AS VECTORS</h1>
+
+    <section id="Vectorial representation">
+      <h2>Vectorial representation</h2>
+
+      <p>Forces have an intensity (magnitude), a direction (line of action) and a verse (sense), and a single number is
+        not sufficient to represent these aspects, so they need a special mathematical object to represent them: this
+        object is known as <b>vector</b>.</p>
+
+      <p>Vector forces have a <b>cartesian representation</b>:
+        \[\mathbf{F} = F_x \, \mathbf{i} + F_y \, \mathbf{j} \]
+
+        where
+      <ul>
+        <li>\(\mathbf{F}\) is the vector object </li>
+        <li>\(F_x, \, F_y\) are the force <u>components</u> in the \(x\) and \(y\) direction respectively</li>
+        <li>\(\mathbf{i}\) and \(\mathbf{j}\) are the unit vectors in the \(x\) and \(y\) direction respectively</li>
+      </ul>
+      </p>
+
+      <p>or a <b>polar representation</b>:
+        \[\mathbf{F} = \left(F,\theta \right) = F \,e^{i\varphi} \]
+
+
+        where
+      <ul>
+        <li>\(F\) is the <u>magnitude</u> (intensity) of the force </li>
+        <li> \(\theta\) is the angle <u>in degrees</u> indicating the <u>direction</u> of the force (with respect to a
+          reference 0° axis).</li>
+        <li> \(\varphi\) is the same angle <u>in radians</u> used for the exponential notation</li>
+        <li>\( i=\sqrt{-1} \) is the imaginary unit.</li>
+      </ul>
+      </p>
+
+      <p>Graphically, a vector can be represented with an arrow. For example, the force
+        \(\mathbf{F}=3\mathbf{i}+4\mathbf{j}\) is the vector represented below (click the "Toggle Cartesian" button to
+        verify).
+        You can read this as <i>"3 units in the x-direction (horizontal) and 4 units in the y-direction (vertical)"</i>.
+      </p>
+
+      <p>The polar representation of the same vector force is \(\mathbf{F}=\left(5,53°\right) = 5\, e^{i 0.93}\) (click
+        the "Toggle Polar" button to verify) and can be read as <i>"magnitude 5 units at an angle 53 degrees from the
+          horizontal"</i>.</p>
+
+
+      <div id="VectorRepresentation"></div>
+      <p> You can change the vector by clicking "Toggle Handles" and moving the arrow around to see how its cartesian
+        and polar representations change with it.</p>
+
+      <p>It is also possible to change representation using basic trigonometry rules and Pythagora's Theorem, as below:
+
+        <script type="text/tikz">
+          \begin{tikzpicture}[thick, scale=2, every node/.style={scale=1.5}]]  
+            \draw (0,0)  -- (1,1) node[pos=0.5,above left]{$F$}  -- (1,0) node[pos=0.5,right]{$F_y$} -- cycle node[pos=0.5,below]{$F_x$};
+            \begin{scope}
+              \clip (0,0) -- (1,1) -- (1,0) -- cycle;
+              \draw (0,0) circle (0.3);
+              \draw (22.5:0.3) node[right,yshift=2pt] {$\varphi$};
+            \end{scope}
+          \end{tikzpicture}
+        </script>
+        \[
+        \begin{array}{ll} \\
+        F=\sqrt{F_x^2+F_y^2} & \qquad & \qquad & F_x=F\cos(\varphi) \\
+        \varphi=\tan^{-1}\left( \frac{F_y}{F_x}\right) & \qquad & \qquad & F_y=F\sin(\varphi) \\
+        \end{array}
+        \]
+
+        the left column to pass from Cartesian to Polar, the right one from Polar to Cartesian.
+      </p>
+    </section>
+    <section id="Scalar multiplication">
+      <h2>Scalar multiplication (scaling)</h2>
+      <p>A vector \(\mathbf{F}\) can be multiplied by a real number \(\alpha\). Doing so, results in the "scaling" of
+        the vector, hence why the name "scalar" for the factor \(\alpha \in \mathbb{R} \). \[ \mathbf{R}=\alpha
+        \mathbf{F} \]</p>
+      <p>It is easy to see, using cartesian representation, that the scale factor affects both components in the same
+        way
+        \[\mathbf{R} = \alpha\,\mathbf{F}=\left(\alpha F_x\right) \, \mathbf{i} + \left(\alpha F_y\right) \,
+        \mathbf{j}\]
+      </p>
+      <p>And as a result, it follows that the magnitude (length) is also scaled by the same amount
+        \[\|\mathbf{F}\|=F=\sqrt{F_x^2+F_y^2}\]
+        \[\|\mathbf{R}\|=R=\sqrt{\alpha^2F_x^2+\alpha^2F_y^2}=\alpha\sqrt{F_x^2+F_y^2}=\alpha F\] </p>
+
+      <div id="VectorScaling" , style="position: relative"></div>
+      <p>Feel free to play with the applet above and note the following facts:
+      <ul>
+        <li>if \(\alpha>1\), the resultant vector \(\mathbf{R}\) will be longer than the original \(\mathbf{F}\) </li>
+        <li>if \(0 < \alpha < 1\) the resultant vector \(\mathbf{R}\) will be shorter than the original \(\mathbf{F}\)
+            </li>
+        <li>if \(\alpha=0\), the resultant vector \(\mathbf{R}\) is null (zero length, no magnitude) </li>
+        <li>if \(\alpha < 0\), the resultant vector \(\mathbf{R}\) will be opposite the original \(\mathbf{F}\) (i.e.
+            their angles are 180° apart) </li>
+      </ul>
+      </p>
+    </section>
+    <section id="Vector sum">
+      <h2>Vector sum</h2>
+      <p>Vectors can be easily added together using their cartesian representation:
+        \[
+        \mathbf{A}+\mathbf{B}=\left(A_x\,\mathbf{i}+A_y\,\mathbf{j}\right)+\left(B_x\,\mathbf{i}+B_y\, \mathbf{j}
+        \right)
+        = \left(A_x+B_x\right)\,\mathbf{i}+\left(A_y+B_y\right)\,\mathbf{j}
+        \]
+
+        Graphically, you can resort to the <b>parallelogram rule</b> that states that the resultant vector is always the
+        diagonal of the parallelogram formed by the two addends.
+
+      </p>
+      <div id="Vector2Sum"></div>
+
+      <p>Another way of graphically sum multiple vectors is the so-called <b>triangle rule</b>, that states that the
+        resultant vector is a vector connecting the start and end points of the polygon formed by all addends, placed
+        consecutively.</p>
+      <div id="VectorTriangleRule"></div>
+
+      <p>As it's possible to observe, the vector summation being a commutative operation means that the order of the
+        addends does not matter.</p>
+    </section>
+
+    <section id="practice-problems">
+      <h2>Practice Problems</h2>
+      
+      <div class="problem">
+        <h3>Problem 1: Cartesian to Polar Conversion</h3>
+        <p>Convert the following vector from Cartesian to polar form: \(\mathbf{V} = -3\mathbf{i} + 4\mathbf{j}\)</p>
+        <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
+        <div class="solution" id="solution1">
+          <p>The magnitude of the vector is:</p>
+          <p>\(|\mathbf{V}| = \sqrt{(-3)^2 + 4^2} = \sqrt{9 + 16} = \sqrt{25} = 5\)</p>
+          <p>The angle can be found using:</p>
+          <p>\(\theta = \tan^{-1}(V_y/V_x) = \tan^{-1}(4/(-3)) = \tan^{-1}(-1.333) = -53.13°\)</p>
+          <p>However, since the x-component is negative and the y-component is positive, the vector is in the second quadrant, so we need to adjust:</p>
+          <p>\(\theta = 180° - 53.13° = 126.87°\)</p>
+          <p>Therefore, the polar form is \(\mathbf{V} = (5, 126.87°)\)</p>
+        </div>
+      </div>
+      
+      <div class="problem">
+        <h3>Problem 2: Vector Addition</h3>
+        <p>Vector \(\mathbf{A}\) has a magnitude of 10 units and points in the direction of 30° from the positive x-axis. Vector \(\mathbf{B}\) has a magnitude of 15 units and points in the direction of 135° from the positive x-axis. Find the resultant vector \(\mathbf{R} = \mathbf{A} + \mathbf{B}\) in both Cartesian and polar form.</p>
+        <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
+        <div class="solution" id="solution2">
+          <p>First, convert both vectors to Cartesian form:</p>
+          <p>\(\mathbf{A} = 10\cos(30°)\mathbf{i} + 10\sin(30°)\mathbf{j} = 8.66\mathbf{i} + 5\mathbf{j}\)</p>
+          <p>\(\mathbf{B} = 15\cos(135°)\mathbf{i} + 15\sin(135°)\mathbf{j} = -10.61\mathbf{i} + 10.61\mathbf{j}\)</p>
+          <p>Adding the vectors:</p>
+          <p>\(\mathbf{R} = \mathbf{A} + \mathbf{B} = (8.66 - 10.61)\mathbf{i} + (5 + 10.61)\mathbf{j} = -1.95\mathbf{i} + 15.61\mathbf{j}\)</p>
+          <p>Converting back to polar form:</p>
+          <p>Magnitude: \(|\mathbf{R}| = \sqrt{(-1.95)^2 + (15.61)^2} = \sqrt{3.80 + 243.67} = \sqrt{247.47} \approx 15.73\)</p>
+          <p>Direction: \(\theta = \tan^{-1}(15.61/(-1.95)) = \tan^{-1}(-8.00) = -82.9°\)</p>
+          <p>Adjusting for the quadrant (negative x, positive y): \(\theta = 180° - 82.9° = 97.1°\)</p>
+          <p>Therefore, \(\mathbf{R} = -1.95\mathbf{i} + 15.61\mathbf{j} = (15.73, 97.1°)\)</p>
+        </div>
+      </div>
+      
+      <div class="problem">
+        <h3>Problem 3: Scalar Multiplication</h3>
+        <p>Given vector \(\mathbf{V} = 4\mathbf{i} - 3\mathbf{j}\), find:</p>
+        <ol type="a">
+          <li>The magnitude and direction of \(\mathbf{V}\)</li>
+          <li>The vector \(2\mathbf{V}\)</li>
+          <li>The vector \(-0.5\mathbf{V}\)</li>
+          <li>The unit vector in the direction of \(\mathbf{V}\)</li>
+        </ol>
+        <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
+        <div class="solution" id="solution3">
+          <p>a) Magnitude: \(|\mathbf{V}| = \sqrt{4^2 + (-3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5\)</p>
+          <p>Direction: \(\theta = \tan^{-1}((-3)/4) = \tan^{-1}(-0.75) = -36.9°\)</p>
+          <p>Since the x-component is positive and the y-component is negative, the vector is in the fourth quadrant, so the angle is correct as is: \(\theta = -36.9° = 323.1°\) (if expressing in the 0-360° range)</p>
+          
+          <p>b) \(2\mathbf{V} = 2(4\mathbf{i} - 3\mathbf{j}) = 8\mathbf{i} - 6\mathbf{j}\)</p>
+          <p>This has magnitude \(|2\mathbf{V}| = 2|\mathbf{V}| = 2 \times 5 = 10\) and the same direction as \(\mathbf{V}\), which is \(-36.9°\)</p>
+          
+          <p>c) \(-0.5\mathbf{V} = -0.5(4\mathbf{i} - 3\mathbf{j}) = -2\mathbf{i} + 1.5\mathbf{j}\)</p>
+          <p>This has magnitude \(|-0.5\mathbf{V}| = |-0.5||\mathbf{V}| = 0.5 \times 5 = 2.5\) and direction \(\theta + 180° = -36.9° + 180° = 143.1°\) (because of the negative scalar multiplier)</p>
+          
+          <p>d) The unit vector is \(\hat{\mathbf{V}} = \frac{\mathbf{V}}{|\mathbf{V}|} = \frac{4\mathbf{i} - 3\mathbf{j}}{5} = 0.8\mathbf{i} - 0.6\mathbf{j}\)</p>
+          <p>This has magnitude 1 and the same direction as \(\mathbf{V}\), which is \(-36.9°\)</p>
+        </div>
+      </div>
+    </section>
+    
+    <section id="quiz">
+      <h2>Self-Assessment Quiz</h2>
+      
+      <div class="quiz-container">
+        <div class="quiz-question">
+          <p><strong>Question 1:</strong> Which of the following statements about vector addition is FALSE?</p>
+          <form id="q1">
+            <input type="radio" id="q1a" name="q1" value="a">
+            <label for="q1a">a) Vector addition is commutative</label><br>
+            <input type="radio" id="q1b" name="q1" value="b">
+            <label for="q1b">b) Vector addition can be visualized using the parallelogram rule</label><br>
+            <input type="radio" id="q1c" name="q1" value="c">
+            <label for="q1c">c) The magnitude of the sum of two vectors equals the sum of their magnitudes</label><br>
+            <input type="radio" id="q1d" name="q1" value="d">
+            <label for="q1d">d) Vector addition can be performed by adding the corresponding components</label><br>
+            <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
+          </form>
+          <div id="q1-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+          <p><strong>Question 2:</strong> If \(\mathbf{A} = 3\mathbf{i} + 4\mathbf{j}\) and \(\mathbf{B} = -2\mathbf{i} + 5\mathbf{j}\), what is \(\mathbf{A} + \mathbf{B}\)?</p>
+          <form id="q2">
+            <input type="radio" id="q2a" name="q2" value="a">
+            <label for="q2a">a) \(\mathbf{i} + 9\mathbf{j}\)</label><br>
+            <input type="radio" id="q2b" name="q2" value="b">
+            <label for="q2b">b) \(5\mathbf{i} - \mathbf{j}\)</label><br>
+            <input type="radio" id="q2c" name="q2" value="c">
+            <label for="q2c">c) \(\mathbf{i} + \mathbf{j}\)</label><br>
+            <input type="radio" id="q2d" name="q2" value="d">
+            <label for="q2d">d) \(6\mathbf{i} + 20\mathbf{j}\)</label><br>
+            <button type="button" onclick="checkAnswer('q2', 'a')">Check Answer</button>
+          </form>
+          <div id="q2-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+          <p><strong>Question 3:</strong> A vector has a magnitude of 10 units and makes an angle of 60° with the positive x-axis. What are its Cartesian components?</p>
+          <form id="q3">
+            <input type="radio" id="q3a" name="q3" value="a">
+            <label for="q3a">a) \(5\mathbf{i} + 5\sqrt{3}\mathbf{j}\)</label><br>
+            <input type="radio" id="q3b" name="q3" value="b">
+            <label for="q3b">b) \(5\mathbf{i} + 5\mathbf{j}\)</label><br>
+            <input type="radio" id="q3c" name="q3" value="c">
+            <label for="q3c">c) \(5\sqrt{3}\mathbf{i} + 5\mathbf{j}\)</label><br>
+            <input type="radio" id="q3d" name="q3" value="d">
+            <label for="q3d">d) \(5\mathbf{i} - 5\sqrt{3}\mathbf{j}\)</label><br>
+            <button type="button" onclick="checkAnswer('q3', 'a')">Check Answer</button>
+          </form>
+          <div id="q3-feedback" class="feedback"></div>
+        </div>
+        
+        <div class="quiz-question">
+          <p><strong>Question 4:</strong> If vector \(\mathbf{V}\) has magnitude 6 and direction 30°, what is the effect of multiplying it by the scalar -2?</p>
+          <form id="q4">
+            <input type="radio" id="q4a" name="q4" value="a">
+            <label for="q4a">a) The magnitude becomes 12 and the direction remains 30°</label><br>
+            <input type="radio" id="q4b" name="q4" value="b">
+            <label for="q4b">b) The magnitude becomes 12 and the direction changes to 210°</label><br>
+            <input type="radio" id="q4c" name="q4" value="c">
+            <label for="q4c">c) The magnitude becomes 3 and the direction changes to 210°</label><br>
+            <input type="radio" id="q4d" name="q4" value="d">
+            <label for="q4d">d) The magnitude becomes -12 and the direction remains 30°</label><br>
+            <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
+          </form>
+          <div id="q4-feedback" class="feedback"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    new p5(sketch1, 'VectorRepresentation');
+    new p5(sketch2, 'VectorScaling');
+    new p5(sketch3, 'Vector2Sum');
+    new p5(sketch4, 'VectorTriangleRule');
+    
+    // Functions for practice problems and quiz
+    function toggleSolution(id) {
+      const solution = document.getElementById(id);
+      if (solution.style.display === "block") {
+        solution.style.display = "none";
+      } else {
+        solution.style.display = "block";
+      }
+    }
+    
+    function checkAnswer(questionId, correctAnswer) {
+      const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+      const feedbackElement = document.getElementById(`${questionId}-feedback`);
+      
+      if (!selectedOption) {
+        feedbackElement.innerHTML = "Please select an answer.";
+        feedbackElement.className = "feedback";
+        return;
+      }
+      
+      if (selectedOption.value === correctAnswer) {
+        feedbackElement.innerHTML = "Correct! Well done.";
+        feedbackElement.className = "feedback correct";
+      } else {
+        feedbackElement.innerHTML = "Incorrect. Try again!";
+        feedbackElement.className = "feedback incorrect";
+      }
+    }
+  </script>
+
+<style>
+  .problem {
+    background-color: #f9f9f9;
+    border-left: 4px solid #ffd700;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 0 5px 5px 0;
+  }
+  
+  .solution-toggle {
+    color: #b38600;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+    margin: 10px 0;
+  }
+  
+  .solution {
+    display: none;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  .quiz-container {
+    margin-top: 20px;
+  }
+  
+  .quiz-question {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border-left: 4px solid #ffb300;
+  }
+  
+  .quiz-question form {
+    margin: 10px 0;
+  }
+  
+  .quiz-question label {
+    display: inline-block;
+    margin: 5px 0;
+  }
+  
+  .quiz-question button {
+    margin-top: 10px;
+  }
+  
+  .feedback {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  
+  .correct {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .incorrect {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+</style>
+</body>
+<footer>
+  <script src="/common/footer.js"></script>
+</footer>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="1000" height="1000"><g clip-path="url(#SvgjsClipPath1629)"><rect width="1000" height="1000" fill="#ffffff"></rect><g transform="matrix(31.25,0,0,31.25,0,0)"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" width="32" height="32"><svg viewBox="0 0 32 32" version="1.1" id="svg56431" sodipodi:docname="favicon-gear.svg" inkscape:version="1.1.1 (c3084ef, 2021-09-22)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+  <defs id="defs56435"><clipPath id="SvgjsClipPath1629"><rect width="1000" height="1000" x="0" y="0" rx="200" ry="200"></rect></clipPath></defs>
+  <sodipodi:namedview id="namedview56433" pagecolor="#505050" bordercolor="#eeeeee" borderopacity="1" inkscape:pageshadow="0" inkscape:pageopacity="0" inkscape:pagecheckerboard="0" showgrid="false" inkscape:zoom="8.6068567" inkscape:cx="-7.7263979" inkscape:cy="21.378304" inkscape:window-width="1512" inkscape:window-height="816" inkscape:window-x="0" inkscape:window-y="38" inkscape:window-maximized="0" inkscape:current-layer="svg56431"></sodipodi:namedview>
+  <!-- Background -->
+  <circle cx="16" cy="16" r="16" fill="#fffbeb" id="circle56421"></circle>
+  <!-- Gear Icon - Centered -->
+  <circle cx="16" cy="16" r="12" fill="#ffd700" id="circle56423"></circle>
+  <path d="M16,4 L18.5,4.5 L19.5,9 L21.5,10 L25.5,7 L27.5,9 L24.5,13 L25.5,15 L30,15.5 L29.5,18.5 L25,19 L24,21 L27,25 L24.5,27 L20.5,24 L18.5,25 L17.5,29.5 L14.5,30 L13.5,25.5 L11.5,24.5 L7.5,27.5 L5,25 L8,21 L7,19 L2.5,18.5 L2,15.5 L6.5,14.5 L7.5,12.5 L4.5,8.5 L7,6 L11,9 L13,8 L14,4.5 Z" fill="#ffd700" stroke="#333" stroke-width="1" id="path56425"></path>
+  <circle cx="16" cy="16.5" r="4.5" fill="#fffbeb" stroke="#333333" stroke-width="1" id="circle56427"></circle>
+  <!-- Golden Border -->
+  <circle cx="16" cy="16" r="15" fill="none" stroke="#ffd700" stroke-width="1" id="circle56429"></circle>
+</svg></svg></g></g></svg>

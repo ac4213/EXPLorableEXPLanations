@@ -1,289 +1,505 @@
-var cnv, cnvx, cnvy; //canvas variables
-var bgdRGB = [200,200,200]; //[85, 140, 137]; //background color
-var sliders=[]; //sliders is an array of slider objects
-var Yspacing, sliderpos = 20;
-var figura = []; //figura is an array of shapes objects
-var ctroid;
-var absx=630, absy=50;
-var tflangew=100, tflangeh=30;
-var webt=20, webh=150;
-var bflangew=200, bflangeh=30;
-var uppEQ, midEQ, lowEQ, resEQ;
+// Canvas variables
+var cnv, cnvx, cnvy;
+var bgdRGB = [233, 216, 177]; // Match the parabolic applet background
+var sliders = []; // Array of slider objects
+var sliderLabels = ["Top flange width", "Top flange height", "Web width", "Web height", "Bottom flange width", "Bottom flange height"];
+var sliderDefaults = [100, 30, 20, 150, 200, 30]; // Default values for sliders
+var sliderMinMax = [[20, 300], [10, 50], [10, 50], [50, 300], [20, 300], [10, 50]]; // Min/max values for sliders
+var figura = []; // Array of shape objects
+var ctroid; // Centroid of the composite shape
+var absx = 300, absy = 150; // Position of the figure on canvas - shifted left
+
+// Control variables
+var showCentroid = true;
+var showAxes = false; // Grid turned off by default
+var showDimensions = false;
+var symmetricMode = false;
+
+// UI elements
+var buttonContainer;
+var resultDiv;
 
 function setup() {
-  cnv = createCanvas(800, 500);
-  cnv.parent('sketch-holder');
-  cnvx = cnv.position().x;
-  cnvy = cnv.position().y;
-  background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);
-  //--------------INPUTS------------------------
-  var FontSize = "12px";
-  var InputPos = [cnvx + 0.1 * width, cnvy + 0.60 * height];
-  var InputWidth = 0.50 * width;
-  Yspacing = 0.055 * height;
-  var InpSize = 45; //pixels
-  
-  //crea la figura
-  figura.push(new RectShape(absx,absy,tflangew,tflangeh,[255,0,0]));
-  figura.push(new RectShape(absx,absy+tflangeh/2+webh/2,webt,webh,[0,255,0]));
-  figura.push(new RectShape(absx,absy+webh+tflangeh,bflangew,bflangeh,[0,0,255]));
+    // Create canvas
+    cnv = createCanvas(800, 500);
+    cnv.parent('sketch-holder');
+    cnvx = cnv.position().x;
+    cnvy = cnv.position().y;
+    
+    // Create sliders
+    createSliders();
+    
+    // Create initial figure
+    resetFigure();
+    
+    // Display settings
+    angleMode(DEGREES);
+    rectMode(CENTER);
+    textSize(12);
+    
+    // Set up results area
+    resultDiv = select('#results-content');
+    
+    // Enable manual redraw to improve performance
+    noLoop();
+}
 
-  //crea sliders
-  sliders.push(createSlider(20,300,tflangew,10));
-  sliders[0].position(sliderpos,cnvy+absy);
-  sliders[0].style('width', 200+'px');
-  sliders[0].input(slidercallback);
-
-  sliders.push(createSlider(20,300,bflangew,10));
-  sliders[1].position(sliderpos,cnvy+absy+webh+tflangeh);
-  sliders[1].style('width', 200+'px');
-  sliders[1].input(slidercallback);
-
-  //crea equations
-  uppEQ = document.createElement('div');
-  uppEQ.id="equazione";
-  uppEQ.style.position = 'absolute';
-  uppEQ.style.left =(sliders[0].x+sliders[0].width+100) + 'px';
-  uppEQ.style.top = (cnvy + figura[0].yc-60) + 'px';
-  uppEQ.style.textAlign="center";
-  uppEQ.style.color = 'red';
-  document.body.appendChild(uppEQ);
-  
-  midEQ = document.createElement('div');
-  midEQ.id="equazione";
-  midEQ.style.position = 'absolute';
-  midEQ.style.left =(sliders[0].x+sliders[0].width+100) + 'px';
-  midEQ.style.top = (cnvy + figura[1].yc-60) + 'px';
-  midEQ.style.textAlign="center";
-  midEQ.style.color = 'green';
-  document.body.appendChild(midEQ);
-  
-  lowEQ = document.createElement('div');
-  lowEQ.id="equazione";
-  lowEQ.style.position = 'absolute';
-  lowEQ.style.left =(sliders[0].x+sliders[0].width+100) + 'px';
-  lowEQ.style.top = (cnvy + figura[2].yc-60) + 'px';
-  lowEQ.style.textAlign="center";
-  lowEQ.style.color = 'blue';
-  document.body.appendChild(lowEQ);
-  
-  resEQ = document.createElement('div');
-  resEQ.id="equazione";
-  resEQ.style.position = 'absolute';
-  resEQ.style.left =(sliders[0].x+sliders[0].width+100) + 'px';
-  resEQ.style.top = (cnvy + figura[2].yc-60+80) + 'px';
-  resEQ.style.textAlign="center";
-  resEQ.style.color = 'black';
-  document.body.appendChild(resEQ);
-
-  genEQ = document.createElement('div');
-  genEQ.id="equazione";
-  genEQ.style.position = 'absolute';
-  genEQ.style.left =(sliders[0].x) + 'px';
-  genEQ.style.top = (cnvy + figura[2].yc+100) + 'px';
-  genEQ.style.textAlign="center";
-  genEQ.style.color = "#EEEEEE";
-  document.body.appendChild(genEQ);
-
-  uppEQ.innerHTML = " $$ I^{^{\(1\)}}_{xx}= \\frac{b_1h_1^3}{12} + A_1d_1^2 $$ ";
-  midEQ.innerHTML = " $$ I^{^{\(2\)}}_{xx}= \\frac{b_2h_2^3}{12} + A_2d_2^2 $$ ";
-  lowEQ.innerHTML = " $$ I^{^{\(3\)}}_{xx}= \\frac{b_3h_3^3}{12} + A_3d_3^2 $$ ";
-  resEQ.innerHTML = " $$ I_{xx} = I^{^{\(1\)}}_{xx} + I^{^{\(2\)}}_{xx} + I^{^{\(3\)}}_{xx} $$ ";
-  genEQ.innerHTML = " $$ y_c = \\frac{\\sum(A_i y_i)}{\\sum(A_i)} = \\frac{A_1y_1+A_2y_2+A_3y_3}{A_1+A_2+A_3} $$ ";
-  
-  
-  MathJax.Hub.Queue(["Typeset",MathJax.Hub],"equazione");  
-
-  //var fps = 60;
-  //frameRate(fps);
-  angleMode(DEGREES);
-  noLoop();
-  redraw();
+function createSliders() {
+    // Create sliders below the canvas
+    for (let i = 0; i < sliderLabels.length; i++) {
+        let sliderDiv = createDiv();
+        sliderDiv.parent('button-container');
+        sliderDiv.style('margin', '10px');
+        sliderDiv.style('text-align', 'center');
+        
+        let label = createP(sliderLabels[i] + ": ");
+        label.parent(sliderDiv);
+        label.style('margin', '5px');
+        
+        let slider = createSlider(sliderMinMax[i][0], sliderMinMax[i][1], sliderDefaults[i], 1);
+        slider.style('width', '200px');
+        slider.parent(sliderDiv);
+        slider.input(() => {
+            let val = slider.value();
+            valueSpan.html(val + ' mm');
+            
+            // If in symmetric mode, update the paired slider
+            if (symmetricMode && (i === 0 || i === 4)) {
+                let pairedIdx = i === 0 ? 4 : 0;
+                sliders[pairedIdx].value(val);
+                document.getElementById('value-' + pairedIdx).innerHTML = val + ' mm';
+            }
+            
+            updateFigure();
+        });
+        
+        let valueSpan = createSpan(sliderDefaults[i] + ' mm');
+        valueSpan.id('value-' + i);
+        valueSpan.style('margin-left', '10px');
+        valueSpan.parent(sliderDiv);
+        
+        sliders.push(slider);
+    }
 }
 
 function draw() {
-  background(bgdRGB[0], bgdRGB[1], bgdRGB[2]); //clear background
-  for (var ii=0; ii < figura.length; ii++) {
-    figura[ii].display();
-  }
-  ctroid = centroid(figura);
-  ellipse(ctroid.x,ctroid.y,5);
-  drawArrow(ctroid.x,ctroid.y,ctroid.x+100,ctroid.y,[255,255,255]);  
-  var Ixx = secmomarea(figura,ctroid.y);
+    // Clear the background
+    background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);
+    
+    // Draw the composite shape
+    for (let i = 0; i < figura.length; i++) {
+        figura[i].display();
+    }
+    
+    // Calculate and draw the centroid
+    ctroid = centroid(figura);
+    
+    if (showCentroid) {
+        drawCentroid(ctroid);
+    }
+    
+    // Draw dimension lines if enabled
+    if (showDimensions) {
+        drawDimensions();
+    }
+    
+    // Calculate the second moment of area
+    let Ixx = secmomarea(figura, ctroid.y);
+    
+    // Draw reference arrows showing the distances from component centroids to the composite centroid
+    drawReferenceArrows();
+    
+    // Update the result display
+    updateResults(ctroid, Ixx);
+    
+    // Draw explanatory text on the canvas
+    drawExplanatoryText(ctroid, Ixx);
+}
 
-  line(sliders[0].x+sliders[0].width+60,figura[2].yc+23,sliders[0].x+sliders[0].width+260,figura[2].yc+23)
-  line(sliders[0].x+sliders[0].width+60,figura[2].yc+25,sliders[0].x+sliders[0].width+260,figura[2].yc+25)
+function resetFigure() {
+    // Reset sliders to default values
+    for (let i = 0; i < sliders.length; i++) {
+        sliders[i].value(sliderDefaults[i]);
+        document.getElementById('value-' + i).innerHTML = sliderDefaults[i] + ' mm';
+    }
+    
+    // Update the figure
+    updateFigure();
+}
 
-  drawtext();
+function updateFigure() {
+    // Get values from sliders
+    let tflangew = sliders[0].value();
+    let tflangeh = sliders[1].value();
+    let webt = sliders[2].value();
+    let webh = sliders[3].value();
+    let bflangew = sliders[4].value();
+    let bflangeh = sliders[5].value();
+    
+    // Update the I-section components
+    figura = [];
+    
+    // Top flange (red)
+    figura.push(new RectShape(absx, absy, tflangew, tflangeh, [255, 0, 0]));
+    
+    // Web (green) - ensure it connects exactly with flanges
+    figura.push(new RectShape(absx, absy + tflangeh/2 + webh/2, webt, webh, [0, 155, 0]));
+    
+    // Bottom flange (blue) - ensure it connects exactly with web
+    figura.push(new RectShape(absx, absy + tflangeh + webh, bflangew, bflangeh, [0, 0, 255]));
+    
+    // Trigger redraw to update the visualization
+    redraw();
+}
+
+function toggleSymmetry() {
+    symmetricMode = !symmetricMode;
+    
+    if (symmetricMode) {
+        // Make bottom flange width equal to top flange width
+        let topFlangeWidth = sliders[0].value();
+        sliders[4].value(topFlangeWidth);
+        document.getElementById('value-4').innerHTML = topFlangeWidth + ' mm';
+    }
+    
+    updateFigure();
+}
+
+function toggleDimensions() {
+    showDimensions = !showDimensions;
+    redraw();
 }
 
 function centroid(figura) {
-  var totarea = 0;
-  var sum=0;
-  for (var ii = 0; ii < figura.length; ii++) {
-    totarea = totarea + figura[ii].Area;
-    sum = sum + figura[ii].Area * figura[ii].yc; //sum(Ai*yci)
-  }
-  var yc = sum/totarea;
-  var xc = figura[0].xc;
-
-  var res = {
-    x: xc,
-    y: yc
-  };
-  return res;
+    var totarea = 0;
+    var sumY = 0;
+    var sumX = 0;
+    
+    for (var ii = 0; ii < figura.length; ii++) {
+        totarea = totarea + figura[ii].Area;
+        sumY = sumY + figura[ii].Area * figura[ii].yc; // sum(Ai*yci)
+        sumX = sumX + figura[ii].Area * figura[ii].xc; // sum(Ai*xci)
+    }
+    
+    var yc = sumY / totarea;
+    var xc = sumX / totarea; // For asymmetric shapes
+    
+    var res = {
+        x: xc,
+        y: yc
+    };
+    return res;
 }
 
-function secmomarea(figura,theaxis) {
-  var Ixx = 0;
-  for (var ii = 0; ii < figura.length; ii++) {
-    var d = (figura[ii].yc - theaxis);
-    Ixx = Ixx + figura[ii].Ixc + figura[ii].Area * Math.pow(d, 2); //Ia=Ix+Ad^2
-  }
-  return Ixx;
+function secmomarea(figura, theaxis) {
+    var Ixx = 0;
+    for (var ii = 0; ii < figura.length; ii++) {
+        var d = (figura[ii].yc - theaxis);
+        Ixx = Ixx + figura[ii].Ixc + figura[ii].Area * Math.pow(d, 2); // Parallel axis theorem: Ia = Ix + Ad^2
+    }
+    return Ixx;
+}
+
+// Function to get total area of all components
+function getTotalArea() {
+    let totalArea = 0;
+    for (let i = 0; i < figura.length; i++) {
+        totalArea += figura[i].Area;
+    }
+    return totalArea;
+}
+
+// Function to draw the centroid marker
+function drawCentroid(ctroid) {
+    push();
+    stroke(255, 0, 0);
+    strokeWeight(2);
+    fill(255, 255, 0);
+    
+    // Draw centroid circle
+    ellipse(ctroid.x, ctroid.y, 10, 10);
+    
+    // Draw crosshairs
+    line(ctroid.x - 15, ctroid.y, ctroid.x + 15, ctroid.y);
+    line(ctroid.x, ctroid.y - 15, ctroid.x, ctroid.y + 15);
+    
+    // Label
+    textAlign(CENTER, TOP);
+    fill(0);
+    text("Centroid", ctroid.x, ctroid.y + 20);
+    
+    pop();
+}
+
+// Function to draw dimensions
+function drawDimensions() {
+    push();
+    stroke(100);
+    strokeWeight(1);
+    fill(0);
+    textAlign(CENTER, CENTER);
+    
+    // Draw dimension lines for top flange
+    let topFlangeWidth = figura[0].wdth;
+    let x1 = figura[0].xc - topFlangeWidth / 2;
+    let x2 = figura[0].xc + topFlangeWidth / 2;
+    let y = figura[0].yc - figura[0].hght / 2 - 15;
+    
+    line(x1, y, x2, y);
+    line(x1, y - 5, x1, y + 5);
+    line(x2, y - 5, x2, y + 5);
+    text(topFlangeWidth + " mm", (x1 + x2) / 2, y - 10);
+    
+    // Draw dimension lines for web height
+    let webHeight = figura[1].hght;
+    let x = figura[1].xc + figura[1].wdth / 2 + 15;
+    let y1 = figura[1].yc - webHeight / 2;
+    let y2 = figura[1].yc + webHeight / 2;
+    
+    line(x, y1, x, y2);
+    line(x - 5, y1, x + 5, y1);
+    line(x - 5, y2, x + 5, y2);
+    
+    push();
+    translate(x + 10, (y1 + y2) / 2);
+    rotate(90);
+    text(webHeight + " mm", 0, 0);
+    pop();
+    
+    // Draw dimension lines for bottom flange
+    let bottomFlangeWidth = figura[2].wdth;
+    x1 = figura[2].xc - bottomFlangeWidth / 2;
+    x2 = figura[2].xc + bottomFlangeWidth / 2;
+    y = figura[2].yc + figura[2].hght / 2 + 15;
+    
+    line(x1, y, x2, y);
+    line(x1, y - 5, x1, y + 5);
+    line(x2, y - 5, x2, y + 5);
+    text(bottomFlangeWidth + " mm", (x1 + x2) / 2, y + 10);
+    
+    pop();
+}
+
+// Function to draw reference arrows showing the distances from component centroids to the composite centroid
+function drawReferenceArrows() {
+    push();
+    strokeWeight(1);
+    
+    // Draw arrow from top flange centroid to composite centroid - offset to the right
+    drawArrow(figura[0].xc + 70, figura[0].yc, ctroid.x + 70, ctroid.y, [200, 0, 0], true);
+    
+    // Draw arrow from web centroid to composite centroid - offset even further right
+    if (Math.abs(figura[1].yc - ctroid.y) > 12) {
+        let direction = (figura[1].yc - ctroid.y) < 0 ? 1 : -1;
+        drawArrow(figura[1].xc + 100, figura[1].yc + direction, ctroid.x + 100, ctroid.y - direction, [0, 155, 0], true);
+    }
+    
+    // Draw arrow from bottom flange centroid to composite centroid - offset to the right
+    drawArrow(figura[2].xc + 130, figura[2].yc, ctroid.x + 130, ctroid.y, [0, 0, 200], true);
+    
+    // Label distance values - moved to the right
+    textAlign(CENTER, CENTER);
+    fill(200, 0, 0);
+    let d1 = Math.abs(figura[0].yc - ctroid.y).toFixed(1);
+    text("d₁ = " + d1 + " mm", figura[0].xc + 70, (figura[0].yc + ctroid.y) / 2);
+    
+    fill(0, 155, 0);
+    let d2 = Math.abs(figura[1].yc - ctroid.y).toFixed(1);
+    text("d₂ = " + d2 + " mm", figura[1].xc + 100, (figura[1].yc + ctroid.y) / 2);
+    
+    fill(0, 0, 200);
+    let d3 = Math.abs(figura[2].yc - ctroid.y).toFixed(1);
+    text("d₃ = " + d3 + " mm", figura[2].xc + 130, (figura[2].yc + ctroid.y) / 2);
+    
+    pop();
+}
+
+function updateResults(ctroid, Ixx) {
+    if (!resultDiv) return;
+    
+    // Calculate individual second moments
+    let Ixx1 = Math.round(secmomarea([figura[0]], ctroid.y));
+    let Ixx2 = Math.round(secmomarea([figura[1]], ctroid.y));
+    let Ixx3 = Math.round(secmomarea([figura[2]], ctroid.y));
+    
+    // Create a formatted HTML result
+    let html = `
+        <table>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Centroid (X, Y)</td>
+            <td>(${ctroid.x.toFixed(1)}, ${ctroid.y.toFixed(1)}) mm</td>
+        </tr>
+        <tr>
+            <td>Total Area</td>
+            <td>${getTotalArea().toFixed(0)} mm²</td>
+        </tr>
+        <tr>
+            <td>Ixx (Top Flange)</td>
+            <td>${Ixx1.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td>Ixx (Web)</td>
+            <td>${Ixx2.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td>Ixx (Bottom Flange)</td>
+            <td>${Ixx3.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td><strong>Total Ixx</strong></td>
+            <td><strong>${Math.round(Ixx).toFixed(0)} mm⁴</strong></td>
+        </tr>
+        </table>
+        <p><strong>${symmetricMode ? 'Symmetric Mode: ON' : ''}</strong></p>
+    `;
+    
+    resultDiv.innerHTML = html;
+}
+
+function drawExplanatoryText(ctroid, Ixx) {
+    push();
+    fill(0);
+    textAlign(LEFT, BOTTOM);
+    textSize(14);
+    text("Moment of Area Explorer", 20, 25);
+    
+    // Draw legend
+    textSize(12);
+    fill(200, 0, 0);
+    text("Top Flange", 520, 130);
+    fill(0, 155, 0);
+    text("Web", 520, 150);
+    fill(0, 0, 200);
+    text("Bottom Flange", 520, 170);
+    
+    pop();
 }
 
 function RectShape(xc, yc, wdth, hght, colore) {
-  this.xc = xc;
-  this.yc = yc;
-  this.colr = colore;
-  this.wdth = wdth;
-  this.hght = hght;
+    this.xc = xc;
+    this.yc = yc;
+    this.colr = colore;
+    this.wdth = wdth;
+    this.hght = hght;
 
-  this.Area = wdth * hght; //b*h
-  this.troid = {
-    x: xc,
-    y: yc
-  }; //center
-  this.Ixc = wdth * Math.pow(hght, 3) / 12; //bh^3/12
-  this.Iyc = hght * Math.pow(wdth, 3) / 12; //hb^3/12
+    this.Area = wdth * hght; //b*h
+    this.troid = {
+        x: xc,
+        y: yc
+    }; //center
+    this.Ixc = wdth * Math.pow(hght, 3) / 12; //bh^3/12 (Second moment about centroidal x-axis)
+    this.Iyc = hght * Math.pow(wdth, 3) / 12; //hb^3/12 (Second moment about centroidal y-axis)
 
-  this.display = function() {
-    push();
-      rectMode(CENTER);
-      //stroke(this.colr[0],this.colr[1],this.colr[2]);
-      stroke(0);
-      fill(this.colr[0],this.colr[1],this.colr[2],50); //color,alpha
-      rect(this.xc, this.yc, this.wdth, this.hght); //draw Recto
-    pop();
-    drawArrow(this.xc,this.yc,this.xc+Math.max(this.wdth/3,50),this.yc,this.colr);
-    this.showcentre();
-  };
+    this.display = function() {
+        push();
+        rectMode(CENTER);
+        stroke(0);
+        strokeWeight(2);
+        
+        // Fill with semi-transparent color
+        fill(this.colr[0], this.colr[1], this.colr[2], 100);
+        
+        // Draw the rectangle
+        rect(this.xc, this.yc, this.wdth, this.hght);
+        
+        // Add hatching pattern to help visualize the shape
+        stroke(this.colr[0], this.colr[1], this.colr[2], 150);
+        strokeWeight(1);
+        
+        let spacing = 10;
+        for (let i = -this.wdth/2 + spacing/2; i < this.wdth/2; i += spacing) {
+            drawHatchLine(this.xc + i, this.yc - this.hght/2, this.xc + i, this.yc + this.hght/2);
+        }
+        pop();
+        
+        // Display the centroid of this component
+        this.showcentre();
+        
+        // Display the area label - moved to the right
+        push();
+        fill(0);
+        textAlign(LEFT, CENTER);
+        textSize(12);
+        text("A = " + this.Area.toFixed(0) + " mm²", this.xc + this.wdth/2 + 20, this.yc);
+        pop();
+    };
 
-  this.showcentre = function() {
-    push();
-      stroke(this.colr[0],this.colr[1],this.colr[2]);
-      fill(this.colr[0],this.colr[1],this.colr[2],30); //color,alpha
-      ellipse(this.xc, this.yc, 5); //draw Recto
-    pop();
-  };
+    this.showcentre = function() {
+        push();
+        stroke(this.colr[0], this.colr[1], this.colr[2]);
+        strokeWeight(1);
+        fill(this.colr[0], this.colr[1], this.colr[2], 200);
+        
+        // Draw a small circle at the centroid
+        ellipse(this.xc, this.yc, 6, 6);
+        
+        // Draw a small cross at the centroid
+        drawHatchLine(this.xc - 4, this.yc, this.xc + 4, this.yc);
+        drawHatchLine(this.xc, this.yc - 4, this.xc, this.yc + 4);
+        pop();
+    };
 }
 
-function slidercallback() {
-  tflangew=sliders[0].value();
-  bflangew=sliders[1].value();
-  figura[0]=(new RectShape(absx,absy,tflangew,tflangeh,[255,0,0]));
-  figura[1]=(new RectShape(absx,absy+tflangeh/2+webh/2,webt,webh,[0,255,0]));
-  figura[2]=(new RectShape(absx,absy+webh+tflangeh,bflangew,bflangeh,[0,0,255]));
-  redraw();
+// Function to draw a line (avoiding the name conflict with p5.js line())
+function drawHatchLine(x1, y1, x2, y2) {
+    line(x1, y1, x2, y2);
 }
 
-function drawtext() {
-  push();
-    textSize(12);
-    fill(0);
-    textAlign(CENTER,BOTTOM);
-    text("top flange width",sliders[0].x+sliders[0].width/2,sliders[0].y-cnvy);
-    text("bottom flange width",sliders[1].x+sliders[1].width/2,sliders[1].y-cnvy);
-    textAlign(CENTER,TOP);
-    text("[mm]",sliders[0].x+sliders[0].width/2,sliders[0].y+sliders[0].height-cnvy);
-    text("[mm]",sliders[1].x+sliders[1].width/2,sliders[1].y+sliders[1].height-cnvy);   
-    text("centroid position",sliders[1].x+sliders[1].width/2+20,sliders[1].y+sliders[1].height);   
-    fill("red");
-    var Ixx1 = Math.round(secmomarea([figura[0]],ctroid.y));
-    var dist1 = Math.round(Math.pow(figura[0].yc - ctroid.y,2));
-    text(Ixx1 + " = " + figura[0].Ixc + " + " + figura[0].Area + " * " + dist1,width/2-20,sliders[0].y-cnvy);
-    fill("green");
-    var Ixx2 = Math.round(secmomarea([figura[1]],ctroid.y));
-    var dist2 = Math.round(Math.pow(figura[1].yc - ctroid.y,2));
-    text(Ixx2 + " = " + figura[1].Ixc + " + " + figura[1].Area + " * " + dist2,width/2-20,(sliders[0].y+sliders[1].y)/2-cnvy);
-    fill("blue");
-    var Ixx3 = Math.round(secmomarea([figura[2]],ctroid.y));
-    var dist3 = Math.round(Math.pow(figura[2].yc - ctroid.y,2));
-    text(Ixx3 + " = " + figura[2].Ixc + " + " + figura[2].Area + " * " + dist3,width/2-20,sliders[1].y-cnvy);
-  pop();
-  if (Math.abs(figura[1].yc-ctroid.y)>12){
-    if ((figura[1].yc-ctroid.y)<0) {var pix=1} else {var pix=-1}
-    drawArrow(figura[1].xc+20, figura[1].yc+pix, ctroid.x+20, ctroid.y-pix, [100,100,100],true)
-  }
-  drawArrow(figura[0].xc+30, figura[0].yc+1, ctroid.x+30, ctroid.y-1, [100,100,100],true)
-  drawArrow(figura[2].xc+40, figura[2].yc-1, ctroid.x+40, ctroid.y+1, [100,100,100],true)  
-}
-
-function drawArrow(fromx, fromy, tox, toy, color, twoheaded){
-  //variables to be used when creating the arrow
-  var colorstring="#", pad="00";
-  for (var ii=0; ii < color.length; ii++) {
-    colorstring= colorstring + (pad + color[ii].toString(16)).slice(-pad.length);
-  }
-  var ctx = cnv.drawingContext; //works for P5.
-  var headlen = 5;
-
-  var angle = Math.atan2(toy-fromy,tox-fromx);
-
-  var oldstrokestyle=ctx.strokeStyle;
-  var oldlineWidth=ctx.lineWidth;
-  var oldfillStyle=ctx.fillStyle;
-
-  //starting path of the arrow from the start square to the end square and drawing the stroke
-  ctx.beginPath();
-  ctx.moveTo(fromx, fromy);
-  ctx.lineTo(tox, toy);
-  ctx.strokeStyle = colorstring;
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  //starting a new path from the head of the arrow to one of the sides of the point
-  ctx.beginPath();
-  ctx.moveTo(tox, toy);
-  ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
-
-  //path from the side point of the arrow, to the other side point
-  ctx.lineTo(tox-headlen*Math.cos(angle+Math.PI/7),toy-headlen*Math.sin(angle+Math.PI/7));
-
-  //path from the side point back to the tip of the arrow, and then again to the opposite side point
-  ctx.lineTo(tox, toy);
-  ctx.lineTo(tox-headlen*Math.cos(angle-Math.PI/7),toy-headlen*Math.sin(angle-Math.PI/7));
-
-  //draws the paths created above
-  ctx.strokeStyle = colorstring;
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  ctx.fillStyle = colorstring;
-  ctx.fill();
-
-  if (twoheaded) {
-    //starting a new path from the head of the arrow to one of the sides of the point
+// Draw an arrow from (fromx, fromy) to (tox, toy)
+function drawArrow(fromx, fromy, tox, toy, color, twoheaded) {
+    // Convert color array to hex string for canvas context
+    var colorstring = "#";
+    var pad = "00";
+    for (var ii = 0; ii < color.length; ii++) {
+        colorstring = colorstring + (pad + color[ii].toString(16)).slice(-pad.length);
+    }
+    
+    // Get drawing context
+    var ctx = cnv.drawingContext; // Access to raw canvas context
+    var headlen = 5; // Length of arrow head
+    
+    // Calculate arrow angle
+    var angle = Math.atan2(toy - fromy, tox - fromx);
+    
+    // Save original context settings
+    var oldstrokestyle = ctx.strokeStyle;
+    var oldlineWidth = ctx.lineWidth;
+    var oldfillStyle = ctx.fillStyle;
+    
+    // Draw the main shaft of the arrow
     ctx.beginPath();
     ctx.moveTo(fromx, fromy);
-    ctx.lineTo(fromx+headlen*Math.cos(angle-Math.PI/7),fromy+headlen*Math.sin(angle-Math.PI/7));
-
-    //path from the side point of the arrow, to the other side point
-    ctx.lineTo(fromx+headlen*Math.cos(angle+Math.PI/7),fromy+headlen*Math.sin(angle+Math.PI/7));
-
-    //path from the side point back to the tip of the arrow, and then again to the opposite side point
-    ctx.lineTo(fromx, fromy);
-    ctx.lineTo(fromx+headlen*Math.cos(angle-Math.PI/7),fromy+headlen*Math.sin(angle-Math.PI/7));
-
-    //draws the paths created above
+    ctx.lineTo(tox, toy);
     ctx.strokeStyle = colorstring;
     ctx.lineWidth = 1;
     ctx.stroke();
+    
+    // Draw the arrowhead at the end point
+    ctx.beginPath();
+    ctx.moveTo(tox, toy);
+    ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI/7), toy - headlen * Math.sin(angle - Math.PI/7));
+    ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI/7), toy - headlen * Math.sin(angle + Math.PI/7));
+    ctx.lineTo(tox, toy);
     ctx.fillStyle = colorstring;
     ctx.fill();
-  }
-
-  ctx.strokeStyle =oldstrokestyle;
-  ctx.lineWidth = oldlineWidth;
-  ctx.fillStyle = oldfillStyle;
+    
+    // If two-headed, draw the second arrowhead at the start point
+    if (twoheaded) {
+        ctx.beginPath();
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(fromx + headlen * Math.cos(angle - Math.PI/7), fromy + headlen * Math.sin(angle - Math.PI/7));
+        ctx.lineTo(fromx + headlen * Math.cos(angle + Math.PI/7), fromy + headlen * Math.sin(angle + Math.PI/7));
+        ctx.lineTo(fromx, fromy);
+        ctx.fillStyle = colorstring;
+        ctx.fill();
+    }
+    
+    // Restore original context settings
+    ctx.strokeStyle = oldstrokestyle;
+    ctx.lineWidth = oldlineWidth;
+    ctx.fillStyle = oldfillStyle;
 }

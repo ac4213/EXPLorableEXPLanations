@@ -1,0 +1,389 @@
+/* 
+ * Fatigue Analysis Module Stylesheet
+ * Author: Dr. Arnaldo Delli Carri
+ * Description: Styles for the stress-based fatigue analysis interactive module
+ */
+
+/* ===== Variables ===== */
+:root {
+    /* Colour scheme */
+    --primary-color: #ffd700;       /* Golden yellow */
+    --secondary-color: #ffb300;     /* Darker yellow */
+    --text-color: #333;             /* Dark grey */
+    --background-color: #fffbeb;    /* Light cream */
+    --link-color: #cc9900;          /* Dark gold */
+    --link-hover-color: #1c01b8;    /* Deep blue */
+    
+    /* UI colours */
+    --highlight-color: #f5f5f5;     /* Light grey */
+    --error-color: #f8d7da;         /* Light red */
+    --success-color: #d4edda;       /* Light green */
+    --warning-color: #fff3cd;       /* Light yellow */
+    
+    /* Spacing */
+    --spacing-small: 5px;
+    --spacing-medium: 10px;
+    --spacing-large: 20px;
+    
+    /* Border radius */
+    --border-radius-small: 3px;
+    --border-radius-medium: 5px;
+}
+
+/* ===== Base Styles ===== */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-large);
+    background-color: var(--background-color);
+}
+
+/* ===== Typography ===== */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: var(--spacing-large);
+    margin-bottom: var(--spacing-medium);
+    line-height: 1.2;
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 2.5em;
+    font-variant: small-caps;
+}
+
+h2 {
+    color: #b38600;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: var(--spacing-medium);
+}
+
+h3 {
+    color: #8a6d00;
+}
+
+p {
+    margin-bottom: var(--spacing-medium);
+}
+
+.small-caps {
+    font-variant: small-caps;
+}
+
+/* ===== Layout Components ===== */
+header {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    text-align: center;
+    padding: 1rem;
+    border-radius: var(--border-radius-medium);
+}
+
+section {
+    background-color: white;
+    border-radius: var(--border-radius-medium);
+    padding: var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+footer {
+    text-align: center;
+    margin-top: var(--spacing-large);
+    padding: var(--spacing-medium);
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius-medium);
+}
+
+/* ===== Navigation ===== */
+nav {
+    background-color: var(--secondary-color);
+    padding: 0.5rem;
+    border-radius: var(--border-radius-medium);
+    margin-top: var(--spacing-medium);
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+nav ul li {
+    margin: var(--spacing-small) var(--spacing-medium);
+}
+
+nav ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: bold;
+    padding: var(--spacing-small) var(--spacing-medium);
+    border-radius: var(--border-radius-small);
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover, 
+nav ul li a:focus {
+    background-color: var(--primary-color);
+    outline: none;
+}
+
+/* ===== Links ===== */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover, 
+a:focus {
+    text-decoration: underline;
+    color: var(--link-hover-color);
+    outline: none;
+}
+
+/* ===== Lists ===== */
+ul, ol {
+    padding-left: var(--spacing-large);
+    margin-bottom: var(--spacing-medium);
+}
+
+/* ===== Simulation Layout ===== */
+.simulation-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: var(--spacing-large);
+}
+
+.simulation-controls {
+    flex: 1;
+    min-width: 300px;
+    margin-right: var(--spacing-large);
+    margin-bottom: var(--spacing-large);
+}
+
+.simulation-display {
+    flex: 2;
+    min-width: 500px;
+}
+
+.plot-container {
+    width: 100%;
+    height: 400px;
+    margin: var(--spacing-large) 0;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius-small);
+}
+
+/* ===== Form Controls ===== */
+.slider-container {
+    margin-bottom: 15px;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.slider-container input[type="range"] {
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+.slider-value {
+    display: inline-block;
+    width: 50px;
+    text-align: right;
+    margin-left: var(--spacing-medium);
+}
+
+button {
+    padding: 8px 15px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--primary-color);
+}
+
+/* ===== Tab System ===== */
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: var(--spacing-large);
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-button {
+    background-color: #f1f1f1;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    margin-right: 5px;
+    font-size: 16px;
+    border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
+    transition: 0.3s;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab-button.active {
+    background-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+    padding: var(--spacing-large);
+    border: 1px solid #ddd;
+    border-top: none;
+    animation: fadeEffect 1s;
+    margin-bottom: var(--spacing-large);
+}
+
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+/* ===== Solution Buttons ===== */
+.solution-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    margin: 15px 0;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.solution-btn:hover {
+    background-color: var(--primary-color);
+}
+
+.solution {
+    background-color: #f9f9f9;
+    border-left: 4px solid var(--secondary-color);
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 0 var(--border-radius-small) var(--border-radius-small) 0;
+}
+
+/* ===== Quiz Styling ===== */
+.quiz-container {
+    margin-top: 30px;
+}
+
+.quiz-question {
+    margin-bottom: var(--spacing-large);
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: var(--border-radius-medium);
+}
+
+.quiz-options {
+    margin-top: var(--spacing-medium);
+}
+
+.quiz-option {
+    margin-bottom: var(--spacing-small);
+}
+
+.btn-check {
+    margin-top: var(--spacing-medium);
+    padding: 8px 15px;
+    background-color: var(--secondary-color);
+    border: none;
+    border-radius: var(--border-radius-small);
+    color: white;
+    cursor: pointer;
+}
+
+.btn-check:hover {
+    background-color: var(--primary-color);
+}
+
+.feedback {
+    margin-top: var(--spacing-medium);
+    padding: var(--spacing-medium);
+    border-radius: var(--border-radius-small);
+    display: none;
+}
+
+.correct {
+    background-color: var(--success-color);
+    color: #155724;
+}
+
+.incorrect {
+    background-color: var(--error-color);
+    color: #721c24;
+}
+
+/* ===== Responsiveness ===== */
+@media screen and (max-width: 768px) {
+    /* Tablet and smaller devices */
+    .simulation-container {
+        flex-direction: column;
+    }
+    
+    .simulation-controls, 
+    .simulation-display {
+        width: 100%;
+        min-width: auto;
+        margin-right: 0;
+    }
+    
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab-button {
+        margin-bottom: var(--spacing-small);
+    }
+    
+    .plot-container {
+        height: 300px;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Mobile devices */
+    body {
+        padding: var(--spacing-medium);
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+    }
+    
+    .plot-container {
+        height: 250px;
+    }
+}

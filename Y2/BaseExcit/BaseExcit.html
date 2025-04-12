@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDOF Vibration with Base Excitation</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    
+    <!-- MathJax for LaTeX rendering -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          displayMath: [['$$','$$'], ['\\[','\\]']],
+          processEscapes: true
+        }
+      });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
+    
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            --secondary-color: #ffb300;
+            --text-color: #333;
+            --background-color: #fffbeb;
+            --highlight-color: #f5f5f5;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-variant: small-caps;
+        }
+        
+        h2 {
+            color: #b38600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        h3 {
+            color: #b38600;
+            margin-top: 20px;
+        }
+        
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .simulation-col {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .content-col {
+            flex: 1;
+            min-width: 400px;
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--highlight-color);
+            border-radius: 5px;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .slider-container label {
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .slider-container input {
+            flex: 2;
+            margin: 0 10px;
+        }
+        
+        .slider-container span {
+            flex: 0.5;
+            text-align: right;
+            min-width: 80px;
+        }
+        
+        .equation-box {
+            background-color: var(--highlight-color);
+            padding: 15px;
+            border-left: 4px solid var(--primary-color);
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .key-point {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-left: 4px solid var(--secondary-color);
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        #sdof-sketch {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        button:hover {
+            background-color: var(--primary-color);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+        
+        .toggle-section {
+            color: var(--link-color);
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .practice-problems {
+            background-color: var(--highlight-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: var(--secondary-color);
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--highlight-color);
+        }
+        
+        @media screen and (max-width: 900px) {
+            .flex-container {
+                flex-direction: column;
+            }
+        }
+        
+        .small-caps {
+            font-variant: small-caps;
+        }
+        
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SDOF Vibration with Base Excitation</h1>
+        <p class="small-caps">Interactive Lecture on Single Degree of Freedom Systems</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+    
+    <div class="flex-container">
+        <div class="simulation-col">
+            <h2>Interactive Simulation</h2>
+            <div id="sdof-sketch"></div>
+            
+            <div class="controls">
+                <div class="slider-container">
+                    <label for="mass-slider">Mass (m):</label>
+                    <input type="range" id="mass-slider" min="1" max="10" step="0.1" value="2">
+                    <span id="mass-value">2.0 kg</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="stiffness-slider">Stiffness (k):</label>
+                    <input type="range" id="stiffness-slider" min="100" max="2000" step="50" value="500">
+                    <span id="stiffness-value">500 N/m</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="damping-slider">Damping (c):</label>
+                    <input type="range" id="damping-slider" min="0" max="50" step="1" value="10">
+                    <span id="damping-value">10 Ns/m</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="amplitude-slider">Base Amplitude:</label>
+                    <input type="range" id="amplitude-slider" min="0" max="0.05" step="0.001" value="0.02">
+                    <span id="amplitude-value">0.02 m</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="frequency-slider">Excitation Frequency:</label>
+                    <input type="range" id="frequency-slider" min="0.1" max="10" step="0.1" value="3.0">
+                    <span id="frequency-value">3.0 Hz</span>
+                </div>
+                
+                <div class="button-container">
+                    <button id="start-button">Start</button>
+                    <button id="reset-button">Reset</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-col">
+            <h2>Introduction to Base Excitation</h2>
+            <p>Base excitation is a fundamental concept in vibration engineering where a system is excited through motion of its support or foundation rather than by directly applying a force to the mass. This type of vibration is commonly encountered in:</p>
+            <ul>
+                <li>Vehicles driving over rough roads</li>
+                <li>Buildings during earthquakes</li>
+                <li>Electronic equipment mounted on vibrating platforms</li>
+                <li>Machinery mounted on flexible foundations</li>
+            </ul>
+            
+            <div class="key-point">
+                <p><strong>Base excitation</strong> occurs when the input to a mechanical system is the motion of its base or foundation, rather than a force applied directly to the mass.</p>
+            </div>
+            
+            <h3>The SDOF Model with Base Excitation</h3>
+            <p>A Single Degree of Freedom (SDOF) system with base excitation consists of:</p>
+            <ul>
+                <li>A mass (m)</li>
+                <li>A spring (k) connecting the mass to the base</li>
+                <li>A damper (c) connecting the mass to the base</li>
+                <li>Base motion (y(t)) which acts as the input to the system</li>
+                <li>Mass motion (x(t)) which is the response of the system</li>
+            </ul>
+            
+            <h2>Equation of Motion</h2>
+            <p>To derive the equation of motion for a base-excited SDOF system, we need to identify all forces acting on the mass and apply Newton's Second Law.</p>
+            
+            <div class="equation-box">
+                <p>For a mass m with absolute displacement x(t) and base with displacement y(t):</p>
+                <p>Spring force: $F_s = k(x - y)$</p>
+                <p>Damping force: $F_d = c(\dot{x} - \dot{y})$</p>
+                <p>Using Newton's Second Law: $m\ddot{x} + c(\dot{x} - \dot{y}) + k(x - y) = 0$</p>
+                <p>Rearranging: $m\ddot{x} + c\dot{x} + kx = c\dot{y} + ky$</p>
+            </div>
+            
+            <p>If we define the relative displacement between the mass and the base as $z = x - y$, then:</p>
+            
+            <div class="equation-box">
+                <p>$m\ddot{z} + c\dot{z} + kz = -m\ddot{y}$</p>
+                <p>Where $-m\ddot{y}$ is the effective force applied to the mass due to base acceleration.</p>
+            </div>
+            
+            <div class="key-point">
+                <p>Unlike direct force excitation where the forcing term is the actual applied force, in base excitation the effective forcing term is proportional to the base acceleration multiplied by the mass.</p>
+            </div>
+            
+            <h2>Harmonic Base Excitation</h2>
+            <p>When the base motion is harmonic (sinusoidal), we can express it as:</p>
+            
+            <div class="equation-box">
+                <p>$y(t) = Y\sin(\omega t)$</p>
+                <p>Where $Y$ is the amplitude of base motion and $\omega$ is the angular frequency.</p>
+                <p>The acceleration of the base is: $\ddot{y}(t) = -Y\omega^2\sin(\omega t)$</p>
+                <p>Substituting into the equation of motion:</p>
+                <p>$m\ddot{z} + c\dot{z} + kz = m Y \omega^2 \sin(\omega t)$</p>
+            </div>
+            
+            <p>The steady-state solution for the relative displacement is:</p>
+            
+            <div class="equation-box">
+                <p>$z(t) = Z\sin(\omega t - \phi)$</p>
+                <p>Where $Z$ is the amplitude of relative motion and $\phi$ is the phase angle between the base motion and the mass response.</p>
+            </div>
+            
+            <h2>Frequency Response and Transmissibility</h2>
+            
+            <h3>Displacement Transmissibility</h3>
+            <p>Displacement transmissibility is the ratio of the amplitude of mass displacement to the amplitude of base displacement:</p>
+            
+            <div class="equation-box">
+                <p>$T_d = \frac{|X|}{|Y|} = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}}$</p>
+                <p>Where:</p>
+                <ul>
+                    <li>$r = \frac{\omega}{\omega_n}$ is the frequency ratio</li>
+                    <li>$\omega_n = \sqrt{\frac{k}{m}}$ is the natural frequency</li>
+                    <li>$\zeta = \frac{c}{2\sqrt{km}}$ is the damping ratio</li>
+                </ul>
+            </div>
+            
+            <h3>Force Transmissibility</h3>
+            <p>Force transmissibility is the ratio of the force transmitted to the foundation to the force generated by the base motion:</p>
+            
+            <div class="equation-box">
+                <p>$T_f = \frac{F_{transmitted}}{F_{base}} = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}}$</p>
+                <p>This has the same mathematical form as displacement transmissibility.</p>
+            </div>
+            
+            <div class="key-point">
+                <p><strong>Important Observations:</strong></p>
+                <ul>
+                    <li>When $r < \sqrt{2}$, the transmissibility is greater than 1, meaning the motion is amplified</li>
+                    <li>When $r > \sqrt{2}$, the transmissibility is less than 1, meaning the motion is attenuated</li>
+                    <li>For $r \gg 1$ (high frequencies), transmissibility approaches $\frac{1}{r^2}$</li>
+                    <li>Increasing damping reduces the peak transmissibility but can increase transmissibility at high frequencies</li>
+                </ul>
+            </div>
+            
+            <h2>Random Vibration and Power Spectral Density</h2>
+            
+            <p>Many real-world vibrations are random rather than perfectly harmonic. Random vibration is characterized by:</p>
+            <ul>
+                <li>Unpredictable instantaneous values</li>
+                <li>Statistical parameters like mean and standard deviation</li>
+                <li>Frequency content described by Power Spectral Density (PSD)</li>
+            </ul>
+            
+            <h3>Power Spectral Density (PSD)</h3>
+            <p>The PSD describes how the power of a signal is distributed across different frequencies:</p>
+            
+            <div class="equation-box">
+                <p>For base excitation with input PSD $S_y(f)$, the response PSD is:</p>
+                <p>$S_x(f) = |H(f)|^2 S_y(f)$</p>
+                <p>Where $H(f)$ is the frequency response function (FRF):</p>
+                <p>$H(f) = \frac{1}{-m\omega^2 + j\omega c + k}$</p>
+            </div>
+            
+            <h3>RMS Response</h3>
+            <p>The root-mean-square (RMS) response can be calculated from the PSD:</p>
+            
+            <div class="equation-box">
+                <p>$x_{RMS} = \sqrt{\int_{0}^{\infty} S_x(f) df}$</p>
+                <p>For a broadband random excitation with constant PSD $S_0$ and lightly damped system:</p>
+                <p>$x_{RMS} \approx \sqrt{\frac{\pi f_n S_0}{4\zeta}}$</p>
+                <p>Where $f_n$ is the natural frequency in Hz.</p>
+            </div>
+            
+            <h2>Applications and Examples</h2>
+            
+            <h3>Vibration Isolation</h3>
+            <p>Vibration isolation aims to reduce the transmission of vibration from one structure to another. For base excitation:</p>
+            <ul>
+                <li>To isolate a sensitive equipment from floor vibration, we want to minimize the displacement transmissibility</li>
+                <li>This is achieved by designing the mounting system to have a natural frequency much lower than the excitation frequency</li>
+                <li>A general rule of thumb is to ensure $r > 3$ for good isolation</li>
+            </ul>
+            
+            <h3>Seismic Response</h3>
+            <p>Buildings during earthquakes experience base excitation from ground motion:</p>
+            <ul>
+                <li>Low-rise, stiff buildings have high natural frequencies and generally move with the ground</li>
+                <li>Tall, flexible buildings have low natural frequencies and can experience amplified motion if their natural frequency matches the predominant earthquake frequency</li>
+            </ul>
+            
+            <div class="practice-problems">
+                <h3>Practice Problem: Vibration Isolation Design</h3>
+                <p>A sensitive electronic device with mass 5 kg needs to be isolated from a base that vibrates with a frequency of 50 Hz. What should be the stiffness of the isolator to ensure the transmissibility is less than 0.1?</p>
+                
+                <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+                <div id="solution1" class="hidden">
+                    <p>For transmissibility to be less than 0.1:</p>
+                    <p>$T_d = \frac{1}{r^2} < 0.1$ (assuming high frequency, where $r \gg 1$)</p>
+                    <p>$r^2 > 10$</p>
+                    <p>$r > 3.16$</p>
+                    <p>Since $r = \frac{\omega}{\omega_n} = \frac{2\pi \times 50}{\sqrt{k/m}}$, we need:</p>
+                    <p>$2\pi \times 50 > 3.16 \times \sqrt{k/5}$</p>
+                    <p>$k < \frac{(2\pi \times 50)^2 \times 5}{3.16^2} = 12,411 \text{ N/m}$</p>
+                    <p>To ensure transmissibility less than 0.1, the stiffness should be less than 12,411 N/m.</p>
+                </div>
+            </div>
+            
+            <div class="practice-problems">
+                <h3>Practice Problem: Base Excitation Response</h3>
+                <p>A machine with mass 100 kg is mounted on a platform using springs with total stiffness 40,000 N/m and dampers with damping coefficient 1,000 Ns/m. If the platform undergoes harmonic motion with amplitude 5 mm and frequency 10 Hz, calculate:</p>
+                <ol>
+                    <li>The natural frequency of the system</li>
+                    <li>The steady-state amplitude of the machine's motion relative to the platform</li>
+                    <li>The transmissibility ratio</li>
+                </ol>
+                
+                <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+                <div id="solution2" class="hidden">
+                    <p>a) Natural frequency:</p>
+                    <p>$\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{40,000}{100}} = 20 \text{ rad/s}$</p>
+                    <p>$f_n = \frac{\omega_n}{2\pi} = \frac{20}{2\pi} = 3.18 \text{ Hz}$</p>
+                    
+                    <p>b) Frequency ratio and damping ratio:</p>
+                    <p>$r = \frac{\omega}{\omega_n} = \frac{2\pi \times 10}{20} = 3.14$</p>
+                    <p>$\zeta = \frac{c}{2\sqrt{km}} = \frac{1,000}{2\sqrt{40,000 \times 100}} = 0.25$</p>
+                    
+                    <p>c) Relative displacement amplitude:</p>
+                    <p>$Z = Y\cdot\frac{r^2}{\sqrt{(1-r^2)^2+(2\zeta r)^2}} = 0.005 \cdot \frac{3.14^2}{\sqrt{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
+                    <p>$Z = 0.005 \cdot \frac{9.86}{\sqrt{83.27}} = 0.005 \cdot \frac{9.86}{9.13} = 0.0054 \text{ m} = 5.4 \text{ mm}$</p>
+                    
+                    <p>d) Transmissibility:</p>
+                    <p>$T_d = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}} = \sqrt{\frac{1+(2 \times 0.25 \times 3.14)^2}{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
+                    <p>$T_d = \sqrt{\frac{1+2.46}{83.27}} = \sqrt{\frac{3.46}{83.27}} = 0.204$</p>
+                    <p>The transmissibility ratio is 0.204, meaning the motion is attenuated to approximately 20.4% of the base motion.</p>
+                </div>
+            </div>
+            
+            <h2>Summary: Key Equations Reference</h2>
+            
+            <div class="equation-box">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Equation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Equation of Motion</td>
+                            <td>$m\ddot{z} + c\dot{z} + kz = -m\ddot{y}$</td>
+                        </tr>
+                        <tr>
+                            <td>Natural Frequency</td>
+                            <td>$\omega_n = \sqrt{\frac{k}{m}}$</td>
+                        </tr>
+                        <tr>
+                            <td>Damping Ratio</td>
+                            <td>$\zeta = \frac{c}{2\sqrt{km}}$</td>
+                        </tr>
+                        <tr>
+                            <td>Displacement Transmissibility</td>
+                            <td>$T_d = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}}$</td>
+                        </tr>
+                        <tr>
+                            <td>High Frequency Approximation</td>
+                            <td>$T_d \approx \frac{1}{r^2}$ for $r \gg 1$</td>
+                        </tr>
+                        <tr>
+                            <td>Relative Response (Harmonic)</td>
+                            <td>$Z = Y\cdot\frac{r^2}{\sqrt{(1-r^2)^2+(2\zeta r)^2}}$</td>
+                        </tr>
+                        <tr>
+                            <td>Response PSD</td>
+                            <td>$S_x(f) = |H(f)|^2 S_y(f)$</td>
+                        </tr>
+                        <tr>
+                            <td>RMS from PSD</td>
+                            <td>$x_{RMS} = \sqrt{\int_{0}^{\infty} S_x(f) df}$</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p class="small-caps">Explorable Explanations: Discovering Engineering Through Interactive Learning</p>
+        <a href="index.html">Return to Home</a>
+    </footer>
+
+    <script>
+        // System parameters
+        let mass = 2.0;
+        let stiffness = 500;
+        let damping = 10;
+        let amplitude = 0.02;
+        let frequency = 3.0;
+        
+        // Derived parameters
+        let naturalFrequency = Math.sqrt(stiffness / mass);
+        let dampingRatio = damping / (2 * Math.sqrt(mass * stiffness));
+        
+        // Simulation state
+        let running = false;
+        let time = 0;
+        const dt = 0.01;
+        
+        // DOM elements
+        const massSlider = document.getElementById('mass-slider');
+        const massValue = document.getElementById('mass-value');
+        const stiffnessSlider = document.getElementById('stiffness-slider');
+        const stiffnessValue = document.getElementById('stiffness-value');
+        const dampingSlider = document.getElementById('damping-slider');
+        const dampingValue = document.getElementById('damping-value');
+        const amplitudeSlider = document.getElementById('amplitude-slider');
+        const amplitudeValue = document.getElementById('amplitude-value');
+        const frequencySlider = document.getElementById('frequency-slider');
+        const frequencyValue = document.getElementById('frequency-value');
+        const startButton = document.getElementById('start-button');
+        const resetButton = document.getElementById('reset-button');
+        
+        // P5.js sketch
+        new p5(function(p) {
+            const canvasWidth = 600;
+            const canvasHeight = 500;
+            
+            // Animation constants
+            const baseWidth = 150;
+            const baseHeight = 40;
+            const massWidth = 100;
+            const massHeight = 60;
+            const groundY = canvasHeight - 40;
+            const restPositionY = groundY - 120 - baseHeight;
+            const scale = 1000; // Scale displacements for visualization
+            
+            // Data arrays for visualization
+            const historySize = 300;
+            const historyData = {
+                time: Array(historySize).fill(0),
+                base: Array(historySize).fill(0),
+                mass: Array(historySize).fill(0),
+                relative: Array(historySize).fill(0)
+            };
+            let historyIndex = 0;
+            
+            // Current state
+            let baseDisplacement = 0;
+            let massDisplacement = 0;
+            let relativeDisplacement = 0;
+            let relativeVelocity = 0;
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('sdof-sketch');
+                p.frameRate(60);
+                
+                // Register event listeners
+                massSlider.addEventListener('input', updateParameter);
+                stiffnessSlider.addEventListener('input', updateParameter);
+                dampingSlider.addEventListener('input', updateParameter);
+                amplitudeSlider.addEventListener('input', updateParameter);
+                frequencySlider.addEventListener('input', updateParameter);
+                
+                startButton.addEventListener('click', toggleSimulation);
+                resetButton.addEventListener('click', resetSimulation);
+            };
+            
+            p.draw = function() {
+                // Update simulation if running
+                if (running) {
+                    updateSimulation();
+                }
+                
+                // Clear background
+                p.background(240);
+                
+                // Draw ground
+                p.fill(120);
+                p.noStroke();
+                p.rect(0, groundY, canvasWidth, canvasHeight - groundY);
+                
+                // Calculate positions
+                const baseY = groundY - baseHeight + baseDisplacement * scale;
+                const massY = restPositionY + massDisplacement * scale;
+                
+                // Draw base
+                p.fill(150);
+                p.rect(canvasWidth/2 - baseWidth/2, baseY, baseWidth, baseHeight);
+                
+                // Draw spring
+                drawSpring(p, canvasWidth/2 - 30, baseY, canvasWidth/2 - 30, massY + massHeight);
+                
+                // Draw damper
+                drawDamper(p, canvasWidth/2 + 30, baseY, canvasWidth/2 + 30, massY + massHeight);
+                
+                // Draw mass
+                p.fill(200, 100, 100);
+                p.rect(canvasWidth/2 - massWidth/2, massY, massWidth, massHeight);
+                
+                // Draw time plot
+                drawTimePlot(p);
+                
+                // Draw transmissibility curve
+                drawTransmissibilityCurve(p);
+                
+                // Draw system info
+                drawSystemInfo(p);
+            };
+            
+            function drawSpring(p, x1, y1, x2, y2) {
+                const segments = 12;
+                const coilWidth = 12;
+                
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.noFill();
+                
+                p.beginShape();
+                p.vertex(x1, y1);
+                
+                const dy = (y2 - y1) / segments;
+                for (let i = 1; i < segments; i++) {
+                    const y = y1 + i * dy;
+                    const x = x1 + ((i % 2 === 0) ? -coilWidth : coilWidth);
+                    p.vertex(x, y);
+                }
+                
+                p.vertex(x2, y2);
+                p.endShape();
+            }
+            
+            function drawDamper(p, x1, y1, x2, y2) {
+                p.stroke(0);
+                p.strokeWeight(2);
+                
+                // Cylinder body
+                const cylinderHeight = 40;
+                const cylinderY = (y1 + y2) / 2 - cylinderHeight/2;
+                
+                p.fill(180);
+                p.rect(x1 - 15, cylinderY, 30, cylinderHeight);
+                
+                // Connecting rods
+                p.line(x1, y1, x1, cylinderY);
+                p.line(x2, y2, x2, cylinderY + cylinderHeight/2);
+                
+                // Piston head
+                p.rect(x2 - 18, cylinderY + cylinderHeight/2 - 5, 36, 10);
+            }
+            
+            function drawTimePlot(p) {
+                const plotX = 20;
+                const plotY = 20;
+                const plotWidth = 250;
+                const plotHeight = 150;
+                
+                // Plot background
+                p.fill(255);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(plotX, plotY, plotWidth, plotHeight);
+                
+                // Plot title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text("Time Response", plotX + plotWidth/2, plotY - 5);
+                
+                // Plot axes
+                p.stroke(0);
+                p.line(plotX, plotY + plotHeight/2, plotX + plotWidth, plotY + plotHeight/2); // x-axis
+                
+                // Plot data
+                p.noFill();
+                
+                // Base motion (blue)
+                p.stroke(0, 0, 255);
+                p.beginShape();
+                for (let i = 0; i < historySize; i++) {
+                    const idx = (historyIndex + i) % historySize;
+                    const x = plotX + (i / historySize) * plotWidth;
+                    const y = plotY + plotHeight/2 - historyData.base[idx] * scale * 0.5;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+                
+                // Mass motion (red)
+                p.stroke(255, 0, 0);
+                p.beginShape();
+                for (let i = 0; i < historySize; i++) {
+                    const idx = (historyIndex + i) % historySize;
+                    const x = plotX + (i / historySize) * plotWidth;
+                    const y = plotY + plotHeight/2 - historyData.mass[idx] * scale * 0.5;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+                
+                // Legend
+                p.fill(0, 0, 255);
+                p.rect(plotX + 5, plotY + 5, 10, 10);
+                p.fill(0);
+                p.textAlign(p.LEFT);
+                p.text("Base", plotX + 20, plotY + 15);
+                
+                p.fill(255, 0, 0);
+                p.rect(plotX + 60, plotY + 5, 10, 10);
+                p.fill(0);
+                p.text("Mass", plotX + 75, plotY + 15);
+            }
+            
+            function drawTransmissibilityCurve(p) {
+                const plotX = 330;
+                const plotY = 20;
+                const plotWidth = 250;
+                const plotHeight = 150;
+                
+                // Plot background
+                p.fill(255);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(plotX, plotY, plotWidth, plotHeight);
+                
+                // Plot title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text("Transmissibility", plotX + plotWidth/2, plotY - 5);
+                
+                // Plot axes
+                p.stroke(0);
+                p.line(plotX, plotY + plotHeight, plotX + plotWidth, plotY + plotHeight); // x-axis
+                p.line(plotX, plotY, plotX, plotY + plotHeight); // y-axis
+                
+                // Plot transmissibility curve
+                p.stroke(128, 0, 128);
+                p.noFill();
+                p.beginShape();
+                
+                const maxR = 3;
+                for (let i = 0; i <= 100; i++) {
+                    const r = maxR * i / 100;
+                    if (r < 0.05) continue; // Skip very low r values to avoid division by near-zero
+                    
+                    const tr = calcTransmissibility(r);
+                    const x = plotX + (r / maxR) * plotWidth;
+                    const y = plotY + plotHeight - Math.min(tr, 5) * (plotHeight / 5);
+                    
+                    p.vertex(x, y);
+                }
+                p.endShape();
+                
+                // Plot current operating point
+                const currentR = 2 * Math.PI * frequency / naturalFrequency;
+                const currentTr = calcTransmissibility(currentR);
+                
+                const pointX = plotX + (currentR / maxR) * plotWidth;
+                const pointY = plotY + plotHeight - Math.min(currentTr, 5) * (plotHeight / 5);
+                
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.ellipse(pointX, pointY, 8, 8);
+                
+                // Labels
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(10);
+                p.text("Frequency Ratio (r)", plotX + plotWidth/2, plotY + plotHeight + 15);
+                
+                p.push();
+                p.translate(plotX - 15, plotY + plotHeight/2);
+                p.rotate(-p.HALF_PI);
+                p.text("Transmissibility", 0, 0);
+                p.pop();
+                
+                // Axis ticks
+                p.textAlign(p.CENTER);
+                p.textSize(8);
+                for (let r = 0; r <= maxR; r += 0.5) {
+                    const x = plotX + (r / maxR) * plotWidth;
+                    p.line(x, plotY + plotHeight, x, plotY + plotHeight + 5);
+                    p.text(r.toFixed(1), x, plotY + plotHeight + 15);
+                }
+                
+                p.textAlign(p.RIGHT);
+                for (let tr = 0; tr <= 5; tr += 1) {
+                    const y = plotY + plotHeight - tr * (plotHeight / 5);
+                    p.line(plotX - 5, y, plotX, y);
+                    p.text(tr.toFixed(0), plotX - 8, y + 3);
+                }
+            }
+            
+            function drawSystemInfo(p) {
+                const infoX = 20;
+                const infoY = 190;
+                
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                
+                // Calculate derived parameters
+                const wn = naturalFrequency;
+                const fn = wn / (2 * Math.PI);
+                const zeta = dampingRatio;
+                const currentR = 2 * Math.PI * frequency / wn;
+                const tr = calcTransmissibility(currentR);
+                
+                p.text(`Natural Frequency: ${fn.toFixed(2)} Hz`, infoX, infoY);
+                p.text(`Damping Ratio: ${zeta.toFixed(3)}`, infoX, infoY + 20);
+                p.text(`Frequency Ratio: ${currentR.toFixed(2)}`, infoX, infoY + 40);
+                p.text(`Transmissibility: ${tr.toFixed(2)}`, infoX, infoY + 60);
+            }
+            
+            function updateSimulation() {
+                // Increment time
+                time += dt;
+                
+                // Calculate base motion (harmonic)
+                const omega = 2 * Math.PI * frequency;
+                baseDisplacement = amplitude * Math.sin(omega * time);
+                const baseAcceleration = -amplitude * omega * omega * Math.sin(omega * time);
+                
+                // Equation of motion: m*z'' + c*z' + k*z = -m*y''
+                const relativeAcceleration = (-mass * baseAcceleration - damping * relativeVelocity - 
+                                            stiffness * relativeDisplacement) / mass;
+                
+                // Update using simple Euler integration
+                relativeVelocity += relativeAcceleration * dt;
+                relativeDisplacement += relativeVelocity * dt;
+                
+                // Calculate absolute mass displacement
+                massDisplacement = baseDisplacement + relativeDisplacement;
+                
+                // Store in history buffer (circular buffer)
+                historyData.time[historyIndex] = time;
+                historyData.base[historyIndex] = baseDisplacement;
+                historyData.mass[historyIndex] = massDisplacement;
+                historyData.relative[historyIndex] = relativeDisplacement;
+                
+                // Increment history index
+                historyIndex = (historyIndex + 1) % historySize;
+            }
+            
+            function updateParameter() {
+                // Update parameters from sliders
+                mass = parseFloat(massSlider.value);
+                massValue.textContent = mass.toFixed(1) + " kg";
+                
+                stiffness = parseFloat(stiffnessSlider.value);
+                stiffnessValue.textContent = stiffness.toFixed(0) + " N/m";
+                
+                damping = parseFloat(dampingSlider.value);
+                dampingValue.textContent = damping.toFixed(1) + " Ns/m";
+                
+                amplitude = parseFloat(amplitudeSlider.value);
+                amplitudeValue.textContent = amplitude.toFixed(3) + " m";
+                
+                frequency = parseFloat(frequencySlider.value);
+                frequencyValue.textContent = frequency.toFixed(1) + " Hz";
+                
+                // Update derived parameters
+                naturalFrequency = Math.sqrt(stiffness / mass);
+                dampingRatio = damping / (2 * Math.sqrt(mass * stiffness));
+            }
+            
+            function toggleSimulation() {
+                running = !running;
+                startButton.textContent = running ? "Pause" : "Start";
+            }
+            
+            function resetSimulation() {
+                running = false;
+                startButton.textContent = "Start";
+                time = 0;
+                baseDisplacement = 0;
+                massDisplacement = 0;
+                relativeDisplacement = 0;
+                relativeVelocity = 0;
+                
+                // Clear history
+                for (let i = 0; i < historySize; i++) {
+                    historyData.time[i] = 0;
+                    historyData.base[i] = 0;
+                    historyData.mass[i] = 0;
+                    historyData.relative[i] = 0;
+                }
+                historyIndex = 0;
+            }
+            
+            function calcTransmissibility(r) {
+                const zeta = dampingRatio;
+                return Math.sqrt(
+                    (1 + Math.pow(2 * zeta * r, 2)) / 
+                    (Math.pow(1 - r * r, 2) + Math.pow(2 * zeta * r, 2))
+                );
+            }
+        });
+        
+        // Toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution) {
+                if (solution.classList.contains('hidden')) {
+                    solution.classList.remove('hidden');
+                    const toggleElement = document.querySelector(`[onclick="toggleSolution('${id}')"]`);
+                    if (toggleElement) {
+                        toggleElement.textContent = 'Hide Solution';
+                    }
+                } else {
+                    solution.classList.add('hidden');
+                    const toggleElement = document.querySelector(`[onclick="toggleSolution('${id}')"]`);
+                    if (toggleElement) {
+                        toggleElement.textContent = 'Show Solution';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+<footer>
+    <script src="/common/footer.js"></script>
+  </footer>
+</html>

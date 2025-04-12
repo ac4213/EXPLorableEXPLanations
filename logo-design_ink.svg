@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 300 100"
+   version="1.1"
+   id="svg938"
+   sodipodi:docname="logo-design_ink.svg"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs942" />
+  <sodipodi:namedview
+     id="namedview940"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="1.564903"
+     inkscape:cx="146.01544"
+     inkscape:cy="100.96472"
+     inkscape:window-width="1512"
+     inkscape:window-height="844"
+     inkscape:window-x="0"
+     inkscape:window-y="38"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg938" />
+  <!-- Background -->
+  <rect
+     width="300"
+     height="100"
+     rx="10"
+     ry="10"
+     fill="#fffbeb"
+     id="rect900"
+     x="0"
+     y="0" />
+  <!-- Main Text -->
+  <text
+     x="92.290077"
+     y="59.61832"
+     font-family="Arial, sans-serif"
+     font-size="24px"
+     font-weight="bold"
+     text-anchor="middle"
+     font-variant="small-caps"
+     fill="#333333"
+     id="text902"
+     style="font-size:64px"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333;fill-opacity:1"
+       id="tspan43117">EXPL</tspan></text>
+  <!-- Interactive Element Icons -->
+  <g
+     transform="matrix(0.8,0,0,0.8,63,70)"
+     id="g912">
+    <!-- Graph Icon -->
+    <rect
+       x="0"
+       y="0"
+       width="25"
+       height="20"
+       fill="#ffb300"
+       rx="2"
+       ry="2"
+       id="rect904" />
+    <line
+       x1="5"
+       y1="5"
+       x2="5"
+       y2="15"
+       stroke="#333333"
+       stroke-width="1.5"
+       id="line906"
+       style="stroke-linecap:square" />
+    <line
+       x1="5"
+       y1="15"
+       x2="20"
+       y2="15"
+       stroke="#333333"
+       stroke-width="1.5"
+       id="line908"
+       style="stroke-width:1.50236;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+    <path
+       d="m 7,13 3,-5 3,2 4,-5 3,2"
+       fill="none"
+       stroke="#333333"
+       stroke-width="1.5"
+       stroke-linejoin="round"
+       id="path910" />
+  </g>
+  <g
+     transform="matrix(0.8,0,0,0.8,113.05905,70)"
+     id="g920">
+    <!-- Gear Icon - Properly Centered -->
+    <circle
+       cx="13"
+       cy="10"
+       r="8"
+       fill="#ffd700"
+       id="circle914" />
+    <path
+       d="m 13,2 2,0.5 0.5,3 L 17,6 19.5,4 21,5.5 19,8 l 0.5,1.5 3,0.5 -0.5,2 -3,0.5 -0.5,1.5 2,2.5 -1.5,1.5 -2.5,-2 -1.5,0.5 -0.5,3 -2,0.5 -1,-3 L 10,16.5 7.5,18.5 6,17 8,14.5 7.5,13 4.5,12.5 4,10.5 7,9.5 7.5,8 5.5,5.5 7,4 9.5,6 11,5.5 l 0.5,-3 z"
+       fill="#ffd700"
+       stroke="#333333"
+       stroke-width="1"
+       id="path916" />
+    <circle
+       cx="13.13938"
+       cy="10.743361"
+       r="3"
+       fill="#fffbeb"
+       stroke="#333333"
+       stroke-width="1"
+       id="circle918" />
+  </g>
+  <g
+     transform="matrix(0.8,0,0,0.8,162.33334,70)"
+     id="g926">
+    <!-- Formula Icon -->
+    <rect
+       x="0"
+       y="0"
+       width="30"
+       height="20"
+       fill="#ffd700"
+       rx="2"
+       ry="2"
+       id="rect922" />
+    <text
+       x="12.388177"
+       y="15.726712"
+       font-family="Arial, sans-serif"
+       font-size="15.084px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#333333"
+       id="text924"
+       style="stroke-width:1.18772;stroke-miterlimit:4;stroke-dasharray:none;paint-order:stroke fill markers"
+       transform="scale(1.2116924,0.82529196)">∑</text>
+  </g>
+  <g
+     transform="matrix(0.8,0,0,0.8,213,70)"
+     id="g932">
+    <!-- Slider Icon -->
+    <rect
+       x="0"
+       y="8"
+       width="30"
+       height="4"
+       fill="#ffb300"
+       rx="2"
+       ry="2"
+       id="rect928" />
+    <circle
+       cx="12.5"
+       cy="10"
+       r="6"
+       fill="#ffd700"
+       stroke="#333333"
+       stroke-width="1"
+       id="circle930" />
+  </g>
+  <!-- Tagline -->
+  <text
+     x="150"
+     y="95"
+     font-family="Arial, sans-serif"
+     font-size="12"
+     text-anchor="middle"
+     font-style="italic"
+     fill="#b38600"
+     id="text934">
+    discovering engineering through interactive learning
+  </text>
+  <!-- Golden Border -->
+  <rect
+     width="300"
+     height="100"
+     rx="10"
+     ry="10"
+     fill="none"
+     stroke="#ffd700"
+     stroke-width="3"
+     id="rect936" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.2;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+     x="177.87787"
+     y="30.229008"
+     id="text12000"><tspan
+       sodipodi:role="line"
+       id="tspan11998"
+       x="177.87787"
+       y="30.229008"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333">orable</tspan><tspan
+       sodipodi:role="line"
+       x="177.87787"
+       y="59.300266"
+       id="tspan13370"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333">anations</tspan></text>
+</svg>

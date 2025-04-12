@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arn - Explorable Explanations</title>
+    <!-- LOGO -->
+    <div class="logo-container">
+        <img src="logo-design_ink.svg" alt="Explorable Explanations Logo" style="width: 100%; height: auto; max-width: 100%;">
+      </div>
+
+    <!-- Basic favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg">
+    
+    <!-- favicon for modern browsers (using PNG) -->
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicon/web-app-manifest-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon/web-app-manifest-512x512.png">
+    
+    <!-- favicon for iOS/Apple devices -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <style>
         :root {
             --primary-color: #ffd700;
@@ -158,7 +174,7 @@
 </head>
 <body>
     <header>
-        <h1>explorable explanations</h1>
+        <h1>EXPLorable EXPLanations</h1>
         <p class="small-caps">discovering engineering through interactive learning</p>
         <p>Dr. Arnaldo Delli Carri</p>
         
@@ -187,10 +203,10 @@
             </ul>
         </div>
         <section id="mechanical-science">
-            <h2>Mechanical Science</h2>
+            <h2>Stage 1: Mechanical Science</h2>
             <h3>Statics of Rigid Bodies</h3>
             <ul>
-                <li><a href="./Y1/01VectorAlgebra/VecAlgebra.html">Vector Algebra - forces as vectors</a></li>
+                <li><a href="./Y1/01VecAlgebra/VecAlgebra.html">Vector Algebra - forces as vectors</a></li>
                 <li>Free Body Diagrams</li>
                 <li><a href="./Y1/02FBD/FBD.html">Internal Loads (SFD, BMD)</a></li>
                 <li><a href="./Y1/03SecMomArea/SecMomArea.html">Second Moment of Area</a></li>
@@ -198,33 +214,38 @@
             <h3>Dynamics of Rigid Bodies</h3>
             <ul>
                 <li>Kinematics of Linear Motion</li>
-                <li><a href="./Y1/04Parabolic/ParabolicM.html">Kinematics of Parabolic Motion</a></li>
+                <li><a href="./Y1/04ParabolicMot/ParabolicMot.html">Kinematics of Parabolic Motion</a></li>
                 <li>Kinematics of Relative Motion</li>
                 <li>Principle of Work and Energy</li>
                 <li>Principle of Impulse and Momentum</li>
             </ul>
         </section>
         <section id="solid-mechanics">
-            <h2>Solid Mechanics and Dynamics</h2>
+            <h2>Stage 2: Solid Mechanics and Dynamics</h2>
             <h3>Solid Mechanics</h3>
             <ul>
                 <li>Direct Shear Stress on a T-Section</li>
                 <li>Macaulay's Method</li>
                 <li><a href="./Y2/PlaneStress/planestress.html">2D-Stress Transformations (Mohr's Circle)</a></li>
+                <li>Combined Loading</li>
+                <li>Elastic instability (buckling)</li>
             </ul>
             <h3>Dynamics of Machines</h3>
             <ul>
-                <li><a href="./Y2/01SDOFvib/SDOFvib.html">SDOF Vibrations</a></li>
+                <li><a href="./Y2/SDOFvib/SDOFvib.html">SDOF Vibrations</a></li>
+                <li><a href="./Y2/BaseExcit/BaseExcit.html">SDOF Base Excitation</a></li>
                 <li>Balance of Rotating Masses</li>
                 <li>Kinematics of Mechanisms</li>
+                <li>Gear Trains</li>
             </ul>
         </section>
         <section id="stress-analysis">
-            <h2>Stress Analysis and Structural Dynamics</h2>
+            <h2>Stage 3: Stress Analysis and Structural Dynamics</h2>
             <h3>Stress Analysis</h3>
             <ul>
-                <li>3D-Stress Transformations</li>
+                <li>3D Stress Transformations</li>
                 <li>Plasticity in Bending of a T-Section</li>
+                <li><a href="./Y3/Fatigue/Fatigue.html">Stress-based Fatigue</a></li>
             </ul>
             <h3>Structural Dynamics</h3>
             <ul>
@@ -254,11 +275,12 @@
                 <li><a href="./Games/Borkout/index.html">Borkout</a></li>
                 <li><a href="./Games/Parabolic/ParabolicGame.html">Parabolic</a></li>
                 <li><a href="./Games/Tetris/index.html">Tetris</a></li>
+                <li><a href="./Games/Snake/Snake.html">Snake</a></li>
             </ul>
         </section>
     </main>
     <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <script src="/common/footer.js"></script>
     </footer>
 </body>
 </html>
