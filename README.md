@@ -4,11 +4,27 @@ An interactive web platform offering hands-on simulations and visualisations to 
 
 ## Introduction
 
-This project provides a suite of interactive web-based applets designed to make engineering concepts tangible and accessible. Each applet focuses on a specific principle across various domains including mechanical science, solid mechanics, stress analysis, structural dynamics, and materials science. By enabling direct manipulation of variables and immediate visual feedback, these tools transform abstract theories into concrete experiences.
+This project, "Virtual Engineering Laboratory Experiences (EXPLorable EXPLanations)", provides a suite of interactive web-based applets designed to make engineering concepts tangible and accessible. Each applet focuses on a specific principle across various domains including mechanical science, solid mechanics, stress analysis, structural dynamics, and materials science. By enabling direct manipulation of variables and immediate visual feedback, these tools transform abstract theories into concrete experiences.
+
+## Motivations
+
+In our modern era, education is being reimagined. We're experiencing an educational revolution, fuelled by advances in technology and the ever-increasing demands of the global economy. Our goal is to contribute to this transformation by delivering high-quality, accessible engineering laboratory experiences to students worldwide.
+
+This project is driven by several key motivations:
+
+1. **Democratise Access to Education**: Engineering education should not be limited to those who have physical access to labs or financial resources. Our virtual labs will be freely accessible to anyone with an internet connection, breaking down barriers of geography and socio-economic status.
+
+2. **Practical Learning**: Many educational platforms focus on theory, leaving students unprepared for the practical application of concepts. Our virtual labs bridge this gap by providing hands-on, immersive learning experiences.
+
+3. **Safe Learning Environment**: Virtual labs remove risks associated with physical lab experiments, allowing students to explore and learn freely without fear of causing harm to themselves or others.
+
+4. **Sustainability**: Virtual labs are far more sustainable than physical labs. They require no physical space, use no consumable resources, and generate no waste.
+
+5. **24/7 Availability**: Our virtual labs will be available around the clock, accommodating different time zones, work schedules, and learning paces.
 
 ## Why This Matters for Engineering Students
 
-Engineering education traditionally relies heavily on mathematical formulation and theoretical understanding. While essential, this approach often creates barriers for students who learn best through visual and kinesthetic means. These applets bridge the gap between abstract formulas and physical reality by:
+Engineering education traditionally relies heavily on mathematical formulation and theoretical understanding. While essential, this approach often creates barriers for students who learn best through visual and kinaesthetic means. These applets bridge the gap between abstract formulae and physical reality by:
 
 - Making invisible phenomena visible
 - Allowing students to test "what if" scenarios in real-time
@@ -39,6 +55,16 @@ Threshold concepts are transformative ideas within a discipline that, once under
 - Creating "aha moments" through discovery-based learning
 - Supporting different learning styles and paces
 
+## Technical Implementation
+
+To make this project a reality, we're implementing these experiences as JavaScript applets embedded in websites. JavaScript was chosen for several reasons:
+
+1. **Ubiquity**: JavaScript is a universal language of the web. Nearly all modern browsers support JavaScript, making it accessible to virtually anyone with a computer and an internet connection.
+
+2. **Interactivity**: JavaScript is excellent for creating interactive user interfaces and simulations, allowing us to create immersive, engaging lab experiences.
+
+3. **Ease of Development**: JavaScript has a rich ecosystem of libraries and frameworks that simplify development and enable us to quickly build and iterate on our virtual labs.
+
 ## Cross-Device Compatibility
 
 The applets are designed with the following principles:
@@ -51,3 +77,15 @@ The applets are designed with the following principles:
 - No reliance on cutting-edge features that might limit accessibility
 
 This ensures that students can access these learning tools regardless of their technology resources, making quality engineering education more equitable and accessible.
+
+## Getting Involved
+
+This is an open-source project. We welcome contributions from anyone interested in advancing engineering education. You can get involved by reporting issues, suggesting improvements, writing code, creating lab scenarios, and more. Check out the CONTRIBUTING.md file for more information.
+
+## Feedback
+
+We greatly value feedback from users. If you have any suggestions or encounter any problems while using our virtual labs, please open an issue on GitHub.
+
+## Licence
+
+This project is licensed under the GNU General Public Licence - see the LICENCE.md file for details.

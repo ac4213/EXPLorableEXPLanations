@@ -1,29 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beam Buckling - Explorable Explanations</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.24.2/plotly.min.js"></script>
-    <!-- MathJax for rendering equations (updated to v3) -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']],
-                displayMath: [['$$', '$$'], ['\\[', '\\]']],
-                processEscapes: true
-            },
-            options: {
-                ignoreHtmlClass: 'no-mathjax',
-                processHtmlClass: 'mathjax'
-            }
-        };
-    </script>
+    <title>Elastic Instability (Buckling) - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- Import React and ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- Import Recharts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.min.js"></script>
     <style>
         :root {
             --primary-color: #ffd700;
@@ -32,10 +22,17 @@
             --background-color: #fffbeb;
             --link-color: #cc9900;
             --link-hover-color: #1c01b8;
+            --section-bg: white;
         }
-        
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             line-height: 1.6;
             color: var(--text-color);
             max-width: 1200px;
@@ -43,309 +40,316 @@
             padding: 20px;
             background-color: var(--background-color);
         }
-        
+
         header {
             background-color: var(--primary-color);
             color: var(--text-color);
             text-align: center;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 5px;
+            margin-bottom: 20px;
         }
-        
+
         h1 {
-            margin: 0;
             font-size: 2.5em;
             font-variant: small-caps;
+            margin-bottom: 10px;
         }
-        
-        nav {
-            background-color: var(--secondary-color);
-            padding: 0.5rem;
-            border-radius: 5px;
-            margin: 10px 0;
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.2em;
         }
-        
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
-        
-        nav ul li {
-            margin: 5px 10px;
-        }
-        
-        nav ul li a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 3px;
-            transition: background-color 0.3s;
-        }
-        
-        nav ul li a:hover, nav ul li a:focus {
-            background-color: var(--primary-color);
-            outline: none;
-        }
-        
-        .small-caps {
-            font-variant: small-caps;
-        }
-        
-        section {
-            background-color: white;
-            border-radius: 5px;
+
+        .content-section, .simulation-section {
+            background-color: var(--section-bg);
+            border-radius: 8px;
             padding: 20px;
-            margin-bottom: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-        
+
         h2 {
             color: #b38600;
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
+            margin-bottom: 15px;
         }
-        
+
         h3 {
             color: #cc9900;
+            margin: 15px 0 10px 0;
         }
-        
-        ul {
-            padding-left: 20px;
+
+        p, ul, ol {
+            margin-bottom: 15px;
         }
-        
-        a {
+
+        ul, ol {
+            padding-left: 25px;
+        }
+
+        .key-point ol, .practice-problems ol {
+            padding-left: 25px;
+            margin-left: 15px;
+        }
+
+        .key-point li, .practice-problems li {
+            margin-bottom: 8px;
+        }
+
+        .equation-box {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .key-point {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        #react-visualizer {
+            width: 100%;
+            padding: 20px;
+            background-color: var(--section-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px auto;
+        }
+
+        #sketch-holder {
+            width: 100%;
+            height: fit-content;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .interactive-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 200px;
+        }
+
+        .practice-problems {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .toggle-section {
+            cursor: pointer;
             color: var(--link-color);
-            text-decoration: none;
-            transition: color 0.3s;
+            font-weight: bold;
         }
-        
-        a:hover, a:focus {
+
+        .toggle-section:hover {
             text-decoration: underline;
             color: var(--link-hover-color);
-            outline: none;
         }
-        
+
+        .hidden {
+            display: none;
+        }
+
+        .quiz-container {
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .quiz-question h3 {
+            margin-bottom: 10px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-options label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .quiz-options label:hover {
+            background-color: #e6f7ff;
+        }
+
+        .quiz-options input {
+            margin-right: 10px;
+        }
+
+        #submit-quiz {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-quiz:hover {
+            background-color: var(--secondary-color);
+        }
+
+        #quiz-results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        #quiz-results p {
+            margin: 5px 0;
+        }
+
+        .equation-table {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .equation-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            background-color: white;
+        }
+
+        .equation-table th, .equation-table td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .equation-table th {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .equation-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .equation-table tr:hover {
+            background-color: #f1f1f1;
+        }
+
         footer {
             text-align: center;
-            margin-top: 20px;
-            padding: 10px;
+            margin-top: 30px;
+            padding: 15px;
             background-color: var(--primary-color);
             color: var(--text-color);
             border-radius: 5px;
         }
-        
-        .simulation-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .sim-controls {
-            flex: 1;
-            min-width: 300px;
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .sim-display {
-            flex: 2;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .control-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        input[type="range"] {
-            width: 100%;
-        }
-        
-        .slider-value {
+
+        .back-link {
             display: inline-block;
-            width: 50px;
-            text-align: right;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
             margin-top: 10px;
+            color: var(--link-color);
+            text-decoration: none;
         }
-        
-        button {
-            background-color: var(--primary-color);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+
+        .back-link:hover {
+            color: var(--link-hover-color);
+            text-decoration: underline;
         }
-        
-        button:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .plot-container {
-            width: 100%;
-            height: 300px;
-            margin-top: 20px;
-        }
-        
-        .equation-display {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow-x: auto;
-        }
-        
-        .quiz-container {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        
-        .quiz-question {
-            margin-bottom: 15px;
-        }
-        
-        .quiz-options {
-            margin-left: 20px;
-        }
-        
-        .quiz-option {
-            margin-bottom: 8px;
-        }
-        
-        .quiz-feedback {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-        }
-        
-        .correct {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .incorrect {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .tab-container {
-            margin-top: 20px;
-        }
-        
-        .tab-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .tab-button {
-            padding: 8px 15px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-        }
-        
-        .tab-button.active {
-            background-color: var(--primary-color);
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 15px;
-            background-color: white;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        
-        th {
-            background-color: var(--secondary-color);
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        
-        .example-problem {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        
-        .example-solution {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #ccc;
-        }
-        
-        @media screen and (max-width: 768px) {
-            .simulation-container {
-                flex-direction: column;
-            }
-            
-            nav ul {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            nav ul li {
-                margin: 5px 0;
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
             }
             
             h1 {
                 font-size: 2em;
             }
+            
+            .equation-table {
+                font-size: 0.9em;
+            }
         }
-        
-        @media screen and (max-width: 480px) {
+
+        @media (max-width: 768px) {
             body {
                 padding: 10px;
+            }
+            
+            header {
+                padding: 1rem;
             }
             
             h1 {
@@ -355,1394 +359,867 @@
             h2 {
                 font-size: 1.5em;
             }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>beam buckling</h1>
-        <p class="small-caps">exploring critical loads and stability</p>
-        <p>Dr. Arnaldo Delli Carri</p>
-    </header>
-    
-    <nav>
-        <ul>
-            <li><a href="#introduction">Introduction</a></li>
-            <li><a href="#theory">Theory</a></li>
-            <li><a href="#simulation">Simulation</a></li>
-            <li><a href="#examples">Worked Examples</a></li>
-            <li><a href="#quiz">Quiz</a></li>
-        </ul>
-    </nav>
-    
-    <main>
-        <section id="introduction">
-            <h2>Introduction to Beam Buckling</h2>
-            <p>Buckling is a failure mode characterized by a sudden sideways deflection of a structural member subjected to axial compression. When the compressive load reaches a critical value, the beam or column becomes unstable and deforms laterally, even though the stresses in the material may be much lower than the yield strength.</p>
             
-            <p>This phenomenon is particularly important in the design of slender columns, struts, and other compression members where stability rather than strength often governs the design process.</p>
-            
-            <div class="equation-display">
-                <p>Buckling differs from simple compression in that:</p>
-                <ul>
-                    <li>It is a sudden, catastrophic failure mode</li>
-                    <li>It occurs at stress levels well below the material's yield strength</li>
-                    <li>It is highly dependent on the geometry (especially slenderness) rather than just material properties</li>
-                </ul>
-            </div>
-            
-            <p>In this module, we'll explore the fundamental concepts of beam buckling, derive the critical buckling loads, and examine design approaches to prevent buckling failures.</p>
-        </section>
-        
-        <section id="theory">
-            <h2>Buckling Theory</h2>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="openTab(event, 'diff-equation')">Differential Equation</button>
-                    <button class="tab-button" onclick="openTab(event, 'modeshapes')">Mode Shapes</button>
-                    <button class="tab-button" onclick="openTab(event, 'euler-buckling')">Euler Buckling</button>
-                    <button class="tab-button" onclick="openTab(event, 'slenderness')">Slenderness Ratio</button>
-                    <button class="tab-button" onclick="openTab(event, 'gordon-rankine')">Gordon-Rankine</button>
-                </div>
-                
-                <div id="diff-equation" class="tab-content active">
-                    <h3>Buckling Differential Equation</h3>
-                    <p>The differential equation describing the deflection of a beam under axial compression is:</p>
-                    <div class="equation-display">
-                        \[EI\frac{d^2y}{dx^2} + P\cdot y = 0\]
-                        <p>Where:</p>
-                        <ul>
-                            <li>\(E\) = Young's modulus of elasticity</li>
-                            <li>\(I\) = Second moment of area (moment of inertia)</li>
-                            <li>\(P\) = Axial compressive load</li>
-                            <li>\(y\) = Lateral deflection at position \(x\)</li>
-                        </ul>
-                    </div>
-                    
-                    <p>This is a second-order differential equation with constant coefficients. The solution takes the form:</p>
-                    <div class="equation-display">
-                        \[y = A\sin(kx) + B\cos(kx)\]
-                        
-                        <p>Where \(k = \sqrt{\frac{P}{EI}}\) and constants \(A\) and \(B\) are determined by the boundary conditions.</p>
-                    </div>
-                </div>
-                
-                <div id="modeshapes" class="tab-content">
-                    <h3>Buckling Mode Shapes</h3>
-                    <p>Mode shapes represent the different ways a column can buckle, depending on its end conditions. Each mode has a corresponding critical load.</p>
-                    
-                    <div class="equation-display">
-                        <p>For a column with both ends pinned (simply supported):</p>
-                        \[y = A\sin\left(\frac{n\pi x}{L}\right)\]
-                        <p>where \(n = 1, 2, 3, ...\)</p>
-                        
-                        <p>The first mode (\(n = 1\)) corresponds to the lowest critical load and is the most common buckling pattern observed in practice.</p>
-                    </div>
-                    
-                    <p>Higher modes require significantly larger loads to develop, which is why the first mode is typically the most relevant for design purposes.</p>
-                    
-                    <div id="modeshape-plot" class="plot-container"></div>
-                </div>
-                
-                <div id="euler-buckling" class="tab-content">
-                    <h3>Euler Critical Buckling</h3>
-                    <p>Euler's formula gives the critical buckling load for an ideal slender column:</p>
-                    
-                    <div class="equation-display">
-                        \[P_{cr} = \frac{n^2\pi^2EI}{(KL)^2}\]
-                        
-                        <p>Where:</p>
-                        <ul>
-                            <li>\(P_{cr}\) = Critical buckling load</li>
-                            <li>\(n\) = Mode number (usually 1 for design)</li>
-                            <li>\(E\) = Young's modulus</li>
-                            <li>\(I\) = Second moment of area</li>
-                            <li>\(L\) = Column length</li>
-                            <li>\(K\) = Effective length factor (depends on end conditions)</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <tr>
-                                <th>End Conditions</th>
-                                <th>K Value</th>
-                                <th>Description</th>
-                            </tr>
-                            <tr>
-                                <td>Fixed-Fixed</td>
-                                <td>0.5</td>
-                                <td>Both ends fixed against rotation and translation</td>
-                            </tr>
-                            <tr>
-                                <td>Fixed-Pinned</td>
-                                <td>0.7</td>
-                                <td>One end fixed, one end pinned (can rotate but not translate)</td>
-                            </tr>
-                            <tr>
-                                <td>Pinned-Pinned</td>
-                                <td>1.0</td>
-                                <td>Both ends pinned (can rotate but not translate)</td>
-                            </tr>
-                            <tr>
-                                <td>Fixed-Free</td>
-                                <td>2.0</td>
-                                <td>One end fixed, one end free (cantilever)</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <p>The critical buckling stress is obtained by dividing the critical load by the cross-sectional area:</p>
-                    
-                    <div class="equation-display">
-                        \[\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2E}{(KL/r)^2}\]
-                        
-                        <p>Where \(r = \sqrt{I/A}\) is the radius of gyration.</p>
-                    </div>
-                </div>
-                
-                <div id="slenderness" class="tab-content">
-                    <h3>Slenderness Ratio</h3>
-                    <p>The slenderness ratio is a dimensionless measure of a column's tendency to buckle:</p>
-                    
-                    <div class="equation-display">
-                        \[\lambda = \frac{KL}{r}\]
-                        
-                        <p>Where:</p>
-                        <ul>
-                            <li>\(\lambda\) = Slenderness ratio</li>
-                            <li>\(K\) = Effective length factor</li>
-                            <li>\(L\) = Column length</li>
-                            <li>\(r\) = Radius of gyration = \(\sqrt{I/A}\)</li>
-                        </ul>
-                    </div>
-                    
-                    <p>The slenderness ratio determines whether Euler buckling theory is applicable:</p>
-                    <ul>
-                        <li>High slenderness ratio (typically $\lambda > 100$): Euler buckling dominates</li>
-                        <li>Intermediate slenderness: Combined elastic and inelastic buckling (Johnson or Gordon-Rankine formulas)</li>
-                        <li>Low slenderness (typically $\lambda < 30$): Material yielding dominates</li>
-                    </ul>
-                    
-                    <div id="slenderness-plot" class="plot-container"></div>
-                </div>
-                
-                <div id="gordon-rankine" class="tab-content">
-                    <h3>Gordon-Rankine Criterion</h3>
-                    <p>The Gordon-Rankine formula provides a transition between Euler buckling (for slender columns) and material yielding (for short columns):</p>
-                    
-                    <div class="equation-display">
-                        \[\frac{1}{\sigma_{cr}} = \frac{1}{\sigma_y} + \frac{1}{\sigma_e}\]
-                        
-                        <p>Where:</p>
-                        <ul>
-                            <li>\(\sigma_{cr}\) = Critical stress</li>
-                            <li>\(\sigma_y\) = Yield stress of the material</li>
-                            <li>\(\sigma_e\) = Euler buckling stress = \(\frac{\pi^2E}{(KL/r)^2}\)</li>
-                        </ul>
-                    </div>
-                    
-                    <p>This can be rearranged to:</p>
-                    
-                    <div class="equation-display">
-                        \[\sigma_{cr} = \frac{\sigma_y}{1 + \alpha \lambda^2}\]
-                        
-                        <p>Where \(\alpha = \frac{\sigma_y}{\pi^2E}\) and \(\lambda = \frac{KL}{r}\)</p>
-                    </div>
-                    
-                    <p>This formula accounts for the transition between two failure modes:</p>
-                    <ul>
-                        <li>For small $\lambda$: $\sigma_{cr} \approx \sigma_y$ (yielding governs)</li>
-                        <li>For large $\lambda$: $\sigma_{cr} \approx \frac{\pi^2E}{\lambda^2}$ (Euler buckling governs)</li>
-                    </ul>
-                    
-                    <div id="gordon-rankine-plot" class="plot-container"></div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="simulation">
-            <h2>Interactive Beam Buckling Simulation</h2>
-            
-            <div class="simulation-container">
-                <div class="sim-controls">
-                    <div class="control-group">
-                        <label for="length-slider">Column Length (L): <span id="length-value" class="slider-value">1</span> m</label>
-                        <input type="range" id="length-slider" min="0.5" max="5" step="0.1" value="1">
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="material-select">Material:</label>
-                        <select id="material-select">
-                            <option value="steel">Steel (E = 200 GPa, σy = 250 MPa)</option>
-                            <option value="aluminum">Aluminum (E = 70 GPa, σy = 100 MPa)</option>
-                            <option value="timber">Timber (E = 10 GPa, σy = 40 MPa)</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                    </div>
-                    
-                    <div id="custom-material" style="display: none;">
-                        <div class="control-group">
-                            <label for="e-modulus">Young's Modulus (E): <span id="e-modulus-value" class="slider-value">200</span> GPa</label>
-                            <input type="range" id="e-modulus" min="1" max="400" step="1" value="200">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="yield-stress">Yield Stress (σy): <span id="yield-stress-value" class="slider-value">250</span> MPa</label>
-                            <input type="range" id="yield-stress" min="10" max="1000" step="10" value="250">
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="cross-section">Cross-Section:</label>
-                        <select id="cross-section">
-                            <option value="circular">Circular</option>
-                            <option value="square">Square</option>
-                            <option value="rectangular">Rectangular</option>
-                            <option value="i-beam">I-Beam</option>
-                        </select>
-                    </div>
-                    
-                    <div id="circular-params">
-                        <div class="control-group">
-                            <label for="diameter">Diameter (d): <span id="diameter-value" class="slider-value">50</span> mm</label>
-                            <input type="range" id="diameter" min="10" max="200" step="1" value="50">
-                        </div>
-                    </div>
-                    
-                    <div id="square-params" style="display: none;">
-                        <div class="control-group">
-                            <label for="side">Side Length (a): <span id="side-value" class="slider-value">50</span> mm</label>
-                            <input type="range" id="side" min="10" max="200" step="1" value="50">
-                        </div>
-                    </div>
-                    
-                    <div id="rectangular-params" style="display: none;">
-                        <div class="control-group">
-                            <label for="width">Width (b): <span id="width-value" class="slider-value">50</span> mm</label>
-                            <input type="range" id="width" min="10" max="200" step="1" value="50">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="height">Height (h): <span id="height-value" class="slider-value">100</span> mm</label>
-                            <input type="range" id="height" min="10" max="300" step="1" value="100">
-                        </div>
-                    </div>
-                    
-                    <div id="i-beam-params" style="display: none;">
-                        <div class="control-group">
-                            <label for="flange-width">Flange Width (bf): <span id="flange-width-value" class="slider-value">100</span> mm</label>
-                            <input type="range" id="flange-width" min="50" max="300" step="1" value="100">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="flange-thickness">Flange Thickness (tf): <span id="flange-thickness-value" class="slider-value">10</span> mm</label>
-                            <input type="range" id="flange-thickness" min="5" max="50" step="1" value="10">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="web-height">Web Height (hw): <span id="web-height-value" class="slider-value">200</span> mm</label>
-                            <input type="range" id="web-height" min="50" max="500" step="1" value="200">
-                        </div>
-                        
-                        <div class="control-group">
-                            <label for="web-thickness">Web Thickness (tw): <span id="web-thickness-value" class="slider-value">8</span> mm</label>
-                            <input type="range" id="web-thickness" min="3" max="30" step="1" value="8">
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="boundary-conditions">Boundary Conditions:</label>
-                        <select id="boundary-conditions">
-                            <option value="pinned-pinned">Pinned-Pinned (K = 1.0)</option>
-                            <option value="fixed-fixed">Fixed-Fixed (K = 0.5)</option>
-                            <option value="fixed-pinned">Fixed-Pinned (K = 0.7)</option>
-                            <option value="fixed-free">Fixed-Free (K = 2.0)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label for="load-slider">Applied Load (P): <span id="load-value" class="slider-value">0</span> kN</label>
-                        <input type="range" id="load-slider" min="0" max="1000" step="1" value="0">
-                    </div>
-                    
-                    <div class="button-group">
-                        <button id="calculate-btn">Calculate</button>
-                        <button id="animate-btn">Animate</button>
-                        <button id="reset-btn">Reset</button>
-                    </div>
-                </div>
-                
-                <div class="sim-display">
-                    <div id="beam-sketch-holder" style="width: 100%; height: 300px;"></div>
-                    
-                    <div class="results" id="results-panel">
-                        <h3>Results</h3>
-                        <p>Area (A): <span id="area-result">0</span> mm²</p>
-                        <p>Moment of Inertia (I): <span id="inertia-result">0</span> mm⁴</p>
-                        <p>Radius of Gyration (r): <span id="radius-result">0</span> mm</p>
-                        <p>Slenderness Ratio (λ): <span id="slenderness-result">0</span></p>
-                        <p>Euler Critical Load (Pcr): <span id="pcr-result">0</span> kN</p>
-                        <p>Euler Buckling Stress (σcr): <span id="sigma-cr-result">0</span> MPa</p>
-                        <p>Gordon-Rankine Critical Stress: <span id="gordon-result">0</span> MPa</p>
-                        <p>Safety Factor: <span id="safety-factor">∞</span></p>
-                        <p>Status: <span id="status-result">Stable</span></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="examples">
-            <h2>Worked Examples</h2>
-            
-            <div class="example-problem">
-                <h3>Example 1: Slender Steel Column</h3>
-                <p><strong>Problem:</strong> A steel column with circular cross-section has a length of 3 m and diameter of 50 mm. The column is pinned at both ends. Calculate the critical buckling load and determine if a compressive load of 50 kN will cause buckling.</p>
-                
-                <div class="example-solution">
-                    <p><strong>Solution:</strong></p>
-                    <p>Given:</p>
-                    <ul>
-                        <li>Material: Steel (E = 200 GPa = 200,000 MPa)</li>
-                        <li>Length (L) = 3 m</li>
-                        <li>Diameter (d) = 50 mm = 0.05 m</li>
-                        <li>End conditions: Pinned-pinned (K = 1.0)</li>
-                        <li>Applied load (P) = 50 kN</li>
-                    </ul>
-                    
-                    <p>Step 1: Calculate the cross-sectional properties</p>
-                    <p>Area: \(A = \frac{\pi d^2}{4} = \frac{\pi \times 50^2}{4} = 1963.5 \text{ mm}^2\)</p>
-                    <p>Moment of inertia: \(I = \frac{\pi d^4}{64} = \frac{\pi \times 50^4}{64} = 306,796 \text{ mm}^4\)</p>
-                    <p>Radius of gyration: \(r = \sqrt{\frac{I}{A}} = \sqrt{\frac{306,796}{1963.5}} = 12.5 \text{ mm}\)</p>
-                    
-                    <p>Step 2: Calculate the slenderness ratio</p>
-                    <p>\(\lambda = \frac{KL}{r} = \frac{1.0 \times 3000}{12.5} = 240\)</p>
-                    
-                    <p>Step 3: Calculate the Euler critical load</p>
-                    <p>\(P_{cr} = \frac{\pi^2 EI}{(KL)^2} = \frac{\pi^2 \times 200,000 \times 306,796}{(1.0 \times 3000)^2} = 67.4 \text{ kN}\)</p>
-                    
-                    <p>Step 4: Compare with applied load</p>
-                    <p>\(P = 50 \text{ kN} < P_{cr} = 67.4 \text{ kN}\)</p>
-                    
-                    <p>Since the applied load is less than the critical buckling load, the column is stable and will not buckle under the given load. However, the safety factor is relatively low:</p>
-                    <p>Safety Factor = \(\frac{P_{cr}}{P} = \frac{67.4}{50} = 1.35\)</p>
-                </div>
-            </div>
-            
-            <div class="example-problem">
-                <h3>Example 2: Intermediate Slenderness Column</h3>
-                <p><strong>Problem:</strong> An aluminum column with a rectangular cross-section (width = 30 mm, height = 60 mm) has a length of 1.5 m. The column is fixed at the bottom and free at the top. Determine the critical buckling load using both Euler's formula and the Gordon-Rankine formula.</p>
-                
-                <div class="example-solution">
-                    <p><strong>Solution:</strong></p>
-                    <p>Given:</p>
-                    <ul>
-                        <li>Material: Aluminum (E = 70 GPa = 70,000 MPa, σy = 100 MPa)</li>
-                        <li>Length (L) = 1.5 m = 1500 mm</li>
-                        <li>Width (b) = 30 mm</li>
-                        <li>Height (h) = 60 mm</li>
-                        <li>End conditions: Fixed-free (K = 2.0)</li>
-                    </ul>
-                    
-                    <p>Step 1: Calculate the cross-sectional properties</p>
-                    <p>Area: \(A = b \times h = 30 \times 60 = 1800 \text{ mm}^2\)</p>
-                    <p>Moment of inertia (about weak axis): \(I_{min} = \frac{b^3h}{12} = \frac{30^3 \times 60}{12} = 135,000 \text{ mm}^4\)</p>
-                    <p>Radius of gyration: \(r_{min} = \sqrt{\frac{I_{min}}{A}} = \sqrt{\frac{135,000}{1800}} = 8.66 \text{ mm}\)</p>
-                    
-                    <p>Step 2: Calculate the slenderness ratio</p>
-                    <p>\(\lambda = \frac{KL}{r_{min}} = \frac{2.0 \times 1500}{8.66} = 346.4\)</p>
-                    
-                    <p>Step 3: Calculate the Euler critical load</p>
-                    <p>\(P_{cr,Euler} = \frac{\pi^2 EI_{min}}{(KL)^2} = \frac{\pi^2 \times 70,000 \times 135,000}{(2.0 \times 1500)^2} = 10.9 \text{ kN}\)</p>
-                    
-                    <p>Step 4: Calculate the Euler critical stress</p>
-                    <p>\(\sigma_{cr,Euler} = \frac{P_{cr,Euler}}{A} = \frac{10,900}{1800} = 6.06 \text{ MPa}\)</p>
-                    
-                    <p>Step 5: Apply Gordon-Rankine formula</p>
-                    <p>\(\alpha = \frac{\sigma_y}{\pi^2 E} = \frac{100}{\pi^2 \times 70,000} = 0.000145\)</p>
-                    <p>\(\sigma_{cr,Gordon} = \frac{\sigma_y}{1 + \alpha \lambda^2} = \frac{100}{1 + 0.000145 \times 346.4^2} = 5.95 \text{ MPa}\)</p>
-                    <p>\(P_{cr,Gordon} = \sigma_{cr,Gordon} \times A = 5.95 \times 1800 = 10.7 \text{ kN}\)</p>
-                    
-                    <p>Step 6: Comparison</p>
-                    <p>The Euler critical load is 10.9 kN, while the Gordon-Rankine critical load is 10.7 kN.</p>
-                    <p>Since the slenderness ratio is very high (346.4), the column is in the elastic buckling range, which is why the two formulas give similar results. For more intermediate slenderness values, the difference would be more significant.</p>
-                </div>
-            </div>
-        </section>
-        
-        <section id="quiz">
-            <h2>Test Your Understanding</h2>
-            
-            <div class="quiz-container">
-                <form id="quiz-form">
-                    <div class="quiz-question">
-                        <p>1. What is the primary factor that determines whether a column will buckle?</p>
-                        <div class="quiz-options">
-                            <div class="quiz-option">
-                                <input type="radio" id="q1a" name="q1" value="a">
-                                <label for="q1a">Material strength</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q1b" name="q1" value="b">
-                                <label for="q1b">Cross-sectional area</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q1c" name="q1" value="c">
-                                <label for="q1c">Slenderness ratio</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q1d" name="q1" value="d">
-                                <label for="q1d">Applied force magnitude</label>
-                            </div>
-                        </div>
-                        <div id="feedback-q1" class="quiz-feedback"></div>
-                    </div>
-                    
-                    <div class="quiz-question">
-                        <p>2. Which boundary condition results in the highest critical buckling load for a column of given length and cross-section?</p>
-                        <div class="quiz-options">
-                            <div class="quiz-option">
-                                <input type="radio" id="q2a" name="q2" value="a">
-                                <label for="q2a">Fixed-Free (K = 2.0)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q2b" name="q2" value="b">
-                                <label for="q2b">Pinned-Pinned (K = 1.0)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q2c" name="q2" value="c">
-                                <label for="q2c">Fixed-Pinned (K = 0.7)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q2d" name="q2" value="d">
-                                <label for="q2d">Fixed-Fixed (K = 0.5)</label>
-                            </div>
-                        </div>
-                        <div id="feedback-q2" class="quiz-feedback"></div>
-                    </div>
-                    
-                    <div class="quiz-question">
-                        <p>3. For a rectangular cross-section, which axis will buckle first?</p>
-                        <div class="quiz-options">
-                            <div class="quiz-option">
-                                <input type="radio" id="q3a" name="q3" value="a">
-                                <label for="q3a">The strong axis (about the longer side)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q3b" name="q3" value="b">
-                                <label for="q3b">The weak axis (about the shorter side)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q3c" name="q3" value="c">
-                                <label for="q3c">Both axes simultaneously</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q3d" name="q3" value="d">
-                                <label for="q3d">It depends on the loading direction</label>
-                            </div>
-                        </div>
-                        <div id="feedback-q3" class="quiz-feedback"></div>
-                    </div>
-                    
-                    <div class="quiz-question">
-                        <p>4. The Gordon-Rankine formula is most applicable for:</p>
-                        <div class="quiz-options">
-                            <div class="quiz-option">
-                                <input type="radio" id="q4a" name="q4" value="a">
-                                <label for="q4a">Very slender columns (λ > 200)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q4b" name="q4" value="b">
-                                <label for="q4b">Intermediate slenderness columns</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q4c" name="q4" value="c">
-                                <label for="q4c">Very short columns (λ < 20)</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q4d" name="q4" value="d">
-                                <label for="q4d">Composite material columns only</label>
-                            </div>
-                        </div>
-                        <div id="feedback-q4" class="quiz-feedback"></div>
-                    </div>
-                    
-                    <div class="quiz-question">
-                        <p>5. Calculate the critical buckling load for a steel column (E = 200 GPa) with a circular cross-section (diameter = 40 mm), length of 2 m, and pinned at both ends.</p>
-                        <div class="quiz-options">
-                            <div class="quiz-option">
-                                <input type="radio" id="q5a" name="q5" value="a">
-                                <label for="q5a">50.3 kN</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q5b" name="q5" value="b">
-                                <label for="q5b">79.0 kN</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q5c" name="q5" value="c">
-                                <label for="q5c">103.6 kN</label>
-                            </div>
-                            <div class="quiz-option">
-                                <input type="radio" id="q5d" name="q5" value="d">
-                                <label for="q5d">124.7 kN</label>
-                            </div>
-                        </div>
-                        <div id="feedback-q5" class="quiz-feedback"></div>
-                    </div>
-                    
-                    <button type="button" id="submit-quiz">Submit Answers</button>
-                </form>
-            </div>
-        </section>
-    </main>
-    
-    <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-    </footer>
-    
-    <script>
-        // Tab functionality
-        function openTab(evt, tabName) {
-            var i, tabContent, tabButtons;
-            
-            // Hide all tab content
-            tabContent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabContent.length; i++) {
-                tabContent[i].classList.remove("active");
+            h3 {
+                font-size: 1.2em;
             }
             
-            // Remove "active" class from all tab buttons
-            tabButtons = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove("active");
+            .content-section, .simulation-section {
+                padding: 15px;
             }
             
-            // Show the current tab and add "active" class to the button
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-            
-            // Trigger resize event to make sure plots render correctly
-            window.dispatchEvent(new Event('resize'));
-            
-            // Refresh MathJax when switching tabs
-            refreshMathJax();
-        }
-        
-        // Material selection handling
-        document.getElementById('material-select').addEventListener('change', function() {
-            if (this.value === 'custom') {
-                document.getElementById('custom-material').style.display = 'block';
-            } else {
-                document.getElementById('custom-material').style.display = 'none';
-                
-                // Set default values based on selection
-                let eModulus, yieldStress;
-                
-                switch(this.value) {
-                    case 'steel':
-                        eModulus = 200;
-                        yieldStress = 250;
-                        break;
-                    case 'aluminum':
-                        eModulus = 70;
-                        yieldStress = 100;
-                        break;
-                    case 'timber':
-                        eModulus = 10;
-                        yieldStress = 40;
-                        break;
-                }
-                
-                document.getElementById('e-modulus').value = eModulus;
-                document.getElementById('e-modulus-value').textContent = eModulus;
-                document.getElementById('yield-stress').value = yieldStress;
-                document.getElementById('yield-stress-value').textContent = yieldStress;
+            #sketch-holder {
+                height: 450px;
             }
             
-            updateResults();
-        });
-        
-        // Cross-section selection handling
-        document.getElementById('cross-section').addEventListener('change', function() {
-            // Hide all parameter groups
-            document.getElementById('circular-params').style.display = 'none';
-            document.getElementById('square-params').style.display = 'none';
-            document.getElementById('rectangular-params').style.display = 'none';
-            document.getElementById('i-beam-params').style.display = 'none';
-            
-            // Show the selected one
-            switch(this.value) {
-                case 'circular':
-                    document.getElementById('circular-params').style.display = 'block';
-                    break;
-                case 'square':
-                    document.getElementById('square-params').style.display = 'block';
-                    break;
-                case 'rectangular':
-                    document.getElementById('rectangular-params').style.display = 'block';
-                    break;
-                case 'i-beam':
-                    document.getElementById('i-beam-params').style.display = 'block';
-                    break;
+            .equation-box, .key-point, .practice-problems {
+                padding: 10px;
             }
             
-            updateResults();
-        });
-        
-        // Update slider value displays
-        document.querySelectorAll('input[type="range"]').forEach(slider => {
-            slider.addEventListener('input', function() {
-                const valueDisplay = document.getElementById(this.id + '-value');
-                if (valueDisplay) {
-                    valueDisplay.textContent = this.value;
-                }
-                updateResults();
-            });
-        });
-        
-        // Initialize mode shape plot
-        const modeShapePlot = document.getElementById('modeshape-plot');
-        function initModeshapePlot() {
-            const x = Array.from({length: 101}, (_, i) => i * 0.01);
-            
-            const mode1 = x.map(xi => Math.sin(Math.PI * xi));
-            const mode2 = x.map(xi => Math.sin(2 * Math.PI * xi));
-            const mode3 = x.map(xi => Math.sin(3 * Math.PI * xi));
-            
-            const data = [
-                {
-                    x: x,
-                    y: mode1,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Mode 1 (n=1)',
-                    line: {
-                        color: 'blue',
-                        width: 3
-                    }
-                },
-                {
-                    x: x,
-                    y: mode2,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Mode 2 (n=2)',
-                    line: {
-                        color: 'red',
-                        width: 2,
-                        dash: 'dash'
-                    }
-                },
-                {
-                    x: x,
-                    y: mode3,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Mode 3 (n=3)',
-                    line: {
-                        color: 'green',
-                        width: 2,
-                        dash: 'dot'
-                    }
-                }
-            ];
-            
-            const layout = {
-                title: 'Buckling Mode Shapes',
-                xaxis: {
-                    title: 'Normalized Length (x/L)',
-                    range: [0, 1]
-                },
-                yaxis: {
-                    title: 'Deflection',
-                    range: [-1.1, 1.1]
-                },
-                margin: {
-                    l: 50,
-                    r: 50,
-                    b: 50,
-                    t: 50,
-                    pad: 4
-                },
-                legend: {
-                    x: 0.7,
-                    y: 0.1
-                }
-            };
-            
-            Plotly.newPlot(modeShapePlot, data, layout);
-        }
-        
-        // Initialize slenderness ratio plot
-        const slendernessPlot = document.getElementById('slenderness-plot');
-        function initSlendernessPlot() {
-            const lambda = Array.from({length: 201}, (_, i) => i + 20);
-            
-            // Elastic buckling (Euler) stress
-            const E = 200000; // MPa (steel)
-            const eulerStress = lambda.map(l => Math.min(250, Math.PI * Math.PI * E / (l * l)));
-            
-            // Yielding stress line
-            const yieldStress = Array(lambda.length).fill(250);
-            
-            // Gordon-Rankine formula
-            const alpha = 250 / (Math.PI * Math.PI * E);
-            const gordonStress = lambda.map(l => 250 / (1 + alpha * l * l));
-            
-            const data = [
-                {
-                    x: lambda,
-                    y: eulerStress,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Euler Buckling',
-                    line: {
-                        color: 'blue',
-                        width: 2
-                    }
-                },
-                {
-                    x: lambda,
-                    y: yieldStress,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Yield Stress',
-                    line: {
-                        color: 'red',
-                        width: 2
-                    }
-                },
-                {
-                    x: lambda,
-                    y: gordonStress,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: 'Gordon-Rankine',
-                    line: {
-                        color: 'green',
-                        width: 3,
-                        dash: 'solid'
-                    }
-                }
-            ];
-            
-            const layout = {
-                title: 'Buckling Stress vs Slenderness Ratio',
-                xaxis: {
-                    title: 'Slenderness Ratio (λ)',
-                    range: [0, 200]
-                },
-                yaxis: {
-                    title: 'Stress (MPa)',
-                    range: [0, 260]
-                },
-                margin: {
-                    l: 50,
-                    r: 50,
-                    b: 50,
-                    t: 50,
-                    pad: 4
-                },
-                legend: {
-                    x: 0.7,
-                    y: 0.9
-                }
-            };
-            
-            Plotly.newPlot(slendernessPlot, data, layout);
-        }
-        
-        // Initialize Gordon-Rankine plot
-        const gordonRankinePlot = document.getElementById('gordon-rankine-plot');
-        function initGordonRankinePlot() {
-            const lambda = Array.from({length: 201}, (_, i) => i);
-            
-            // Different yield stress materials
-            const E = 200000; // MPa
-            
-            const materials = [
-                { name: 'High Strength Steel', yieldStress: 350 },
-                { name: 'Mild Steel', yieldStress: 250 },
-                { name: 'Aluminum', yieldStress: 100 },
-                { name: 'Timber', yieldStress: 40 }
-            ];
-            
-            const data = materials.map(material => {
-                const alpha = material.yieldStress / (Math.PI * Math.PI * E);
-                const gordonStress = lambda.map(l => material.yieldStress / (1 + alpha * l * l));
-                
-                return {
-                    x: lambda,
-                    y: gordonStress,
-                    type: 'scatter',
-                    mode: 'lines',
-                    name: material.name,
-                    line: {
-                        width: 2
-                    }
-                };
-            });
-            
-            const layout = {
-                title: 'Gordon-Rankine Formula for Different Materials',
-                xaxis: {
-                    title: 'Slenderness Ratio (λ)',
-                    range: [0, 200]
-                },
-                yaxis: {
-                    title: 'Critical Stress (MPa)',
-                    range: [0, 360]
-                },
-                margin: {
-                    l: 50,
-                    r: 50,
-                    b: 50,
-                    t: 50,
-                    pad: 4
-                },
-                legend: {
-                    x: 0.7,
-                    y: 0.9
-                }
-            };
-            
-            Plotly.newPlot(gordonRankinePlot, data, layout);
-        }
-        
-        // Calculate cross-section properties
-        function calculateProperties() {
-            const crossSection = document.getElementById('cross-section').value;
-            let area, momentOfInertia, radiusOfGyration;
-            
-            switch(crossSection) {
-                case 'circular':
-                    const diameter = parseFloat(document.getElementById('diameter').value);
-                    const radius = diameter / 2;
-                    
-                    area = Math.PI * radius * radius;
-                    momentOfInertia = Math.PI * Math.pow(radius, 4) / 4;
-                    break;
-                    
-                case 'square':
-                    const side = parseFloat(document.getElementById('side').value);
-                    
-                    area = side * side;
-                    momentOfInertia = side * Math.pow(side, 3) / 12;
-                    break;
-                    
-                case 'rectangular':
-                    const width = parseFloat(document.getElementById('width').value);
-                    const height = parseFloat(document.getElementById('height').value);
-                    
-                    area = width * height;
-                    // Use the minimum moment of inertia (about weak axis)
-                    const Ix = width * Math.pow(height, 3) / 12;
-                    const Iy = height * Math.pow(width, 3) / 12;
-                    momentOfInertia = Math.min(Ix, Iy);
-                    break;
-                    
-                case 'i-beam':
-                    const flangeWidth = parseFloat(document.getElementById('flange-width').value);
-                    const flangeThickness = parseFloat(document.getElementById('flange-thickness').value);
-                    const webHeight = parseFloat(document.getElementById('web-height').value);
-                    const webThickness = parseFloat(document.getElementById('web-thickness').value);
-                    
-                    const totalHeight = webHeight + 2 * flangeThickness;
-                    
-                    // Area calculation
-                    area = 2 * flangeWidth * flangeThickness + webHeight * webThickness;
-                    
-                    // Moment of inertia about x-axis (strong axis)
-                    const Ix_ibeam = (flangeWidth * Math.pow(totalHeight, 3) - (flangeWidth - webThickness) * Math.pow(webHeight, 3)) / 12;
-                    
-                    // Moment of inertia about y-axis (weak axis)
-                    const Iy_ibeam = (2 * flangeThickness * Math.pow(flangeWidth, 3) + webHeight * Math.pow(webThickness, 3)) / 12;
-                    
-                    // Use the minimum moment of inertia (about weak axis)
-                    momentOfInertia = Math.min(Ix_ibeam, Iy_ibeam);
-                    break;
-            }
-            
-            radiusOfGyration = Math.sqrt(momentOfInertia / area);
-            
-            return {
-                area: area,
-                momentOfInertia: momentOfInertia,
-                radiusOfGyration: radiusOfGyration
-            };
-        }
-        
-        // Calculate buckling loads and stresses
-        function calculateBuckling() {
-            // Get input values
-            const length = parseFloat(document.getElementById('length-slider').value) * 1000; // Convert to mm
-            const eModulus = parseFloat(document.getElementById('e-modulus').value) * 1000; // Convert to MPa
-            const yieldStress = parseFloat(document.getElementById('yield-stress').value);
-            
-            // Get boundary condition factor
-            let kFactor;
-            switch(document.getElementById('boundary-conditions').value) {
-                case 'pinned-pinned':
-                    kFactor = 1.0;
-                    break;
-                case 'fixed-fixed':
-                    kFactor = 0.5;
-                    break;
-                case 'fixed-pinned':
-                    kFactor = 0.7;
-                    break;
-                case 'fixed-free':
-                    kFactor = 2.0;
-                    break;
-            }
-            
-            // Calculate cross-section properties
-            const props = calculateProperties();
-            
-            // Calculate slenderness ratio
-            const slendernessRatio = kFactor * length / props.radiusOfGyration;
-            
-            // Calculate Euler critical load
-            const criticalLoad = Math.PI * Math.PI * eModulus * props.momentOfInertia / Math.pow(kFactor * length, 2);
-            
-            // Convert to kN
-            const criticalLoadkN = criticalLoad / 1000;
-            
-            // Calculate Euler buckling stress
-            const eulerStress = criticalLoad / props.area;
-            
-            // Calculate Gordon-Rankine critical stress
-            const alpha = yieldStress / (Math.PI * Math.PI * eModulus);
-            const gordonStress = yieldStress / (1 + alpha * slendernessRatio * slendernessRatio);
-            
-            // Calculate Gordon-Rankine critical load
-            const gordonLoad = gordonStress * props.area / 1000; // Convert to kN
-            
-            // Get applied load
-            const appliedLoad = parseFloat(document.getElementById('load-slider').value);
-            
-            // Calculate safety factor
-            let safetyFactor;
-            if (appliedLoad === 0) {
-                safetyFactor = "∞";
-            } else {
-                safetyFactor = (gordonLoad / appliedLoad).toFixed(2);
-            }
-            
-            // Determine stability status
-            let status = "Stable";
-            if (appliedLoad > gordonLoad) {
-                status = "Unstable - Buckling will occur";
-            }
-            
-            return {
-                area: props.area.toFixed(2),
-                momentOfInertia: props.momentOfInertia.toFixed(0),
-                radiusOfGyration: props.radiusOfGyration.toFixed(2),
-                slendernessRatio: slendernessRatio.toFixed(2),
-                criticalLoad: criticalLoadkN.toFixed(2),
-                eulerStress: eulerStress.toFixed(2),
-                gordonStress: gordonStress.toFixed(2),
-                safetyFactor: safetyFactor,
-                status: status
-            };
-        }
-        
-        // Update results panel
-        function updateResults() {
-            const results = calculateBuckling();
-            
-            document.getElementById('area-result').textContent = results.area;
-            document.getElementById('inertia-result').textContent = results.momentOfInertia;
-            document.getElementById('radius-result').textContent = results.radius;
-            document.getElementById('slenderness-result').textContent = results.slendernessRatio;
-            document.getElementById('pcr-result').textContent = results.criticalLoad;
-            document.getElementById('sigma-cr-result').textContent = results.eulerStress;
-            document.getElementById('gordon-result').textContent = results.gordonStress;
-            document.getElementById('safety-factor').textContent = results.safetyFactor;
-            document.getElementById('status-result').textContent = results.status;
-            
-            // Update status color
-            if (results.status === "Stable") {
-                document.getElementById('status-result').style.color = "green";
-            } else {
-                document.getElementById('status-result').style.color = "red";
-            }
-        }
-        
-        // Quiz handling
-        document.getElementById('submit-quiz').addEventListener('click', function() {
-            const answers = {
-                q1: 'c', // Slenderness ratio
-                q2: 'd', // Fixed-Fixed
-                q3: 'b', // The weak axis
-                q4: 'b', // Intermediate slenderness columns
-                q5: 'b'  // 79.0 kN
-            };
-            
-            let score = 0;
-            
-            // Check each question
-            for (const [question, correctAnswer] of Object.entries(answers)) {
-                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
-                const feedbackElement = document.getElementById(`feedback-${question}`);
-                
-                if (!selectedOption) {
-                    feedbackElement.textContent = "Please select an answer.";
-                    feedbackElement.className = "quiz-feedback incorrect";
-                    feedbackElement.style.display = "block";
-                    continue;
-                }
-                
-                if (selectedOption.value === correctAnswer) {
-                    score++;
-                    feedbackElement.textContent = "Correct!";
-                    feedbackElement.className = "quiz-feedback correct";
-                } else {
-                    feedbackElement.textContent = "Incorrect. Please try again.";
-                    feedbackElement.className = "quiz-feedback incorrect";
-                }
-                
-                feedbackElement.style.display = "block";
-            }
-            
-            alert(`You scored ${score} out of 5!`);
-        });
-        
-        // P5.js sketch for beam buckling visualization
-        let beamSketch = function(p) {
-            let length = 300; // Initial column length in pixels
-            let diameter = 20; // Initial column width in pixels
-            let load = 0; // Applied load in pixels (for visualization)
-            let criticalLoad = 100; // Critical load in pixels (for visualization)
-            let boundaryCondition = 'pinned-pinned'; // Default boundary condition
-            
-            p.setup = function() {
-                p.createCanvas(600, 300);
-                p.textAlign(p.CENTER, p.CENTER);
-                p.rectMode(p.CENTER);
-                p.noFill();
-                p.stroke(0);
-                p.strokeWeight(2);
-            };
-            
-            p.draw = function() {
-                p.background(240);
-                
-                // Get current values from UI
-                updateParameters();
-                
-                // Draw the beam based on boundary condition
-                switch(boundaryCondition) {
-                    case 'pinned-pinned':
-                        drawPinnedPinnedBeam();
-                        break;
-                    case 'fixed-fixed':
-                        drawFixedFixedBeam();
-                        break;
-                    case 'fixed-pinned':
-                        drawFixedPinnedBeam();
-                        break;
-                    case 'fixed-free':
-                        drawFixedFreeBeam();
-                        break;
-                }
-                
-                // Draw load indicator
-                drawLoadIndicator();
-                
-                // Draw axis
-                drawAxis();
-            };
-            
-            function updateParameters() {
-                // Get values from UI and scale appropriately for visualization
-                length = parseFloat(document.getElementById('length-slider').value) * 50; // Scale for visual
-                
-                // Get diameter based on cross section
-                const crossSection = document.getElementById('cross-section').value;
-                switch(crossSection) {
-                    case 'circular':
-                        diameter = parseFloat(document.getElementById('diameter').value) / 5;
-                        break;
-                    case 'square':
-                        diameter = parseFloat(document.getElementById('side').value) / 5;
-                        break;
-                    case 'rectangular':
-                        diameter = Math.min(
-                            parseFloat(document.getElementById('width').value), 
-                            parseFloat(document.getElementById('height').value)
-                        ) / 5;
-                        break;
-                    case 'i-beam':
-                        diameter = parseFloat(document.getElementById('web-thickness').value) / 2;
-                        break;
-                }
-                
-                // Limit diameter for visualization purposes
-                diameter = p.constrain(diameter, 5, 40);
-                
-                // Get boundary condition
-                boundaryCondition = document.getElementById('boundary-conditions').value;
-                
-                // Get applied load and critical load for visualization
-                load = parseFloat(document.getElementById('load-slider').value) / 10;
-                
-                // Get results to update critical load visualization
-                const results = calculateBuckling();
-                criticalLoad = parseFloat(results.criticalLoad) / 10;
-            }
-            
-            function drawPinnedPinnedBeam() {
-                const startX = p.width / 2 - length / 2;
-                const endX = p.width / 2 + length / 2;
-                const beamY = p.height / 2;
-                
-                // Draw foundation
-                drawTriangle(startX, beamY + diameter / 2);
-                drawTriangle(endX, beamY + diameter / 2);
-                
-                // Draw straight beam when load < criticalLoad
-                if (load < criticalLoad) {
-                    p.line(startX, beamY, endX, beamY);
-                    return;
-                }
-                
-                // Calculate buckled shape - first mode shape for pinned-pinned
-                const deflectionMagnitude = p.map(load, criticalLoad, criticalLoad * 2, 0, diameter * 3);
-                p.beginShape();
-                for (let x = startX; x <= endX; x++) {
-                    const normalizedX = (x - startX) / length;
-                    const deflection = deflectionMagnitude * p.sin(p.PI * normalizedX);
-                    p.vertex(x, beamY - deflection);
-                }
-                p.endShape();
-            }
-            
-            function drawFixedFixedBeam() {
-                const startX = p.width / 2 - length / 2;
-                const endX = p.width / 2 + length / 2;
-                const beamY = p.height / 2;
-                
-                // Draw foundation
-                drawFixedSupport(startX, beamY);
-                drawFixedSupport(endX, beamY);
-                
-                // Draw straight beam when load < criticalLoad
-                if (load < criticalLoad) {
-                    p.line(startX, beamY, endX, beamY);
-                    return;
-                }
-                
-                // Calculate buckled shape - first mode shape for fixed-fixed
-                const deflectionMagnitude = p.map(load, criticalLoad, criticalLoad * 2, 0, diameter * 3);
-                p.beginShape();
-                for (let x = startX; x <= endX; x++) {
-                    const normalizedX = (x - startX) / length;
-                    const deflection = deflectionMagnitude * (1 - p.cos(2 * p.PI * normalizedX));
-                    p.vertex(x, beamY - deflection);
-                }
-                p.endShape();
-            }
-            
-            function drawFixedPinnedBeam() {
-                const startX = p.width / 2 - length / 2;
-                const endX = p.width / 2 + length / 2;
-                const beamY = p.height / 2;
-                
-                // Draw foundation
-                drawFixedSupport(startX, beamY);
-                drawTriangle(endX, beamY + diameter / 2);
-                
-                // Draw straight beam when load < criticalLoad
-                if (load < criticalLoad) {
-                    p.line(startX, beamY, endX, beamY);
-                    return;
-                }
-                
-                // Calculate buckled shape - first mode shape for fixed-pinned
-                const deflectionMagnitude = p.map(load, criticalLoad, criticalLoad * 2, 0, diameter * 3);
-                p.beginShape();
-                for (let x = startX; x <= endX; x++) {
-                    const normalizedX = (x - startX) / length;
-                    const deflection = deflectionMagnitude * (1 - p.cos(p.PI * normalizedX / 2));
-                    p.vertex(x, beamY - deflection);
-                }
-                p.endShape();
-            }
-            
-            function drawFixedFreeBeam() {
-                const startX = p.width / 2 - length / 2;
-                const endX = p.width / 2 + length / 2;
-                const beamY = p.height / 2;
-                
-                // Draw foundation
-                drawFixedSupport(startX, beamY);
-                
-                // Draw straight beam when load < criticalLoad
-                if (load < criticalLoad) {
-                    p.line(startX, beamY, endX, beamY);
-                    return;
-                }
-                
-                // Calculate buckled shape - first mode shape for fixed-free
-                const deflectionMagnitude = p.map(load, criticalLoad, criticalLoad * 2, 0, diameter * 3);
-                p.beginShape();
-                for (let x = startX; x <= endX; x++) {
-                    const normalizedX = (x - startX) / length;
-                    const deflection = deflectionMagnitude * (1 - p.cos(p.PI * normalizedX / 2));
-                    p.vertex(x, beamY - deflection);
-                }
-                p.endShape();
-            }
-            
-            function drawTriangle(x, y) {
-                const size = diameter * 1.5;
-                p.fill(150);
-                p.stroke(0);
-                p.triangle(x, y, x - size / 2, y + size / 2, x + size / 2, y + size / 2);
-                p.noFill();
-            }
-            
-            function drawFixedSupport(x, y) {
-                const size = diameter * 1.5;
-                p.fill(150);
-                p.stroke(0);
-                p.rect(x, y, size / 2, size * 1.5);
-                p.noFill();
-            }
-            
-            function drawLoadIndicator() {
-                if (load > 0) {
-                    const arrowSize = 20;
-                    const startX = p.width / 2 - length / 2;
-                    const endX = p.width / 2 + length / 2;
-                    const topY = p.height / 2 - diameter / 2 - 20;
-                    const bottomY = p.height / 2 + diameter / 2 + 20;
-                    
-                    // Draw load arrows
-                    p.fill(255, 0, 0);
-                    p.stroke(255, 0, 0);
-                    p.strokeWeight(2);
-                    
-                    if (boundaryCondition === 'fixed-free') {
-                        // For cantilever, draw arrow at free end
-                        p.triangle(endX, p.height / 2, 
-                                  endX - arrowSize, p.height / 2 - arrowSize / 2, 
-                                  endX - arrowSize, p.height / 2 + arrowSize / 2);
-                        p.line(endX, p.height / 2, endX - 40, p.height / 2);
-                    } else {
-                        // For other beams, draw arrow at top
-                        p.triangle(p.width / 2, topY, 
-                                  p.width / 2 - arrowSize / 2, topY - arrowSize, 
-                                  p.width / 2 + arrowSize / 2, topY - arrowSize);
-                        p.line(p.width / 2, topY, p.width / 2, topY - 40);
-                    }
-                    
-                    // Draw load value
-                    p.textSize(14);
-                    p.fill(255, 0, 0);
-                    p.noStroke();
-                    
-                    if (boundaryCondition === 'fixed-free') {
-                        p.text("P = " + document.getElementById('load-slider').value + " kN", endX - 40, p.height / 2 - 15);
-                    } else {
-                        p.text("P = " + document.getElementById('load-slider').value + " kN", p.width / 2, topY - 55);
-                    }
-                    
-                    // Indicate if buckling will occur
-                    if (load > criticalLoad) {
-                        p.textSize(16);
-                        p.fill(255, 0, 0);
-                        p.text("BUCKLING!", p.width / 2, p.height - 30);
-                    }
-                }
-                
-                // Reset stroke settings
-                p.strokeWeight(2);
-                p.stroke(0);
-                p.noFill();
-            }
-            
-            function drawAxis() {
-                p.textSize(12);
-                p.fill(0);
-                p.text("L = " + document.getElementById('length-slider').value + " m", p.width / 2, p.height - 10);
-                p.noFill();
-            }
-        };
-        
-        // Add function to explicitly refresh MathJax
-        function refreshMathJax() {
-            if (typeof MathJax !== 'undefined') {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            button {
+                padding: 8px 15px;
             }
         }
 
-        // Initialize all plots and sketches after page is loaded
-        window.addEventListener('load', function() {
-            initModeshapePlot();
-            initSlendernessPlot();
-            initGordonRankinePlot();
-            
-            // Initialize p5.js beam sketch
-            new p5(beamSketch, 'beam-sketch-holder');
-            
-            // Calculate initial results
-            updateResults();
-            
-            // Refresh MathJax to properly render all equations
-            refreshMathJax();
-        });
-        
-        // Add animation functionality
-        document.getElementById('animate-btn').addEventListener('click', function() {
-            const maxLoad = parseFloat(document.getElementById('load-slider').value) || 0;
-            const criticalLoad = parseFloat(document.getElementById('pcr-result').textContent) || 0;
-            
-            // Don't animate if no load specified
-            if (maxLoad <= 0) {
-                alert("Please specify a non-zero load to animate.");
-                return;
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 1.6em;
             }
             
-            // Set up animation
-            let currentLoad = 0;
-            const animationStep = maxLoad / 50; // 50 steps to reach max load
+            #sketch-holder {
+                height: 350px;
+            }
             
-            // Start animation
-            const animation = setInterval(function() {
-                currentLoad += animationStep;
+            .quiz-options label {
+                padding: 6px;
+            }
+            
+            .equation-table td, .equation-table th {
+                padding: 8px 10px;
+            }
+            
+            .equation-table {
+                font-size: 0.8em;
+            }
+            
+            input[type="range"] {
+                width: 100%;
+            }
+            
+            footer {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media (max-width: 320px) {
+            body {
+                padding: 5px;
+            }
+            
+            header {
+                padding: 0.8rem;
+            }
+            
+            h1 {
+                font-size: 1.4em;
+            }
+            
+            #sketch-holder {
+                height: 300px;
+            }
+            
+            .content-section, .simulation-section {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>elastic instability (buckling)</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div id="react-visualizer"></div>
+    
+    <div class="content-section">
+        <h2>Understanding Elastic Instability</h2>
+        <p>Elastic instability, commonly known as buckling, is a structural phenomenon where a slender member under compression suddenly deflects laterally when the applied load reaches a critical value. This is one of the most important failure modes in structural engineering.</p>
+
+        <div class="key-point">
+            <p><strong>Definition:</strong> Elastic instability occurs when a structural member loses its ability to maintain its original straight configuration under compressive loading, resulting in sudden large lateral deflections even though the material remains within its elastic range.</p>
+        </div>
+
+        <h3>Key Characteristics of Buckling</h3>
+        <ul>
+            <li>Sudden and catastrophic failure mode</li>
+            <li>Occurs at loads well below the material's ultimate strength</li>
+            <li>Involves large deformations with small load increases</li>
+            <li>Highly dependent on member slenderness and support conditions</li>
+            <li>Can occur in compression members, beams under lateral loads, and thin plates/shells</li>
+        </ul>
+
+        <h3>Euler Buckling Theory - Mathematical Derivation</h3>
+        <p>The foundational theory for understanding column buckling was developed by Leonhard Euler in 1744. The derivation starts with the fundamental differential equation for the elastic curve of a beam-column.</p>
+
+        <div class="equation-box">
+            <p><strong>Starting Point - Differential Equation:</strong></p>
+            <p>For a column under axial load \(P\) with lateral deflection \(y\):</p>
+            <p>\(EI\frac{d^2y}{dx^2} + Py = 0\)</p>
+            <p>Rearranging: \(\frac{d^2y}{dx^2} + \frac{P}{EI}y = 0\)</p>
+            <p>Let \(k^2 = \frac{P}{EI}\), then: \(\frac{d^2y}{dx^2} + k^2y = 0\)</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>General Solution:</strong></p>
+            <p>The general solution to this differential equation is:</p>
+            <p>\(y = A\sin(kx) + B\cos(kx)\)</p>
+            <p>Where \(A\) and \(B\) are constants determined by boundary conditions</p>
+        </div>
+
+        <h3>Buckling Mode Shapes</h3>
+        <p>For a column with pinned ends (simply supported), the boundary conditions are \(y = 0\) at \(x = 0\) and \(x = L\):</p>
+
+        <div class="equation-box">
+            <p><strong>Applying Boundary Conditions:</strong></p>
+            <p>At \(x = 0\): \(y = 0 \Rightarrow B = 0\)</p>
+            <p>At \(x = L\): \(y = 0 \Rightarrow A\sin(kL) = 0\)</p>
+            <p>For non-trivial solutions (\(A \neq 0\)): \(\sin(kL) = 0\)</p>
+            <p>This gives: \(kL = m\pi\) where \(m = 1, 2, 3, ...\)</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Critical Loads and Mode Shapes:</strong></p>
+            <p>Substituting \(k^2 = \frac{P}{EI}\) and \(k = \frac{m\pi}{L}\):</p>
+            <p>\(P_{cr,m} = \frac{m^2\pi^2 EI}{L^2}\) for \(m = 1, 2, 3, ...\)</p>
+            <p>The deflected shape: \(y = A\sin\left(\frac{m\pi x}{L}\right)\)</p>
+            <p><strong>First mode (\(m = 1\)):</strong> \(P_{cr} = \frac{\pi^2 EI}{L^2}\) (Euler's formula)</p>
+            <p>Higher modes occur at \(4P_{cr}\), \(9P_{cr}\), \(16P_{cr}\), etc.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Interpretation:</strong> The first buckling mode (\(m = 1\)) represents the lowest critical load and consists of a single half-sine wave. Higher modes (\(m > 1\)) require significantly higher loads but are generally unstable in practice, as the column will buckle in the first mode at the lowest critical load.</p>
+        </div>
+
+        <h3>Effective Length and End Conditions</h3>
+        <p>The effective length \(L_e\) depends on the support conditions at the column ends:</p>
+
+        <div class="equation-box">
+            <p>\(L_e = K \cdot L\)</p>
+            <p>Where \(K\) is the effective length factor:</p>
+            <ul>
+                <li>Pinned-pinned: \(K = 1.0\)</li>
+                <li>Fixed-free (cantilever): \(K = 2.0\)</li>
+                <li>Fixed-pinned: \(K = 0.7\)</li>
+                <li>Fixed-fixed: \(K = 0.5\)</li>
+            </ul>
+        </div>
+
+        <h3>Slenderness Ratio</h3>
+        <p>The tendency of a column to buckle is characterised by its slenderness ratio:</p>
+
+        <div class="equation-box">
+            <p>\(\lambda = \frac{L_e}{r}\)</p>
+            <p>Where \(r = \sqrt{\frac{I}{A}}\) is the radius of gyration</p>
+            <p>Higher slenderness ratios indicate greater susceptibility to buckling</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Buckling Simulation</h2>
+        <p>Adjust the parameters to see how they affect the critical buckling load and column behaviour.</p>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="lengthSlider">Length (m): <span id="lengthValue">2.0</span></label>
+                <input type="range" id="lengthSlider" min="1" max="5" step="0.1" value="2.0">
+            </div>
+            <div class="control-group">
+                <label for="loadSlider">Applied Load (kN): <span id="loadValue">10</span></label>
+                <input type="range" id="loadSlider" min="0" max="150" step="1" value="10">
+            </div>
+            <div class="control-group">
+                <label for="endCondition">End Conditions:</label>
+                <select id="endCondition">
+                    <option value="pinned">Pinned-Pinned (K=1.0)</option>
+                    <option value="fixed">Fixed-Fixed (K=0.5)</option>
+                    <option value="cantilever">Fixed-Free (K=2.0)</option>
+                    <option value="fixedPinned">Fixed-Pinned (K=0.7)</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="sketch-holder">
+            <!-- Our simulation will go here! -->
+        </div>
+        <div id="button-container">
+            <!-- Our GUI goes here-->
+        </div>
+
+        <div id="buckling-data" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
+            <h4>Analysis Results:</h4>
+            <p>Critical Load: <span id="criticalLoad">--</span> kN</p>
+            <p>Safety Factor: <span id="safetyFactor">--</span></p>
+            <p>Slenderness Ratio: <span id="slenderness">--</span></p>
+            <p>Status: <span id="bucklingStatus">Stable</span></p>
+        </div>
+
+        <h3>Simulation Instructions</h3>
+        <ul>
+            <li>Use the sliders to adjust column length and applied load</li>
+            <li>Select different end conditions from the dropdown menu</li>
+            <li>Watch the column deform when the applied load exceeds the critical buckling load</li>
+            <li>Observe how the critical load changes with different parameters</li>
+            <li>The column colour changes from blue (stable) to red (buckled)</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Types of Buckling</h2>
+
+        <h3>1. Local Buckling</h3>
+        <p>Occurs in thin-walled sections where individual plates (flanges or webs) buckle before the overall member fails. Common in steel I-beams and hollow sections.</p>
+
+        <h3>2. Lateral-Torsional Buckling</h3>
+        <p>Affects beams where the compression flange becomes unstable and deflects laterally whilst twisting. Critical in unbraced steel beams.</p>
+
+        <h3>3. Global Buckling</h3>
+        <p>The overall buckling of the entire structural member, as described by Euler's theory.</p>
+
+        <h3>4. Post-Buckling Behaviour</h3>
+        <p>Some structures can carry additional load after initial buckling. This is particularly important in thin plates and shells.</p>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> Buckling is often the governing failure mode for compression members in real structures. Understanding and preventing buckling is crucial for safe structural design, particularly in tall buildings, bridges, and aerospace applications.</p>
+        </div>
+
+        <h2>Practical Design Considerations</h2>
+
+        <h3>1. Imperfections</h3>
+        <p>Real structures have initial imperfections (geometrical and material) that reduce the actual buckling load below the theoretical Euler load.</p>
+
+        <h3>2. Rankine-Gordon Empirical Formula</h3>
+        <p>The Rankine-Gordon formula provides a practical approach for design by combining crushing failure and Euler buckling:</p>
+        <div class="equation-box">
+            <p>\(\frac{1}{P_{design}} = \frac{1}{P_{crushing}} + \frac{1}{P_{Euler}}\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(P_{crushing} = \sigma_c \cdot A\) (crushing load based on compressive strength)</li>
+                <li>\(P_{Euler} = \frac{\pi^2 EI}{L_e^2}\) (Euler buckling load)</li>
+            </ul>
+            <p>This can be written as:</p>
+            <p>\(P_{design} = \frac{\sigma_c A}{1 + \frac{\sigma_c L_e^2}{\pi^2 E r^2}} = \frac{\sigma_c A}{1 + a\lambda^2}\)</p>
+            <p>Where \(a = \frac{\sigma_c}{\pi^2 E}\) is the Rankine constant and \(\lambda = \frac{L_e}{r}\) is the slenderness ratio</p>
+        </div>
+
+        <h3>3. Design Standards</h3>
+        <p>Modern design codes (Eurocode 3, BS 5950, AISC) provide buckling curves that account for:</p>
+        <ul>
+            <li>Material properties</li>
+            <li>Cross-sectional shape</li>
+            <li>Manufacturing tolerances</li>
+            <li>Residual stresses</li>
+        </ul>
+
+        <h2>Historical Development</h2>
+
+        <h3>Euler's Contribution (1744)</h3>
+        <p>Leonhard Euler first derived the critical load formula for pin-ended columns, laying the mathematical foundation for stability analysis.</p>
+
+        <h3>Timoshenko's Work (Early 1900s)</h3>
+        <p>Stephen Timoshenko extended buckling theory to include shear deformation effects and developed solutions for various boundary conditions.</p>
+
+        <h3>Modern Developments</h3>
+        <p>Contemporary research focuses on:</p>
+        <ul>
+            <li>Numerical methods for complex geometries</li>
+            <li>Buckling of composite materials</li>
+            <li>Dynamic buckling under time-varying loads</li>
+            <li>Imperfection sensitivity analysis</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Basic Euler Buckling</h3>
+            <p>A steel column with pinned ends has the following properties:</p>
+            <ul>
+                <li>Length: 3 m</li>
+                <li>Young's modulus: 200 GPa</li>
+                <li>Second moment of area: 8.5 × 10⁻⁶ m⁴</li>
+            </ul>
+            <p>Calculate the critical buckling load.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(L = 3 \text{ m}, E = 200 \times 10^9 \text{ Pa}, I = 8.5 \times 10^{-6} \text{ m}^4\)</p>
+                <p>For pinned ends: \(K = 1.0\), so \(L_e = 3 \text{ m}\)</p>
+                <p>Using Euler's formula:</p>
+                <p>\(P_{cr} = \frac{\pi^2 EI}{L_e^2} = \frac{\pi^2 \times 200 \times 10^9 \times 8.5 \times 10^{-6}}{3^2}\)</p>
+                <p>\(P_{cr} = \frac{\pi^2 \times 1700}{9} = \frac{16811.7}{9} = 1868 \text{ kN}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Effect of End Conditions</h3>
+            <p>Compare the critical buckling loads for the same column from Problem 1 with different end conditions:</p>
+            <ol>
+                <li>Fixed-fixed ends</li>
+                <li>Fixed-free (cantilever)</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Using the same column properties from Problem 1:</p>
                 
-                if (currentLoad >= maxLoad) {
-                    currentLoad = maxLoad;
-                    clearInterval(animation);
+                <p><strong>a) Fixed-fixed ends (\(K = 0.5\)):</strong></p>
+                <p>\(L_e = 0.5 \times 3 = 1.5 \text{ m}\)</p>
+                <p>\(P_{cr} = \frac{\pi^2 \times 200 \times 10^9 \times 8.5 \times 10^{-6}}{1.5^2} = 7472 \text{ kN}\)</p>
+                
+                <p><strong>b) Fixed-free (\(K = 2.0\)):</strong></p>
+                <p>\(L_e = 2.0 \times 3 = 6 \text{ m}\)</p>
+                <p>\(P_{cr} = \frac{\pi^2 \times 200 \times 10^9 \times 8.5 \times 10^{-6}}{6^2} = 467 \text{ kN}\)</p>
+                
+                <p>The fixed-fixed condition provides 4 times the load capacity of pinned-pinned, whilst cantilever reduces it to 1/4.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Slenderness Ratio Calculation</h3>
+            <p>A hollow rectangular section column has:</p>
+            <ul>
+                <li>External dimensions: 100 mm × 50 mm</li>
+                <li>Wall thickness: 5 mm</li>
+                <li>Length: 2.5 m (pinned ends)</li>
+            </ul>
+            <p>Calculate the slenderness ratio about both axes.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>For a hollow rectangular section:</p>
+                <p>External: 100 × 50 mm, Internal: 90 × 40 mm</p>
+                
+                <p><strong>Area:</strong> \(A = 100 \times 50 - 90 \times 40 = 1400 \text{ mm}^2\)</p>
+                
+                <p><strong>Second moments of area:</strong></p>
+                <p>\(I_{xx} = \frac{100 \times 50^3 - 90 \times 40^3}{12} = \frac{6,250,000 - 4,800,000}{12} = 120,833 \text{ mm}^4\)</p>
+                <p>\(I_{yy} = \frac{50 \times 100^3 - 40 \times 90^3}{12} = \frac{50,000,000 - 29,160,000}{12} = 1,736,667 \text{ mm}^4\)</p>
+                
+                <p><strong>Radii of gyration:</strong></p>
+                <p>\(r_x = \sqrt{\frac{I_{xx}}{A}} = \sqrt{\frac{120,833}{1400}} = 9.29 \text{ mm}\)</p>
+                <p>\(r_y = \sqrt{\frac{I_{yy}}{A}} = \sqrt{\frac{1,736,667}{1400}} = 35.23 \text{ mm}\)</p>
+                
+                <p><strong>Slenderness ratios:</strong></p>
+                <p>\(\lambda_x = \frac{2500}{9.29} = 269\) (critical - weak axis)</p>
+                <p>\(\lambda_y = \frac{2500}{35.23} = 71\)</p>
+                
+                <p>The column will buckle about the x-x axis (weak axis) as it has the higher slenderness ratio.</p>
+            </div>
+        </div>
+            <div class="practice-problems">
+            <h3>Problem 4: Rankine-Gordon Design Formula</h3>
+            <p>A steel column with the following properties needs to be designed using the Rankine-Gordon formula:</p>
+            <ul>
+                <li>Length: 4 m (pinned ends)</li>
+                <li>Cross-sectional area: 2500 mm²</li>
+                <li>Radius of gyration: 25 mm</li>
+                <li>Compressive strength: 250 MPa</li>
+                <li>Young's modulus: 200 GPa</li>
+            </ul>
+            <p>Calculate the design load using the Rankine-Gordon formula.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p>Given: \(L = 4 \text{ m}, A = 2500 \text{ mm}^2 = 0.0025 \text{ m}^2, r = 25 \text{ mm} = 0.025 \text{ m}\)</p>
+                <p>\(\sigma_c = 250 \text{ MPa} = 250 \times 10^6 \text{ Pa}, E = 200 \text{ GPa} = 200 \times 10^9 \text{ Pa}\)</p>
+                
+                <p><strong>Step 1: Calculate slenderness ratio</strong></p>
+                <p>\(\lambda = \frac{L_e}{r} = \frac{4}{0.025} = 160\)</p>
+                
+                <p><strong>Step 2: Calculate Rankine constant</strong></p>
+                <p>\(a = \frac{\sigma_c}{\pi^2 E} = \frac{250 \times 10^6}{\pi^2 \times 200 \times 10^9} = \frac{250}{1973.9} = 0.000127\)</p>
+                
+                <p><strong>Step 3: Apply Rankine-Gordon formula</strong></p>
+                <p>\(P_{design} = \frac{\sigma_c A}{1 + a\lambda^2} = \frac{250 \times 10^6 \times 0.0025}{1 + 0.000127 \times 160^2}\)</p>
+                <p>\(P_{design} = \frac{625,000}{1 + 0.000127 \times 25,600} = \frac{625,000}{1 + 3.25} = \frac{625,000}{4.25} = 147,059 \text{ N} = 147.1 \text{ kN}\)</p>
+                
+                <p><strong>Comparison with pure Euler:</strong></p>
+                <p>\(P_{Euler} = \frac{\pi^2 EI}{L^2} = \frac{\pi^2 \times 200 \times 10^9 \times (0.025^2 \times 0.0025)}{4^2} = 192.4 \text{ kN}\)</p>
+                
+                <p>The Rankine-Gordon formula gives a more conservative (lower) design load that accounts for material failure as well as buckling.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: Elastic instability (buckling) occurs when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The material reaches its ultimate strength</label>
+                    <label><input type="radio" name="q1" value="b"> b) A structural member suddenly deflects laterally under compression at a critical load</label>
+                    <label><input type="radio" name="q1" value="c"> c) The material reaches its yield strength</label>
+                    <label><input type="radio" name="q1" value="d"> d) Fatigue failure occurs</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: According to Euler's buckling theory, the critical load is proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) L² (length squared)</label>
+                    <label><input type="radio" name="q2" value="b"> b) 1/L² (inverse length squared)</label>
+                    <label><input type="radio" name="q2" value="c"> c) L (length)</label>
+                    <label><input type="radio" name="q2" value="d"> d) 1/L (inverse length)</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: Which end condition provides the highest buckling resistance?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Pinned-pinned (K = 1.0)</label>
+                    <label><input type="radio" name="q3" value="b"> b) Fixed-fixed (K = 0.5)</label>
+                    <label><input type="radio" name="q3" value="c"> c) Fixed-free (K = 2.0)</label>
+                    <label><input type="radio" name="q3" value="d"> d) Fixed-pinned (K = 0.7)</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: The slenderness ratio is defined as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Le/I (effective length / second moment of area)</label>
+                    <label><input type="radio" name="q4" value="b"> b) Le/r (effective length / radius of gyration)</label>
+                    <label><input type="radio" name="q4" value="c"> c) r/Le (radius of gyration / effective length)</label>
+                    <label><input type="radio" name="q4" value="d"> d) I/A (second moment of area / cross-sectional area)</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: The Rankine-Gordon formula is used to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Calculate the exact Euler buckling load</label>
+                    <label><input type="radio" name="q5" value="b"> b) Combine crushing failure and buckling failure for practical design</label>
+                    <label><input type="radio" name="q5" value="c"> c) Determine the mode shapes of buckling</label>
+                    <label><input type="radio" name="q5" value="d"> d) Calculate the radius of gyration</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2>Summary: Key Equations Reference</h2>
+        
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Equation</th>
+                        <th>Variables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Euler Critical Load</td>
+                        <td>\(P_{cr} = \frac{\pi^2 EI}{L_e^2}\)</td>
+                        <td>\(E\) = modulus of elasticity<br>\(I\) = second moment of area<br>\(L_e\) = effective length</td>
+                    </tr>
+                    <tr>
+                        <td>Effective Length</td>
+                        <td>\(L_e = K \cdot L\)</td>
+                        <td>\(K\) = effective length factor<br>\(L\) = actual length</td>
+                    </tr>
+                    <tr>
+                        <td>Slenderness Ratio</td>
+                        <td>\(\lambda = \frac{L_e}{r}\)</td>
+                        <td>\(r\) = radius of gyration</td>
+                    </tr>
+                    <tr>
+                        <td>Radius of Gyration</td>
+                        <td>\(r = \sqrt{\frac{I}{A}}\)</td>
+                        <td>\(A\) = cross-sectional area</td>
+                    </tr>
+                    <tr>
+                        <td>Buckling Mode Shapes</td>
+                        <td>\(y = A\sin\left(\frac{m\pi x}{L}\right)\)</td>
+                        <td>\(m\) = mode number (1, 2, 3, ...)<br>First mode: \(m = 1\)</td>
+                    </tr>
+                    <tr>
+                        <td>Higher Mode Critical Loads</td>
+                        <td>\(P_{cr,m} = \frac{m^2\pi^2 EI}{L_e^2}\)</td>
+                        <td>Higher modes at \(m^2\) times first mode</td>
+                    </tr>
+                    <tr>
+                        <td>Rankine-Gordon Formula</td>
+                        <td>\(P_{design} = \frac{\sigma_c A}{1 + a\lambda^2}\)</td>
+                        <td>\(a = \frac{\sigma_c}{\pi^2 E}\) = Rankine constant<br>\(\sigma_c\) = compressive strength</td>
+                    </tr>
+                    <tr>
+                        <td>Critical Stress</td>
+                        <td>\(\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2 E}{\lambda^2}\)</td>
+                        <td>Euler stress based on slenderness</td>
+                    </tr>
+                    <tr>
+                        <td>Non-dimensional Slenderness</td>
+                        <td>\(\bar{\lambda} = \sqrt{\frac{f_y}{\sigma_{cr}}}\)</td>
+                        <td>\(f_y\) = yield strength</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="key-point">
+            <h3>Conclusion</h3>
+            <p>Understanding elastic instability is crucial for structural engineers. Key points to remember:</p>
+            <ol>
+                <li>Buckling can occur at loads well below material strength limits</li>
+                <li>The Euler formula derives from solving the differential equation of the elastic curve</li>
+                <li>Multiple buckling modes exist, with the first mode determining the critical load</li>
+                <li>Slenderness ratio is the primary factor affecting buckling resistance</li>
+                <li>End conditions significantly influence critical loads through the effective length factor</li>
+                <li>The Rankine-Gordon formula provides practical design by combining material and stability failure</li>
+                <li>Prevention of buckling through proper design is essential for structural safety</li>
+            </ol>
+            <p>These principles are fundamental for designing safe and efficient compression members in buildings, bridges, and other structures.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p>Coventry University, United Kingdom</p>
+        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
+        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
+    </footer>
+
+    <script>
+        // Buckling simulation variables
+        let canvas;
+        let length, appliedLoad, endCondition;
+        let E = 200e9; // Young's modulus (Pa)
+        let I = 0.2e-6; // Second moment of area (m⁴) - very slender for buckling in all cases
+        let A = 0.005; // Cross-sectional area (m²)
+        let maxLoad = 150; // Maximum load for slider (kN) - increased range for all cases
+        
+        // Animation variables
+        let buckledShape = [];
+        let numPoints = 50;
+        
+        function setup() {
+            canvas = createCanvas(800, 500);
+            canvas.parent('sketch-holder');
+            
+            // Initialize parameters
+            length = 2.0;
+            appliedLoad = 10;
+            endCondition = 'pinned';
+            
+            updateControls();
+            calculateBuckling();
+        }
+        
+        function draw() {
+            background(240, 240, 240);
+            
+            // Draw grid
+            drawGrid();
+            
+            // Draw column first to get coordinates
+            let columnCoords = drawColumn();
+            
+            // Draw support conditions using column coordinates
+            drawSupports(columnCoords);
+            
+            // Draw load using column coordinates
+            drawAppliedLoad(columnCoords);
+            
+            // Update display
+            updateDisplay();
+        }
+        
+        function drawGrid() {
+            stroke(220);
+            strokeWeight(1);
+            
+            // Vertical lines
+            for (let x = 0; x < width; x += 20) {
+                line(x, 0, x, height);
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y < height; y += 20) {
+                line(0, y, width, y);
+            }
+        }
+        
+        function drawSupports(coords) {
+            let {baseY, topY, centerX} = coords;
+            
+            push();
+            stroke(0);
+            strokeWeight(3);
+            fill(100);
+            
+            // Bottom support
+            if (endCondition === 'pinned' || endCondition === 'fixedPinned') {
+                // Pinned support
+                triangle(centerX - 15, baseY, centerX + 15, baseY, centerX, baseY - 15);
+            } else {
+                // Fixed support
+                rect(centerX - 20, baseY, 40, 10);
+                for (let i = -15; i <= 15; i += 5) {
+                    line(centerX + i, baseY + 10, centerX + i + 5, baseY + 15);
+                }
+            }
+            
+            // Top support
+            if (endCondition === 'pinned') {
+                // Pinned support (inverted)
+                triangle(centerX - 15, topY, centerX + 15, topY, centerX, topY + 15);
+            } else if (endCondition === 'fixed' || endCondition === 'fixedPinned') {
+                // Fixed support
+                rect(centerX - 20, topY - 10, 40, 10);
+                for (let i = -15; i <= 15; i += 5) {
+                    line(centerX + i, topY - 10, centerX + i + 5, topY - 15);
+                }
+            }
+            // For cantilever, no top support
+            
+            pop();
+        }
+        
+        function drawColumn() {
+            let margin = 80; // Margin from top and bottom
+            let availableHeight = height - 2 * margin;
+            let columnScale = availableHeight / (length * 100); // Dynamic scaling
+            if (columnScale > 1) columnScale = 1; // Don't scale up, only down
+            
+            let columnHeight = length * 100 * columnScale;
+            let baseY = height - margin;
+            let topY = baseY - columnHeight;
+            let centerX = width / 2;
+            
+            // Calculate if buckled
+            let Pcr = calculateCriticalLoad();
+            let isBuckled = appliedLoad * 1000 > Pcr; // Convert kN to N
+            
+            push();
+            strokeWeight(8);
+            
+            if (isBuckled) {
+                // Draw buckled shape
+                stroke(255, 50, 50); // Red for buckled
+                
+                // Generate buckled shape
+                let amplitude = Math.min(50, (appliedLoad * 1000 / Pcr - 1) * 30);
+                let points = [];
+                
+                for (let i = 0; i <= numPoints; i++) {
+                    let t = i / numPoints;
+                    let y = lerp(baseY, topY, t);
+                    let deflection = amplitude * sin(PI * t);
+                    
+                    // Adjust deflection based on end conditions
+                    if (endCondition === 'cantilever') {
+                        deflection = amplitude * sin(PI * t / 2) * t;
+                    }
+                    
+                    points.push({x: centerX + deflection, y: y});
                 }
                 
-                document.getElementById('load-slider').value = currentLoad.toFixed(0);
-                document.getElementById('load-value').textContent = currentLoad.toFixed(0);
-                updateResults();
-            }, 50);
-        });
-        
-        // Reset button functionality
-        document.getElementById('reset-btn').addEventListener('click', function() {
-            document.getElementById('load-slider').value = 0;
-            document.getElementById('load-value').textContent = 0;
-            updateResults();
-        });
-        
-        // Calculate button functionality
-        document.getElementById('calculate-btn').addEventListener('click', function() {
-            updateResults();
+                // Draw the buckled column
+                noFill();
+                beginShape();
+                for (let point of points) {
+                    vertex(point.x, point.y);
+                }
+                endShape();
+                
+            } else {
+                // Draw straight column
+                stroke(50, 50, 255); // Blue for stable
+                line(centerX, baseY, centerX, topY);
+            }
             
-            // Scroll to results panel
-            document.getElementById('results-panel').scrollIntoView({ behavior: 'smooth' });
+            pop();
+            
+            // Return coordinates for other functions
+            return {baseY, topY, centerX, columnScale};
+        }
+        
+        function drawAppliedLoad(coords) {
+            let {topY, centerX} = coords;
+            
+            // Draw load arrow
+            push();
+            stroke(255, 100, 0);
+            strokeWeight(3);
+            fill(255, 100, 0);
+            
+            // Arrow shaft
+            let arrowLength = map(appliedLoad, 0, maxLoad, 10, 60);
+            line(centerX, topY - 20, centerX, topY - 20 - arrowLength);
+            
+            // Arrow head
+            triangle(centerX - 8, topY - 20 - arrowLength + 10, 
+                    centerX + 8, topY - 20 - arrowLength + 10, 
+                    centerX, topY - 20 - arrowLength);
+            
+            // Load label
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text(appliedLoad + ' kN', centerX, topY - 30 - arrowLength);
+            
+            pop();
+        }
+        
+        function calculateCriticalLoad() {
+            let K;
+            switch (endCondition) {
+                case 'pinned': K = 1.0; break;
+                case 'fixed': K = 0.5; break;
+                case 'cantilever': K = 2.0; break;
+                case 'fixedPinned': K = 0.7; break;
+                default: K = 1.0;
+            }
+            
+            let Le = K * length;
+            return (Math.PI * Math.PI * E * I) / (Le * Le);
+        }
+        
+        function updateDisplay() {
+            let Pcr = calculateCriticalLoad();
+            let PcrKN = Pcr / 1000; // Convert to kN
+            let safetyFactor = appliedLoad > 0 ? (PcrKN / appliedLoad) : Infinity;
+            let r = Math.sqrt(I / A);
+            let K = getKValue();
+            let slenderness = (K * length) / r;
+            let isBuckled = appliedLoad * 1000 > Pcr;
+            
+            document.getElementById('criticalLoad').textContent = PcrKN.toFixed(1);
+            document.getElementById('safetyFactor').textContent = safetyFactor.toFixed(2);
+            document.getElementById('slenderness').textContent = slenderness.toFixed(0);
+            document.getElementById('bucklingStatus').textContent = isBuckled ? 'BUCKLED' : 'Stable';
+            document.getElementById('bucklingStatus').style.color = isBuckled ? 'red' : 'green';
+            document.getElementById('bucklingStatus').style.fontWeight = 'bold';
+        }
+        
+        function getKValue() {
+            switch (endCondition) {
+                case 'pinned': return 1.0;
+                case 'fixed': return 0.5;
+                case 'cantilever': return 2.0;
+                case 'fixedPinned': return 0.7;
+                default: return 1.0;
+            }
+        }
+        
+        function updateControls() {
+            // Length slider
+            document.getElementById('lengthSlider').addEventListener('input', function() {
+                length = parseFloat(this.value);
+                document.getElementById('lengthValue').textContent = length.toFixed(1);
+                calculateBuckling();
+            });
+            
+            // Load slider
+            document.getElementById('loadSlider').addEventListener('input', function() {
+                appliedLoad = parseFloat(this.value);
+                document.getElementById('loadValue').textContent = appliedLoad;
+                calculateBuckling();
+            });
+            
+            // End condition dropdown
+            document.getElementById('endCondition').addEventListener('change', function() {
+                endCondition = this.value;
+                calculateBuckling();
+            });
+        }
+        
+        function calculateBuckling() {
+            // This function triggers recalculation - the actual calculation is done in updateDisplay()
+        }
+        
+        // Function to toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+        
+        // Initialize page when loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if React and ReactDOM are available
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && 
+                typeof document.getElementById('react-visualizer') !== 'undefined') {
+                // Create a placeholder message
+                const placeholder = document.createElement('div');
+                placeholder.innerHTML = '<h2 style="text-align: center; padding: 20px;">Interactive Buckling Visualisation</h2>' + 
+                                        '<p style="text-align: center;">Explore how column length, load, and support conditions affect buckling behaviour.</p>' +
+                                        '<p style="text-align: center; margin-top: 20px;"><em>Use the controls below to experiment with different parameters and observe the critical loads.</em></p>';
+                document.getElementById('react-visualizer').appendChild(placeholder);
+            }
+            
+            // Quiz functionality
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Sudden lateral deflection at critical load
+                        q2: 'b', // Inversely proportional to L²
+                        q3: 'b', // Fixed-fixed provides highest resistance
+                        q4: 'b', // Le/r
+                        q5: 'b'  // Rankine-Gordon combines crushing and buckling
+                    };
+                    
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+                    
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+                    
+                    feedback += `<p>Your score: ${score}/5</p>`;
+                    
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
         });
+        
+        // MathJax configuration
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']]
+            }
+        };
     </script>
+
 </body>
-<footer>
-    <script src="/common/footer.js"></script>
-  </footer>
 </html>

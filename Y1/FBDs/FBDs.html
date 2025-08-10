@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Body Diagrams - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- Import React and ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Your script goes here -->
+    <script src="FBDs.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Free Body Diagrams</h1>
+        <p class="subtitle">Understanding Forces and Constraints in Engineering</p>
+    </header>
+
+    <div class="content-section">
+        <h2>What is a Free Body Diagram?</h2>
+        <p>A Free Body Diagram (FBD) is a graphical representation used to visualise all the forces acting on a body. It's a fundamental tool in engineering mechanics that helps us:</p>
+        <ul>
+            <li>Identify all forces acting on an object</li>
+            <li>Establish coordinate systems for analysis</li>
+            <li>Apply equilibrium equations systematically</li>
+            <li>Solve for unknown forces and reactions</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Key Principle:</strong> A free body diagram shows a body isolated from its surroundings with all external forces and moments acting upon it. Internal forces are not shown on FBDs.</p>
+        </div>
+
+        <h2>Active Forces</h2>
+        <p>Active forces are externally applied loads that act on a structure or body. These include:</p>
+
+        <h3>1. Concentrated Loads</h3>
+        <div class="equation-box">
+            <p><strong>Point Forces:</strong> Forces applied at a specific point</p>
+            <p>Notation: \(\vec{F} = F_x\hat{i} + F_y\hat{j}\) (in 2D)</p>
+            <p><strong>Point Moments:</strong> Couples or torques applied at a point</p>
+            <p>Notation: \(M\) (anticlockwise positive in 2D)</p>
+        </div>
+
+        <h3>2. Distributed Loads</h3>
+        <div class="equation-box">
+            <p><strong>Uniformly Distributed Load (UDL):</strong></p>
+            <p>Load intensity: \(w\) (force per unit length)</p>
+            <p>Resultant force: \(F = w \cdot L\)</p>
+            <p>Location: Acts at the centroid of the distribution</p>
+            
+            <p><strong>Linearly Varying Load:</strong></p>
+            <p>Load intensity: \(w(x) = w_0 + \frac{w_1 - w_0}{L}x\)</p>
+            <p>Resultant: \(F = \frac{1}{2}(w_0 + w_1) \cdot L\)</p>
+        </div>
+
+        <h3>3. Gravitational Load</h3>
+        <div class="equation-box">
+            <p>Weight force: \(\vec{W} = m\vec{g}\)</p>
+            <p>Acts at the centre of mass of the body</p>
+            <p>Always acts vertically downward</p>
+            <p>Magnitude: \(W = mg\) where \(g = 9.81 \text{ m/s}^2\)</p>
+        </div>
+
+        <h2>Reactive Forces (Support Reactions)</h2>
+        <p>Reactive forces are the forces that develop at supports or constraints in response to applied loads. Understanding these is crucial for structural analysis.</p>
+
+        <h3>Common 2D Support Types</h3>
+        
+        <div class="key-point">
+            <h3>1. Roller Support (Simple Support)</h3>
+            <ul>
+                <li>Prevents movement perpendicular to the surface</li>
+                <li>Allows movement parallel to the surface</li>
+                <li>Allows rotation</li>
+                <li><strong>Provides:</strong> 1 reaction force (perpendicular to surface)</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <h3>2. Pin Support (Hinged Support)</h3>
+            <ul>
+                <li>Prevents all translational movement</li>
+                <li>Allows rotation</li>
+                <li><strong>Provides:</strong> 2 reaction forces (horizontal and vertical)</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <h3>3. Fixed Support (Built-in/Clamped)</h3>
+            <ul>
+                <li>Prevents all translational movement</li>
+                <li>Prevents rotation</li>
+                <li><strong>Provides:</strong> 2 reaction forces and 1 reaction moment</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <h3>4. Collar Support</h3>
+            <ul>
+                <li>Allows movement along a guide</li>
+                <li>Prevents movement perpendicular to the guide</li>
+                <li>Prevents rotation</li>
+                <li><strong>Provides:</strong> 1 reaction force (perpendicular) and 1 reaction moment</li>
+            </ul>
+        </div>
+
+        <h3>Special Force Types</h3>
+        
+        <div class="equation-box">
+            <h4>Normal Force</h4>
+            <p>Acts perpendicular to the contact surface</p>
+            <p>Always pushes (never pulls)</p>
+            <p>Magnitude: \(N \geq 0\)</p>
+        </div>
+
+        <div class="equation-box">
+            <h4>Friction Force</h4>
+            <p><strong>Static Friction:</strong> \(f_s \leq \mu_s N\)</p>
+            <p><strong>Kinetic Friction:</strong> \(f_k = \mu_k N\)</p>
+            <p>Where \(\mu_s\) and \(\mu_k\) are coefficients of friction</p>
+            <p>Acts parallel to the contact surface, opposing relative motion</p>
+        </div>
+
+        <div class="equation-box">
+            <h4>Cable and Rope Forces</h4>
+            <p>Can only pull (tension), never push</p>
+            <p>Acts along the line of the cable/rope</p>
+            <p>Magnitude: \(T \geq 0\)</p>
+            <p>For massless cables: tension is constant throughout</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Free Body Diagram Builder</h2>
+        <p>Build your own free body diagram by selecting supports and adding loads. Click and drag to position elements.</p>
+        
+        <div id="sketch-holder">
+            <!-- Our sketch will go here! -->
+        </div>
+        
+        <div id="button-container">
+            <!-- Buttons will be added by p5.js -->
+        </div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="load-select">Add Load:</label>
+                <select id="load-select">
+                    <option value="point">Point Force</option>
+                    <option value="moment">Moment</option>
+                    <option value="distributed">Distributed Load</option>
+                    <option value="weight">Weight</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="support-select">Add Support:</label>
+                <select id="support-select">
+                    <option value="roller">Roller</option>
+                    <option value="pin">Pin</option>
+                    <option value="fixed">Fixed</option>
+                    <option value="collar">Collar</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="show-reactions">Show Reactions:</label>
+                <input type="checkbox" id="show-reactions" checked>
+            </div>
+        </div>
+
+        <h3>Instructions</h3>
+        <ul>
+            <li>Select a beam type from the presets or build your own</li>
+            <li>Click to add forces and supports at different locations</li>
+            <li>Toggle "Show Reactions" to see the support reaction forces</li>
+            <li>Drag elements to reposition them</li>
+            <li>Click "Clear" to start over</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Steps for Drawing Free Body Diagrams</h2>
+        
+        <div class="key-point">
+            <h3>Systematic Approach</h3>
+            <ol>
+                <li><strong>Isolate the body:</strong> Draw the object separated from its surroundings</li>
+                <li><strong>Add active forces:</strong> Show all applied loads (forces, moments, weight)</li>
+                <li><strong>Replace supports:</strong> Replace each support with its reaction forces/moments</li>
+                <li><strong>Label everything:</strong> Add clear labels and coordinate system</li>
+                <li><strong>Check completeness:</strong> Ensure all external forces are shown</li>
+            </ol>
+        </div>
+
+        <h2>Equilibrium Equations</h2>
+        <p>For a body in static equilibrium, the following conditions must be satisfied:</p>
+        
+        <div class="equation-box">
+            <p><strong>Force Equilibrium:</strong></p>
+            <p>\(\sum F_x = 0\) (Sum of horizontal forces = 0)</p>
+            <p>\(\sum F_y = 0\) (Sum of vertical forces = 0)</p>
+            <p><strong>Moment Equilibrium:</strong></p>
+            <p>\(\sum M_O = 0\) (Sum of moments about any point O = 0)</p>
+        </div>
+
+        <h2>Common Mistakes to Avoid</h2>
+        <ul>
+            <li><strong>Missing forces:</strong> Forgetting weight or applied loads</li>
+            <li><strong>Wrong reaction directions:</strong> Incorrect support reaction components</li>
+            <li><strong>Internal forces shown:</strong> FBDs show only external forces</li>
+            <li><strong>Incorrect friction direction:</strong> Friction opposes relative motion</li>
+            <li><strong>Cable compression:</strong> Cables can only be in tension</li>
+        </ul>
+
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Simply Supported Beam</h3>
+            <p>A 6-metre beam is simply supported at both ends. It carries a uniformly distributed load of 10 kN/m and a point load of 20 kN at 2 metres from the left support. Draw the free body diagram and calculate the support reactions.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Beam length: L = 6 m</li>
+                    <li>UDL: w = 10 kN/m</li>
+                    <li>Point load: P = 20 kN at x = 2 m</li>
+                </ul>
+                
+                <p><strong>FBD includes:</strong></p>
+                <ul>
+                    <li>Point load: 20 kN downward at 2 m</li>
+                    <li>UDL resultant: 60 kN downward at 3 m (centre)</li>
+                    <li>Reaction at A: R_A (upward)</li>
+                    <li>Reaction at B: R_B (upward)</li>
+                </ul>
+                
+                <p><strong>Equilibrium equations:</strong></p>
+                <p>Taking moments about A:</p>
+                <p>\(\sum M_A = 0\): \(R_B \times 6 - 20 \times 2 - 60 \times 3 = 0\)</p>
+                <p>\(R_B = \frac{40 + 180}{6} = 36.67 \text{ kN}\)</p>
+                
+                <p>Vertical equilibrium:</p>
+                <p>\(\sum F_y = 0\): \(R_A + R_B - 20 - 60 = 0\)</p>
+                <p>\(R_A = 80 - 36.67 = 43.33 \text{ kN}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Cantilever Beam</h3>
+            <p>A 4-metre cantilever beam is fixed at one end and free at the other. It carries a linearly varying load from 0 at the fixed end to 12 kN/m at the free end. Find the reactions at the fixed support.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Beam length: L = 4 m</li>
+                    <li>Triangular load: 0 to 12 kN/m</li>
+                </ul>
+                
+                <p><strong>Load resultant:</strong></p>
+                <p>Magnitude: \(F = \frac{1}{2} \times 12 \times 4 = 24 \text{ kN}\)</p>
+                <p>Location: \(\frac{2}{3} \times 4 = 2.67 \text{ m from fixed end}\)</p>
+                
+                <p><strong>Reactions at fixed support:</strong></p>
+                <p>Vertical reaction: \(R_y = 24 \text{ kN (upward)}\)</p>
+                <p>Horizontal reaction: \(R_x = 0\) (no horizontal loads)</p>
+                <p>Moment reaction: \(M = 24 \times 2.67 = 64 \text{ kN·m (anticlockwise)}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Inclined Member with Friction</h3>
+            <p>A 100 kg block rests on a 30° incline. The coefficient of static friction is 0.3. Draw the FBD and determine if the block will slide.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Mass: m = 100 kg</li>
+                    <li>Angle: θ = 30°</li>
+                    <li>μ_s = 0.3</li>
+                </ul>
+                
+                <p><strong>Forces on FBD:</strong></p>
+                <ul>
+                    <li>Weight: W = 981 N (downward)</li>
+                    <li>Normal force: N (perpendicular to incline)</li>
+                    <li>Friction: f (up the incline)</li>
+                </ul>
+                
+                <p><strong>Force components:</strong></p>
+                <p>Perpendicular to incline: \(N = W \cos 30° = 981 \times 0.866 = 849.5 \text{ N}\)</p>
+                <p>Parallel to incline: \(W \sin 30° = 981 \times 0.5 = 490.5 \text{ N}\)</p>
+                
+                <p><strong>Maximum static friction:</strong></p>
+                <p>\(f_{max} = \mu_s N = 0.3 \times 849.5 = 254.9 \text{ N}\)</p>
+                
+                <p><strong>Conclusion:</strong></p>
+                <p>Since \(W \sin 30° = 490.5 \text{ N} > f_{max} = 254.9 \text{ N}\)</p>
+                <p>The block will slide down the incline.</p>
+            </div>
+        </div>
+
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: How many unknown reactions does a pin support provide in 2D?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 1 reaction force</label>
+                    <label><input type="radio" name="q1" value="b"> b) 2 reaction forces</label>
+                    <label><input type="radio" name="q1" value="c"> c) 2 reaction forces and 1 moment</label>
+                    <label><input type="radio" name="q1" value="d"> d) 3 reaction forces</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: Which support allows both translation along a surface and rotation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Fixed support</label>
+                    <label><input type="radio" name="q2" value="b"> b) Pin support</label>
+                    <label><input type="radio" name="q2" value="c"> c) Roller support</label>
+                    <label><input type="radio" name="q2" value="d"> d) Collar support</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: For a uniformly distributed load of intensity w over length L, what is the magnitude of the resultant force?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) w</label>
+                    <label><input type="radio" name="q3" value="b"> b) wL</label>
+                    <label><input type="radio" name="q3" value="c"> c) wL/2</label>
+                    <label><input type="radio" name="q3" value="d"> d) 2wL</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: Which of the following can a cable NOT do?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Support tension</label>
+                    <label><input type="radio" name="q4" value="b"> b) Support compression</label>
+                    <label><input type="radio" name="q4" value="c"> c) Change direction of force</label>
+                    <label><input type="radio" name="q4" value="d"> d) Transmit force along its length</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: For a body in static equilibrium in 2D, how many independent equilibrium equations are available?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 2</label>
+                    <label><input type="radio" name="q5" value="b"> b) 3</label>
+                    <label><input type="radio" name="q5" value="c"> c) 4</label>
+                    <label><input type="radio" name="q5" value="d"> d) 6</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Advanced Topics</h2>
+        
+        <h3>Three-Force Members</h3>
+        <p>When a body is in equilibrium under exactly three forces:</p>
+        <div class="key-point">
+            <ul>
+                <li>The three forces must be concurrent (meet at a point), OR</li>
+                <li>The three forces must be parallel</li>
+                <li>This principle helps simplify many FBD problems</li>
+            </ul>
+        </div>
+
+        <h3>Two-Force Members</h3>
+        <p>When a body is in equilibrium under exactly two forces:</p>
+        <div class="key-point">
+            <ul>
+                <li>The forces must be equal in magnitude</li>
+                <li>The forces must be opposite in direction</li>
+                <li>The forces must be collinear (act along the same line)</li>
+                <li>Examples: simple links, cables, struts</li>
+            </ul>
+        </div>
+
+        <h3>Statically Determinate vs Indeterminate</h3>
+        <div class="equation-box">
+            <p><strong>Degree of Static Indeterminacy:</strong></p>
+            <p>DSI = Number of unknowns - Number of equilibrium equations</p>
+            <p>If DSI = 0: Statically determinate (can solve using statics alone)</p>
+            <p>If DSI > 0: Statically indeterminate (requires additional compatibility equations)</p>
+            <p>If DSI < 0: Mechanism (unstable structure)</p>
+        </div>
+
+        <h2>Summary</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li>Free body diagrams are essential tools for solving mechanics problems</li>
+                <li>Always include ALL external forces and reactions</li>
+                <li>Different supports provide different constraints and reactions</li>
+                <li>Systematic approach ensures no forces are missed</li>
+                <li>Practice drawing FBDs for various configurations builds intuition</li>
+                <li>Understanding support types is crucial for structural analysis</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <p>Coventry University, United Kingdom</p>
+        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
+        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
+    </footer>
+
+    <script>
+        // Function to toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+        
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // 2 reaction forces
+                        q2: 'c', // Roller support
+                        q3: 'b', // wL
+                        q4: 'b', // Support compression
+                        q5: 'b'  // 3 equations
+                    };
+                    
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+                    
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+                    
+                    feedback += `<p>Your score: ${score}/5</p>`;
+                    
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
