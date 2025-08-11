@@ -312,13 +312,14 @@
             <h3>Types of Damping in SDOF Systems</h3>
             <p>The behavior of a SDOF system depends critically on its damping ratio \(\zeta\), which is defined as:</p>
             <div class="equation-box">
-                <p>\[\zeta = \frac{c}{c_{critical}} = \frac{c}{2\sqrt{km}}\]</p>
+                <p>\[\zeta = \frac{c}{c_{c}} = \frac{c}{2\sqrt{km}}\]</p>
             </div>
+            <p>where \(c_c=2\sqrt{km}\) is called <em>critical damping ratio</em>.</p>
             
-            <p>There are three damping conditions that lead to distinctly different system behaviors:</p>
+            <p>There are three damping conditions that lead to distinctly different system behaviors, depending on whether the damping coefficient is smaller, equal or greater than the critical damping ratio:</p>
             
             <ol>
-                <li><strong>Underdamped</strong> ((\\zeta < 1\)): The system oscillates with gradually decreasing amplitude</li>
+                <li><strong>Underdamped</strong> (\(\zeta < 1\)): The system oscillates with gradually decreasing amplitude</li>
                 <li><strong>Critically Damped</strong> (\(\zeta = 1\)): The system returns to equilibrium without oscillation in minimum time</li>
                 <li><strong>Overdamped</strong> (\(\zeta > 1\)): The system returns to equilibrium without oscillation but more slowly than a critically damped system</li>
             </ol>
@@ -664,43 +665,43 @@
                 <tbody>
                     <tr>
                         <td>Equation of Motion</td>
-                        <td>$m\ddot{x}+c\dot{x}+kx=F_0\cos(\omega_f t)$</td>
-                        <td>$m$ = mass<br>$c$ = damping coefficient<br>$k$ = spring stiffness<br>$F_0$ = force amplitude</td>
+                        <td>\(m\ddot{x}+c\dot{x}+kx=F_0\cos(\omega t)\)</td>
+                        <td>\(m\) = mass<br>\(c\) = damping coefficient<br>\(k\) = spring stiffness<br>\(F_0\) = force amplitude<br>\(\omega\) = forcing frequency</td>
                     </tr>
                     <tr>
                         <td>Natural Frequency</td>
-                        <td>$\omega_n = \sqrt{\frac{k}{m}}$</td>
-                        <td>$\omega_n$ = natural angular frequency [rad/s]</td>
+                        <td>\(\omega_n = \sqrt{\frac{k}{m}}\)</td>
+                        <td>\(\omega_n\) = natural angular frequency [rad/s]</td>
                     </tr>
                     <tr>
                         <td>Damping Ratio</td>
-                        <td>$\zeta = \frac{c}{c_{critical}} = \frac{c}{2\sqrt{km}}$</td>
-                        <td>$\zeta$ = damping ratio<br>$c_{critical}$ = critical damping coefficient</td>
+                        <td>\(\zeta = \frac{c}{c_{c}} = \frac{c}{2\sqrt{km}}\)</td>
+                        <td>\(\zeta\) = damping ratio<br>\(c_{c}\) = critical damping coefficient</td>
                     </tr>
                     <tr>
                         <td>Damped Natural Frequency</td>
-                        <td>$\omega_d = \omega_n\sqrt{1-\zeta^2}$</td>
-                        <td>$\omega_d$ = damped natural frequency [rad/s]</td>
+                        <td>\(\omega_d = \omega_n\sqrt{1-\zeta^2}\)</td>
+                        <td>\(\omega_d\) = damped natural frequency [rad/s]</td>
                     </tr>
                     <tr>
                         <td>Underdamped Free Response</td>
-                        <td>$x(t) = Ae^{-\zeta \omega_n t}\cos(\omega_d t - \phi)$</td>
-                        <td>$A$ = amplitude<br>$\phi$ = phase angle</td>
+                        <td>\(x(t) = Ae^{-\zeta \omega_n t}\cos(\omega_d t - \phi)\)</td>
+                        <td>\(A\) = amplitude<br>\(\phi\) = phase angle</td>
                     </tr>
                     <tr>
                         <td>Forced Response Amplitude</td>
-                        <td>$X = \frac{F_0/k}{\sqrt{[1-(\omega_f/\omega_n)^2]^2 + [2\zeta(\omega_f/\omega_n)]^2}}$</td>
-                        <td>$X$ = amplitude of steady-state response<br>$\omega_f$ = forcing frequency</td>
+                        <td>\(X = \frac{F_0/k}{\sqrt{[1-(\omega_f/\omega_n)^2]^2 + [2\zeta(\omega_f/\omega_n)]^2}}\)</td>
+                        <td>\(X\) = amplitude of steady-state response<br>\(\omega_f\) = forcing frequency</td>
                     </tr>
                     <tr>
                         <td>Phase Angle</td>
-                        <td>$\phi = \tan^{-1}\left(\frac{2\zeta(\omega_f/\omega_n)}{1-(\omega_f/\omega_n)^2}\right)$</td>
-                        <td>$\phi$ = phase angle between force and displacement</td>
+                        <td>\(\phi = \tan^{-1}\left(\frac{2\zeta(\omega_f/\omega_n)}{1-(\omega_f/\omega_n)^2}\right)\)</td>
+                        <td>\(\phi\) = phase angle between force and displacement</td>
                     </tr>
                     <tr>
                         <td>Resonant Amplitude</td>
-                        <td>$X_{res} \approx \frac{F_0/k}{2\zeta}$ (for small $\zeta$)</td>
-                        <td>$X_{res}$ = amplitude at resonance</td>
+                        <td>\(X_{\text{res}} \approx \frac{F_0/k}{2\zeta}\) (for small \(\zeta\))</td>
+                        <td>\(X_{\text{res}}\) = amplitude at resonance</td>
                     </tr>
                 </tbody>
             </table>
