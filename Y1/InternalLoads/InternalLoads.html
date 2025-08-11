@@ -26,198 +26,14 @@
     };
 </script>
 
-<!-- Our simulation script will be loaded at the end of the body -->
-
+<!-- simulation script will be loaded at the end of the body -->
+ 
+<link rel="stylesheet" href="/assets/css/main.css"">
 <style>
-    :root {
-        --primary-color: #ffd700;
-        --secondary-color: #ffb300;
-        --text-color: #333;
-        --background-color: #fffbeb;
-        --link-color: #cc9900;
-        --link-hover-color: #1c01b8;
-        --section-bg-color: white;
-    }
-    
-    body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: var(--text-color);
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        background-color: var(--background-color);
-    }
-    
-    header {
-        background-color: var(--primary-color);
-        color: var(--text-color);
-        text-align: center;
-        padding: 1rem;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-    
-    h1 {
-        margin: 0;
-        font-size: 2.5em;
-        font-variant: small-caps;
-    }
-    
-    h2 {
-        color: #b38600;
-        border-bottom: 2px solid var(--primary-color);
-        padding-bottom: 10px;
-        margin-top: 30px;
-    }
-    
-    h3 {
-        color: #b38600;
-        margin-top: 25px;
-    }
-    
-    .intro {
-        background-color: var(--section-bg-color);
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .simulation-container {
-        background-color: var(--section-bg-color);
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .theory-container {
-        background-color: var(--section-bg-color);
-        padding: 20px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    
-    .equation-box {
-        background-color: #f9f9f9;
-        padding: 15px;
-        border-left: 4px solid var(--primary-color);
-        margin: 15px 0;
-    }
-    
-    footer {
-        text-align: center;
-        margin-top: 20px;
-        padding: 10px;
-        background-color: var(--primary-color);
-        color: var(--text-color);
-        border-radius: 5px;
-    }
-    
-    .interactive-controls {
-        background-color: #f0f0f0;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    
-    .key-concept {
-        background-color: #f0f8ff;
-        padding: 15px;
-        border-left: 4px solid #4682b4;
-        margin: 15px 0;
-    }
-    
-    .example {
-        background-color: #f0fff0;
-        padding: 15px;
-        border-left: 4px solid #228b22;
-        margin: 15px 0;
-    }
-    
-    .note {
-        background-color: #fffacd;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0;
-    }
-    
-    .two-col {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        margin: 20px 0;
-    }
-    
-    .col {
-        flex: 1;
-        min-width: 300px;
-    }
-    
-    img {
-        max-width: 100%;
-        height: auto;
-    }
-    
-    /* Quiz styling */
-    .quiz-container {
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 5px;
-        margin-top: 20px;
-    }
-    
-    .quiz-question {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px dashed #ccc;
-    }
-    
-    .quiz-feedback {
-        margin-top: 10px;
-        padding: 10px;
-        background-color: #e8f4f8;
-        border-left: 4px solid #4682b4;
-        display: none;
-    }
-    
-    button#check-answers {
-        background-color: var(--secondary-color);
-        border: none;
-        color: var(--text-color);
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 15px 0;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-    
-    button#check-answers:hover {
-        background-color: var(--primary-color);
-    }
-    
-    details {
-        background-color: #f5f5f5;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
-    
-    summary {
-        font-weight: bold;
-        cursor: pointer;
-        padding: 5px;
-    }
-    
     /* Make sure the simulation elements are contained within their containers */
     #FBD_SimplySupported, #FBD_Cantilever, #INTF_SimplySupported, #INTF_Cantilever {
         position: relative;
-        height: 620px;
+        height: 650px;
         width: 100%;
         overflow: hidden;
     }
@@ -226,32 +42,7 @@
     #FBD_SimplySupported canvas, #FBD_Cantilever canvas, 
     #INTF_SimplySupported canvas, #INTF_Cantilever canvas {
         display: block;
-        margin: 0 auto;
-    }
-    
-    /* Responsive adjustments */
-    @media screen and (max-width: 768px) {
-        .two-col {
-            flex-direction: column;
-        }
-        
-        h1 {
-            font-size: 2em;
-        }
-    }
-    
-    @media screen and (max-width: 480px) {
-        body {
-            padding: 10px;
-        }
-        
-        h1 {
-            font-size: 1.8em;
-        }
-        
-        h2 {
-            font-size: 1.5em;
-        }
+        margin: 10 auto;
     }
 </style>
 </head>
@@ -304,7 +95,7 @@
     </div>
 </section>
 
-<section class="theory-container"
+<section class="theory-container">
     <h2>Equilibrium Conditions</h2>
     <p>For a beam to be in static equilibrium, the following conditions must be satisfied:</p>
     
@@ -566,11 +357,6 @@
     </div>
 </section>
 
-<footer>
-    <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-    <p>Coventry University, United Kingdom</p>
-</footer>
-
 <!-- Load the simulation script after the DOM elements exist -->
 <script src="sketchMulti.js"></script>
     
@@ -624,8 +410,10 @@
         }
     });
 </script>
-</body>
+
 <footer>
-    <script src="/common/footer.js"></script>
-  </footer>
+    <script src="/assets/common/footer.js"></script>
+</footer>
+  
+</body>
 </html>

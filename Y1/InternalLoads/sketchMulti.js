@@ -19,18 +19,22 @@ let forcePositionSlider, forceMagnitudeSlider, momentPositionSlider, momentMagni
 // Create sliders for customizing values
 forcePositionSlider = p.createSlider(0, beamLength, forcePosition,10);
 forcePositionSlider.position(200, 35);
+forcePositionSlider.style('width','130px');
 
 forceMagnitudeSlider = p.createSlider(-80,80,forceMagnitude,10);  
 forceMagnitudeSlider.position(10, 35);
+forceMagnitudeSlider.style('width','130px');
 
 //forceAngleSlider = createSlider(0,180,forceAngle,5);  
 //forceAngleSlider.position(400, 35);
 
 momentPositionSlider = p.createSlider(0, beamLength, momentPosition,10);
 momentPositionSlider.position(200, 85);
+momentPositionSlider.style('width','130px');
 
 momentMagnitudeSlider = p.createSlider(-10,10,momentMagnitude,1);  
 momentMagnitudeSlider.position(10, 85);
+momentMagnitudeSlider.style('width','130px');
 
   };
 
@@ -252,18 +256,22 @@ let forcePositionSlider, forceMagnitudeSlider, momentPositionSlider, momentMagni
 // Create sliders for customizing values
 forcePositionSlider = p.createSlider(0, beamLength, forcePosition,10);
 forcePositionSlider.position(200, 35);
+forcePositionSlider.style('width','130px');
 
 forceMagnitudeSlider = p.createSlider(-80,80,forceMagnitude,10);  
 forceMagnitudeSlider.position(10, 35);
+forceMagnitudeSlider.style('width','130px');
 
 //forceAngleSlider = createSlider(0,180,forceAngle,5);  
 //forceAngleSlider.position(400, 35);
 
 momentPositionSlider = p.createSlider(0, beamLength, momentPosition,10);
 momentPositionSlider.position(200, 85);
+momentPositionSlider.style('width','130px');
 
 momentMagnitudeSlider = p.createSlider(-10,10,momentMagnitude,1);  
 momentMagnitudeSlider.position(10, 85);
+momentMagnitudeSlider.style('width','130px');
 
   };
 
@@ -500,31 +508,38 @@ let aSlider, FSlider, bSlider, MSlider, qSlider, cSlider, dSlider;
 
 // Create sliders for customizing values
 aSlider = p.createSlider(0, L, a,10); //[mm]
-aSlider.position(200, 15);
+aSlider.position(200, 20);
+aSlider.style('width','130px');
 
 FSlider = p.createSlider(-80,80,F,10);  
-FSlider.position(10, 15);
+FSlider.position(10, 20);
+FSlider.style('width','130px');
 
 //forceAngleSlider = createSlider(0,180,forceAngle,5);  
 //forceAngleSlider.position(400, 35);
 
 bSlider = p.createSlider(0, L, b,10); //[mm]
-bSlider.position(200, 65);
+bSlider.position(200, 70);
+bSlider.style('width','130px');
 
 MSlider = p.createSlider(-10,10,M,1); //[mm]
-MSlider.position(10, 65);
+MSlider.position(10, 70);
+MSlider.style('width','130px');
 
 //cutPositionSlider = createSlider(0,L,100,1);  
 //cutPositionSlider.position(10, 125);
 
 qSlider= p.createSlider(-1,1,q,0.1);
-qSlider.position(10,115)
+qSlider.position(10,120);
+qSlider.style('width','130px');
 
 cSlider= p.createSlider(0,L,c,10);
-cSlider.position(200,115)
+cSlider.position(200,120);
+cSlider.style('width','130px');
 
 dSlider= p.createSlider(0,L,d,10);
-dSlider.position(410,115)
+dSlider.position(410,120);
+dSlider.style('width','130px');
 
   };
 
@@ -923,31 +938,38 @@ let aSlider, FSlider, bSlider, MSlider, qSlider, cSlider, dSlider;
 
 // Create sliders for customizing values
 aSlider = p.createSlider(0, L, a,10); //[mm]
-aSlider.position(200, 15);
+aSlider.position(200, 20);
+aSlider.style('width','130px');
 
 FSlider = p.createSlider(-80,80,F,10);  
-FSlider.position(10, 15);
+FSlider.position(10, 20);
+FSlider.style('width','130px');
 
 //forceAngleSlider = createSlider(0,180,forceAngle,5);  
 //forceAngleSlider.position(400, 35);
 
 bSlider = p.createSlider(0, L, b,10); //[mm]
-bSlider.position(200, 65);
+bSlider.position(200, 70);
+bSlider.style('width','130px');
 
 MSlider = p.createSlider(-10,10,M,1); //[mm]
-MSlider.position(10, 65);
+MSlider.position(10, 70);
+MSlider.style('width','130px');
 
 //cutPositionSlider = createSlider(0,L,100,1);  
 //cutPositionSlider.position(10, 125);
 
 qSlider= p.createSlider(-1,1,q,0.1);
-qSlider.position(10,115)
+qSlider.position(10,120);
+qSlider.style('width','130px');
 
 cSlider= p.createSlider(0,L,c,10);
-cSlider.position(200,115)
+cSlider.position(200,120);
+cSlider.style('width','130px');
 
 dSlider= p.createSlider(0,L,d,10);
-dSlider.position(410,115)
+dSlider.position(410,120);
+dSlider.style('width','130px');
 
   };
 

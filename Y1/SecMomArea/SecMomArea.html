@@ -10,26 +10,6 @@
     <!-- MathJax library -->
     <!-- Import MathJax for LaTeX rendering -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script type="text/x-mathjax-config">
-        // <![CDATA[
-        MathJax.Hub.Config({
-            TeX: {extensions: ["AMSmath.js", "AMSsymbols.js"]},
-            extensions: ["tex2jax.js"],
-            jax: ["input/TeX", "output/HTML-CSS"],
-            showProcessingMessages : false,
-            messageStyle : "none" ,
-            showMathMenu: false ,
-            tex2jax: {
-                processEnvironments: true,
-                inlineMath: [ ['$','$'], ["\(","\)"] ],
-                displayMath: [ ['$$','$$'], ["\[","\]"] ],
-                preview : "none",
-                processEscapes: true
-            },
-            "HTML-CSS": { linebreaks: { automatic:true, width: "latex-container"} }
-        });
-        // ]]>
-    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script src=".\SecMomArea.js" ></script>
@@ -38,139 +18,7 @@
         Sorry... JavaScript must be enabled.
     </noscript>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #fffbeb;
-            color: #333;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
-            color: #333;
-            font-variant: small-caps;
-            margin-bottom: 5px;
-        }
-        
-        h2 {
-            color: #b38600;
-            border-bottom: 2px solid #ffd700;
-            padding-bottom: 5px;
-        }
-        
-        #sketch-holder {
-            margin: 20px auto;
-            display: block;
-            text-align: center;
-        }
-        
-        #button-container {
-            margin: 10px auto;
-            text-align: center;
-        }
-        
-        button {
-            background-color: #ffd700;
-            border: none;
-            color: #333;
-            padding: 8px 16px;
-            margin: 5px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        button:hover {
-            background-color: #ffb300;
-        }
-        
-        .info-panel {
-            background-color: white;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .math-container {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            border-left: 4px solid #ffb300;
-        }
-        
-        .control-panel {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin: 15px 0;
-        }
-        
-        .section {
-            background-color: white;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.9em;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        
-        th, td {
-            padding: 8px 12px;
-            text-align: left;
-        }
-        
-        th {
-            background-color: #ffd700;
-            color: #333;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        
-        .results-panel {
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 15px auto;
-            border-left: 4px solid #ffd700;
-            max-width: 800px;
-        }
-        
-        @media (max-width: 768px) {
-            .control-panel {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/main.css"">
 </head>
 
 <body>
@@ -184,8 +32,8 @@
         <p>The centroid of a shape is the geometric center of the shape - the balancing point if it were made of a uniform material.</p>
         <div class="math-container">
             <p>For a composite shape made up of multiple simple shapes, the centroid can be found using:</p>
-            $$ y_c = \frac{\sum A_i y_i}{\sum A_i} $$
-            <p>Where $y_c$ is the y-coordinate of the centroid, $A_i$ is the area of each component, and $y_i$ is the centroid of each component.</p>
+            \[ y_c = \frac{\sum A_i y_i}{\sum A_i} \]
+            <p>Where \(y_c\) is the y-coordinate of the centroid, \(A_i\) is the area of each component, and \(y_i\) is the centroid of each component.</p>
         </div>
     </div>
     
@@ -194,11 +42,11 @@
         <p>The Second Moment of Area (also called Moment of Inertia) measures how far a shape's area is distributed from an axis. It's crucial for determining resistance to bending.</p>
         <div class="math-container">
             <p>For a simple rectangle about its centroidal x-axis:</p>
-            $$ I_x = \frac{bh^3}{12} $$
-            <p>Where $b$ is the width and $h$ is the height perpendicular to the x-axis.</p>
+            \[ I_x = \frac{bh^3}{12} \]
+            <p>Where \(b\) is the width and \(h\) is the height perpendicular to the x-axis.</p>
             <p>For composite shapes, we use the Parallel Axis Theorem:</p>
-            $$ I = I_c + Ad^2 $$
-            <p>Where $I_c$ is the moment about the centroidal axis, $A$ is the area, and $d$ is the distance between axes.</p>
+            \[ I = I_c + Ad^2 \]
+            <p>Where \(I_c\) is the moment about the centroidal axis, \(A\) is the area, and \(d\) is the distance between axes.</p>
         </div>
     </div>
     
@@ -237,14 +85,14 @@
         <h2>Applications in Engineering</h2>
         <p>The second moment of area is essential in various engineering applications:</p>
         <ul>
-            <li><strong>Beam Deflection:</strong> $\delta = \frac{PL^3}{3EI}$ where deflection is inversely proportional to $I$</li>
-            <li><strong>Bending Stress:</strong> $\sigma = \frac{My}{I}$ where stress decreases as $I$ increases</li>
-            <li><strong>Column Buckling:</strong> $P_{cr} = \frac{\pi^2EI}{(KL)^2}$ where critical load increases with $I$</li>
+            <li><strong>Beam Deflection:</strong> \(\delta = \frac{PL^3}{3EI}\) where deflection is inversely proportional to \(I\)</li>
+            <li><strong>Bending Stress:</strong> \(\sigma = \frac{My}{I}\) where stress decreases as \(I\) increases</li>
+            <li><strong>Column Buckling:</strong> \(P_{cr} = \frac{\pi^2EI}{(KL)^2}\) where critical load increases with \(I\)</li>
         </ul>
         <p>These principles are used in the design of structural elements in buildings, bridges, mechanical components, and more.</p>
     </div>
 </body>
 <footer>
-    <script src="/common/footer.js"></script>
+    <script src="/assets/common/footer.js"></script>
   </footer>
 </html>

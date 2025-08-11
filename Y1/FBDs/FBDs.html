@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <!-- External CSS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/assets/css/main.css"">
     <!-- Your script goes here -->
     <script src="FBDs.js"></script>
 </head>
@@ -21,12 +21,12 @@
 <body>
     <header>
         <h1>Free Body Diagrams</h1>
-        <p class="subtitle">Understanding Forces and Constraints in Engineering</p>
+        <p class="subtitle">Understanding Forces and Constraints</p>
     </header>
 
     <div class="content-section">
         <h2>What is a Free Body Diagram?</h2>
-        <p>A Free Body Diagram (FBD) is a graphical representation used to visualise all the forces acting on a body. It's a fundamental tool in engineering mechanics that helps us:</p>
+        <p>A Free Body Diagram (FBD) is a graphical representation used to visualise all the forces acting on a body. It's a fundamental tool in engineering mechanics that helps:</p>
         <ul>
             <li>Identify all forces acting on an object</li>
             <li>Establish coordinate systems for analysis</li>
@@ -35,7 +35,8 @@
         </ul>
 
         <div class="key-point">
-            <p><strong>Key Principle:</strong> A free body diagram shows a body isolated from its surroundings with all external forces and moments acting upon it. Internal forces are not shown on FBDs.</p>
+            <p><strong>Key Principle:</strong> A free body diagram shows a body isolated from its surroundings with all external forces and moments acting upon it.</p>
+            <p>Internal forces and kinematic quantities such as displacements, velocities, accelerations are NEVER shown on FBDs.</p>
         </div>
 
         <h2>Active Forces</h2>
@@ -44,15 +45,15 @@
         <h3>1. Concentrated Loads</h3>
         <div class="equation-box">
             <p><strong>Point Forces:</strong> Forces applied at a specific point</p>
-            <p>Notation: \(\vec{F} = F_x\hat{i} + F_y\hat{j}\) (in 2D)</p>
+            <p>Notation: \(\vec{F} = F_x \hat{i} + F_y \hat{j}\) (in 2D)</p>
             <p><strong>Point Moments:</strong> Couples or torques applied at a point</p>
-            <p>Notation: \(M\) (anticlockwise positive in 2D)</p>
+            <p>Notation: \(M\hat{k}\) (anticlockwise positive in 2D)</p>
         </div>
 
         <h3>2. Distributed Loads</h3>
         <div class="equation-box">
             <p><strong>Uniformly Distributed Load (UDL):</strong></p>
-            <p>Load intensity: \(w\) (force per unit length)</p>
+            <p>Load intensity: \(w\) (force per unit length) \([\text{ N/m}]\)</p>
             <p>Resultant force: \(F = w \cdot L\)</p>
             <p>Location: Acts at the centroid of the distribution</p>
             
@@ -80,7 +81,7 @@
                 <li>Prevents movement perpendicular to the surface</li>
                 <li>Allows movement parallel to the surface</li>
                 <li>Allows rotation</li>
-                <li><strong>Provides:</strong> 1 reaction force (perpendicular to surface)</li>
+                <strong>Provides:</strong> 1 reaction force (perpendicular to surface)
             </ul>
         </div>
 
@@ -89,26 +90,26 @@
             <ul>
                 <li>Prevents all translational movement</li>
                 <li>Allows rotation</li>
-                <li><strong>Provides:</strong> 2 reaction forces (horizontal and vertical)</li>
+                <strong>Provides:</strong> any 2 perpendicular reaction forces (usually horizontal and vertical)
             </ul>
         </div>
 
         <div class="key-point">
             <h3>3. Fixed Support (Built-in/Clamped)</h3>
             <ul>
-                <li>Prevents all translational movement</li>
                 <li>Prevents rotation</li>
-                <li><strong>Provides:</strong> 2 reaction forces and 1 reaction moment</li>
+                <li>Prevents all translational movement</li>
+                <strong>Provides:</strong> 2 reaction forces and 1 reaction moment
             </ul>
         </div>
 
         <div class="key-point">
             <h3>4. Collar Support</h3>
             <ul>
-                <li>Allows movement along a guide</li>
                 <li>Prevents movement perpendicular to the guide</li>
                 <li>Prevents rotation</li>
-                <li><strong>Provides:</strong> 1 reaction force (perpendicular) and 1 reaction moment</li>
+                <li>Allows movement along a guide</li>
+                <strong>Provides:</strong> 1 reaction force (perpendicular) and 1 reaction moment
             </ul>
         </div>
 
@@ -197,7 +198,6 @@
                 <li><strong>Add active forces:</strong> Show all applied loads (forces, moments, weight)</li>
                 <li><strong>Replace supports:</strong> Replace each support with its reaction forces/moments</li>
                 <li><strong>Label everything:</strong> Add clear labels and coordinate system</li>
-                <li><strong>Check completeness:</strong> Ensure all external forces are shown</li>
             </ol>
         </div>
 
@@ -371,16 +371,6 @@
     <div class="content-section">
         <h2>Advanced Topics</h2>
         
-        <h3>Three-Force Members</h3>
-        <p>When a body is in equilibrium under exactly three forces:</p>
-        <div class="key-point">
-            <ul>
-                <li>The three forces must be concurrent (meet at a point), OR</li>
-                <li>The three forces must be parallel</li>
-                <li>This principle helps simplify many FBD problems</li>
-            </ul>
-        </div>
-
         <h3>Two-Force Members</h3>
         <p>When a body is in equilibrium under exactly two forces:</p>
         <div class="key-point">
@@ -389,6 +379,16 @@
                 <li>The forces must be opposite in direction</li>
                 <li>The forces must be collinear (act along the same line)</li>
                 <li>Examples: simple links, cables, struts</li>
+            </ul>
+        </div>
+
+                <h3>Three-Force Members</h3>
+        <p>When a body is in equilibrium under exactly three forces:</p>
+        <div class="key-point">
+            <ul>
+                <li>The three forces must be concurrent (meet at a point), OR</li>
+                <li>The three forces must be parallel</li>
+                <li>This principle helps simplify many FBD problems</li>
             </ul>
         </div>
 
@@ -415,12 +415,7 @@
         </div>
     </div>
 
-    <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-        <p>Coventry University, United Kingdom</p>
-        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
-        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
-    </footer>
+
 
     <script>
         // Function to toggle solution visibility
@@ -476,6 +471,9 @@
             }
         });
     </script>
-
+    
+    <footer>
+    <script src="/assets/common/footer.js"></script>
+    </footer>
 </body>
 </html>

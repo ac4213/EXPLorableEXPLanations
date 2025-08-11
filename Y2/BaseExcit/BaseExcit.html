@@ -19,8 +19,8 @@
       });
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
-    
-    <style>
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+<!--     <style>
         :root {
             --primary-color: #ffd700;
             --secondary-color: #ffb300;
@@ -242,7 +242,7 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-    </style>
+    </style> -->
 </head>
 <body>
     <header>
@@ -626,9 +626,9 @@
                 p.background(240);
                 
                 // Draw ground
-                p.fill(120);
+                /* p.fill(120);
                 p.noStroke();
-                p.rect(0, groundY, canvasWidth, canvasHeight - groundY);
+                p.rect(0, groundY, canvasWidth, canvasHeight - groundY); */
                 
                 // Calculate positions
                 const baseY = groundY - baseHeight + baseDisplacement * scale;
@@ -689,14 +689,14 @@
                 const cylinderY = (y1 + y2) / 2 - cylinderHeight/2;
                 
                 p.fill(180);
-                p.rect(x1 - 15, cylinderY, 30, cylinderHeight);
+                //p.rect(x1 - 15, cylinderY, 30, cylinderHeight);
                 
                 // Connecting rods
                 p.line(x1, y1, x1, cylinderY);
                 p.line(x2, y2, x2, cylinderY + cylinderHeight/2);
                 
                 // Piston head
-                p.rect(x2 - 18, cylinderY + cylinderHeight/2 - 5, 36, 10);
+                p.rect(x2 - 18, cylinderY + cylinderHeight/2 - 10, 36, 20);
             }
             
             function drawTimePlot(p) {
@@ -748,6 +748,7 @@
                 p.endShape();
                 
                 // Legend
+                p.noStroke();
                 p.fill(0, 0, 255);
                 p.rect(plotX + 5, plotY + 5, 10, 10);
                 p.fill(0);
@@ -785,7 +786,7 @@
                 p.line(plotX, plotY, plotX, plotY + plotHeight); // y-axis
                 
                 // Plot transmissibility curve
-                p.stroke(128, 0, 128);
+                p.stroke(0);
                 p.noFill();
                 p.beginShape();
                 
@@ -817,12 +818,12 @@
                 p.fill(0);
                 p.textAlign(p.CENTER);
                 p.textSize(10);
-                p.text("Frequency Ratio (r)", plotX + plotWidth/2, plotY + plotHeight + 15);
+                p.text("Frequency Ratio (r)", plotX + plotWidth/2, plotY + plotHeight + 30);
                 
                 p.push();
                 p.translate(plotX - 15, plotY + plotHeight/2);
                 p.rotate(-p.HALF_PI);
-                p.text("Transmissibility", 0, 0);
+                p.text("Transmissibility", 0, -5);
                 p.pop();
                 
                 // Axis ticks
@@ -971,6 +972,6 @@
     </script>
 </body>
 <footer>
-    <script src="/common/footer.js"></script>
+    <script src="/assets/common/footer.js"></script>
   </footer>
 </html>
