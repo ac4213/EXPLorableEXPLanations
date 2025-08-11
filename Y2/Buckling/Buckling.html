@@ -9,11 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <!-- Import MathJax for LaTeX rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
-    <!-- Import React and ReactDOM -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <!-- Import Recharts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.5.0/Recharts.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
     <!--     <style>
         :root {
@@ -119,15 +114,6 @@
             padding: 15px;
             margin: 15px 0;
             border-radius: 0 4px 4px 0;
-        }
-
-        #react-visualizer {
-            width: 100%;
-            padding: 20px;
-            background-color: var(--section-bg);
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin: 20px auto;
         }
 
         #sketch-holder {
@@ -442,8 +428,6 @@
         <h1>elastic instability (buckling)</h1>
         <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
-
-    <div id="react-visualizer"></div>
     
     <div class="content-section">
         <h2>Understanding Elastic Instability</h2>
@@ -1161,16 +1145,6 @@
         
         // Initialize page when loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if React and ReactDOM are available
-            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && 
-                typeof document.getElementById('react-visualizer') !== 'undefined') {
-                // Create a placeholder message
-                const placeholder = document.createElement('div');
-                placeholder.innerHTML = '<h2 style="text-align: center; padding: 20px;">Interactive Buckling Visualisation</h2>' + 
-                                        '<p style="text-align: center;">Explore how column length, load, and support conditions affect buckling behaviour.</p>' +
-                                        '<p style="text-align: center; margin-top: 20px;"><em>Use the controls below to experiment with different parameters and observe the critical loads.</em></p>';
-                document.getElementById('react-visualizer').appendChild(placeholder);
-            }
             
             // Quiz functionality
             const quizBtn = document.getElementById('submit-quiz');
