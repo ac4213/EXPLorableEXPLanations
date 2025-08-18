@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relative Motion in 2D - Interactive Lecture</title>
+    
+    <!-- Import p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    
+    <style>
+        /* Additional styles specific to this page */
+        .control-panel {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .control-row label {
+            width: 150px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        .control-row input[type="range"] {
+            flex: 1;
+            min-width: 150px;
+            margin: 0 10px;
+        }
+        
+        .control-row span {
+            width: 80px;
+            text-align: right;
+            color: #333;
+        }
+        
+        .pov-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .pov-button {
+            padding: 10px 20px;
+            background-color: #ffb300;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .pov-button.active {
+            background-color: #ffd700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .pov-button:hover {
+            background-color: #ffd700;
+        }
+        
+        .velocity-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .velocity-card {
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .velocity-card h4 {
+            margin: 0 0 8px 0;
+            color: #b38600;
+        }
+        
+        .velocity-card p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        
+        #sketch-holder {
+            min-height: 500px;
+        }
+        
+        @media (max-width: 768px) {
+            .velocity-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-row label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .control-row input[type="range"] {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .pov-buttons {
+                flex-direction: column;
+            }
+            
+            .pov-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Relative Motion in 2D</h1>
+        <p class="subtitle">Understanding Motion from Different Perspectives</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Introduction to Relative Motion</h2>
+        <p>In the real world, motion is always observed from a particular <strong>frame of reference</strong>. What appears to be motion from one perspective might appear completely different from another. This concept is fundamental to understanding dynamics and is crucial in many engineering applications.</p>
+        
+        <div class="key-point">
+            <p><strong>Key Principle:</strong> All motion is relative. There is no such thing as absolute motion – motion can only be described relative to a chosen reference frame.</p>
+        </div>
+        
+        <h3>Everyday Examples</h3>
+        <ul>
+            <li>A passenger on a train sees the platform moving backwards, whilst a person on the platform sees the train moving forwards</li>
+            <li>To someone in a car, roadside objects appear to move backwards</li>
+            <li>The Sun appears to move across the sky from Earth's perspective, but Earth orbits the Sun</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Relative Displacement in 2D</h2>
+        
+        <div class="equation-box">
+            <p><strong>Definition:</strong> The relative displacement of object B with respect to object A is the vector difference between their position vectors:</p>
+            <p>\(\vec{r}_{B/A} = \vec{r}_B - \vec{r}_A\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\vec{r}_{B/A}\) = position of B relative to A</li>
+                <li>\(\vec{r}_B\) = position of B from the origin</li>
+                <li>\(\vec{r}_A\) = position of A from the origin</li>
+            </ul>
+        </div>
+        
+        <h3>Component Form</h3>
+        <div class="equation-box">
+            <p>In 2D Cartesian coordinates:</p>
+            <p>\(\vec{r}_{B/A} = (x_B - x_A)\hat{i} + (y_B - y_A)\hat{j}\)</p>
+            <p>Magnitude: \(|\vec{r}_{B/A}| = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}\)</p>
+            <p>Direction: \(\theta = \tan^{-1}\left(\frac{y_B - y_A}{x_B - x_A}\right)\)</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Important Property:</strong> \(\vec{r}_{B/A} = -\vec{r}_{A/B}\)</p>
+            <p>The position of B relative to A is the negative of the position of A relative to B.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Relative Velocity in 2D</h2>
+        
+        <div class="equation-box">
+            <p><strong>Definition:</strong> The relative velocity of object B with respect to object A is the vector difference between their velocity vectors:</p>
+            <p>\(\vec{v}_{B/A} = \vec{v}_B - \vec{v}_A\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\vec{v}_{B/A}\) = velocity of B relative to A</li>
+                <li>\(\vec{v}_B\) = velocity of B in the fixed frame</li>
+                <li>\(\vec{v}_A\) = velocity of A in the fixed frame</li>
+            </ul>
+        </div>
+        
+        <h3>Velocity Addition Formula</h3>
+        <div class="equation-box">
+            <p>For three reference frames (e.g., A, B, and ground G):</p>
+            <p>\(\vec{v}_{B/G} = \vec{v}_{B/A} + \vec{v}_{A/G}\)</p>
+            <p>This states that the velocity of B relative to the ground equals the velocity of B relative to A plus the velocity of A relative to the ground.</p>
+        </div>
+        
+        <h3>Component Form</h3>
+        <div class="equation-box">
+            <p>In 2D Cartesian coordinates:</p>
+            <p>\(\vec{v}_{B/A} = (v_{Bx} - v_{Ax})\hat{i} + (v_{By} - v_{Ay})\hat{j}\)</p>
+            <p>Speed: \(|\vec{v}_{B/A}| = \sqrt{(v_{Bx} - v_{Ax})^2 + (v_{By} - v_{Ay})^2}\)</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Applications in Engineering</h2>
+        
+        <h3>Navigation and Transport</h3>
+        <ul>
+            <li><strong>Aircraft Navigation:</strong> Pilots must account for wind velocity to determine ground speed and heading</li>
+            <li><strong>Marine Engineering:</strong> Ships must consider ocean currents when plotting courses</li>
+            <li><strong>Spacecraft Rendezvous:</strong> Docking procedures require precise relative velocity calculations</li>
+        </ul>
+        
+        <h3>Mechanical Systems</h3>
+        <ul>
+            <li><strong>Gear Trains:</strong> Relative motion between gears determines transmission ratios</li>
+            <li><strong>Cam Mechanisms:</strong> The follower's motion relative to the cam determines the output motion</li>
+            <li><strong>Robotic Arms:</strong> End-effector position depends on relative motion of joints</li>
+        </ul>
+        
+        <h3>Fluid Dynamics</h3>
+        <ul>
+            <li><strong>Wind Tunnel Testing:</strong> Air velocity relative to the model simulates flight conditions</li>
+            <li><strong>Turbomachinery:</strong> Blade velocity relative to fluid determines energy transfer</li>
+        </ul>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation</h2>
+        <p>Explore relative motion by observing two objects from different reference frames. Switch between viewpoints to see how motion appears different from each perspective.</p>
+        
+        <div class="pov-buttons">
+            <button class="pov-button active" id="pov-ground">Stationary Observer</button>
+            <button class="pov-button" id="pov-object1">Object A Viewpoint</button>
+            <button class="pov-button" id="pov-object2">Object B Viewpoint</button>
+        </div>
+        
+        <div id="sketch-holder">
+            <!-- p5.js sketch will go here -->
+        </div>
+        
+        <div class="control-panel">
+            <h3>Velocity Controls</h3>
+            
+            <div class="control-row">
+                <label>Object A Speed:</label>
+                <input type="range" id="speed1" min="0" max="5" step="0.1" value="2">
+                <span id="speed1-value">2.0 m/s</span>
+            </div>
+            
+            <div class="control-row">
+                <label>Object A Direction:</label>
+                <input type="range" id="angle1" min="0" max="360" step="1" value="45">
+                <span id="angle1-value">45°</span>
+            </div>
+            
+            <div class="control-row">
+                <label>Object B Speed:</label>
+                <input type="range" id="speed2" min="0" max="5" step="0.1" value="3">
+                <span id="speed2-value">3.0 m/s</span>
+            </div>
+            
+            <div class="control-row">
+                <label>Object B Direction:</label>
+                <input type="range" id="angle2" min="0" max="360" step="1" value="135">
+                <span id="angle2-value">135°</span>
+            </div>
+            
+            <button id="reset-button" style="margin-top: 10px;">Reset Positions</button>
+            <button id="pause-button" style="margin-top: 10px;">Pause/Play</button>
+        </div>
+        
+        <div class="velocity-info">
+            <div class="velocity-card">
+                <h4>Object A</h4>
+                <p>Velocity: <span id="vel-a">2.0 m/s @ 45°</span></p>
+                <p>Components: <span id="vel-a-comp">(1.41, 1.41) m/s</span></p>
+            </div>
+            <div class="velocity-card">
+                <h4>Object B</h4>
+                <p>Velocity: <span id="vel-b">3.0 m/s @ 135°</span></p>
+                <p>Components: <span id="vel-b-comp">(-2.12, 2.12) m/s</span></p>
+            </div>
+            <div class="velocity-card">
+                <h4>B relative to A</h4>
+                <p>Relative Velocity: <span id="vel-rel-ba">3.61 m/s</span></p>
+                <p>Components: <span id="vel-rel-ba-comp">(-3.54, 0.71) m/s</span></p>
+            </div>
+            <div class="velocity-card">
+                <h4>A relative to B</h4>
+                <p>Relative Velocity: <span id="vel-rel-ab">3.61 m/s</span></p>
+                <p>Components: <span id="vel-rel-ab-comp">(3.54, -0.71) m/s</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: River Crossing</h3>
+            <p>A boat can travel at 5 m/s in still water. It needs to cross a river that flows east at 3 m/s. If the river is 100 m wide:</p>
+            <ol>
+                <li>At what angle should the boat head to travel straight across?</li>
+                <li>What will be the boat's speed relative to the ground?</li>
+                <li>How long will it take to cross?</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>1) To travel straight across, the boat's velocity component must cancel the river's flow:</p>
+                <p>\(v_{boat} \sin\theta = v_{river} = 3\) m/s</p>
+                <p>\(\sin\theta = \frac{3}{5} = 0.6\)</p>
+                <p>\(\theta = 36.87°\) west of north</p>
+                
+                <p>2) Ground speed (northward component):</p>
+                <p>\(v_{ground} = v_{boat} \cos\theta = 5 \times 0.8 = 4\) m/s</p>
+                
+                <p>3) Time to cross:</p>
+                <p>\(t = \frac{distance}{speed} = \frac{100}{4} = 25\) seconds</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 2: Aircraft Navigation</h3>
+            <p>An aircraft flies at 200 m/s relative to the air. There's a wind blowing from the west at 50 m/s. The pilot wants to fly northeast (45° from north). What heading should the pilot take, and what will be the ground speed?</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using vector addition: \(\vec{v}_{ground} = \vec{v}_{air} + \vec{v}_{wind}\)</p>
+                
+                <p>Let the heading be \(\theta\) from north. We need:</p>
+                <p>Ground velocity components:</p>
+                <p>\(v_{gx} = v_{ground} \sin(45°)\)</p>
+                <p>\(v_{gy} = v_{ground} \cos(45°)\)</p>
+                
+                <p>Air velocity + wind = ground velocity:</p>
+                <p>\(200\sin\theta + 50 = v_{ground} \sin(45°)\)</p>
+                <p>\(200\cos\theta + 0 = v_{ground} \cos(45°)\)</p>
+                
+                <p>Solving: \(\theta = 30.96°\) from north</p>
+                <p>Ground speed: \(v_{ground} = 236.6\) m/s</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 3: Collision Course</h3>
+            <p>Two cars approach an intersection. Car A travels north at 15 m/s, whilst Car B travels east at 20 m/s. What is the velocity of Car B relative to Car A? At what angle does Car A's driver see Car B approaching?</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Relative velocity of B with respect to A:</p>
+                <p>\(\vec{v}_{B/A} = \vec{v}_B - \vec{v}_A\)</p>
+                <p>\(\vec{v}_{B/A} = 20\hat{i} - 15\hat{j}\) m/s</p>
+                
+                <p>Magnitude:</p>
+                <p>\(|\vec{v}_{B/A}| = \sqrt{20^2 + 15^2} = \sqrt{625} = 25\) m/s</p>
+                
+                <p>Direction (from Car A's perspective):</p>
+                <p>\(\theta = \tan^{-1}\left(\frac{20}{15}\right) = 53.13°\) east of south</p>
+                
+                <p>From Car A's viewpoint, Car B appears to approach from the southeast at 25 m/s.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Key Takeaways</h2>
+        <div class="key-point">
+            <ol>
+                <li><strong>Frame of Reference:</strong> Motion appears different from different viewpoints</li>
+                <li><strong>Vector Subtraction:</strong> Relative velocity is found by vector subtraction</li>
+                <li><strong>Reciprocity:</strong> \(\vec{v}_{B/A} = -\vec{v}_{A/B}\)</li>
+                <li><strong>Addition Rule:</strong> Velocities add when changing reference frames</li>
+                <li><strong>Engineering Applications:</strong> Critical for navigation, mechanism design, and fluid dynamics</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <script>
+        // p5.js sketch for relative motion simulation
+        let objectA, objectB;
+        let povMode = 'ground'; // 'ground', 'objectA', 'objectB'
+        let trailA = [];
+        let trailB = [];
+        let isPaused = false;
+        let scaleFactor = 50; // pixels per metre
+        
+        function setup() {
+            let canvas = createCanvas(800, 500);
+            canvas.parent('sketch-holder');
+            
+            // Initialise objects
+            resetPositions();
+            
+            // Setup UI event listeners
+            setupControls();
+        }
+        
+        function resetPositions() {
+            objectA = {
+                pos: createVector(width * 0.3, height * 0.7),
+                vel: createVector(2 * cos(radians(45)), -2 * sin(radians(45))),
+                colour: color(255, 100, 100)
+            };
+            
+            objectB = {
+                pos: createVector(width * 0.7, height * 0.3),
+                vel: createVector(3 * cos(radians(135)), -3 * sin(radians(135))),
+                colour: color(100, 100, 255)
+            };
+            
+            trailA = [];
+            trailB = [];
+        }
+        
+        function draw() {
+            background(240);
+            
+            push();
+            // Apply transformation based on POV
+            if (povMode === 'objectA') {
+                translate(width/2 - objectA.pos.x, height/2 - objectA.pos.y);
+            } else if (povMode === 'objectB') {
+                translate(width/2 - objectB.pos.x, height/2 - objectB.pos.y);
+            }
+            
+            // Draw grid
+            drawGrid();
+            
+            // Update positions if not paused
+            if (!isPaused) {
+                updatePositions();
+            }
+            
+            // Draw trails
+            drawTrails();
+            
+            // Draw objects
+            drawObject(objectA, 'A');
+            drawObject(objectB, 'B');
+            
+            // Draw velocity vectors
+            drawVelocityVectors();
+            
+            pop();
+            
+            // Draw velocity diagram (always in screen coordinates)
+            drawVelocityDiagram();
+            
+            // Draw reference frame label
+            drawReferenceLabel();
+        }
+        
+        function updatePositions() {
+            if (!isPaused) {
+                // Update positions based on velocities
+                objectA.pos.add(p5.Vector.mult(objectA.vel, 0.5));
+                objectB.pos.add(p5.Vector.mult(objectB.vel, 0.5));
+                
+                // Add to trails
+                if (frameCount % 3 === 0) {
+                    trailA.push(objectA.pos.copy());
+                    trailB.push(objectB.pos.copy());
+                    
+                    // Limit trail length
+                    if (trailA.length > 50) trailA.shift();
+                    if (trailB.length > 50) trailB.shift();
+                }
+                
+                // Wrap around screen edges
+                if (objectA.pos.x < 0) objectA.pos.x = width;
+                if (objectA.pos.x > width) objectA.pos.x = 0;
+                if (objectA.pos.y < 0) objectA.pos.y = height;
+                if (objectA.pos.y > height) objectA.pos.y = 0;
+                
+                if (objectB.pos.x < 0) objectB.pos.x = width;
+                if (objectB.pos.x > width) objectB.pos.x = 0;
+                if (objectB.pos.y < 0) objectB.pos.y = height;
+                if (objectB.pos.y > height) objectB.pos.y = 0;
+            }
+        }
+        
+        function drawGrid() {
+            stroke(220);
+            strokeWeight(1);
+            
+            // Draw grid lines
+            for (let x = -width; x < width * 2; x += 50) {
+                line(x, -height, x, height * 2);
+            }
+            for (let y = -height; y < height * 2; y += 50) {
+                line(-width, y, width * 2, y);
+            }
+        }
+        
+        function drawObject(obj, label) {
+            push();
+            fill(obj.colour);
+            noStroke();
+            ellipse(obj.pos.x, obj.pos.y, 30, 30);
+            
+            fill(255);
+            textAlign(CENTER, CENTER);
+            textSize(14);
+            text(label, obj.pos.x, obj.pos.y);
+            pop();
+        }
+        
+        function drawTrails() {
+            noFill();
+            strokeWeight(2);
+            
+            // Draw trail for A
+            stroke(255, 100, 100, 100);
+            beginShape();
+            for (let p of trailA) {
+                vertex(p.x, p.y);
+            }
+            endShape();
+            
+            // Draw trail for B
+            stroke(100, 100, 255, 100);
+            beginShape();
+            for (let p of trailB) {
+                vertex(p.x, p.y);
+            }
+            endShape();
+        }
+        
+        function drawVelocityVectors() {
+            strokeWeight(3);
+            
+            // Adjust velocities based on POV
+            let velA = objectA.vel.copy();
+            let velB = objectB.vel.copy();
+            
+            if (povMode === 'objectA') {
+                velB.sub(objectA.vel);
+                velA = createVector(0, 0);
+            } else if (povMode === 'objectB') {
+                velA.sub(objectB.vel);
+                velB = createVector(0, 0);
+            }
+            
+            // Draw velocity vector for A
+            stroke(255, 100, 100);
+            drawArrow(objectA.pos, p5.Vector.mult(velA, scaleFactor));
+            
+            // Draw velocity vector for B
+            stroke(100, 100, 255);
+            drawArrow(objectB.pos, p5.Vector.mult(velB, scaleFactor));
+            
+            // Draw relative velocity vector
+            if (povMode === 'objectA') {
+                stroke(150, 50, 255);
+                drawArrow(objectB.pos, p5.Vector.mult(velB, scaleFactor));
+            } else if (povMode === 'objectB') {
+                stroke(255, 50, 150);
+                drawArrow(objectA.pos, p5.Vector.mult(velA, scaleFactor));
+            }
+        }
+        
+        function drawArrow(base, vec) {
+            push();
+            translate(base.x, base.y);
+            line(0, 0, vec.x, vec.y);
+            
+            // Arrowhead
+            let angle = atan2(vec.y, vec.x);
+            translate(vec.x, vec.y);
+            rotate(angle);
+            let arrowSize = 7;
+            triangle(0, 0, -arrowSize, -arrowSize/2, -arrowSize, arrowSize/2);
+            pop();
+        }
+        
+        function drawVelocityDiagram() {
+            push();
+            // Position in top-right corner
+            translate(width - 150, 100);
+            
+            // Background
+            fill(255, 255, 255, 200);
+            stroke(200);
+            strokeWeight(1);
+            rect(-70, -70, 140, 140);
+            
+            // Title
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            text('Velocity Diagram', 0, -55);
+            
+            // Scale factor for diagram
+            let diagScale = 15;
+            
+            // Adjust velocities based on POV
+            let velA = objectA.vel.copy();
+            let velB = objectB.vel.copy();
+            
+            if (povMode === 'objectA') {
+                velB.sub(objectA.vel);
+                velA = createVector(0, 0);
+            } else if (povMode === 'objectB') {
+                velA.sub(objectB.vel);
+                velB = createVector(0, 0);
+            }
+            
+            // Draw axes
+            stroke(180);
+            strokeWeight(1);
+            line(-60, 0, 60, 0);
+            line(0, -60, 0, 60);
+            
+            // Draw velocity vectors
+            strokeWeight(2);
+            stroke(255, 100, 100);
+            drawArrow(createVector(0, 0), p5.Vector.mult(velA, diagScale));
+            
+            stroke(100, 100, 255);
+            drawArrow(createVector(0, 0), p5.Vector.mult(velB, diagScale));
+            
+            // Labels
+            textSize(10);
+            fill(255, 100, 100);
+            text('vA', velA.x * diagScale + 10, velA.y * diagScale);
+            fill(100, 100, 255);
+            text('vB', velB.x * diagScale + 10, velB.y * diagScale);
+            
+            pop();
+        }
+        
+        function drawReferenceLabel() {
+            push();
+            fill(0);
+            textAlign(LEFT);
+            textSize(14);
+            let label = 'Reference Frame: ';
+            if (povMode === 'ground') {
+                label += 'Stationary Observer';
+            } else if (povMode === 'objectA') {
+                label += 'Object A';
+            } else {
+                label += 'Object B';
+            }
+            text(label, 10, 20);
+            pop();
+        }
+        
+        function setupControls() {
+            // POV buttons
+            document.getElementById('pov-ground').addEventListener('click', () => {
+                povMode = 'ground';
+                updatePOVButtons();
+            });
+            
+            document.getElementById('pov-object1').addEventListener('click', () => {
+                povMode = 'objectA';
+                updatePOVButtons();
+            });
+            
+            document.getElementById('pov-object2').addEventListener('click', () => {
+                povMode = 'objectB';
+                updatePOVButtons();
+            });
+            
+            // Velocity controls
+            document.getElementById('speed1').addEventListener('input', updateVelocities);
+            document.getElementById('angle1').addEventListener('input', updateVelocities);
+            document.getElementById('speed2').addEventListener('input', updateVelocities);
+            document.getElementById('angle2').addEventListener('input', updateVelocities);
+            
+            // Reset and pause buttons
+            document.getElementById('reset-button').addEventListener('click', resetPositions);
+            document.getElementById('pause-button').addEventListener('click', () => {
+                isPaused = !isPaused;
+            });
+            
+            // Initial update
+            updateVelocities();
+        }
+        
+        function updatePOVButtons() {
+            document.querySelectorAll('.pov-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (povMode === 'ground') {
+                document.getElementById('pov-ground').classList.add('active');
+            } else if (povMode === 'objectA') {
+                document.getElementById('pov-object1').classList.add('active');
+            } else {
+                document.getElementById('pov-object2').classList.add('active');
+            }
+        }
+        
+        function updateVelocities() {
+            // Get values from controls
+            let speed1 = parseFloat(document.getElementById('speed1').value);
+            let angle1 = parseFloat(document.getElementById('angle1').value);
+            let speed2 = parseFloat(document.getElementById('speed2').value);
+            let angle2 = parseFloat(document.getElementById('angle2').value);
+            
+            // Update velocity vectors
+            objectA.vel = createVector(
+                speed1 * cos(radians(angle1)),
+                -speed1 * sin(radians(angle1))
+            );
+            
+            objectB.vel = createVector(
+                speed2 * cos(radians(angle2)),
+                -speed2 * sin(radians(angle2))
+            );
+            
+            // Update display values
+            document.getElementById('speed1-value').textContent = speed1.toFixed(1) + ' m/s';
+            document.getElementById('angle1-value').textContent = angle1 + '°';
+            document.getElementById('speed2-value').textContent = speed2.toFixed(1) + ' m/s';
+            document.getElementById('angle2-value').textContent = angle2 + '°';
+            
+            // Update velocity info cards
+            updateVelocityInfo(speed1, angle1, speed2, angle2);
+        }
+        
+        function updateVelocityInfo(speed1, angle1, speed2, angle2) {
+            // Object A
+            let vAx = speed1 * cos(radians(angle1));
+            let vAy = speed1 * sin(radians(angle1));
+            document.getElementById('vel-a').textContent = `${speed1.toFixed(1)} m/s @ ${angle1}°`;
+            document.getElementById('vel-a-comp').textContent = `(${vAx.toFixed(2)}, ${vAy.toFixed(2)}) m/s`;
+            
+            // Object B
+            let vBx = speed2 * cos(radians(angle2));
+            let vBy = speed2 * sin(radians(angle2));
+            document.getElementById('vel-b').textContent = `${speed2.toFixed(1)} m/s @ ${angle2}°`;
+            document.getElementById('vel-b-comp').textContent = `(${vBx.toFixed(2)}, ${vBy.toFixed(2)}) m/s`;
+            
+            // B relative to A
+            let vBAx = vBx - vAx;
+            let vBAy = vBy - vAy;
+            let vBAMag = sqrt(vBAx * vBAx + vBAy * vBAy);
+            document.getElementById('vel-rel-ba').textContent = `${vBAMag.toFixed(2)} m/s`;
+            document.getElementById('vel-rel-ba-comp').textContent = `(${vBAx.toFixed(2)}, ${vBAy.toFixed(2)}) m/s`;
+            
+            // A relative to B
+            let vABx = vAx - vBx;
+            let vABy = vAy - vBy;
+            let vABMag = sqrt(vABx * vABx + vABy * vABy);
+            document.getElementById('vel-rel-ab').textContent = `${vABMag.toFixed(2)} m/s`;
+            document.getElementById('vel-rel-ab-comp').textContent = `(${vABx.toFixed(2)}, ${vABy.toFixed(2)}) m/s`;
+        }
+        
+        // Solution toggle function
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+    </script>
+</body>
+</html>

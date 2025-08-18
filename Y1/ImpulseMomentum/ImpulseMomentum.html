@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impulse and Momentum - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="impulse-momentum-styles.css">
+    <!-- Simulation Scripts -->
+    <script src="billiards-simulation.js"></script>
+    <script src="angular-momentum-simulation.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Impulse and Momentum</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Impulse and Momentum</h2>
+        <p>The principle of impulse and momentum is a fundamental concept in dynamics that relates forces acting over time to changes in an object's motion. This principle provides powerful tools for analysing collisions, explosions, and other dynamic events.</p>
+
+        <div class="key-point">
+            <p><strong>Key Insight:</strong> Impulse is the effect of a force acting over time, whilst momentum is a measure of an object's motion. The impulse-momentum theorem states that the impulse applied to an object equals its change in momentum.</p>
+        </div>
+
+        <h3>Linear Momentum</h3>
+        <div class="equation-box">
+            <p>Linear momentum is defined as:</p>
+            <p>\(\vec{p} = m\vec{v}\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\vec{p}\) = momentum vector (kg·m/s)</li>
+                <li>\(m\) = mass (kg)</li>
+                <li>\(\vec{v}\) = velocity vector (m/s)</li>
+            </ul>
+        </div>
+
+        <h3>Linear Impulse</h3>
+        <div class="equation-box">
+            <p>Linear impulse is the integral of force over time:</p>
+            <p>\(\vec{J} = \displaystyle \int_{t_1}^{t_2} \vec{F} \, dt\)</p>
+            <p>For constant force:</p>
+            <p>\(\vec{J} = \vec{F} \cdot \Delta t\)</p>
+        </div>
+
+        <h3>The Impulse-Momentum Theorem</h3>
+        <p>Starting from Newton's Second Law:</p>
+        <div class="equation-box">
+            <p>\(\vec{F} = m\vec{a} = m\displaystyle\frac{d\vec{v}}{dt}\)</p>
+            <p>Integrating both sides with respect to time and recalling the definition of linear impulse above:</p>
+            <p>\(\displaystyle \int_{t_1}^{t_2} \vec{F} \, dt = m \displaystyle\int_{v_1}^{v_2} d\vec{v}\)</p>
+            <p>\(\vec{J} = m\vec{v}_2 - m\vec{v}_1\)</p>
+            <p>\(\vec{J} = \Delta\vec{p}\)</p>
+            <p><strong>Therefore: Impulse = Change in Momentum</strong></p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Interpretation:</strong> The impulse-momentum theorem tells us that to change an object's momentum, we must apply a force over time. A large force over a short time can produce the same momentum change as a small force over a long time.</p>
+            <p><strong>NOTA BENE:</strong> both impulse and momentum are <em>vector quantities</em>, therefore they must be resolved into components when solving problems.</p>
+        </div>
+
+        <h3>Conservation of Linear Momentum</h3>
+        <div class="equation-box">
+            <p>For a system with no external forces:</p>
+            <p>\(\sum \vec{p}_{\text{initial}} = \sum \vec{p}_{\text{final}}\)</p>
+            <p>Or for a two-body collision:</p>
+            <p>\(m_1\vec{v}_{1i} + m_2\vec{v}_{2i} = m_1\vec{v}_{1f} + m_2\vec{v}_{2f}\)</p>
+        </div>
+
+        <h2>Collisions and the Coefficient of Restitution</h2>
+        
+        <h3>Types of Collisions</h3>
+        <p>Collisions between objects can be classified based on how kinetic energy is conserved or lost during the impact:</p>
+        
+        <div class="equation-box">
+            <p><strong>1. Perfectly Elastic Collision (e = 1)</strong></p>
+            <ul>
+                <li>Both momentum AND kinetic energy are conserved</li>
+                <li>No permanent deformation occurs</li>
+                <li>Objects separate after collision</li>
+                <li>Examples: Billiard balls (approximately), molecular collisions</li>
+            </ul>
+        </div>
+        
+        <div class="equation-box">
+            <p><strong>2. Inelastic Collision (0 < e < 1)</strong></p>
+            <ul>
+                <li>Momentum is conserved but kinetic energy is NOT conserved</li>
+                <li>Some energy is converted to heat, sound, or deformation</li>
+                <li>Objects separate after collision but with reduced relative velocity</li>
+                <li>Examples: Most real-world collisions, tennis ball bouncing</li>
+            </ul>
+        </div>
+        
+        <div class="equation-box">
+            <p><strong>3. Perfectly Inelastic Collision (e = 0)</strong></p>
+            <ul>
+                <li>Momentum is conserved but maximum kinetic energy is lost</li>
+                <li>Objects stick together after collision</li>
+                <li>Combined mass moves with common velocity</li>
+                <li>Examples: Clay balls colliding, car crashes where vehicles lock together</li>
+            </ul>
+        </div>
+
+        <h3>Coefficient of Restitution</h3>
+        <p>The coefficient of restitution (e) is a measure of how "bouncy" a collision is. It quantifies the elasticity of the collision:</p>
+        
+        <div class="equation-box">
+            <p><strong>Definition:</strong></p>
+            <p>\(e = \frac{\text{relative velocity of separation}}{\text{relative velocity of approach}}\)</p>
+            <p>Or mathematically:</p>
+            <p>\(e = -\frac{v_{2f} - v_{1f}}{v_{2i} - v_{1i}}\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(v_{1i}, v_{2i}\) = initial velocities of objects 1 and 2</li>
+                <li>\(v_{1f}, v_{2f}\) = final velocities of objects 1 and 2</li>
+                <li>The negative sign ensures e is positive</li>
+            </ul>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Physical Interpretation:</strong></p>
+            <ul>
+                <li><strong>e = 1:</strong> Perfect bounce - objects separate with the same relative speed they approached</li>
+                <li><strong>e = 0.5:</strong> Objects separate at half the relative speed they approached</li>
+                <li><strong>e = 0:</strong> No bounce - objects stick together</li>
+            </ul>
+        </div>
+
+        <h3>Newton's Experimental Law</h3>
+        <p>The coefficient of restitution was first studied by Isaac Newton, who found it depends on the materials of the colliding objects:</p>
+        
+        <div class="equation-box">
+            <p><strong>Typical Values:</strong></p>
+            <ul>
+                <li>Steel on steel: e ≈ 0.95</li>
+                <li>Glass on glass: e ≈ 0.94</li>
+                <li>Golf ball on club: e ≈ 0.83</li>
+                <li>Tennis ball on racquet: e ≈ 0.75</li>
+                <li>Basketball on floor: e ≈ 0.60</li>
+                <li>Putty or clay: e ≈ 0</li>
+            </ul>
+        </div>
+
+        <h3>Energy Loss in Collisions</h3>
+        <p>The kinetic energy lost in a collision can be calculated using:</p>
+        
+        <div class="equation-box">
+            <p>For a collision between two objects:</p>
+            <p>\(\Delta E_k = \frac{1}{2}\frac{m_1 m_2}{m_1 + m_2}(v_{1i} - v_{2i})^2(1 - e^2)\)</p>
+            <p>Note that:</p>
+            <ul>
+                <li>When e = 1 (elastic): \(\Delta KE = 0\) (no energy lost)</li>
+                <li>When e = 0 (perfectly inelastic): Maximum energy loss</li>
+            </ul>
+        </div>
+
+        <h3>Oblique Collisions</h3>
+        <p>For collisions that are not head-on, the coefficient of restitution applies only along the line of impact (normal direction):</p>
+        
+        <div class="equation-box">
+            <p>The collision is analysed in two components:</p>
+            <ul>
+                <li><strong>Normal component:</strong> Along the line connecting centres at impact</li>
+                <li><strong>Tangential component:</strong> Perpendicular to the line of impact</li>
+            </ul>
+            <p>The coefficient of restitution equation applies only to the normal components:</p>
+            <p>\(e = -\frac{(v_{2n})_f - (v_{1n})_f}{(v_{2n})_i - (v_{1n})_i}\)</p>
+            <p>Tangential components are unchanged (assuming no friction)</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Important Note:</strong> In all types of collisions, momentum is ALWAYS conserved (in isolated systems). The coefficient of restitution tells us how kinetic energy behaves, not momentum!</p>
+        </div>
+
+        <h3>Engineering Applications of Restitution</h3>
+        <p>Understanding the coefficient of restitution is crucial for engineering design:</p>
+        
+        <div class="equation-box">
+            <p><strong>Impact Force and Time:</strong></p>
+            <p>For a given momentum change, the average impact force depends on collision time:</p>
+            <p>\(F_{avg} = \frac{\Delta p}{\Delta t}\)</p>
+            <ul>
+                <li><strong>High e (elastic):</strong> Shorter contact time → Higher peak forces</li>
+                <li><strong>Low e (inelastic):</strong> Longer contact time → Lower peak forces</li>
+            </ul>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Design Considerations:</strong></p>
+            <ul>
+                <li><strong>Safety Equipment:</strong> Helmets, airbags use low e materials to extend impact time and reduce forces</li>
+                <li><strong>Sports Equipment:</strong> Golf balls, tennis balls designed with specific e values for optimal performance</li>
+                <li><strong>Industrial Dampers:</strong> Shock absorbers use very low e to dissipate energy</li>
+                <li><strong>Precision Machinery:</strong> High e materials minimise energy loss in mechanisms</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation 1: Billiard Ball Collisions</h2>
+        <p>Explore 2D momentum conservation with two billiard balls. Adjust the parameters below to observe different collision scenarios - straight-on or oblique impacts!</p>
+        
+        <div class="simulation-container">
+            <div class="simulation-wrapper">
+                <div id="billiards-container"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="reset-billiards">Reset</button>
+            <button id="run-collision">Run Collision</button>
+            <button id="toggle-vectors">Toggle Vectors</button>
+            
+            <div class="control-group">
+                <label for="mass-ratio">Mass Ratio (White/Blue):</label>
+                <input type="range" id="mass-ratio" min="0.5" max="3" step="0.1" value="1">
+                <span id="mass-ratio-value">1.0</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="y-pos-white">White Ball Y Position:</label>
+                <input type="range" id="y-pos-white" min="50" max="350" step="10" value="200">
+                <span id="y-pos-white-value">200</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="y-pos-blue">Blue Ball Y Position:</label>
+                <input type="range" id="y-pos-blue" min="50" max="350" step="10" value="200">
+                <span id="y-pos-blue-value">200</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="speed-white">White Ball Speed (m/s):</label>
+                <input type="range" id="speed-white" min="0" max="10" step="0.5" value="5">
+                <span id="speed-white-value">5.0</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="speed-blue">Blue Ball Speed (m/s):</label>
+                <input type="range" id="speed-blue" min="0" max="10" step="0.5" value="2">
+                <span id="speed-blue-value">2.0</span>
+            </div>
+            
+            <div class="control-group">
+                <label for="restitution">Coefficient of Restitution:</label>
+                <input type="range" id="restitution" min="0" max="1" step="0.1" value="0.9">
+                <span id="restitution-value">0.9</span>
+            </div>
+        </div>
+
+        <h3>Quick Reference</h3>
+        <div class="key-point">
+            <p>Adjust the coefficient of restitution slider to see different collision behaviours:</p>
+            <ul>
+                <li><strong>e = 1.0:</strong> Perfectly elastic - no energy lost</li>
+                <li><strong>e = 0.9:</strong> Slightly inelastic - small energy loss (typical for billiard balls)</li>
+                <li><strong>e = 0.5:</strong> Moderately inelastic - significant energy loss</li>
+                <li><strong>e = 0.0:</strong> Perfectly inelastic - objects stick together</li>
+            </ul>
+            <p>Watch how the total momentum remains constant regardless of the coefficient value!</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Angular Momentum and Angular Impulse</h2>
+
+        <h3>Angular Momentum</h3>
+        <div class="equation-box">
+            <p>For a particle:</p>
+            <p>\(\vec{L} = \vec{r} \times \vec{p} = \vec{r} \times m\vec{v}\)</p>
+            <p>(where \(\times\) denotes the <em>vector product</em> between two vectors)</p>
+            <p>For a rigid body rotating about a fixed axis it can be proven that:</p>
+            <p>\(L = I\omega\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(I\quad\) moment of inertia (kg·m²)</li>
+                <li>\(\omega\quad\) angular velocity (rad/s)</li>
+            </ul>
+        </div>
+
+        <h3>Angular Impulse</h3>
+        <div class="equation-box">
+            <p>Angular impulse is the integral of torque/moment over time:</p>
+            <p>\(\vec{J}_\theta = \displaystyle\int_{t_1}^{t_2} \vec{M} \, dt\)</p>
+            <p>For constant torque/moment:</p>
+            <p>\(\vec{J}_\theta = \vec{M} \cdot \Delta t\)</p>
+        </div>
+
+        <h3>Derivation from Rotational Dynamics</h3>
+        <p>Starting from the rotational form of Newton's Second Law:</p>
+        <div class="equation-box">
+            <p>\(\vec{M} = I\vec{\alpha} = I\displaystyle\frac{d\vec{\omega}}{dt}\)</p>
+            <p>Integrating both sides:</p>
+            <p>\(\displaystyle\int_{t_1}^{t_2} \vec{M} \, dt = I\int_{\omega_1}^{\omega_2} d\vec{\omega}\)</p>
+            <p>\(\vec{J}_\theta = I\vec{\omega}_2 - I\vec{\omega}_1 = \Delta\vec{L}\)</p>
+            <p><strong>Therefore: Angular Impulse = Change in Angular Momentum</strong></p>
+        </div>
+
+        <h3>Conservation of Angular Momentum</h3>
+        <div class="equation-box">
+            <p>When no external torques act on a system:</p>
+            <p>\(\vec{L}_{\text{initial}} = \vec{L}_{\text{final}}\)</p>
+            <p>or:</p>
+            <p>\(I_1\omega_1 = I_2\omega_2\)</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Classic Example:</strong> A figure skater spins faster when pulling their arms inward. As the moment of inertia \(I\) decreases, the angular velocity \(\omega\) must increase to conserve angular momentum.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation 2: Conservation of Angular Momentum</h2>
+        <p>Observe how changing the moment of inertia affects rotational velocity. Click the buttons to extend or retract the masses!</p>
+        
+        <div class="simulation-container">
+            <div class="simulation-wrapper">
+                <div id="angular-container"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="spin-up">Spin Up</button>
+            <button id="extend-masses">Extend Masses</button>
+            <button id="retract-masses">Retract Masses</button>
+            <button id="reset-angular">Reset</button>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Observe:</strong> When the masses are extended, the system slows down. When retracted, it speeds up. The angular momentum \(L = I\omega\) remains constant!</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Real-World Applications</h2>
+        
+        <h3>Linear Impulse and Momentum</h3>
+        <ul>
+            <li><strong>Automotive Safety:</strong> Crumple zones and airbags increase collision time, reducing the force on passengers</li>
+            <li><strong>Sports:</strong> Follow-through in golf, tennis, and cricket increases contact time and impulse</li>
+            <li><strong>Aerospace:</strong> Rocket propulsion uses momentum conservation (thrust = mass flow rate × exhaust velocity)</li>
+            <li><strong>Ballistics:</strong> Recoil of firearms demonstrates momentum conservation</li>
+        </ul>
+
+        <h3>Angular Impulse and Momentum</h3>
+        <ul>
+            <li><strong>Satellite Stabilisation:</strong> Reaction wheels and gyroscopes maintain orientation</li>
+            <li><strong>Sports:</strong> Divers and gymnasts change their rotation rate by altering body position</li>
+            <li><strong>Engineering:</strong> Flywheels store rotational energy and smooth out torque variations</li>
+            <li><strong>Helicopters:</strong> Tail rotors counteract the torque from the main rotor</li>
+        </ul>
+
+        <h2>Advanced Concepts</h2>
+
+        <h3>Oblique Collisions</h3>
+        <p>For 2D collisions at an angle, momentum is conserved in both x and y directions independently:</p>
+        <div class="equation-box">
+            <p>X-direction: \(m_1v_{1xi} + m_2v_{2xi} = m_1v_{1xf} + m_2v_{2xf}\)</p>
+            <p>Y-direction: \(m_1v_{1yi} + m_2v_{2yi} = m_1v_{1yf} + m_2v_{2yf}\)</p>
+        </div>
+
+        <h3>Variable Mass Systems</h3>
+        <p>For systems with changing mass (like rockets):</p>
+        <div class="equation-box">
+            <p>Rocket equation (Tsiolkovsky):</p>
+            <p>\(\Delta v = v_e \ln\left(\frac{m_0}{m_f}\right)\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(v_e\) = exhaust velocity</li>
+                <li>\(m_0\) = initial mass</li>
+                <li>\(m_f\) = final mass</li>
+            </ul>
+        </div>
+
+        <h3>Gyroscopic Effects</h3>
+        <p>When a spinning object experiences a torque perpendicular to its angular momentum, it precesses:</p>
+        <div class="equation-box">
+            <p>Precession rate: \(\Omega = \frac{\tau}{L} = \frac{\tau}{I\omega}\)</p>
+        </div>
+
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Head-on Collision</h3>
+            <p>Two cars collide head-on. Car A (1500 kg) travels at 20 m/s east, whilst Car B (1200 kg) travels at 15 m/s west. If they stick together after collision, find their final velocity.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Define east as positive direction.</p>
+                <p>Initial momentum: \(p_i = m_Av_A + m_Bv_B = 1500(20) + 1200(-15) = 30000 - 18000 = 12000 \text{ kg·m/s}\)</p>
+                <p>After collision (perfectly inelastic): \(p_f = (m_A + m_B)v_f\)</p>
+                <p>By conservation: \(12000 = (1500 + 1200)v_f = 2700v_f\)</p>
+                <p>\(v_f = \frac{12000}{2700} = 4.44 \text{ m/s east}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Figure Skater</h3>
+            <p>A figure skater with arms extended has a moment of inertia of 2.5 kg·m² and rotates at 3 rad/s. When pulling arms in, the moment of inertia reduces to 1.0 kg·m². Find the new angular velocity.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>By conservation of angular momentum:</p>
+                <p>\(L_i = L_f\)</p>
+                <p>\(I_i\omega_i = I_f\omega_f\)</p>
+                <p>\(2.5 \times 3 = 1.0 \times \omega_f\)</p>
+                <p>\(\omega_f = 7.5 \text{ rad/s}\)</p>
+                <p>The skater spins 2.5 times faster!</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Impulse and Force</h3>
+            <p>A 0.15 kg cricket ball travelling at 40 m/s is struck by a bat and leaves at 50 m/s in the opposite direction. If contact time is 0.003 s, find the average force on the ball.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Define initial direction as positive:</p>
+                <p>Initial momentum: \(p_i = 0.15 \times 40 = 6 \text{ kg·m/s}\)</p>
+                <p>Final momentum: \(p_f = 0.15 \times (-50) = -7.5 \text{ kg·m/s}\)</p>
+                <p>Change in momentum: \(\Delta p = -7.5 - 6 = -13.5 \text{ kg·m/s}\)</p>
+                <p>Impulse: \(J = F_{avg} \times \Delta t = \Delta p\)</p>
+                <p>\(F_{avg} = \frac{-13.5}{0.003} = -4500 \text{ N}\)</p>
+                <p>The force is 4500 N in the opposite direction to initial motion.</p>
+            </div>
+        </div>
+
+        <h2>Summary</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Impulse-Momentum Theorem:</strong> \(\vec{J} = \Delta\vec{p}\quad\) Impulse equals change in momentum</li>
+                <li><strong>Conservation of Momentum:</strong> In isolated systems, total momentum is conserved</li>
+                <li><strong>Angular Analogue:</strong> \(\vec{J}_\theta = \Delta\vec{L}\quad\) Angular impulse equals change in angular momentum</li>
+                <li><strong>Conservation of Angular Momentum:</strong> Without external torques, angular momentum is conserved</li>
+                <li><strong>Practical Applications:</strong> These principles are crucial for collision analysis, propulsion systems, and rotational dynamics</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <script src="footer.js"></script>
+    </footer>
+
+    <script>
+        // Function to toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+
+        // Initialize simulations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize billiards simulation
+            initializeBilliardsSimulation();
+            
+            // Initialize angular momentum simulation
+            initializeAngularSimulation();
+        });
+    </script>
+</body>
+</html>

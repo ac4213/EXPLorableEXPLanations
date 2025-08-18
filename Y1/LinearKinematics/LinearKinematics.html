@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Kinematics - Interactive Lecture</title>
+    
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    
+    <!-- Custom styles for this page -->
+    <style>
+        .simulation-controls {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .control-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 10px 0;
+            gap: 20px;
+        }
+        
+        .control-column {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .slider-container {
+            margin: 10px 0;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .slider-container input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        
+        .slider-value {
+            display: inline-block;
+            min-width: 60px;
+            text-align: right;
+            font-family: monospace;
+        }
+        
+        .car-controls {
+            border: 2px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        
+        .car1-controls {
+            border-color: #ff6b6b;
+            background-color: #fff5f5;
+        }
+        
+        .car2-controls {
+            border-color: #4dabf7;
+            background-color: #f0f8ff;
+        }
+        
+        .race-stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 5px;
+        }
+        
+        .winner-announcement {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        #sketch-holder-drag-race, #sketch-holder-acc-demo {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .control-row {
+                flex-direction: column;
+            }
+            
+            #sketch-holder-drag-race, #sketch-holder-acc-demo {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Linear Kinematics</h1>
+        <p class="subtitle">Motion in One Dimension - Interactive Lecture & Simulations</p>
+    </header>
+
+    <div class="content-section">
+        <h2>What is Kinematics?</h2>
+        <div class="key-point">
+            <p><strong>Kinematics</strong> is the branch of mechanics that describes the motion of objects without considering the forces that cause the motion. It focuses purely on the geometry of motion - how things move, not why they move.</p>
+        </div>
+        
+        <p>In kinematics, we study the relationships between:</p>
+        <ul>
+            <li>Position and displacement</li>
+            <li>Velocity (how fast position changes)</li>
+            <li>Acceleration (how fast velocity changes)</li>
+            <li>Time</li>
+        </ul>
+        
+        <p><strong>Linear kinematics</strong> focuses on motion along a straight line in one dimension (1D).</p>
+    </div>
+
+    <div class="content-section">
+        <h2>Fundamental Concepts</h2>
+        To measure <strong>position</strong>, a <em>reference frame</em> is needed.
+        <h3>1. Displacement</h3>
+        <div class="equation-box">
+            <p><strong>Displacement (Δs)</strong> is the change in position of an object:</p>
+            <p>\(\Delta s = s_f - s_i\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(s_f\) = final position</li>
+                <li>\(s_i\) = initial position</li>
+            </ul>
+            <p>as measured within the chosen reference frame.</p>
+            <p>SI Unit: metres (m)</p>
+            <p>Expressing the displacement as a function of time provides the function \(s(t)\), sometimes called <em>hourly law</em> of motion.</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Important:</strong> Displacement is a <em>vector quantity</em>, it has both magnitude and direction. In 1D motion, direction is indicated by the sign (+ or -).</p>
+            <p>Displacement differs from distance: distance is always positive (scalar), whilst displacement can be negative.</p>
+        </div>
+        
+        <h3>2. Velocity</h3>
+        <div class="equation-box">
+            <p><strong>Velocity (v)</strong> is <em>the rate of change of position with respect to time</em>:</p>
+            <p>Average velocity: \(v_{\text{avg}} = \displaystyle \frac{\Delta s}{\Delta t} = \frac{s_f - s_i}{t_f - t_i}\)</p>
+            <p>Instantaneous velocity: \(v(t) = \displaystyle \frac{ds(t)}{dt}\)</p>
+            <p>SI Unit: metres per second (m/s)</p>
+        </div>
+        
+        <p>Velocity tells us two things:</p>
+        <ul>
+            <li><strong>Speed:</strong> How fast the object is moving (magnitude)</li>
+            <li><strong>Direction:</strong> Which way it's moving (sign in 1D)</li>
+        </ul>
+        
+        <h3>3. Acceleration</h3>
+        <div class="equation-box">
+            <p><strong>Acceleration (a)</strong> is <em>the rate of change of velocity with respect to time</em>:</p>
+            <p>Average acceleration: \(a_{\text{avg}} = \displaystyle \frac{\Delta v}{\Delta t} = \frac{v_f - v_i}{t_f - t_i}\)</p>
+            <p>Instantaneous acceleration: \(a = \displaystyle \frac{dv(t)}{dt} = \frac{d^2s(t)}{dt^2}\)</p>
+            <p>SI Unit: metres per second squared (m/s²)</p>
+        </div>
+        
+        <div class="key-point">
+            <p>Depending on the sign of velocity, acceleration can have:</p>
+            <ul>
+                <li><strong>Same sign:</strong> Object speeding up</li>
+                <li><strong>Opposite sign:</strong> Object slowing down</li>
+                <li><strong>Zero:</strong> Object moving at constant speed</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Equations of Motion</h2>
+        <p>For constant acceleration, we have five key kinematic equations:</p>
+        
+        <div class="equation-box">
+            <h3>The SUVAT Equations</h3>
+            <ol>
+                <li>\(v = u + a_0t\)</li>
+                <li>\(s = ut + \frac{1}{2}a_0t^2\)</li>
+                <li>\(v^2 = u^2 + 2as\)</li>
+                <li>\(s = \frac{(u + v)t}{2}\)</li>
+                <li>\(s = vt - \frac{1}{2}at^2\)</li>
+            </ol>
+            <p>Where:</p>
+            <ul>
+                <li>\(s\) = displacement</li>
+                <li>\(u\) = initial velocity</li>
+                <li>\(v\) = final velocity</li>
+                <li>\(a_0\) = acceleration <strong>(constant)</strong></li>
+                <li>\(t\) = time</li>
+            </ul>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>NOTA BENE:</strong> These equations only apply when acceleration is <strong>constant</strong>. </p>
+            <p>For varying acceleration, we need calculus methods (integration).</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Drag Race</h2>
+        <p>Set the initial velocities and accelerations for two cars and watch them race to the finish line!</p>
+        
+        <div id="sketch-holder-drag-race">
+            <!-- Drag race simulation will go here -->
+        </div>
+        
+        <div class="simulation-controls">
+            <div class="control-row">
+                <div class="control-column car-controls car1-controls">
+                    <h4 style="color: #ff6b6b;">Red Car</h4>
+                    <div class="slider-container">
+                        <label>Initial Velocity: <span id="car1-v0-value" class="slider-value">10.0</span> m/s</label>
+                        <input type="range" id="car1-v0" min="0" max="30" step="0.5" value="10">
+                    </div>
+                    <div class="slider-container">
+                        <label>Acceleration: <span id="car1-acc-value" class="slider-value">2.0</span> m/s²</label>
+                        <input type="range" id="car1-acc" min="-5" max="10" step="0.1" value="2">
+                    </div>
+                </div>
+                
+                <div class="control-column car-controls car2-controls">
+                    <h4 style="color: #4dabf7;">Blue Car</h4>
+                    <div class="slider-container">
+                        <label>Initial Velocity: <span id="car2-v0-value" class="slider-value">5.0</span> m/s</label>
+                        <input type="range" id="car2-v0" min="0" max="30" step="0.5" value="5">
+                    </div>
+                    <div class="slider-container">
+                        <label>Acceleration: <span id="car2-acc-value" class="slider-value">3.0</span> m/s²</label>
+                        <input type="range" id="car2-acc" min="-5" max="10" step="0.1" value="3">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slider-container">
+                <label>Race Distance: <span id="race-distance-value" class="slider-value">200</span> m</label>
+                <input type="range" id="race-distance" min="50" max="500" step="10" value="200">
+            </div>
+            
+            <div style="text-align: center; margin: 10px 0;">
+                <button id="start-race">START RACE</button>
+                <button id="reset-race">RESET</button>
+            </div>
+        </div>
+        
+        <div id="race-results" class="race-stats" style="display: none;">
+            <div class="stat-box">
+                <h4>Red Car</h4>
+                <p>Time: <span id="car1-time">-</span> s</p>
+                <p>Final velocity: <span id="car1-vf">-</span> m/s</p>
+            </div>
+            <div class="stat-box">
+                <h4>Blue Car</h4>
+                <p>Time: <span id="car2-time">-</span> s</p>
+                <p>Final velocity: <span id="car2-vf">-</span> m/s</p>
+            </div>
+        </div>
+        
+        <div id="winner-announcement" class="winner-announcement" style="display: none;"></div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Acceleration & Deceleration</h2>
+        <p>Observe how acceleration affects an object's motion. Click to apply acceleration!</p>
+        
+        <div id="sketch-holder-acc-demo">
+            <!-- Acceleration demo will go here -->
+        </div>
+        
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Applied Acceleration: <span id="acc-demo-value" class="slider-value">5.0</span> m/s²</label>
+                <input type="range" id="acc-demo-slider" min="-10" max="10" step="0.5" value="5">
+            </div>
+            <div style="text-align: center;">
+                <button id="reset-acc-demo">RESET</button>
+                <p><em>Click and hold on the track to apply acceleration. Release to coast at constant velocity.</em></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Real-World Applications</h2>
+        
+        <h3>Transport Engineering</h3>
+        <ul>
+            <li><strong>Railway Design:</strong> Calculating safe braking distances and acceleration zones</li>
+            <li><strong>Traffic Engineering:</strong> Determining stopping sight distances for road design</li>
+            <li><strong>Airport Runways:</strong> Calculating required runway lengths for aircraft take-off and landing</li>
+        </ul>
+        
+        <h3>Vehicle Performance</h3>
+        <ul>
+            <li><strong>0-60 mph Times:</strong> Measuring vehicle acceleration performance</li>
+            <li><strong>Braking Systems:</strong> Designing systems that provide optimal deceleration</li>
+            <li><strong>Fuel Efficiency:</strong> Optimising acceleration profiles for minimal fuel consumption</li>
+        </ul>
+        
+        <h3>Manufacturing & Robotics</h3>
+        <ul>
+            <li><strong>Conveyor Systems:</strong> Controlling product movement through production lines</li>
+            <li><strong>Robot Arms:</strong> Programming smooth motion profiles for precise positioning</li>
+            <li><strong>CNC Machines:</strong> Optimising tool paths for efficiency and accuracy</li>
+        </ul>
+        
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> In real-world applications, engineers must consider jerk (rate of change of acceleration) to ensure smooth motion and prevent mechanical stress. Sudden changes in acceleration can cause discomfort to passengers or damage to machinery.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Emergency Braking</h3>
+            <p>A car travelling at 30 m/s (108 km/h) needs to make an emergency stop. If the maximum deceleration is 8 m/s², calculate:</p>
+            <ol>
+                <li>The stopping distance</li>
+                <li>The time taken to stop</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(u = 30\) m/s, \(v = 0\) m/s (stops), \(a = -8\) m/s²</p>
+                
+                <p><strong>a) Stopping distance:</strong></p>
+                <p>Using: \(v^2 = u^2 + 2as\)</p>
+                <p>\(0 = 30^2 + 2(-8)s\)</p>
+                <p>\(0 = 900 - 16s\)</p>
+                <p>\(s = \frac{900}{16} = 56.25\) m</p>
+                
+                <p><strong>b) Time to stop:</strong></p>
+                <p>Using: \(v = u + at\)</p>
+                <p>\(0 = 30 + (-8)t\)</p>
+                <p>\(t = \frac{30}{8} = 3.75\) s</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 2: Overtaking Manoeuvre</h3>
+            <p>A car travelling at 20 m/s begins to overtake a lorry. It accelerates at 2 m/s² for 5 seconds. Calculate:</p>
+            <ol>
+                <li>The final velocity</li>
+                <li>The distance covered during acceleration</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(u = 20\) m/s, \(a = 2\) m/s², \(t = 5\) s</p>
+                
+                <p><strong>a) Final velocity:</strong></p>
+                <p>Using: \(v = u + at\)</p>
+                <p>\(v = 20 + 2(5) = 30\) m/s</p>
+                
+                <p><strong>b) Distance covered:</strong></p>
+                <p>Using: \(s = ut + \frac{1}{2}at^2\)</p>
+                <p>\(s = 20(5) + \frac{1}{2}(2)(5^2)\)</p>
+                <p>\(s = 100 + 25 = 125\) m</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 3: Two-Stage Motion</h3>
+            <p>A train accelerates from rest at 1.5 m/s² for 20 seconds, then travels at constant velocity for 60 seconds. Find the total distance travelled.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Stage 1: Acceleration</strong></p>
+                <p>Given: \(u = 0\) m/s, \(a = 1.5\) m/s², \(t = 20\) s</p>
+                <p>Distance: \(s_1 = ut + \frac{1}{2}at^2 = 0 + \frac{1}{2}(1.5)(20^2) = 300\) m</p>
+                <p>Final velocity: \(v = u + at = 0 + 1.5(20) = 30\) m/s</p>
+                
+                <p><strong>Stage 2: Constant velocity</strong></p>
+                <p>Given: \(v = 30\) m/s, \(t = 60\) s</p>
+                <p>Distance: \(s_2 = vt = 30(60) = 1800\) m</p>
+                
+                <p><strong>Total distance:</strong> \(s_{total} = s_1 + s_2 = 300 + 1800 = 2100\) m</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Which of the following is NOT a vector quantity?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Displacement</label>
+                    <label><input type="radio" name="q1" value="b"> b) Velocity</label>
+                    <label><input type="radio" name="q1" value="c"> c) Distance</label>
+                    <label><input type="radio" name="q1" value="d"> d) Acceleration</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: A car decelerates uniformly from 25 m/s to rest over 50 m. What is its acceleration?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) -12.5 m/s²</label>
+                    <label><input type="radio" name="q2" value="b"> b) -6.25 m/s²</label>
+                    <label><input type="radio" name="q2" value="c"> c) -2.5 m/s²</label>
+                    <label><input type="radio" name="q2" value="d"> d) -5.0 m/s²</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: An object has negative velocity and negative acceleration. The object is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Speeding up in the positive direction</label>
+                    <label><input type="radio" name="q3" value="b"> b) Slowing down in the negative direction</label>
+                    <label><input type="radio" name="q3" value="c"> c) Speeding up in the negative direction</label>
+                    <label><input type="radio" name="q3" value="d"> d) Slowing down in the positive direction</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: Which kinematic equation would you use to find time if you know initial velocity, final velocity, and displacement?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) \(v = u + at\)</label>
+                    <label><input type="radio" name="q4" value="b"> b) \(s = ut + \frac{1}{2}at^2\)</label>
+                    <label><input type="radio" name="q4" value="c"> c) \(v^2 = u^2 + 2as\)</label>
+                    <label><input type="radio" name="q4" value="d"> d) \(s = \frac{(u + v)t}{2}\)</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- p5.js sketches -->
+    <script>
+        // Drag Race Simulation
+        let dragRaceSketch = function(p) {
+            let car1, car2;
+            let raceDistance = 200;
+            let racing = false;
+            let raceComplete = false;
+            let startTime;
+            let scaleFactor = 1.5; // pixels per metre
+            
+            class Car {
+                constructor(y, colour, v0, acc) {
+                    this.startY = y;
+                    this.y = y;
+                    this.x = 50;
+                    this.colour = colour;
+                    this.v0 = v0;
+                    this.v = v0;
+                    this.acc = acc;
+                    this.s = 0;
+                    this.finished = false;
+                    this.finishTime = 0;
+                }
+                
+                reset() {
+                    this.x = 50;
+                    this.s = 0;
+                    this.v = this.v0;
+                    this.finished = false;
+                    this.finishTime = 0;
+                }
+                
+                update(t) {
+                    if (!this.finished) {
+                        // s = ut + 0.5at²
+                        this.s = this.v0 * t + 0.5 * this.acc * t * t;
+                        // v = u + at
+                        this.v = this.v0 + this.acc * t;
+                        
+                        this.x = 50 + this.s * scaleFactor;
+                        
+                        if (this.s >= raceDistance) {
+                            this.finished = true;
+                            // Calculate exact finish time using quadratic formula
+                            if (this.acc !== 0) {
+                                let a = 0.5 * this.acc;
+                                let b = this.v0;
+                                let c = -raceDistance;
+                                this.finishTime = (-b + Math.sqrt(b*b - 4*a*c)) / (2*a);
+                            } else if (this.v0 !== 0) {
+                                this.finishTime = raceDistance / this.v0;
+                            }
+                            this.v = this.v0 + this.acc * this.finishTime;
+                        }
+                    }
+                }
+                
+                draw(p) {
+                    p.push();
+                    p.fill(this.colour);
+                    p.noStroke();
+                    // Car body
+                    p.rect(this.x - 20, this.y - 8, 40, 16, 3);
+                    // Windows
+                    p.fill(200, 200, 255);
+                    p.rect(this.x - 5, this.y - 6, 15, 8, 2);
+                    // Wheels
+                    p.fill(50);
+                    p.ellipse(this.x - 12, this.y + 8, 8, 8);
+                    p.ellipse(this.x + 12, this.y + 8, 8, 8);
+                    
+                    // Speed indicator
+                    p.fill(0);
+                    p.textAlign(p.LEFT);
+                    p.text(`${this.v.toFixed(1)} m/s`, this.x + 25, this.y);
+                    p.pop();
+                }
+            }
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-drag-race');
+                
+                car1 = new Car(150, p.color(255, 107, 107), 10, 2);
+                car2 = new Car(250, p.color(77, 171, 247), 5, 3);
+                
+                p.textFont('Arial');
+                p.textSize(12);
+            };
+            
+            p.draw = function() {
+                p.background(240);
+                
+                // Draw track
+                p.fill(100);
+                p.rect(0, 100, p.width, 200);
+                
+                // Draw lanes
+                p.stroke(255);
+                p.strokeWeight(2);
+                for (let i = 1; i <= 2; i++) {
+                    p.line(0, 100 + i * 66, p.width, 100 + i * 66);
+                }
+                
+                // Draw centre line (dashed)
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([10, 10]);
+                p.line(0, 200, p.width, 200);
+                p.drawingContext.setLineDash([]);
+                
+                // Draw start line
+                p.stroke(255);
+                p.strokeWeight(4);
+                p.line(50, 100, 50, 300);
+                
+                // Draw finish line
+                let finishX = 50 + raceDistance * scaleFactor;
+                p.stroke(255, 255, 0);
+                p.strokeWeight(4);
+                p.line(finishX, 100, finishX, 300);
+                
+                // Draw chequered pattern at finish
+                p.noStroke();
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 10; j++) {
+                        if ((i + j) % 2 === 0) {
+                            p.fill(0);
+                        } else {
+                            p.fill(255);
+                        }
+                        p.rect(finishX, 100 + i * 66 + j * 20, 10, 20);
+                    }
+                }
+                
+                // Draw distance markers
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                for (let d = 0; d <= raceDistance; d += 50) {
+                    let x = 50 + d * scaleFactor;
+                    p.text(`${d}m`, x, 90);
+                }
+                
+                // Update and draw cars
+                if (racing && !raceComplete) {
+                    let t = (p.millis() - startTime) / 1000;
+                    car1.update(t);
+                    car2.update(t);
+                    
+                    if (car1.finished && car2.finished) {
+                        raceComplete = true;
+                        showResults();
+                    }
+                }
+                
+                car1.draw(p);
+                car2.draw(p);
+                
+                // Draw position indicators
+                p.fill(255, 107, 107);
+                p.textAlign(p.LEFT);
+                p.text(`Red: ${car1.s.toFixed(1)}m`, 10, 30);
+                p.fill(77, 171, 247);
+                p.text(`Blue: ${car2.s.toFixed(1)}m`, 10, 50);
+                
+                // Draw time
+                if (racing) {
+                    let t = raceComplete ? 
+                        Math.max(car1.finishTime || 0, car2.finishTime || 0) : 
+                        (p.millis() - startTime) / 1000;
+                    p.fill(0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(20);
+                    p.text(`Time: ${t.toFixed(2)}s`, p.width/2, 30);
+                    p.textSize(12);
+                }
+            };
+            
+            window.startRace = function() {
+                // Get values from sliders
+                car1.v0 = parseFloat(document.getElementById('car1-v0').value);
+                car1.acc = parseFloat(document.getElementById('car1-acc').value);
+                car2.v0 = parseFloat(document.getElementById('car2-v0').value);
+                car2.acc = parseFloat(document.getElementById('car2-acc').value);
+                raceDistance = parseFloat(document.getElementById('race-distance').value);
+                
+                // Adjust scale factor based on race distance
+                scaleFactor = Math.min(700 / raceDistance, 3);
+                
+                // Reset cars
+                car1.reset();
+                car2.reset();
+                
+                // Start race
+                racing = true;
+                raceComplete = false;
+                startTime = p.millis();
+                
+                // Hide previous results
+                document.getElementById('race-results').style.display = 'none';
+                document.getElementById('winner-announcement').style.display = 'none';
+            };
+            
+            window.resetRace = function() {
+                racing = false;
+                raceComplete = false;
+                car1.reset();
+                car2.reset();
+                document.getElementById('race-results').style.display = 'none';
+                document.getElementById('winner-announcement').style.display = 'none';
+            };
+            
+            function showResults() {
+                document.getElementById('race-results').style.display = 'flex';
+                document.getElementById('car1-time').textContent = car1.finishTime.toFixed(2);
+                document.getElementById('car1-vf').textContent = car1.v.toFixed(1);
+                document.getElementById('car2-time').textContent = car2.finishTime.toFixed(2);
+                document.getElementById('car2-vf').textContent = car2.v.toFixed(1);
+                
+                let winnerDiv = document.getElementById('winner-announcement');
+                winnerDiv.style.display = 'block';
+                if (car1.finishTime < car2.finishTime) {
+                    winnerDiv.textContent = '🏆 Red Car Wins! 🏆';
+                    winnerDiv.style.backgroundColor = '#ffebee';
+                    winnerDiv.style.color = '#ff6b6b';
+                } else if (car2.finishTime < car1.finishTime) {
+                    winnerDiv.textContent = '🏆 Blue Car Wins! 🏆';
+                    winnerDiv.style.backgroundColor = '#e3f2fd';
+                    winnerDiv.style.color = '#4dabf7';
+                } else {
+                    winnerDiv.textContent = "It's a Tie!";
+                    winnerDiv.style.backgroundColor = '#fff3cd';
+                    winnerDiv.style.color = '#856404';
+                }
+            }
+        };
+        
+        // Acceleration Demo Simulation
+        let accDemoSketch = function(p) {
+            let object;
+            let acceleration = 5;
+            let applying = false;
+            let trail = [];
+            
+            class MovingObject {
+                constructor() {
+                    this.reset();
+                }
+                
+                reset() {
+                    this.x = 50;
+                    this.v = 10; // Start with initial velocity
+                    this.a = 0;
+                    trail = [];
+                }
+                
+                update() {
+                    this.a = applying ? acceleration : 0;
+                    this.v += this.a * 0.016; // Assuming 60fps
+                    
+                    // Limit velocity
+                    this.v = p.constrain(this.v, -50, 50);
+                    
+                    this.x += this.v * 0.016 * 10; // Scale for visibility
+                    
+                    // Wrap around
+                    if (this.x > p.width + 20) {
+                        this.x = -20;
+                    } else if (this.x < -20) {
+                        this.x = p.width + 20;
+                    }
+                    
+                    // Add to trail
+                    trail.push({x: this.x, y: p.height/2});
+                    if (trail.length > 50) {
+                        trail.shift();
+                    }
+                }
+                
+                draw(p) {
+                    // Draw trail
+                    p.noFill();
+                    p.strokeWeight(2);
+                    for (let i = 0; i < trail.length - 1; i++) {
+                        let alpha = p.map(i, 0, trail.length, 0, 100);
+                        p.stroke(100, 150, 255, alpha);
+                        p.line(trail[i].x, trail[i].y, trail[i+1].x, trail[i+1].y);
+                    }
+                    
+                    // Draw object
+                    p.push();
+                    p.fill(100, 150, 255);
+                    p.noStroke();
+                    p.rectMode(p.CENTER);
+                    p.rect(this.x, p.height/2, 30, 30, 5);
+                    p.pop();
+                    
+                    // Draw velocity vector
+                    p.stroke(255, 100, 100);
+                    p.strokeWeight(3);
+                    let vx = this.x + this.v * 2;
+                    p.line(this.x, p.height/2 - 40, vx, p.height/2 - 40);
+                    // Arrowhead
+                    p.push();
+                    p.translate(vx, p.height/2 - 40);
+                    p.rotate(this.v > 0 ? 0 : p.PI);
+                    p.noStroke();
+                    p.fill(255, 100, 100);
+                    p.triangle(0, 0, -8, -5, -8, 5);
+                    p.pop();
+                    
+                    // Draw acceleration vector if applying
+                    if (applying && this.a !== 0) {
+                        p.stroke(100, 255, 100);
+                        p.strokeWeight(3);
+                        let ax = this.x + this.a * 10;
+                        p.line(this.x, p.height/2 + 40, ax, p.height/2 + 40);
+                        // Arrowhead
+                        p.push();
+                        p.translate(ax, p.height/2 + 40);
+                        p.rotate(this.a > 0 ? 0 : p.PI);
+                        p.noStroke();
+                        p.fill(100, 255, 100);
+                        p.triangle(0, 0, -8, -5, -8, 5);
+                        p.pop();
+                    }
+                }
+            }
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-acc-demo');
+                canvas.mousePressed(() => applying = true);
+                canvas.mouseReleased(() => applying = false);
+                canvas.touchStarted(() => { applying = true; return false; });
+                canvas.touchEnded(() => { applying = false; return false; });
+                
+                object = new MovingObject();
+                p.textFont('Arial');
+            };
+            
+            p.draw = function() {
+                p.background(240);
+                
+                // Draw track
+                p.fill(180);
+                p.noStroke();
+                p.rect(0, p.height/2 - 60, p.width, 120);
+                
+                // Draw grid lines
+                p.stroke(200);
+                p.strokeWeight(1);
+                for (let x = 0; x < p.width; x += 50) {
+                    p.line(x, p.height/2 - 60, x, p.height/2 + 60);
+                }
+                
+                // Update and draw object
+                object.update();
+                object.draw(p);
+                
+                // Draw info
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text(`Velocity: ${object.v.toFixed(1)} m/s`, 10, 30);
+                p.text(`Acceleration: ${object.a.toFixed(1)} m/s²`, 10, 50);
+                
+                // Draw legend
+                p.textAlign(p.RIGHT);
+                p.fill(255, 100, 100);
+                p.text('Velocity →', p.width - 10, 30);
+                p.fill(100, 255, 100);
+                p.text('Acceleration →', p.width - 10, 50);
+                
+                // Instructions
+                if (!applying) {
+                    p.fill(100);
+                    p.textAlign(p.CENTER);
+                    p.text('Click/Touch and hold to apply acceleration', p.width/2, p.height - 20);
+                } else {
+                    p.fill(100, 255, 100);
+                    p.textAlign(p.CENTER);
+                    p.text('Applying acceleration...', p.width/2, p.height - 20);
+                }
+            };
+            
+            window.resetAccDemo = function() {
+                object.reset();
+            };
+            
+            window.updateAcceleration = function(value) {
+                acceleration = parseFloat(value);
+            };
+        };
+        
+        // Create p5 instances
+        new p5(dragRaceSketch);
+        new p5(accDemoSketch);
+        
+        // Slider updates
+        document.addEventListener('DOMContentLoaded', function() {
+            // Drag race sliders
+            const car1V0 = document.getElementById('car1-v0');
+            const car1Acc = document.getElementById('car1-acc');
+            const car2V0 = document.getElementById('car2-v0');
+            const car2Acc = document.getElementById('car2-acc');
+            const raceDistSlider = document.getElementById('race-distance');
+            
+            car1V0.addEventListener('input', e => {
+                document.getElementById('car1-v0-value').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            car1Acc.addEventListener('input', e => {
+                document.getElementById('car1-acc-value').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            car2V0.addEventListener('input', e => {
+                document.getElementById('car2-v0-value').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            car2Acc.addEventListener('input', e => {
+                document.getElementById('car2-acc-value').textContent = parseFloat(e.target.value).toFixed(1);
+            });
+            raceDistSlider.addEventListener('input', e => {
+                document.getElementById('race-distance-value').textContent = e.target.value;
+            });
+            
+            // Acceleration demo slider
+            const accDemoSlider = document.getElementById('acc-demo-slider');
+            accDemoSlider.addEventListener('input', e => {
+                document.getElementById('acc-demo-value').textContent = parseFloat(e.target.value).toFixed(1);
+                window.updateAcceleration(e.target.value);
+            });
+            
+            // Buttons
+            document.getElementById('start-race').addEventListener('click', window.startRace);
+            document.getElementById('reset-race').addEventListener('click', window.resetRace);
+            document.getElementById('reset-acc-demo').addEventListener('click', window.resetAccDemo);
+            
+            // Quiz
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                const answers = {
+                    q1: 'c', // Distance is scalar
+                    q2: 'b', // -6.25 m/s²
+                    q3: 'c', // Speeding up in negative direction
+                    q4: 'd'  // s = (u+v)t/2
+                };
+                
+                let score = 0;
+                let feedback = '<h3>Quiz Results:</h3>';
+                
+                for (let question in answers) {
+                    const selected = document.querySelector(`input[name="${question}"]:checked`);
+                    if (selected) {
+                        if (selected.value === answers[question]) {
+                            score++;
+                            feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: Incorrect. ✗</p>`;
+                        }
+                    } else {
+                        feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                    }
+                }
+                
+                feedback += `<p>Your score: ${score}/4</p>`;
+                
+                const resultsDiv = document.getElementById('quiz-results');
+                resultsDiv.innerHTML = feedback;
+                resultsDiv.classList.remove('hidden');
+            });
+        });
+        
+        // Toggle solution function
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                solution.previousElementSibling.textContent = 'Hide Solution';
+            } else {
+                solution.classList.add('hidden');
+                solution.previousElementSibling.textContent = 'Show Solution';
+            }
+        }
+    </script>
+</body>
+</html>

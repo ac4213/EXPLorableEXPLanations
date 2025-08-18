@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work and Energy - Interactive Lecture</title>
+    <!-- Import p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    
+    <style>
+        .simulation-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .sim-holder {
+            width: 100%;
+            min-height: 400px;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            margin: 10px 0;
+        }
+        
+        .energy-bars {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+        }
+        
+        .energy-bar-container {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .energy-bar-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .energy-bar-wrapper {
+            height: 150px;
+            width: 40px;
+            background-color: #e0e0e0;
+            border: 2px solid #333;
+            border-radius: 3px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+        
+        .energy-bar {
+            width: 100%;
+            background: linear-gradient(to top, #4CAF50, #8BC34A);
+            border-radius: 0 0 3px 3px;
+            transition: height 0.3s ease;
+        }
+        
+        .energy-value {
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #555;
+        }
+        
+        .controls-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        
+        .control-item label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .control-item input[type="range"] {
+            width: 100%;
+        }
+        
+        .control-value {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .sim-holder {
+                min-height: 300px;
+            }
+            
+            .energy-bars {
+                flex-direction: column;
+            }
+            
+            .energy-bar-wrapper {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Work and Energy</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Work and Energy</h2>
+        <p>The principle of work and energy is a fundamental concept in mechanics that relates the work done on a body to the change in its kinetic energy. This principle provides a powerful alternative to Newton's second law for solving dynamics problems.</p>
+        
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Energy methods often simplify problems by eliminating the need to consider forces that do no work, and by avoiding the direct calculation of acceleration.</p>
+        </div>
+
+        <h3>Definition of Work</h3>
+        <div class="equation-box">
+            <p><strong>Work of a Force:</strong></p>
+            <p>For a force \(\vec{F}\) acting through an infinitesimal displacement \(d\vec{s}\) from position \(s_1\) to position \(s_2\):</p>
+            <p>\(W = \displaystyle \int_{s_1}^{s_2}\vec{F} \cdot d \vec{s}\)</p>
+            <p>where \(\cdot\) is the <em>scalar product</em> between the force and displacement vectors, therefore the work done is a scalar quantity, and its SI unit is the Joule \([\text{J}]=[\text{Nm}]\).</p>
+            
+            <p><strong>Work of a Couple Moment:</strong></p>
+            <p>For a constant couple moment \(M\) acting through an angular displacement \(\theta\):</p>
+            <p>\(W = M \theta\)</p>
+        </div>
+
+        <h3>Work of a Constant Force</h3>
+        <p>When a constant force acts on a particle that moves along a straight line, the work done is simply the product of the force component in the direction of motion and the distance travelled, or alternatively by the product of the force and the component of distance travelled in the same direction of the force.</p>
+        
+        <div class="equation-box">
+            <p>\(W_F = \vec{F} \cdot \Delta\vec{s}=\big(F\cos\theta\big)\Delta s =F\big(\Delta s \cos\theta\big)\)</p>
+            <p>where \(\theta\) is the angle between the force vector and the displacement vector.</p>
+        </div>
+
+        <h3>Work of the Gravitational Force</h3>
+        <p>The gravitational force is a special case of a constant force (near Earth's surface):</p>
+        
+        <div class="equation-box">
+            <p>For a mass \(m\) moving vertically through height \(h\):</p>
+            <p>\(W_{g} = -mgh\) (when moving upward)</p>
+            <p>\(W_{g} = +mgh\) (when moving downward)</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Important:</strong> The work done by gravity depends only on the vertical displacement, not on the path taken. This makes gravity a <strong>conservative force</strong>.</p>
+        </div>
+
+        <h3>Work of Spring Forces</h3>
+        <p>The force on a spring is proportional on its stiffness (spring coefficient \(k\)) and its displacement (extension)</p>
+        <p>\[F_k=-ks\]</p>
+        
+        <div class="equation-box">
+            <p>For a spring being extended from \(s_1\) to \(s_2\):</p>
+            <p>\(W_{k} = \displaystyle \int_{s_1}^{s_2}-ks \, ds=-\frac{1}{2}k\big( s_2^2-s_1^2\big) \)</p>
+        </div>
+
+        <h3>Work of Reaction Forces</h3>
+        <p>Reaction forces \(R\) are always perpendicular to the direction of motion, therefore they do <strong>no work</strong>:</p>
+        
+        <div class="equation-box">
+            <p>Since \(\theta = 90°\) between normal force and displacement:</p>
+            <p>\(W_{R} = R \cdot \Delta s \cdot \cos(90°) = 0\)</p>
+        </div>
+        
+        <p>This is why energy methods are particularly useful, we can ignore forces such as all reactions that do not contribute to the energy balance!</p>
+
+        <h3>Work of Friction Forces</h3>
+        <p>Friction forces always oppose motion and therefore do negative work:</p>
+        
+        <div class="equation-box">
+            <p>\(W_{f} = -F_f \cdot \Delta s = -\mu_k N \cdot \Delta s\)</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Conservative vs Non-Conservative Forces:</strong></p>
+            <ul>
+                <li><strong>Conservative forces</strong> (gravity, springs): Work depends only on initial and final positions</li>
+                <li><strong>Non-conservative forces</strong> (friction, drag): Work depends on the path taken</li>
+            </ul>
+        </div>
+
+        <h3>Potential Energy</h3>
+        <p>For conservative forces, we can define a potential energy function:</p>
+        
+        <div class="equation-box">
+            <p><strong>Gravitational Potential Energy:</strong> \(U_g = mgh\)</p>
+            <p><strong>Elastic Potential Energy:</strong> \(U_e = \frac{1}{2}kx^2\)</p>
+            <p>The work done by a conservative force equals the negative change in potential energy:</p>
+            <p>\(W_{\text{cons}} = -\Delta U\)</p>
+        </div>
+
+        <h3>The Principle of Work and Energy</h3>
+        <p>By integrating Newton's second law with respect to displacement</p>
+        <p>\[\displaystyle \int \sum F \, ds=\displaystyle \int ma \, ds\]</p>
+        <p>\[\displaystyle \sum \int  F \, ds=\displaystyle \int mv \, dv\]</p>
+        <p>\[\displaystyle \sum W = \frac{1}{2}mv_2^2 - \frac{1}{2}mv_1^2\]</p>
+        <p>hence we define the quantity <em>kinetic energy</em> \(E_k=\frac{1}{2}mv^2\) </p>
+        <p>and we arrive at</p>
+        <div class="equation-box">
+            <p><strong>The Work-Energy Theorem:</strong></p>
+            <p>\[\sum W = \Delta E_k\]</p>
+            <p>The total work done on a particle equals the change in its kinetic energy.</p>
+        </div>
+
+        <h3>Rotational Work and Energy</h3>
+        <p>For rotating rigid bodies:</p>
+        
+        <div class="equation-box">
+            <p><strong>Rotational Kinetic Energy:</strong> \(E_{k,\text{rot}} = \frac{1}{2}I\omega^2\)</p>
+            <p>where \(I\) is the moment of inertia and \(\omega\) is the angular velocity.</p>
+            
+            <p><strong>Total Energy for Rolling Motion:</strong></p>
+            <p>\(E_{k,\text{tot}} = E_{k,\text{trans}} + E_{k,\text{rot}} = \frac{1}{2}mv^2 + \frac{1}{2}I\omega^2\)</p>
+        </div>
+
+        <h3>Other forms of the Work-Energy theorem</h3>
+        <p>starting from the previous form:</p>
+        <p>\[\sum W = \Delta E_k\]</p>
+        <p>we can split the sum of work into work done by conservative forces \(W_{\text{cons}}\) and work done by non-conservative forces  \(W_{\text{nc}}\)</p>
+        <p>\[W_{\text{cons}}+W_{\text{nc}} = \Delta E_k\]</p>
+        <p>recalling the definition of potential energy for conservative forces \(W_{\text{cons}}=-\Delta U\)</p>
+        <p>\[-\Delta U+W_{\text{nc}} = \Delta E_k\]</p>
+        <p>finally, by noting that \(\Delta U=U_2-U_1\,\) and \(\,\Delta E_k=E_{k2}-E_{k1}\,\) we arrive at an alternative form of the Work-Energy theorem</p>
+        <div class="equation-box">
+            <p>\[E_{k_1}+U_1+W_{\text{nc}} = E_{k_2}+U_2\]</p>
+            <p><em>The final mechanical (kinetic and potential) energy of the system is equal to the initial mechanical energy of the system plus (minus) the contribution of non-conservative forces.</em></p>
+            <p>\[E_1+W_{\text{nc}} = E_2\]</p>
+            <p><strong>corollary:</strong> in the absence of non-conservative forces (such as friction and drag), the total mechanical energy of the system is conserved \(E_1=E_2\).</p>
+        </div>
+    </div>
+
+    <!-- Simulation 1: U-shaped slide -->
+    <div class="simulation-container">
+        <h2>Simulation 1: Energy Conservation in a U-Shaped Slide</h2>
+        <p>Release the bead from different heights and observe how friction affects the maximum height reached. Toggle friction to see the difference between conservative and non-conservative systems.</p>
+        
+        <div id="slide-sim" class="sim-holder"></div>
+        
+        <div class="controls-panel">
+            <button id="slide-reset">Reset</button>
+            <button id="slide-release">Release Bead</button>
+            <button id="toggle-friction">Toggle Friction: OFF</button>
+            <div class="control-item">
+                <label>Initial Height:</label>
+                <input type="range" id="slide-height" min="50" max="150" value="100">
+                <div class="control-value">Height: <span id="height-value">100</span> mm</div>
+            </div>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Observation:</strong> Without friction, the bead returns to its initial height (energy is conserved). With friction, some energy is dissipated as heat, and the bead doesn't reach the initial height.</p>
+        </div>
+    </div>
+
+    <!-- Simulation 2: Block on incline -->
+    <div class="simulation-container">
+        <h2>Simulation 2: Block Sliding Down an Incline</h2>
+        <p>Watch how potential energy converts to kinetic energy as the block slides down. The energy bars show the distribution of energy in real-time.</p>
+        
+        <div id="incline-sim" class="sim-holder"></div>
+        
+        <div class="energy-bars">
+            <div class="energy-bar-container">
+                <div class="energy-bar-label">Potential Energy</div>
+                <div class="energy-bar-wrapper">
+                    <div id="pe-bar" class="energy-bar" style="height: 100%; background: linear-gradient(to top, #2196F3, #64B5F6);"></div>
+                </div>
+                <div class="energy-value">PE: <span id="pe-value">100</span>%</div>
+            </div>
+            <div class="energy-bar-container">
+                <div class="energy-bar-label">Kinetic Energy</div>
+                <div class="energy-bar-wrapper">
+                    <div id="ke-bar" class="energy-bar" style="height: 0%;"></div>
+                </div>
+                <div class="energy-value">KE: <span id="ke-value">0</span>%</div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <button id="incline-reset">Reset</button>
+            <button id="incline-start">Start</button>
+            <div class="control-item">
+                <label>Incline Angle:</label>
+                <input type="range" id="incline-angle" min="15" max="60" value="30">
+                <div class="control-value">Angle: <span id="angle-value">30</span>°</div>
+            </div>
+            <div class="control-item">
+                <label>Coefficient of Friction:</label>
+                <input type="range" id="incline-friction" min="0" max="0.5" step="0.05" value="0.1">
+                <div class="control-value">μ: <span id="friction-value">0.10</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simulation 3: Rolling race -->
+    <div class="simulation-container">
+        <h2>Simulation 3: Rolling Race - Different Objects</h2>
+        <p>Compare how different shaped objects roll down an incline. Each object has a different distribution of rotational and translational kinetic energy.</p>
+        
+        <div id="race-sim" class="sim-holder"></div>
+        
+        <div class="energy-bars">
+            <div class="energy-bar-container">
+                <div class="energy-bar-label">Potential</div>
+                <div class="energy-bar-wrapper">
+                    <div id="race-pe-bar" class="energy-bar" style="height: 100%; background: linear-gradient(to top, #2196F3, #64B5F6);"></div>
+                </div>
+                <div class="energy-value"><span id="race-pe-value">100</span>%</div>
+            </div>
+            <div class="energy-bar-container">
+                <div class="energy-bar-label">Translational KE</div>
+                <div class="energy-bar-wrapper">
+                    <div id="race-tke-bar" class="energy-bar" style="height: 0%;"></div>
+                </div>
+                <div class="energy-value"><span id="race-tke-value">0</span>%</div>
+            </div>
+            <div class="energy-bar-container">
+                <div class="energy-bar-label">Rotational KE</div>
+                <div class="energy-bar-wrapper">
+                    <div id="race-rke-bar" class="energy-bar" style="height: 0%; background: linear-gradient(to top, #FF9800, #FFC107);"></div>
+                </div>
+                <div class="energy-value"><span id="race-rke-value">0</span>%</div>
+            </div>
+        </div>
+        
+        <div class="controls-panel">
+            <button id="race-reset">Reset</button>
+            <button id="race-start">Start Race</button>
+            <div class="control-item">
+                <label>Select Object:</label>
+                <select id="object-select">
+                    <option value="sphere">Solid Sphere (I = 2/5 MR²)</option>
+                    <option value="hollow-sphere">Hollow Sphere (I = 2/3 MR²)</option>
+                    <option value="cylinder">Solid Cylinder (I = 1/2 MR²)</option>
+                    <option value="hollow-cylinder">Hollow Cylinder (I = MR²)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Physics Insight:</strong> Objects with lower moments of inertia (like solid spheres) accelerate faster down the incline because less energy goes into rotation. The acceleration is independent of mass and radius!</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Applications of Work-Energy Principle</h2>
+        
+        <h3>Engineering Applications</h3>
+        <ul>
+            <li><strong>Vehicle Design:</strong> Calculating braking distances and impact forces</li>
+            <li><strong>Roller Coaster Design:</strong> Determining maximum speeds and loop sizes</li>
+            <li><strong>Power Generation:</strong> Hydroelectric dams converting potential to electrical energy</li>
+            <li><strong>Manufacturing:</strong> Flywheel energy storage in presses and punches</li>
+            <li><strong>Sports Equipment:</strong> Optimising energy transfer in golf clubs, tennis rackets</li>
+        </ul>
+
+        <h3>Problem-Solving Strategy</h3>
+        <div class="equation-box">
+            <ol>
+                <li>Identify the system and draw a free-body diagram</li>
+                <li>Choose reference levels for potential energy</li>
+                <li>Calculate initial kinetic and potential energies</li>
+                <li>Calculate work done by non-conservative forces</li>
+                <li>Apply the work-energy equation</li>
+                <li>Solve for the unknown quantity</li>
+            </ol>
+        </div>
+
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Sliding Block</h3>
+            <p>A 5 kg block starts from rest at the top of a 30° incline that is 2 metres long. If the coefficient of kinetic friction is 0.2, find the speed of the block at the bottom.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(m = 5\) kg, \(\theta = 30°\), \(s = 2\) m, \(\mu_k = 0.2\), \(v_1 = 0\)</p>
+                
+                <p>Height change: \(h = s \sin\theta = 2 \sin 30° = 1\) m</p>
+                
+                <p>Normal force: \(N = mg\cos\theta = 5 \times 9.81 \times \cos 30° = 42.5\) N</p>
+                
+                <p>Work by friction: \(W_f = -\mu_k N s = -0.2 \times 42.5 \times 2 = -17\) J</p>
+                
+                <p>Using work-energy theorem:</p>
+                <p>\(mgh + W_f = \frac{1}{2}mv_2^2\)</p>
+                <p>\(5 \times 9.81 \times 1 - 17 = \frac{1}{2} \times 5 \times v_2^2\)</p>
+                <p>\(49.05 - 17 = 2.5v_2^2\)</p>
+                <p>\(v_2 = \sqrt{\frac{32.05}{2.5}} = 3.58\) m/s</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Rolling Cylinder</h3>
+            <p>A solid cylinder of mass 10 kg and radius 0.2 m rolls without slipping down a 45° incline. If it starts from rest and rolls 3 metres along the incline, find its final linear velocity.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(m = 10\) kg, \(R = 0.2\) m, \(\theta = 45°\), \(s = 3\) m</p>
+                
+                <p>For a solid cylinder: \(I = \frac{1}{2}mR^2\)</p>
+                
+                <p>Height change: \(h = s\sin\theta = 3\sin 45° = 2.12\) m</p>
+                
+                <p>For rolling without slipping: \(v = R\omega\)</p>
+                
+                <p>Energy equation:</p>
+                <p>\(mgh = \frac{1}{2}mv^2 + \frac{1}{2}I\omega^2\)</p>
+                <p>\(mgh = \frac{1}{2}mv^2 + \frac{1}{2} \times \frac{1}{2}mR^2 \times \frac{v^2}{R^2}\)</p>
+                <p>\(gh = \frac{1}{2}v^2 + \frac{1}{4}v^2 = \frac{3}{4}v^2\)</p>
+                <p>\(v = \sqrt{\frac{4gh}{3}} = \sqrt{\frac{4 \times 9.81 \times 2.12}{3}} = 5.27\) m/s</p>
+            </div>
+        </div>
+
+        <h2>Summary</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li>Work is the dot product of force and displacement</li>
+                <li>The work-energy theorem states: Total work = Change in kinetic energy</li>
+                <li>Conservative forces (gravity, springs) have associated potential energies</li>
+                <li>Non-conservative forces (friction) dissipate mechanical energy</li>
+                <li>For systems with rotation, total energy includes both translational and rotational kinetic energy</li>
+                <li>Energy methods often simplify problems by avoiding acceleration calculations</li>
+            </ol>
+        </div>
+
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Work of a Force</td>
+                        <td>\(W = \vec{F} \cdot \vec{s}\)</td>
+                        <td>Scalar product of force and displacement</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy (Translation)</td>
+                        <td>\(E_k = \frac{1}{2}mv^2\)</td>
+                        <td>Energy due to linear motion</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy (Rotation)</td>
+                        <td>\(E_{k,\text{rot}} = \frac{1}{2}I\omega^2\)</td>
+                        <td>Energy due to rotational motion</td>
+                    </tr>
+                    <tr>
+                        <td>Gravitational PE</td>
+                        <td>\(U_g = mgh\)</td>
+                        <td>Potential energy due to height</td>
+                    </tr>
+                    <tr>
+                        <td>Elastic PE</td>
+                        <td>\(U_k = \frac{1}{2}kx^2\)</td>
+                        <td>Energy stored in springs</td>
+                    </tr>
+                    <tr>
+                        <td>Work-Energy Theorem</td>
+                        <td>\(\sum W = \Delta E_k\)</td>
+                        <td>Fundamental principle</td>
+                    </tr>
+                    <tr>
+                        <td>Conservation of Mechanical Energy</td>
+                        <td>\(E_1 + W_{nc} = E_2\)</td>
+                        <td>Including non-conservative work</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <script src="../common/footer.js"></script>
+    </footer>
+
+    <script>
+        // Toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                solution.previousElementSibling.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                solution.previousElementSibling.textContent = "Show Solution";
+            }
+        }
+
+        // Simulation 1: U-shaped slide
+        let slideSketch = function(p) {
+            let beadX, beadY, beadVx, beadVy;
+            let initialHeight = 100;
+            let isReleased = false;
+            let hasFriction = false;
+            let g = 0.5; // Gravity
+            let frictionCoeff = 0.02;
+            let slideWidth = 200;
+            let slideBottom = 250;
+            let radius = 10;
+            let trail = [];
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('slide-sim');
+                p.resetSimulation();
+            };
+            
+            p.resetSimulation = function() {
+                beadX = p.width/2 - slideWidth/2;
+                beadY = slideBottom - initialHeight;
+                beadVx = 0;
+                beadVy = 0;
+                isReleased = false;
+                trail = [];
+            };
+            
+            p.draw = function() {
+                p.background(245);
+                
+                // Draw U-shaped slide
+                p.stroke(50);
+                p.strokeWeight(3);
+                p.noFill();
+                p.beginShape();
+                p.vertex(p.width/2 - slideWidth/2 - 50, 50);
+                p.vertex(p.width/2 - slideWidth/2, slideBottom);
+                p.bezierVertex(
+                    p.width/2 - slideWidth/4, slideBottom + 50,
+                    p.width/2 + slideWidth/4, slideBottom + 50,
+                    p.width/2 + slideWidth/2, slideBottom
+                );
+                p.vertex(p.width/2 + slideWidth/2 + 50, 50);
+                p.endShape();
+                
+                // Draw trail
+                p.stroke(100, 100, 255, 100);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for(let i = 0; i < trail.length; i++) {
+                    p.vertex(trail[i].x, trail[i].y);
+                }
+                p.endShape();
+                
+                // Update physics
+                if(isReleased) {
+                    // Calculate position on slide
+                    let slidePos = getSlidePosition(beadX);
+                    let normal = getSlideNormal(beadX);
+                    
+                    // Apply gravity
+                    beadVy += g;
+                    
+                    // Apply constraint to stay on slide
+                    if(Math.abs(beadY - slidePos.y) > 1) {
+                        beadY = slidePos.y;
+                        
+                        // Project velocity along slide
+                        let tangent = {x: -normal.y, y: normal.x};
+                        let vDotT = beadVx * tangent.x + beadVy * tangent.y;
+                        
+                        // Apply friction if enabled
+                        if(hasFriction) {
+                            vDotT *= (1 - frictionCoeff);
+                        }
+                        
+                        beadVx = vDotT * tangent.x;
+                        beadVy = vDotT * tangent.y;
+                    }
+                    
+                    // Update position
+                    beadX += beadVx;
+                    beadY += beadVy;
+                    
+                    // Add to trail
+                    trail.push({x: beadX, y: beadY});
+                    if(trail.length > 100) trail.shift();
+                    
+                    // Stop at edges
+                    if(beadX < p.width/2 - slideWidth/2 - 45 || beadX > p.width/2 + slideWidth/2 + 45) {
+                        isReleased = false;
+                    }
+                }
+                
+                // Draw bead
+                p.fill(255, 100, 100);
+                p.noStroke();
+                p.ellipse(beadX, beadY, radius * 2);
+                
+                // Draw energy indicator
+                let ke = 0.5 * (beadVx * beadVx + beadVy * beadVy);
+                let pe = (slideBottom - beadY) * g;
+                let totalE = ke + pe;
+                
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.text(`Kinetic Energy: ${ke.toFixed(1)}`, 10, 20);
+                p.text(`Potential Energy: ${pe.toFixed(1)}`, 10, 40);
+                p.text(`Total Energy: ${totalE.toFixed(1)}`, 10, 60);
+                p.text(`Friction: ${hasFriction ? 'ON' : 'OFF'}`, 10, 80);
+                
+                // Helper function to get slide position
+                function getSlidePosition(x) {
+                    let relX = (x - p.width/2) / (slideWidth/2);
+                    relX = p.constrain(relX, -1, 1);
+                    let y = slideBottom - Math.sqrt(1 - relX * relX) * slideBottom * 0.3;
+                    return {x: x, y: y};
+                }
+                
+                // Helper function to get slide normal
+                function getSlideNormal(x) {
+                    let relX = (x - p.width/2) / (slideWidth/2);
+                    relX = p.constrain(relX, -1, 1);
+                    let angle = Math.asin(relX);
+                    return {x: Math.sin(angle), y: -Math.cos(angle)};
+                }
+            };
+            
+            document.getElementById('slide-reset').onclick = function() {
+                p.resetSimulation();
+            };
+            
+            document.getElementById('slide-release').onclick = function() {
+                isReleased = true;
+            };
+            
+            document.getElementById('toggle-friction').onclick = function() {
+                hasFriction = !hasFriction;
+                this.textContent = `Toggle Friction: ${hasFriction ? 'ON' : 'OFF'}`;
+            };
+            
+            document.getElementById('slide-height').oninput = function() {
+                initialHeight = parseInt(this.value);
+                document.getElementById('height-value').textContent = this.value;
+                p.resetSimulation();
+            };
+        };
+        
+        // Simulation 2: Block on incline
+        let inclineSketch = function(p) {
+            let blockX, blockY;
+            let velocity = 0;
+            let angle = 30;
+            let friction = 0.1;
+            let isMoving = false;
+            let inclineLength = 400;
+            let blockSize = 40;
+            let startHeight;
+            let initialPE;
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('incline-sim');
+                p.resetSimulation();
+            };
+            
+            p.resetSimulation = function() {
+                blockX = 150;
+                blockY = 200 - inclineLength * Math.sin(angle * Math.PI / 180);
+                velocity = 0;
+                isMoving = false;
+                startHeight = 350 - blockY;
+                initialPE = startHeight;
+                updateEnergyBars(100, 0);
+            };
+            
+            p.draw = function() {
+                p.background(245);
+                
+                // Draw incline
+                p.push();
+                p.translate(150, 200);
+                p.rotate(angle * Math.PI / 180);
+                p.stroke(50);
+                p.strokeWeight(3);
+                p.line(0, 0, inclineLength, 0);
+                p.pop();
+                
+                // Draw ground
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.line(0, 350, p.width, 350);
+                
+                // Update physics
+                if(isMoving) {
+                    let g = 0.3;
+                    let a = g * Math.sin(angle * Math.PI / 180) - friction * g * Math.cos(angle * Math.PI / 180);
+                    
+                    if(a > 0) {
+                        velocity += a;
+                        blockX += velocity * Math.cos(angle * Math.PI / 180);
+                        blockY += velocity * Math.sin(angle * Math.PI / 180);
+                    }
+                    
+                    // Calculate energies
+                    let currentHeight = 350 - blockY;
+                    let pe = (currentHeight / startHeight) * 100;
+                    let ke = 100 - pe;
+                    updateEnergyBars(Math.max(0, pe), Math.min(100, ke));
+                    
+                    // Stop at bottom
+                    if(blockY >= 350 - blockSize/2) {
+                        isMoving = false;
+                        blockY = 350 - blockSize/2;
+                        updateEnergyBars(0, 100);
+                    }
+                }
+                
+                // Draw block
+                p.push();
+                p.translate(blockX, blockY);
+                p.rotate(angle * Math.PI / 180);
+                p.fill(100, 150, 255);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rectMode(p.CENTER);
+                p.rect(0, 0, blockSize, blockSize);
+                p.pop();
+                
+                // Draw force arrows
+                if(!isMoving) {
+                    p.stroke(255, 0, 0);
+                    p.strokeWeight(2);
+                    p.fill(255, 0, 0);
+                    // Weight
+                    p.drawArrow(blockX, blockY, blockX, blockY + 60);
+                    p.text('mg', blockX + 10, blockY + 50);
+                }
+            };
+            
+            p.drawArrow = function(x1, y1, x2, y2) {
+                p.line(x1, y1, x2, y2);
+                let angle = Math.atan2(y2 - y1, x2 - x1);
+                p.push();
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.triangle(0, 0, -8, -4, -8, 4);
+                p.pop();
+            };
+            
+            document.getElementById('incline-reset').onclick = function() {
+                p.resetSimulation();
+            };
+            
+            document.getElementById('incline-start').onclick = function() {
+                isMoving = true;
+            };
+            
+            document.getElementById('incline-angle').oninput = function() {
+                angle = parseInt(this.value);
+                document.getElementById('angle-value').textContent = this.value;
+                p.resetSimulation();
+            };
+            
+            document.getElementById('incline-friction').oninput = function() {
+                friction = parseFloat(this.value);
+                document.getElementById('friction-value').textContent = this.value;
+                p.resetSimulation();
+            };
+            
+            function updateEnergyBars(pe, ke) {
+                document.getElementById('pe-bar').style.height = pe + '%';
+                document.getElementById('ke-bar').style.height = ke + '%';
+                document.getElementById('pe-value').textContent = Math.round(pe);
+                document.getElementById('ke-value').textContent = Math.round(ke);
+            }
+        };
+        
+        // Simulation 3: Rolling race
+        let raceSketch = function(p) {
+            let objectX, objectY;
+            let velocity = 0;
+            let omega = 0;
+            let angle = 30;
+            let isRacing = false;
+            let inclineLength = 500;
+            let objectRadius = 20;
+            let objectType = 'sphere';
+            let momentCoeff = 2/5; // For sphere
+            let startHeight;
+            
+            const momentCoeffs = {
+                'sphere': 2/5,
+                'hollow-sphere': 2/3,
+                'cylinder': 1/2,
+                'hollow-cylinder': 1
+            };
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('race-sim');
+                p.resetSimulation();
+            };
+            
+            p.resetSimulation = function() {
+                objectX = 100;
+                objectY = 200 - inclineLength * Math.sin(angle * Math.PI / 180) + objectRadius;
+                velocity = 0;
+                omega = 0;
+                isRacing = false;
+                startHeight = 350 - objectY;
+                updateRaceEnergyBars(100, 0, 0);
+            };
+            
+            p.draw = function() {
+                p.background(245);
+                
+                // Draw incline
+                p.push();
+                p.translate(100, 200);
+                p.rotate(angle * Math.PI / 180);
+                p.stroke(50);
+                p.strokeWeight(3);
+                p.line(0, 0, inclineLength, 0);
+                p.pop();
+                
+                // Draw ground
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.line(0, 350, p.width, 350);
+                
+                // Update physics for rolling
+                if(isRacing) {
+                    let g = 0.3;
+                    let sinTheta = Math.sin(angle * Math.PI / 180);
+                    
+                    // Acceleration for rolling object
+                    let a = g * sinTheta / (1 + momentCoeff);
+                    
+                    velocity += a;
+                    omega = velocity / objectRadius; // Rolling condition
+                    
+                    objectX += velocity * Math.cos(angle * Math.PI / 180);
+                    objectY += velocity * Math.sin(angle * Math.PI / 180);
+                    
+                    // Calculate energies
+                    let currentHeight = 350 - objectY;
+                    let pe = (currentHeight / startHeight) * 100;
+                    let totalKE = 100 - pe;
+                    
+                    // Split KE into translational and rotational
+                    let tke = totalKE / (1 + momentCoeff);
+                    let rke = totalKE * momentCoeff / (1 + momentCoeff);
+                    
+                    updateRaceEnergyBars(Math.max(0, pe), tke, rke);
+                    
+                    // Stop at bottom
+                    if(objectY >= 350 - objectRadius) {
+                        isRacing = false;
+                        objectY = 350 - objectRadius;
+                    }
+                }
+                
+                // Draw object
+                p.push();
+                p.translate(objectX, objectY);
+                p.rotate(omega * p.frameCount * 0.1);
+                
+                if(objectType === 'sphere' || objectType === 'hollow-sphere') {
+                    p.fill(objectType === 'sphere' ? [100, 150, 255] : [150, 100, 255]);
+                    p.stroke(50);
+                    p.strokeWeight(2);
+                    p.ellipse(0, 0, objectRadius * 2);
+                    if(objectType === 'hollow-sphere') {
+                        p.noFill();
+                        p.ellipse(0, 0, objectRadius * 1.4);
+                    }
+                } else {
+                    p.fill(objectType === 'cylinder' ? [255, 150, 100] : [150, 255, 100]);
+                    p.stroke(50);
+                    p.strokeWeight(2);
+                    p.rectMode(p.CENTER);
+                    p.rect(0, 0, objectRadius * 2, objectRadius * 2);
+                    if(objectType === 'hollow-cylinder') {
+                        p.noFill();
+                        p.rect(0, 0, objectRadius * 1.4, objectRadius * 1.4);
+                    }
+                }
+                
+                // Draw reference mark
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.line(0, 0, objectRadius, 0);
+                p.pop();
+                
+                // Display info
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.text(`Object: ${objectType}`, 10, 20);
+                p.text(`I = ${momentCoeff === 1 ? '' : momentCoeff === 0.5 ? '1/2' : momentCoeff === 2/3 ? '2/3' : '2/5'} MR²`, 10, 40);
+                p.text(`Velocity: ${velocity.toFixed(2)} m/s`, 10, 60);
+            };
+            
+            document.getElementById('race-reset').onclick = function() {
+                p.resetSimulation();
+            };
+            
+            document.getElementById('race-start').onclick = function() {
+                isRacing = true;
+            };
+            
+            document.getElementById('object-select').onchange = function() {
+                objectType = this.value;
+                momentCoeff = momentCoeffs[objectType];
+                p.resetSimulation();
+            };
+            
+            function updateRaceEnergyBars(pe, tke, rke) {
+                document.getElementById('race-pe-bar').style.height = pe + '%';
+                document.getElementById('race-tke-bar').style.height = tke + '%';
+                document.getElementById('race-rke-bar').style.height = rke + '%';
+                document.getElementById('race-pe-value').textContent = Math.round(pe);
+                document.getElementById('race-tke-value').textContent = Math.round(tke);
+                document.getElementById('race-rke-value').textContent = Math.round(rke);
+            }
+        };
+        
+        // Initialize all simulations
+        new p5(slideSketch);
+        new p5(inclineSketch);
+        new p5(raceSketch);
+    </script>
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

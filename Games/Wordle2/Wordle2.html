@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Word Quest - Daily Challenge</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            min-height: 100dvh;
+            padding: 5px;
+            overflow: hidden;
+        }
+        
+        #gameContainer {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+            height: 100vh;
+            height: -webkit-fill-available;
+            height: 100dvh;
+            max-height: 900px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        #header {
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        h1 {
+            color: #4a5568;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        #gameInfo {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #718096;
+        }
+        
+        #wordHints {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            background: #f0f4f8;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .hint-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .hint-label {
+            font-size: 10px;
+            color: #718096;
+            display: block;
+        }
+        
+        .hint-value {
+            font-weight: bold;
+            color: #2d3748;
+            font-size: 13px;
+        }
+        
+        #canvasContainer {
+            display: flex;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+        
+        #powerUps {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            background: #f7fafc;
+            border-radius: 8px;
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+        
+        .powerUp {
+            text-align: center;
+            cursor: pointer;
+            font-size: 11px;
+            flex: 1;
+        }
+        
+        .powerUp button {
+            background: #805ad5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 2px;
+            width: 90%;
+        }
+        
+        .powerUp button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .powerUp button.swap-button {
+            background: #f6ad55;
+        }
+        
+        #message {
+            text-align: center;
+            padding: 5px;
+            font-size: 13px;
+            color: #4a5568;
+            min-height: 25px;
+            flex-shrink: 0;
+        }
+        
+        #keyboard {
+            display: grid;
+            gap: 3px;
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+        }
+        
+        .key {
+            padding: 0;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2d3748;
+            flex: 1;
+            max-width: 40px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .key:active {
+            transform: scale(0.95);
+        }
+        
+        .key.wide {
+            max-width: 60px;
+            font-size: 11px;
+        }
+        
+        .key.not-in-word {
+            background: #a0aec0;
+            color: white;
+        }
+        
+        .key.wrong-position {
+            background: #f6ad55;
+            color: white;
+        }
+        
+        .key.correct {
+            background: #48bb78;
+            color: white;
+        }
+        
+        #bottomActions {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 5px;
+            background: #edf2f7;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        
+        #bottomActions button {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        #bottomActions span {
+            font-size: 12px;
+            color: #4a5568;
+        }
+        
+        /* Leaderboard Styles */
+        #leaderboardModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        #leaderboardContent {
+            background: white;
+            border-radius: 15px;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        #leaderboardContent h2 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .score-submission {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .score-submission input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 150px;
+            margin-right: 10px;
+        }
+        
+        .score-submission button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .score-submission button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        
+        .leaderboard-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+        
+        .leaderboard-tab {
+            padding: 6px 16px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .leaderboard-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .leaderboard-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            background: #f7fafc;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .leaderboard-entry:hover {
+            transform: translateX(5px);
+            background: #edf2f7;
+        }
+        
+        .leaderboard-entry.current-user {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+        }
+        
+        .leaderboard-entry.top-three {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+        }
+        
+        .rank {
+            font-weight: bold;
+            color: #4a5568;
+            width: 30px;
+        }
+        
+        .player-name {
+            flex: 1;
+            margin: 0 10px;
+            color: #2d3748;
+        }
+        
+        .player-score {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .close-leaderboard {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 20px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        #leaderboardButton {
+            padding: 6px 12px;
+            background: #38b2ac;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-height: 700px) {
+            h1 { font-size: 20px; margin-bottom: 3px; }
+            #gameInfo { font-size: 12px; margin-bottom: 5px; }
+            .key { height: 35px; font-size: 13px; }
+            .key.wide { font-size: 10px; }
+            #powerUps { padding: 5px; }
+            .powerUp { font-size: 10px; }
+            .powerUp button { font-size: 10px; padding: 3px 6px; }
+            #message { font-size: 12px; min-height: 20px; }
+            #wordHints { padding: 6px; }
+            .hint-label { font-size: 9px; }
+            .hint-value { font-size: 12px; }
+        }
+        
+        @media (max-height: 600px) {
+            h1 { font-size: 18px; }
+            #gameInfo { font-size: 11px; }
+            .key { height: 32px; font-size: 12px; }
+            #powerUps { padding: 4px; }
+            .powerUp { font-size: 9px; }
+            .powerUp button { font-size: 9px; padding: 2px 5px; }
+            #wordHints { padding: 5px; }
+            .hint-value { font-size: 11px; }
+        }
+        
+        @media (max-width: 360px) {
+            .key { max-width: 32px; font-size: 12px; }
+            .key.wide { max-width: 50px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="header">
+            <h1>🎯 Word Quest</h1>
+            <div id="gameInfo">
+                <span id="modeDisplay">Daily: <span id="wordCount">1/8</span></span>
+                <span>Score: <span id="score">0</span></span>
+                <span>Streak: <span id="streak">0</span></span>
+            </div>
+        </div>
+        
+        <div id="wordHints">
+            <div class="hint-item">
+                <span class="hint-label">Category</span>
+                <span class="hint-value" id="categoryDisplay">?</span>
+            </div>
+            <div class="hint-item">
+                <span class="hint-label">Vowels</span>
+                <span class="hint-value" id="vowelCount">?</span>
+            </div>
+            <div class="hint-item">
+                <span class="hint-label">Repeats</span>
+                <span class="hint-value" id="repeatDisplay">?</span>
+            </div>
+        </div>
+        
+        <div id="canvasContainer"></div>
+        
+        <div id="powerUps">
+            <div class="powerUp">
+                <div>🔤 Purchase Vowel</div>
+                <button id="revealVowel" onclick="usePowerUp('revealVowel')">Use (0)</button>
+            </div>
+            <div class="powerUp">
+                <div>❌ Remove 3</div>
+                <button id="wrongLetter" onclick="usePowerUp('wrongLetter')">Use (0)</button>
+            </div>
+            <div class="powerUp">
+                <div>🔄 Swap Try</div>
+                <button id="swapTry" class="swap-button" onclick="usePowerUp('swapTry')">Trade</button>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="keyboard">
+            <div class="keyboard-row" id="row1"></div>
+            <div class="keyboard-row" id="row2"></div>
+            <div class="keyboard-row" id="row3"></div>
+        </div>
+        
+        <div id="bottomActions">
+            <span>Best: <span id="bestScore">0</span></span>
+            <button onclick="startNewGame()">New Game</button>
+            <button id="leaderboardButton" onclick="showLeaderboard()">🏆 Leaderboard</button>
+            <span id="gameMode">Daily Mode</span>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" onclick="closeLeaderboardModal(event)">
+        <div id="leaderboardContent">
+            <h2>🏆 Daily Leaderboard</h2>
+            
+            <div class="score-submission" id="scoreSubmission" style="display: none;">
+                <div style="margin-bottom: 10px;">
+                    <strong>Your Score: <span id="submitScore">0</span></strong>
+                </div>
+                <input type="text" id="playerName" placeholder="Enter your name" maxlength="15">
+                <button onclick="submitScore()">Submit Score</button>
+            </div>
+            
+            <div class="leaderboard-tabs">
+                <button class="leaderboard-tab active" onclick="switchLeaderboardTab('today')">Today</button>
+                <button class="leaderboard-tab" onclick="switchLeaderboardTab('yesterday')">Yesterday</button>
+                <button class="leaderboard-tab" onclick="switchLeaderboardTab('alltime')">All Time Best</button>
+            </div>
+            
+            <div class="leaderboard-list" id="leaderboardList">
+                <div class="leaderboard-entry">
+                    <span style="text-align: center; width: 100%; color: #718096;">Loading leaderboard...</span>
+                </div>
+            </div>
+            
+            <button class="close-leaderboard" onclick="closeLeaderboard()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Word lists by length with categories
+        const wordLists = {
+            4: [
+                {word: 'BIRD', category: 'Animal'},
+                {word: 'TREE', category: 'Nature'},
+                {word: 'BOOK', category: 'Object'},
+                {word: 'RAIN', category: 'Weather'},
+                {word: 'FOOD', category: 'General'},
+                {word: 'GAME', category: 'Activity'},
+                {word: 'STAR', category: 'Space'},
+                {word: 'FISH', category: 'Animal'},
+                {word: 'ROAD', category: 'Place'},
+                {word: 'TIME', category: 'Concept'},
+                {word: 'CAKE', category: 'Food'},
+                {word: 'MOON', category: 'Space'},
+                {word: 'LAKE', category: 'Nature'},
+                {word: 'SHIP', category: 'Vehicle'},
+                {word: 'DESK', category: 'Furniture'}
+            ],
+            5: [
+                {word: 'HOUSE', category: 'Building'},
+                {word: 'BEACH', category: 'Place'},
+                {word: 'APPLE', category: 'Food'},
+                {word: 'CLOUD', category: 'Weather'},
+                {word: 'MUSIC', category: 'Art'},
+                {word: 'PLANT', category: 'Nature'},
+                {word: 'CHAIR', category: 'Furniture'},
+                {word: 'BREAD', category: 'Food'},
+                {word: 'LIGHT', category: 'Physics'},
+                {word: 'OCEAN', category: 'Nature'},
+                {word: 'SMILE', category: 'Expression'},
+                {word: 'PHONE', category: 'Technology'},
+                {word: 'RIVER', category: 'Nature'},
+                {word: 'STONE', category: 'Material'},
+                {word: 'TRAIN', category: 'Vehicle'}
+            ],
+            6: [
+                {word: 'GARDEN', category: 'Place'},
+                {word: 'COFFEE', category: 'Drink'},
+                {word: 'WINDOW', category: 'Building'},
+                {word: 'MARKET', category: 'Place'},
+                {word: 'SUNSET', category: 'Nature'},
+                {word: 'BRIDGE', category: 'Structure'},
+                {word: 'FLOWER', category: 'Nature'},
+                {word: 'SUMMER', category: 'Season'},
+                {word: 'FAMILY', category: 'People'},
+                {word: 'CASTLE', category: 'Building'},
+                {word: 'BUTTER', category: 'Food'},
+                {word: 'FOREST', category: 'Nature'},
+                {word: 'WINTER', category: 'Season'},
+                {word: 'STREET', category: 'Place'},
+                {word: 'FRIEND', category: 'People'}
+            ],
+            7: [
+                {word: 'LIBRARY', category: 'Building'},
+                {word: 'KITCHEN', category: 'Room'},
+                {word: 'PICTURE', category: 'Art'},
+                {word: 'JOURNEY', category: 'Travel'},
+                {word: 'WEATHER', category: 'Nature'},
+                {word: 'MORNING', category: 'Time'},
+                {word: 'HISTORY', category: 'Subject'},
+                {word: 'VILLAGE', category: 'Place'},
+                {word: 'HOLIDAY', category: 'Event'},
+                {word: 'BLANKET', category: 'Object'},
+                {word: 'COUNTRY', category: 'Place'},
+                {word: 'CHICKEN', category: 'Animal'},
+                {word: 'DANCING', category: 'Activity'},
+                {word: 'EVENING', category: 'Time'},
+                {word: 'PARKING', category: 'Place'}
+            ]
+        };
+
+        // Game state
+        let gameState = {
+            currentWord: '',
+            currentCategory: '',
+            currentLength: 4,
+            attempts: [],
+            maxAttempts: 4,
+            currentAttempt: '',
+            gameOver: false,
+            dailyWordIndex: 0,
+            totalWords: 8,
+            score: 0,
+            streak: 0,
+            powerUps: {
+                revealVowel: 0,
+                wrongLetter: 0
+            },
+            usedSwapTry: false,
+            keyboardState: {},
+            dailySeed: 0,
+            revealedVowels: [],
+            eliminatedLetters: [],
+            isRandomMode: false,
+            dailyCompleted: false,
+            randomWordsPlayed: 0,
+            lastStreakGuesses: 0
+        };
+
+        // Get daily seed for consistent daily challenges
+        function getDailySeed() {
+            const today = new Date();
+            return today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+        }
+
+        // Seeded random for consistent daily challenges
+        function seededRandom(seed) {
+            const x = Math.sin(seed) * 10000;
+            return x - Math.floor(x);
+        }
+
+        // Get daily word based on index
+        function getDailyWord(index) {
+            const seed = getDailySeed() + index;
+            const lengths = [4, 4, 5, 5, 6, 6, 7, 7];
+            const length = lengths[index];
+            const list = wordLists[length];
+            const wordIndex = Math.floor(seededRandom(seed) * list.length);
+            return list[wordIndex];
+        }
+
+        // Get random word
+        function getRandomWord() {
+            const lengths = [4, 5, 6, 7];
+            const length = lengths[Math.floor(Math.random() * lengths.length)];
+            const list = wordLists[length];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        // Update word hints display
+        function updateWordHints() {
+            // Category
+            document.getElementById('categoryDisplay').textContent = gameState.currentCategory;
+            
+            // Vowel count
+            const vowels = 'AEIOU';
+            const vowelCount = gameState.currentWord.split('').filter(l => vowels.includes(l)).length;
+            document.getElementById('vowelCount').textContent = vowelCount;
+            
+            // Check for repeated letters
+            const letterCounts = {};
+            for (let letter of gameState.currentWord) {
+                letterCounts[letter] = (letterCounts[letter] || 0) + 1;
+            }
+            const hasRepeats = Object.values(letterCounts).some(count => count > 1);
+            document.getElementById('repeatDisplay').textContent = hasRepeats ? 'Yes' : 'No';
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const saved = localStorage.getItem('wordQuestState');
+            const savedDate = localStorage.getItem('wordQuestDate');
+            const currentDate = getDailySeed();
+            const completedToday = localStorage.getItem('wordQuestCompletedDate');
+            
+            if (completedToday == currentDate) {
+                // Daily challenge already completed today
+                gameState.isRandomMode = true;
+                gameState.dailyCompleted = true;
+                gameState.score = 0;
+                gameState.streak = 0;
+                gameState.powerUps = {
+                    revealVowel: 1,
+                    wrongLetter: 0
+                };
+                gameState.lastStreakGuesses = 0;
+                startRandomMode();
+            } else if (saved && savedDate == currentDate && !JSON.parse(saved).dailyCompleted) {
+                // Continue daily challenge
+                gameState = JSON.parse(saved);
+                updateWordHints();
+                updateUI();
+            } else {
+                // New day, start fresh daily challenge
+                localStorage.setItem('wordQuestDate', currentDate);
+                gameState.dailySeed = currentDate;
+                
+                // Give one random power-up to start
+                const powerTypes = ['revealVowel', 'wrongLetter'];
+                const randomPower = powerTypes[Math.floor(Math.random() * powerTypes.length)];
+                gameState.powerUps[randomPower] = 1;
+                gameState.lastStreakGuesses = 0;
+                
+                startNextWord();
+            }
+            
+            updateUI();
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            localStorage.setItem('wordQuestState', JSON.stringify(gameState));
+            localStorage.setItem('wordQuestDate', getDailySeed());
+        }
+
+        // Reset keyboard colors
+        function resetKeyboard() {
+            gameState.keyboardState = {};
+            document.querySelectorAll('.key').forEach(key => {
+                if (!key.textContent.includes('ENTER') && key.textContent !== '⌫') {
+                    key.className = 'key';
+                }
+            });
+        }
+
+        // Start next word in daily challenge
+        function startNextWord() {
+            if (gameState.isRandomMode) {
+                startRandomMode();
+                return;
+            }
+            
+            if (gameState.dailyWordIndex < gameState.totalWords) {
+                const wordData = getDailyWord(gameState.dailyWordIndex);
+                gameState.currentWord = wordData.word;
+                gameState.currentCategory = wordData.category;
+                gameState.currentLength = wordData.word.length;
+                gameState.maxAttempts = gameState.currentLength;
+                gameState.attempts = [];
+                gameState.currentAttempt = '';
+                gameState.gameOver = false;
+                gameState.usedSwapTry = false;
+                gameState.revealedVowels = [];
+                gameState.eliminatedLetters = [];
+                
+                resetKeyboard();
+                updateWordHints();
+                updateUI();
+                saveGameState();
+            } else {
+                // Daily challenge complete
+                showFinalScore();
+                gameState.dailyCompleted = true;
+                gameState.isRandomMode = true;
+                localStorage.setItem('wordQuestCompletedDate', getDailySeed());
+                saveGameState();
+                setTimeout(() => startRandomMode(), 3000);
+            }
+        }
+
+        // Start random mode
+        function startRandomMode() {
+            const wordData = getRandomWord();
+            gameState.currentWord = wordData.word;
+            gameState.currentCategory = wordData.category;
+            gameState.currentLength = wordData.word.length;
+            gameState.maxAttempts = gameState.currentLength;
+            gameState.attempts = [];
+            gameState.currentAttempt = '';
+            gameState.gameOver = false;
+            gameState.usedSwapTry = false;
+            gameState.revealedVowels = [];
+            gameState.eliminatedLetters = [];
+            gameState.randomWordsPlayed++;
+            
+            resetKeyboard();
+            updateWordHints();
+            updateUI();
+        }
+
+        // Initialize keyboard
+        function initKeyboard() {
+            const row1 = document.getElementById('row1');
+            const row2 = document.getElementById('row2');
+            const row3 = document.getElementById('row3');
+            
+            const rows = [
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫']
+            ];
+            
+            rows[0].forEach(letter => {
+                const key = document.createElement('button');
+                key.className = 'key';
+                key.textContent = letter;
+                key.id = `key-${letter}`;
+                key.onclick = () => addLetter(letter);
+                row1.appendChild(key);
+            });
+            
+            rows[1].forEach(letter => {
+                const key = document.createElement('button');
+                key.className = 'key';
+                key.textContent = letter;
+                key.id = `key-${letter}`;
+                key.onclick = () => addLetter(letter);
+                row2.appendChild(key);
+            });
+            
+            rows[2].forEach(letter => {
+                const key = document.createElement('button');
+                if (letter === 'ENTER') {
+                    key.className = 'key wide';
+                    key.onclick = () => submitGuess();
+                } else if (letter === '⌫') {
+                    key.className = 'key wide';
+                    key.onclick = () => deleteLetter();
+                } else {
+                    key.className = 'key';
+                    key.id = `key-${letter}`;
+                    key.onclick = () => addLetter(letter);
+                }
+                key.textContent = letter;
+                row3.appendChild(key);
+            });
+        }
+
+        // Add letter to current attempt
+        function addLetter(letter) {
+            if (!gameState.gameOver && gameState.currentAttempt.length < gameState.currentLength) {
+                gameState.currentAttempt += letter;
+                updateDisplay();
+            }
+        }
+
+        // Delete last letter
+        function deleteLetter() {
+            if (!gameState.gameOver && gameState.currentAttempt.length > 0) {
+                gameState.currentAttempt = gameState.currentAttempt.slice(0, -1);
+                updateDisplay();
+            }
+        }
+
+        // Submit guess
+        function submitGuess() {
+            if (gameState.gameOver) return;
+            if (gameState.currentAttempt.length !== gameState.currentLength) {
+                showMessage('Word must be ' + gameState.currentLength + ' letters');
+                return;
+            }
+            
+            const guess = gameState.currentAttempt;
+            const result = checkGuess(guess);
+            gameState.attempts.push({guess, result});
+            
+            updateKeyboardState(guess, result);
+            gameState.currentAttempt = '';
+            
+            if (guess === gameState.currentWord) {
+                const attemptsUsed = gameState.attempts.length;
+                const baseScore = gameState.currentLength * 10;
+                const attemptBonus = (gameState.maxAttempts - attemptsUsed + 1) * 5;
+                const roundScore = baseScore + attemptBonus;
+                
+                if (!gameState.isRandomMode) {
+                    gameState.score += roundScore;
+                    
+                    // Check for streak - need N-2 or fewer attempts twice in a row
+                    if (attemptsUsed <= gameState.maxAttempts - 2) {
+                        if (gameState.lastStreakGuesses > 0 && gameState.lastStreakGuesses <= gameState.maxAttempts - 2) {
+                            // This is consecutive N-2 or better solve
+                            gameState.streak = 2;  // Show streak of 2 when earned
+                            earnPowerUp();
+                            gameState.lastStreakGuesses = 0;  // Reset after earning
+                        } else {
+                            // First N-2 solve, waiting for second
+                            gameState.lastStreakGuesses = attemptsUsed;
+                            gameState.streak = 1;
+                        }
+                    } else {
+                        gameState.lastStreakGuesses = 0;
+                        gameState.streak = 0;
+                    }
+                }
+                
+                showMessage(`Excellent! +${roundScore} points`);
+                gameState.gameOver = true;
+                setTimeout(() => {
+                    if (!gameState.isRandomMode) {
+                        gameState.dailyWordIndex++;
+                    }
+                    startNextWord();
+                }, 2000);
+            } else if (gameState.attempts.length >= gameState.maxAttempts) {
+                showMessage(`The word was: ${gameState.currentWord}`);
+                gameState.gameOver = true;
+                gameState.streak = 0;
+                gameState.lastStreakGuesses = 0;
+                setTimeout(() => {
+                    if (!gameState.isRandomMode) {
+                        gameState.dailyWordIndex++;
+                    }
+                    startNextWord();
+                }, 3000);
+            }
+            
+            updateDisplay();
+            if (!gameState.isRandomMode) {
+                saveGameState();
+            }
+        }
+
+        // Check guess against target word
+        function checkGuess(guess) {
+            const result = [];
+            const targetLetters = gameState.currentWord.split('');
+            const guessLetters = guess.split('');
+            
+            // First pass: mark correct positions
+            for (let i = 0; i < guessLetters.length; i++) {
+                if (guessLetters[i] === targetLetters[i]) {
+                    result[i] = 'correct';
+                    targetLetters[i] = null;
+                }
+            }
+            
+            // Second pass: mark wrong positions
+            for (let i = 0; i < guessLetters.length; i++) {
+                if (result[i]) continue;
+                
+                const index = targetLetters.indexOf(guessLetters[i]);
+                if (index !== -1) {
+                    result[i] = 'wrong-position';
+                    targetLetters[index] = null;
+                } else {
+                    result[i] = 'not-in-word';
+                }
+            }
+            
+            return result;
+        }
+
+        // Update keyboard colors
+        function updateKeyboardState(guess, result) {
+            for (let i = 0; i < guess.length; i++) {
+                const letter = guess[i];
+                const key = document.getElementById(`key-${letter}`);
+                if (!key) continue;
+                
+                const currentState = gameState.keyboardState[letter];
+                const newState = result[i];
+                
+                if (newState === 'correct' || 
+                    (newState === 'wrong-position' && currentState !== 'correct') ||
+                    (!currentState)) {
+                    gameState.keyboardState[letter] = newState;
+                    key.className = `key ${newState}`;
+                }
+            }
+        }
+
+        // Power-up functions
+        function usePowerUp(type) {
+            if (gameState.gameOver) return;
+            
+            if (type === 'swapTry' && !gameState.usedSwapTry && gameState.attempts.length < gameState.maxAttempts - 1) {
+                gameState.usedSwapTry = true;
+                gameState.maxAttempts--;
+                const types = ['revealVowel', 'wrongLetter'];
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                if (gameState.powerUps[randomType] < 3) {
+                    gameState.powerUps[randomType]++;
+                    showMessage(`Traded for ${randomType === 'revealVowel' ? 'Purchase Vowel' : 'Remove 3'}!`);
+                }
+                updateDisplay();
+            } else if (gameState.powerUps[type] > 0) {
+                gameState.powerUps[type]--;
+                
+                if (type === 'revealVowel') {
+                    const vowels = 'AEIOU';
+                    const wordVowels = gameState.currentWord.split('').filter(l => vowels.includes(l));
+                    const unrevealedVowels = wordVowels.filter(v => !gameState.revealedVowels.includes(v));
+                    if (unrevealedVowels.length > 0) {
+                        const vowel = unrevealedVowels[Math.floor(Math.random() * unrevealedVowels.length)];
+                        const position = gameState.currentWord.indexOf(vowel) + 1;
+                        gameState.revealedVowels.push(vowel);
+                        showMessage(`Vowel '${vowel}' is at position ${position}`);
+                    }
+                } else if (type === 'wrongLetter') {
+                    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    const notInWord = alphabet.split('').filter(l => 
+                        !gameState.currentWord.includes(l) && 
+                        !gameState.eliminatedLetters.includes(l)
+                    );
+                    const toEliminate = notInWord.slice(0, 3);
+                    gameState.eliminatedLetters.push(...toEliminate);
+                    showMessage(`Not in word: ${toEliminate.join(', ')}`);
+                    
+                    // Update keyboard
+                    toEliminate.forEach(letter => {
+                        const key = document.getElementById(`key-${letter}`);
+                        if (key) {
+                            key.className = 'key not-in-word';
+                            gameState.keyboardState[letter] = 'not-in-word';
+                        }
+                    });
+                }
+            }
+            
+            updateUI();
+            if (!gameState.isRandomMode) {
+                saveGameState();
+            }
+        }
+
+        // Earn power-up for streak
+        function earnPowerUp() {
+            const types = ['revealVowel', 'wrongLetter'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            if (gameState.powerUps[type] < 3) {
+                gameState.powerUps[type]++;
+                showMessage(`Streak bonus! Earned ${type === 'revealVowel' ? 'Purchase Vowel' : 'Remove 3'}!`);
+            }
+        }
+
+        // Show message
+        function showMessage(text) {
+            document.getElementById('message').textContent = text;
+            setTimeout(() => {
+                document.getElementById('message').textContent = '';
+            }, 3000);
+        }
+
+        // Update UI
+        function updateUI() {
+            if (gameState.isRandomMode) {
+                document.getElementById('modeDisplay').innerHTML = `Random #${gameState.randomWordsPlayed}`;
+                document.getElementById('gameMode').textContent = 'Random Mode';
+            } else {
+                document.getElementById('modeDisplay').innerHTML = `Daily: <span id="wordCount">${gameState.dailyWordIndex + 1}/${gameState.totalWords}</span>`;
+                document.getElementById('gameMode').textContent = 'Daily Mode';
+            }
+            
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('streak').textContent = gameState.streak;
+            
+            document.getElementById('revealVowel').textContent = `Use (${gameState.powerUps.revealVowel})`;
+            document.getElementById('revealVowel').disabled = gameState.powerUps.revealVowel === 0;
+            
+            document.getElementById('wrongLetter').textContent = `Use (${gameState.powerUps.wrongLetter})`;
+            document.getElementById('wrongLetter').disabled = gameState.powerUps.wrongLetter === 0;
+            
+            document.getElementById('swapTry').disabled = gameState.usedSwapTry || gameState.attempts.length >= gameState.maxAttempts - 1;
+            
+            const bestScore = localStorage.getItem('wordQuestBestScore') || 0;
+            document.getElementById('bestScore').textContent = bestScore;
+            
+            updateDisplay();
+        }
+
+        // Show final score
+        function showFinalScore() {
+            const bestScore = localStorage.getItem('wordQuestBestScore') || 0;
+            if (gameState.score > bestScore) {
+                localStorage.setItem('wordQuestBestScore', gameState.score);
+            }
+            
+            showMessage(`Daily Complete! Score: ${gameState.score}. Play random words!`);
+            
+            // Show leaderboard with submission option
+            setTimeout(() => {
+                showLeaderboard(true);
+            }, 1000);
+        }
+        
+        // LEADERBOARD FUNCTIONS
+        
+        // Backend API configuration
+        // TO CONNECT TO REAL BACKEND:
+        // Replace these URLs with your actual API endpoints
+        const LEADERBOARD_API = {
+            submit: 'https://your-backend.com/api/leaderboard/submit',  // POST endpoint
+            today: 'https://your-backend.com/api/leaderboard/today',     // GET endpoint
+            yesterday: 'https://your-backend.com/api/leaderboard/yesterday', // GET endpoint
+            alltime: 'https://your-backend.com/api/leaderboard/alltime'  // GET endpoint
+        };
+        
+        let currentLeaderboardTab = 'today';
+        let hasSubmittedScore = false;
+        
+        // Show leaderboard modal
+        function showLeaderboard(showSubmission = false) {
+            const modal = document.getElementById('leaderboardModal');
+            const submission = document.getElementById('scoreSubmission');
+            
+            modal.style.display = 'block';
+            
+            // Check if user completed daily challenge today
+            const completedDate = localStorage.getItem('wordQuestCompletedDate');
+            const submittedDate = localStorage.getItem('wordQuestSubmittedDate');
+            const currentDate = getDailySeed();
+            
+            if (showSubmission && completedDate == currentDate && submittedDate != currentDate && !gameState.isRandomMode) {
+                submission.style.display = 'block';
+                document.getElementById('submitScore').textContent = gameState.score;
+                
+                // Load saved name if exists
+                const savedName = localStorage.getItem('wordQuestPlayerName');
+                if (savedName) {
+                    document.getElementById('playerName').value = savedName;
+                }
+            } else {
+                submission.style.display = 'none';
+            }
+            
+            loadLeaderboard('today');
+        }
+        
+        // Close leaderboard modal
+        function closeLeaderboard() {
+            document.getElementById('leaderboardModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        function closeLeaderboardModal(event) {
+            if (event.target.id === 'leaderboardModal') {
+                closeLeaderboard();
+            }
+        }
+        
+        // Switch leaderboard tabs
+        function switchLeaderboardTab(tab) {
+            currentLeaderboardTab = tab;
+            
+            // Update active tab
+            document.querySelectorAll('.leaderboard-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            loadLeaderboard(tab);
+        }
+        
+        // Load leaderboard data
+        async function loadLeaderboard(type) {
+            const list = document.getElementById('leaderboardList');
+            
+            // FOR REAL IMPLEMENTATION:
+            // Uncomment this code and remove the mock data below
+            /*
+            try {
+                const response = await fetch(LEADERBOARD_API[type]);
+                const data = await response.json();
+                displayLeaderboard(data);
+            } catch (error) {
+                console.error('Failed to load leaderboard:', error);
+                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #e53e3e;">Failed to load leaderboard</span></div>';
+            }
+            */
+            
+            // MOCK DATA for demonstration
+            // Remove this when connecting to real backend
+            const mockData = getMockLeaderboardData(type);
+            displayLeaderboard(mockData);
+        }
+        
+        // Display leaderboard entries
+        function displayLeaderboard(data) {
+            const list = document.getElementById('leaderboardList');
+            const currentPlayerName = localStorage.getItem('wordQuestPlayerName');
+            
+            if (!data || data.length === 0) {
+                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #718096;">No scores yet. Be the first!</span></div>';
+                return;
+            }
+            
+            list.innerHTML = data.map((entry, index) => {
+                const rank = index + 1;
+                const isCurrentUser = entry.name === currentPlayerName && entry.date === getDailySeed();
+                const isTopThree = rank <= 3;
+                
+                let rankDisplay = rank;
+                if (rank === 1) rankDisplay = '🥇';
+                else if (rank === 2) rankDisplay = '🥈';
+                else if (rank === 3) rankDisplay = '🥉';
+                
+                return `
+                    <div class="leaderboard-entry ${isCurrentUser ? 'current-user' : ''} ${isTopThree && !isCurrentUser ? 'top-three' : ''}">
+                        <span class="rank">${rankDisplay}</span>
+                        <span class="player-name">${entry.name}</span>
+                        <span class="player-score">${entry.score}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Submit score to leaderboard
+        async function submitScore() {
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            if (!playerName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            if (playerName.length < 2) {
+                alert('Name must be at least 2 characters');
+                return;
+            }
+            
+            // Save player name for future
+            localStorage.setItem('wordQuestPlayerName', playerName);
+            localStorage.setItem('wordQuestSubmittedDate', getDailySeed());
+            
+            const scoreData = {
+                name: playerName,
+                score: gameState.score,
+                date: getDailySeed(),
+                words: gameState.dailyWordIndex,
+                timestamp: Date.now()
+            };
+            
+            // FOR REAL IMPLEMENTATION:
+            // Uncomment this code to submit to real backend
+            /*
+            try {
+                const response = await fetch(LEADERBOARD_API.submit, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(scoreData)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('scoreSubmission').style.display = 'none';
+                    hasSubmittedScore = true;
+                    loadLeaderboard('today');
+                    showMessage('Score submitted successfully!');
+                } else {
+                    alert('Failed to submit score. Please try again.');
+                }
+            } catch (error) {
+                console.error('Failed to submit score:', error);
+                alert('Failed to submit score. Please try again.');
+            }
+            */
+            
+            // MOCK IMPLEMENTATION for demonstration
+            // Remove this when connecting to real backend
+            addMockScore(scoreData);
+            document.getElementById('scoreSubmission').style.display = 'none';
+            hasSubmittedScore = true;
+            loadLeaderboard('today');
+            showMessage('Score submitted successfully!');
+        }
+        
+        // MOCK DATA FUNCTIONS - Remove these when implementing real backend
+        function getMockLeaderboardData(type) {
+            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
+            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
+            
+            const today = getDailySeed();
+            const yesterday = today - 1;
+            
+            if (type === 'today') {
+                return allScores.filter(s => s.date === today).sort((a, b) => b.score - a.score).slice(0, 50);
+            } else if (type === 'yesterday') {
+                return allScores.filter(s => s.date === yesterday).sort((a, b) => b.score - a.score).slice(0, 50);
+            } else {
+                // All time best - group by player and take their best score
+                const bestScores = {};
+                allScores.forEach(score => {
+                    if (!bestScores[score.name] || bestScores[score.name].score < score.score) {
+                        bestScores[score.name] = score;
+                    }
+                });
+                return Object.values(bestScores).sort((a, b) => b.score - a.score).slice(0, 50);
+            }
+        }
+        
+        function addMockScore(scoreData) {
+            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
+            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
+            allScores.push(scoreData);
+            localStorage.setItem('wordQuestMockLeaderboard', JSON.stringify(allScores));
+        }
+        
+        function getDefaultMockScores() {
+            const today = getDailySeed();
+            const yesterday = today - 1;
+            
+            return [
+                // Today's scores
+                { name: 'WordMaster', score: 385, date: today },
+                { name: 'Sarah', score: 360, date: today },
+                { name: 'Mike_123', score: 340, date: today },
+                { name: 'GrannySmith', score: 320, date: today },
+                { name: 'Bob', score: 295, date: today },
+                { name: 'Alice', score: 280, date: today },
+                { name: 'Charlie', score: 265, date: today },
+                { name: 'Diana', score: 250, date: today },
+                
+                // Yesterday's scores
+                { name: 'PuzzlePro', score: 390, date: yesterday },
+                { name: 'Emma', score: 375, date: yesterday },
+                { name: 'David', score: 355, date: yesterday },
+                { name: 'Sophie', score: 330, date: yesterday },
+                { name: 'Tom', score: 310, date: yesterday },
+                { name: 'Lucy', score: 290, date: yesterday },
+                
+                // Older scores for all-time
+                { name: 'Champion', score: 410, date: today - 7 },
+                { name: 'Legend27', score: 405, date: today - 14 },
+                { name: 'MasterMind', score: 395, date: today - 21 }
+            ];
+        }
+
+        // Start new game
+        function startNewGame() {
+            const completedToday = localStorage.getItem('wordQuestCompletedDate');
+            const currentDate = getDailySeed();
+            
+            if (completedToday == currentDate) {
+                // Can only play random mode today
+                gameState.isRandomMode = true;
+                gameState.dailyCompleted = true;
+                gameState.randomWordsPlayed = 0;
+                gameState.score = 0;
+                gameState.streak = 0;
+                gameState.powerUps = {
+                    revealVowel: 1,
+                    wrongLetter: 0
+                };
+                gameState.lastStreakGuesses = 0;
+                startRandomMode();
+            } else {
+                // Start fresh daily challenge
+                gameState = {
+                    currentWord: '',
+                    currentCategory: '',
+                    currentLength: 4,
+                    attempts: [],
+                    maxAttempts: 4,
+                    currentAttempt: '',
+                    gameOver: false,
+                    dailyWordIndex: 0,
+                    totalWords: 8,
+                    score: 0,
+                    streak: 0,
+                    powerUps: {
+                        revealVowel: 0,
+                        wrongLetter: 0
+                    },
+                    usedSwapTry: false,
+                    keyboardState: {},
+                    dailySeed: getDailySeed(),
+                    revealedVowels: [],
+                    eliminatedLetters: [],
+                    isRandomMode: false,
+                    dailyCompleted: false,
+                    randomWordsPlayed: 0,
+                    lastStreakGuesses: 0
+                };
+                
+                // Give one random power-up to start
+                const powerTypes = ['revealVowel', 'wrongLetter'];
+                const randomPower = powerTypes[Math.floor(Math.random() * powerTypes.length)];
+                gameState.powerUps[randomPower] = 1;
+                gameState.lastStreakGuesses = 0;
+                
+                startNextWord();
+            }
+        }
+
+        // p5.js sketch for game display
+        let sketch = function(p) {
+            let canvasHeight;
+            
+            p.setup = function() {
+                canvasHeight = Math.min(200, window.innerHeight * 0.28);
+                const canvas = p.createCanvas(p.min(460, window.innerWidth - 20), canvasHeight);
+                canvas.parent('canvasContainer');
+                p.textAlign(p.CENTER, p.CENTER);
+                p.noLoop();
+            };
+
+            p.draw = function() {
+                p.background(247, 250, 252);
+                
+                if (!gameState.currentWord) return;
+                
+                const boxSize = p.min(38, (p.width - 20) / gameState.currentLength, (canvasHeight - 40) / gameState.maxAttempts);
+                const startX = (p.width - (boxSize * gameState.currentLength + 4 * (gameState.currentLength - 1))) / 2;
+                const startY = 10;
+                
+                // Draw previous attempts
+                for (let row = 0; row < gameState.attempts.length; row++) {
+                    const attempt = gameState.attempts[row];
+                    for (let col = 0; col < gameState.currentLength; col++) {
+                        const x = startX + col * (boxSize + 4);
+                        const y = startY + row * (boxSize + 4);
+                        
+                        // Box color based on result
+                        if (attempt.result[col] === 'correct') {
+                            p.fill(72, 187, 120);
+                        } else if (attempt.result[col] === 'wrong-position') {
+                            p.fill(246, 173, 85);
+                        } else {
+                            p.fill(160, 174, 192);
+                        }
+                        
+                        p.noStroke();
+                        p.rect(x, y, boxSize, boxSize, 6);
+                        p.fill(255);
+                        p.textSize(boxSize * 0.5);
+                        p.text(attempt.guess[col], x + boxSize/2, y + boxSize/2);
+                    }
+                }
+                
+                // Draw current attempt
+                if (!gameState.gameOver && gameState.attempts.length < gameState.maxAttempts) {
+                    const row = gameState.attempts.length;
+                    for (let col = 0; col < gameState.currentLength; col++) {
+                        const x = startX + col * (boxSize + 4);
+                        const y = startY + row * (boxSize + 4);
+                        
+                        p.fill(255);
+                        p.stroke(203, 213, 224);
+                        p.strokeWeight(2);
+                        p.rect(x, y, boxSize, boxSize, 6);
+                        
+                        if (col < gameState.currentAttempt.length) {
+                            p.fill(45, 55, 72);
+                            p.noStroke();
+                            p.textSize(boxSize * 0.5);
+                            p.text(gameState.currentAttempt[col], x + boxSize/2, y + boxSize/2);
+                        }
+                    }
+                }
+                
+                // Draw remaining empty rows
+                for (let row = gameState.attempts.length + 1; row < gameState.maxAttempts; row++) {
+                    for (let col = 0; col < gameState.currentLength; col++) {
+                        const x = startX + col * (boxSize + 4);
+                        const y = startY + row * (boxSize + 4);
+                        
+                        p.fill(237, 242, 247);
+                        p.noStroke();
+                        p.rect(x, y, boxSize, boxSize, 6);
+                    }
+                }
+                
+                // Draw vowel match feedback for last guess
+                const feedbackY = startY + gameState.maxAttempts * (boxSize + 4) + 10;
+                if (gameState.attempts.length > 0) {
+                    const lastAttempt = gameState.attempts[gameState.attempts.length - 1];
+                    const vowels = 'AEIOU';
+                    const guessVowels = lastAttempt.guess.split('').filter(l => vowels.includes(l));
+                    const targetVowels = gameState.currentWord.split('').filter(l => vowels.includes(l));
+                    const correctVowels = guessVowels.filter(v => targetVowels.includes(v)).length;
+                    
+                    p.fill(113, 128, 150);
+                    p.textSize(11);
+                    p.text(`Vowels matched in last guess: ${correctVowels}`, p.width/2, feedbackY);
+                }
+            };
+        };
+
+        // Update display
+        function updateDisplay() {
+            if (window.myp5) {
+                window.myp5.redraw();
+            }
+        }
+
+        // Initialize game
+        window.onload = function() {
+            window.myp5 = new p5(sketch);
+            initKeyboard();
+            loadGameState();
+            
+            // Keyboard input
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    submitGuess();
+                } else if (e.key === 'Backspace') {
+                    deleteLetter();
+                } else if (e.key.match(/^[a-zA-Z]$/)) {
+                    addLetter(e.key.toUpperCase());
+                }
+            });
+        };
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.myp5) {
+                const canvasHeight = Math.min(200, window.innerHeight * 0.28);
+                window.myp5.resizeCanvas(
+                    Math.min(460, window.innerWidth - 20), 
+                    canvasHeight
+                );
+                updateDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
