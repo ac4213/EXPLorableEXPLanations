@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinematics of 2D Mechanisms - Interactive Lecture</title>
+    
+    <!-- Import p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    
+    <style>
+        /* Additional styles specific to this page */
+        .simulation-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .control-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+
+        input[type="checkbox"] {
+            margin-left: 5px;
+        }
+
+        .value-display {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .diagram-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .practice-problems {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .toggle-section {
+            cursor: pointer;
+            color: var(--link-color);
+            font-weight: bold;
+        }
+
+        .toggle-section:hover {
+            text-decoration: underline;
+            color: var(--link-hover-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .quiz-container {
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .quiz-question h3 {
+            margin-bottom: 10px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-options label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .quiz-options label:hover {
+            background-color: #e6f7ff;
+        }
+
+        .quiz-options input {
+            margin-right: 10px;
+        }
+
+        #submit-quiz {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submit-quiz:hover {
+            background-color: var(--secondary-color);
+        }
+
+        #quiz-results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        #quiz-results p {
+            margin: 5px 0;
+        }
+
+        .pause-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .pause-button.paused {
+            background-color: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            input[type="range"] {
+                width: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            input[type="range"] {
+                width: 150px;
+            }
+            
+            .control-group {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Kinematics of 2D Mechanisms</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Introduction to Mechanism Kinematics</h2>
+        <p>Mechanism kinematics is the study of motion in mechanical systems without considering the forces that cause the motion. Understanding the position, velocity, and acceleration of mechanism components is crucial for designing efficient machines and predicting their behaviour.</p>
+        
+        <div class="key-point">
+            <p><strong>Key Concept:</strong> Kinematics analysis allows engineers to:</p>
+            <ul>
+                <li>Determine the motion paths of mechanism components</li>
+                <li>Calculate velocities and accelerations at any instant</li>
+                <li>Identify singularities and dead points</li>
+                <li>Optimise mechanism design for specific motion requirements</li>
+            </ul>
+        </div>
+
+        <h3>Types of Motion in Mechanisms</h3>
+        <ul>
+            <li><strong>Pure Translation:</strong> All points on the body move in parallel paths</li>
+            <li><strong>Pure Rotation:</strong> All points rotate about a fixed axis</li>
+            <li><strong>General Plane Motion:</strong> Combination of translation and rotation</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Position Analysis</h2>
+        
+        <h3>Position Equations</h3>
+        <p>The position of any point in a mechanism can be determined using vector loop equations. For a mechanism with rigid links, we can write:</p>
+        
+        <div class="equation-box">
+            <p>Loop closure equation:</p>
+            <p>\(\sum_{i=1}^{n} \vec{r}_i = 0\)</p>
+            <p>Where \(\vec{r}_i\) represents the position vector of link \(i\)</p>
+        </div>
+        
+        <p>For a point A on a rigid body rotating about point O:</p>
+        <div class="equation-box">
+            <p>\(\vec{r}_A = \vec{r}_O + \vec{r}_{A/O}\)</p>
+            <p>In component form:</p>
+            <p>\(x_A = x_O + r_{AO} \cos(\theta)\)</p>
+            <p>\(y_A = y_O + r_{AO} \sin(\theta)\)</p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Position Diagrams:</strong> Graphical representations showing the instantaneous configuration of all links and joints in a mechanism. These diagrams are essential for visualising the mechanism's geometry and identifying potential interference or collision points.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Velocity Analysis</h2>
+        
+        <h3>Derivation of Velocity Equations</h3>
+        <p>Taking the time derivative of the position equation gives us the velocity relationship:</p>
+        
+        <div class="equation-box">
+            <p>General velocity equation for point A on a rigid body:</p>
+            <p>\(\vec{v}_A = \vec{v}_O + \vec{\omega} \times \vec{r}_{A/O}\)</p>
+            <p>In 2D mechanisms, this simplifies to:</p>
+            <p>\(\vec{v}_A = \vec{v}_O + \omega \hat{k} \times \vec{r}_{A/O}\)</p>
+            <p>Where:
+            <ul>
+                <li>\(\vec{v}_O\) = velocity of reference point O</li>
+                <li>\(\omega\) = angular velocity of the body</li>
+                <li>\(\vec{r}_{A/O}\) = position vector from O to A</li>
+            </ul>
+            </p>
+        </div>
+        
+        <h3>Velocity Diagrams</h3>
+        <p>Velocity diagrams (hodographs) are graphical constructions that represent the velocity vectors of different points in a mechanism. These diagrams follow specific rules:</p>
+        <ul>
+            <li>Velocities are drawn to scale from a common origin (velocity pole)</li>
+            <li>The velocity difference between two points on the same rigid body is perpendicular to the line joining them</li>
+            <li>The magnitude of relative velocity equals \(\omega \times r\)</li>
+        </ul>
+        
+        <div class="key-point">
+            <p><strong>Instantaneous Centre of Rotation:</strong> For any rigid body in plane motion, there exists a point (which may be outside the body) that has zero velocity at that instant. All other points appear to rotate about this instantaneous centre.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Acceleration Analysis</h2>
+        
+        <h3>Derivation of Acceleration Equations</h3>
+        <p>Taking the time derivative of the velocity equation yields the acceleration relationship:</p>
+        
+        <div class="equation-box">
+            <p>General acceleration equation for point A:</p>
+            <p>\(\vec{a}_A = \vec{a}_O + \vec{\alpha} \times \vec{r}_{A/O} + \vec{\omega} \times (\vec{\omega} \times \vec{r}_{A/O})\)</p>
+            <p>Breaking into components:</p>
+            <p>\(\vec{a}_A = \vec{a}_O + \vec{a}_{A/O}^{tangential} + \vec{a}_{A/O}^{centripetal}\)</p>
+            <p>Where:
+            <ul>
+                <li>\(\vec{a}_{A/O}^{tangential} = \alpha \hat{k} \times \vec{r}_{A/O}\) (perpendicular to \(\vec{r}_{A/O}\))</li>
+                <li>\(\vec{a}_{A/O}^{centripetal} = -\omega^2 \vec{r}_{A/O}\) (towards centre O)</li>
+                <li>\(\alpha\) = angular acceleration = \(\dot{\omega}\)</li>
+            </ul>
+            </p>
+        </div>
+        
+        <h3>Components of Acceleration</h3>
+        <p>The total acceleration consists of:</p>
+        <ul>
+            <li><strong>Tangential component:</strong> Due to angular acceleration, causes change in speed</li>
+            <li><strong>Centripetal component:</strong> Due to angular velocity, causes change in direction</li>
+        </ul>
+        
+        <div class="key-point">
+            <p><strong>Important:</strong> Even at constant angular velocity (\(\alpha = 0\)), points on rotating bodies experience centripetal acceleration directed towards the centre of rotation.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Relative Motion Analysis</h2>
+        
+        <h3>Relative Velocity and Acceleration</h3>
+        <p>When analysing mechanisms with sliding joints or multiple moving reference frames, we must consider relative motion:</p>
+        
+        <div class="equation-box">
+            <p>Relative velocity equation:</p>
+            <p>\(\vec{v}_A = \vec{v}_B + \vec{v}_{A/B}\)</p>
+            <p>Relative acceleration equation:</p>
+            <p>\(\vec{a}_A = \vec{a}_B + \vec{a}_{A/B} + \vec{a}_{Coriolis}\)</p>
+        </div>
+        
+        <h3>Coriolis Acceleration</h3>
+        <p>When a point moves relative to a rotating reference frame, an additional acceleration component appears:</p>
+        
+        <div class="equation-box">
+            <p>Coriolis acceleration:</p>
+            <p>\(\vec{a}_{Coriolis} = 2\vec{\omega} \times \vec{v}_{rel}\)</p>
+            <p>Where:
+            <ul>
+                <li>\(\vec{\omega}\) = angular velocity of the reference frame</li>
+                <li>\(\vec{v}_{rel}\) = velocity of the point relative to the rotating frame</li>
+            </ul>
+            </p>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Physical Interpretation:</strong> Coriolis acceleration arises because the direction of relative velocity changes as the reference frame rotates. It's always perpendicular to both the angular velocity vector and the relative velocity vector.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulations</h2>
+        
+        <h3>Simulation 1: Four-Bar Linkage</h3>
+        <p>A four-bar linkage is one of the simplest and most versatile mechanisms. Adjust the angular velocity and acceleration to see how the velocity and acceleration vectors change throughout the mechanism.</p>
+        
+        <div class="simulation-container">
+            <div id="fourbar-sketch"></div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="fourbar-omega">Angular Velocity (ω)</label>
+                    <input type="range" id="fourbar-omega" min="-5" max="5" step="0.1" value="2">
+                    <span class="value-display" id="fourbar-omega-display">2.0 rad/s</span>
+                </div>
+                <div class="control-group">
+                    <label for="fourbar-alpha">Angular Acceleration (α)</label>
+                    <input type="range" id="fourbar-alpha" min="-5" max="5" step="0.1" value="0">
+                    <span class="value-display" id="fourbar-alpha-display">0.0 rad/s²</span>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="fourbar-show-velocity"> Show Velocity
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="fourbar-show-acceleration"> Show Acceleration
+                    </label>
+                </div>
+                <button id="fourbar-pause" class="pause-button">Pause</button>
+                <button id="fourbar-reset">Reset</button>
+            </div>
+            <div class="diagram-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #0066cc;"></div>
+                    <span>Links</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00aa00;"></div>
+                    <span>Velocity</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <span>Acceleration</span>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Simulation 2: Slider-Crank Mechanism</h3>
+        <p>The slider-crank mechanism converts rotary motion to linear motion (or vice versa). It's the basis of piston engines and many reciprocating machines.</p>
+        
+        <div class="simulation-container">
+            <div id="slidercrank-sketch"></div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="slidercrank-omega">Angular Velocity (ω)</label>
+                    <input type="range" id="slidercrank-omega" min="-5" max="5" step="0.1" value="3">
+                    <span class="value-display" id="slidercrank-omega-display">3.0 rad/s</span>
+                </div>
+                <div class="control-group">
+                    <label for="slidercrank-alpha">Angular Acceleration (α)</label>
+                    <input type="range" id="slidercrank-alpha" min="-5" max="5" step="0.1" value="0">
+                    <span class="value-display" id="slidercrank-alpha-display">0.0 rad/s²</span>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="slidercrank-show-velocity"> Show Velocity
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="slidercrank-show-acceleration"> Show Acceleration
+                    </label>
+                </div>
+                <button id="slidercrank-pause" class="pause-button">Pause</button>
+                <button id="slidercrank-reset">Reset</button>
+            </div>
+            <div class="diagram-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #0066cc;"></div>
+                    <span>Links</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00aa00;"></div>
+                    <span>Velocity</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <span>Acceleration</span>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Simulation 3: Quick-Return Mechanism</h3>
+        <p>The quick-return mechanism provides different velocities for forward and return strokes, useful in shaping machines where the cutting stroke should be slower than the return stroke.</p>
+        
+        <div class="simulation-container">
+            <div id="quickreturn-sketch"></div>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="quickreturn-omega">Angular Velocity (ω)</label>
+                    <input type="range" id="quickreturn-omega" min="-5" max="5" step="0.1" value="1">
+                    <span class="value-display" id="quickreturn-omega-display">1.0 rad/s</span>
+                </div>
+                <div class="control-group">
+                    <label for="quickreturn-alpha">Angular Acceleration (α)</label>
+                    <input type="range" id="quickreturn-alpha" min="-5" max="5" step="0.1" value="0">
+                    <span class="value-display" id="quickreturn-alpha-display">0.0 rad/s²</span>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="quickreturn-show-velocity"> Show Velocity
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="quickreturn-show-acceleration"> Show Acceleration
+                    </label>
+                </div>
+                <button id="quickreturn-pause" class="pause-button">Pause</button>
+                <button id="quickreturn-reset">Reset</button>
+            </div>
+            <div class="diagram-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #0066cc;"></div>
+                    <span>Links</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #00aa00;"></div>
+                    <span>Velocity</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ff0000;"></div>
+                    <span>Acceleration</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Four-Bar Linkage Velocity Analysis</h3>
+            <p>A four-bar linkage has the following dimensions: Ground link = 100 mm, Crank = 40 mm, Coupler = 80 mm, Rocker = 60 mm. If the crank rotates at 120 rpm clockwise, calculate:</p>
+            <ol>
+                <li>The angular velocity of the crank in rad/s</li>
+                <li>The velocity of the coupler point when the crank angle is 45°</li>
+                <li>The angular velocity of the rocker at this instant</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: L₁ = 100 mm, L₂ = 40 mm, L₃ = 80 mm, L₄ = 60 mm, n = 120 rpm, θ₂ = 45°</p>
+                
+                <p>a) Angular velocity of crank:</p>
+                <p>\(\omega_2 = \frac{2\pi n}{60} = \frac{2\pi \times 120}{60} = 12.57 \text{ rad/s}\)</p>
+                
+                <p>b) Velocity of coupler point A (crank-coupler joint):</p>
+                <p>\(v_A = \omega_2 \times r_2 = 12.57 \times 40 = 502.8 \text{ mm/s}\)</p>
+                <p>Direction: Perpendicular to crank, at angle 45° - 90° = -45° to horizontal</p>
+                
+                <p>c) To find rocker angular velocity, use velocity diagram method:</p>
+                <p>Using loop closure and velocity equations:</p>
+                <p>After solving (using graphical or analytical methods), \(\omega_4 \approx 5.24 \text{ rad/s}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Slider-Crank Acceleration Analysis</h3>
+            <p>A slider-crank mechanism has a crank radius of 50 mm and connecting rod length of 150 mm. The crank rotates at a constant 300 rpm. Calculate the acceleration of the piston when the crank angle is 90° from the horizontal.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: r = 50 mm, l = 150 mm, n = 300 rpm (constant), θ = 90°</p>
+                
+                <p>Angular velocity:</p>
+                <p>\(\omega = \frac{2\pi \times 300}{60} = 31.42 \text{ rad/s}\)</p>
+                <p>\(\alpha = 0\) (constant speed)</p>
+                
+                <p>At θ = 90°:</p>
+                <p>Crank pin position: x = 0, y = 50 mm</p>
+                
+                <p>Connecting rod angle:</p>
+                <p>\(\beta = \sin^{-1}\left(\frac{r \sin\theta}{l}\right) = \sin^{-1}\left(\frac{50}{150}\right) = 19.47°\)</p>
+                
+                <p>Piston acceleration (using standard formula):</p>
+                <p>\(a_p = -r\omega^2[\cos\theta + \frac{r\cos(2\theta)}{l}]\)</p>
+                <p>\(a_p = -50 \times 31.42^2[0 + \frac{50 \times (-1)}{150}]\)</p>
+                <p>\(a_p = -50 \times 987.4 \times (-0.333) = 16,446 \text{ mm/s}^2 = 16.45 \text{ m/s}^2\)</p>
+                <p>Direction: Towards the crank centre (positive x-direction)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Coriolis Acceleration in Quick-Return Mechanism</h3>
+            <p>In a quick-return mechanism, the crank rotates at 60 rpm. At a certain instant, the slotted lever has an angular velocity of 2 rad/s and the sliding block is 100 mm from the pivot with a relative velocity of 200 mm/s along the slot. Calculate the Coriolis acceleration of the sliding block.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: ω_lever = 2 rad/s, v_rel = 200 mm/s, r = 100 mm</p>
+                
+                <p>Coriolis acceleration formula:</p>
+                <p>\(a_{Coriolis} = 2\omega \times v_{rel}\)</p>
+                
+                <p>Magnitude:</p>
+                <p>\(|a_{Coriolis}| = 2 \times \omega_{lever} \times v_{rel}\)</p>
+                <p>\(|a_{Coriolis}| = 2 \times 2 \times 200 = 800 \text{ mm/s}^2\)</p>
+                
+                <p>Direction: Perpendicular to both ω (vertical) and v_rel (along slot)</p>
+                <p>Using right-hand rule: The Coriolis acceleration is perpendicular to the slot</p>
+                
+                <p>Total acceleration of sliding block includes:</p>
+                <ul>
+                    <li>Tangential acceleration due to angular acceleration of lever</li>
+                    <li>Centripetal acceleration = ω²r = 4 × 100 = 400 mm/s²</li>
+                    <li>Coriolis acceleration = 800 mm/s²</li>
+                    <li>Relative acceleration along the slot</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: For a point on a rigid body rotating about a fixed axis, which component of acceleration is always present?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Tangential acceleration only</label>
+                    <label><input type="radio" name="q1" value="b"> b) Centripetal acceleration only</label>
+                    <label><input type="radio" name="q1" value="c"> c) Both tangential and centripetal</label>
+                    <label><input type="radio" name="q1" value="d"> d) Neither if angular velocity is constant</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2: In a four-bar linkage, the velocity of a point on the coupler link relative to another point on the same link is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Parallel to the line joining the two points</label>
+                    <label><input type="radio" name="q2" value="b"> b) Perpendicular to the line joining the two points</label>
+                    <label><input type="radio" name="q2" value="c"> c) At 45° to the line joining the two points</label>
+                    <label><input type="radio" name="q2" value="d"> d) Zero if the link is rigid</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3: The Coriolis acceleration occurs when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) A body rotates at constant angular velocity</label>
+                    <label><input type="radio" name="q3" value="b"> b) A point moves relative to a rotating reference frame</label>
+                    <label><input type="radio" name="q3" value="c"> c) Two bodies slide against each other</label>
+                    <label><input type="radio" name="q3" value="d"> d) A body undergoes pure translation</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: In a slider-crank mechanism at constant angular velocity, the piston acceleration is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Zero at all positions</label>
+                    <label><input type="radio" name="q4" value="b"> b) Maximum at top dead centre</label>
+                    <label><input type="radio" name="q4" value="c"> c) Maximum at 90° crank angle</label>
+                    <label><input type="radio" name="q4" value="d"> d) Constant throughout the cycle</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: The instantaneous centre of rotation for a body in general plane motion:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Must be within the body</label>
+                    <label><input type="radio" name="q5" value="b"> b) Has zero velocity at that instant</label>
+                    <label><input type="radio" name="q5" value="c"> c) Has maximum velocity at that instant</label>
+                    <label><input type="radio" name="q5" value="d"> d) Does not exist for all motions</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Applications in Engineering</h2>
+        
+        <h3>Common Applications of Mechanism Kinematics</h3>
+        <ul>
+            <li><strong>Automotive Engineering:</strong> Engine valve trains, suspension systems, steering mechanisms</li>
+            <li><strong>Manufacturing:</strong> Robotic arms, conveyor systems, packaging machines</li>
+            <li><strong>Aerospace:</strong> Landing gear mechanisms, control surface actuators</li>
+            <li><strong>Biomechanics:</strong> Prosthetic limbs, rehabilitation devices</li>
+            <li><strong>Consumer Products:</strong> Folding mechanisms, adjustable furniture, exercise equipment</li>
+        </ul>
+        
+        <div class="key-point">
+            <p><strong>Design Consideration:</strong> Understanding kinematics is essential for:</p>
+            <ul>
+                <li>Avoiding mechanical interference</li>
+                <li>Optimising motion paths for efficiency</li>
+                <li>Minimising wear and vibration</li>
+                <li>Achieving desired motion characteristics</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary: Key Equations Reference</h2>
+        
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Equation</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Position</td>
+                        <td>\(\vec{r}_A = \vec{r}_O + \vec{r}_{A/O}\)</td>
+                        <td>Vector addition of positions</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity</td>
+                        <td>\(\vec{v}_A = \vec{v}_O + \vec{\omega} \times \vec{r}_{A/O}\)</td>
+                        <td>Includes rotational component</td>
+                    </tr>
+                    <tr>
+                        <td>Acceleration</td>
+                        <td>\(\vec{a}_A = \vec{a}_O + \vec{\alpha} \times \vec{r}_{A/O} + \vec{\omega} \times (\vec{\omega} \times \vec{r}_{A/O})\)</td>
+                        <td>Tangential + Centripetal</td>
+                    </tr>
+                    <tr>
+                        <td>Tangential Acceleration</td>
+                        <td>\(a_t = \alpha \times r\)</td>
+                        <td>Perpendicular to radius</td>
+                    </tr>
+                    <tr>
+                        <td>Centripetal Acceleration</td>
+                        <td>\(a_c = \omega^2 \times r\)</td>
+                        <td>Towards centre</td>
+                    </tr>
+                    <tr>
+                        <td>Coriolis Acceleration</td>
+                        <td>\(\vec{a}_{Cor} = 2\vec{\omega} \times \vec{v}_{rel}\)</td>
+                        <td>For relative motion in rotating frame</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="key-point">
+            <h3>Conclusion</h3>
+            <p>Understanding mechanism kinematics is fundamental to mechanical design and analysis. The key insights to remember are:</p>
+            <ol>
+                <li>Position, velocity, and acceleration analyses build upon each other sequentially</li>
+                <li>Velocity diagrams provide powerful graphical tools for complex mechanisms</li>
+                <li>Acceleration has both tangential and centripetal components in rotational motion</li>
+                <li>Coriolis effects must be considered in mechanisms with relative sliding motion</li>
+                <li>Different mechanisms provide unique motion characteristics suitable for specific applications</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <script>
+        // Function to toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
+            }
+        }
+        
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Centripetal acceleration only (for constant ω)
+                        q2: 'b', // Perpendicular to the line
+                        q3: 'b', // Point moves relative to rotating frame
+                        q4: 'b', // Maximum at top dead centre
+                        q5: 'b'  // Has zero velocity at that instant
+                    };
+                    
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+                    
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+                    
+                    feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
+                    
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
+        
+        // Four-Bar Linkage Simulation
+        let fourbarSketch = function(p) {
+            let omega = 2;
+            let alpha = 0;
+            let theta = 0;
+            let showVelocity = false;
+            let showAcceleration = false;
+            let isPaused = false;
+
+            // Responsive scaling
+            let canvasWidth = 800;
+            let canvasHeight = 600;
+            let SCALE = 2.0;
+            
+            function updateCanvasSize() {
+                const container = document.getElementById('fourbar-sketch');
+                if (container && container.offsetWidth > 0) {
+                    canvasWidth = Math.min(800, container.offsetWidth - 20);
+                    canvasHeight = Math.min(600, canvasWidth * 0.75);
+                    SCALE = canvasWidth / 400;
+                } else {
+                    // Fallback sizes
+                    canvasWidth = Math.min(800, window.innerWidth - 40);
+                    canvasHeight = Math.min(600, canvasWidth * 0.75);
+                    SCALE = canvasWidth / 400;
+                }
+            }
+
+            // Link lengths (will be scaled)
+            const L1 = 120;
+            const L2 = 50;
+            const L3 = 100;
+            const L4 = 80;
+
+            p.setup = function() {
+                updateCanvasSize();
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('fourbar-sketch');
+                p.angleMode(p.RADIANS);
+            };
+
+            p.windowResized = function() {
+                updateCanvasSize();
+                p.resizeCanvas(canvasWidth, canvasHeight);
+            };
+
+            p.draw = function() {
+                p.background(245);
+                p.translate(canvasWidth * 0.25, canvasHeight * 0.6);
+
+                // Update animation if not paused
+                if (!isPaused) {
+                    let dt = 1 / 60;
+                    omega += alpha * dt;
+                    theta += omega * dt;
+                }
+
+                // Scale link lengths
+                let l1 = L1 * SCALE;
+                let l2 = L2 * SCALE;
+                let l3 = L3 * SCALE;
+                let l4 = L4 * SCALE;
+
+                // Ground pivot positions
+                let O1 = p.createVector(0, 0);
+                let O4 = p.createVector(l1, 0);
+
+                // Point A (end of crank)
+                let A = p.createVector(l2 * p.cos(theta), l2 * p.sin(theta));
+
+                // Point B (coupler-rocker joint)
+                let d = p.dist(A.x, A.y, O4.x, O4.y);
+                let B, theta4;
+                
+                if (d > l3 + l4 || d < p.abs(l3 - l4)) {
+                    B = p.createVector(
+                        A.x + l3 * p.cos(theta + p.PI / 4),
+                        A.y + l3 * p.sin(theta + p.PI / 4)
+                    );
+                } else {
+                    let a = (d * d + l3 * l3 - l4 * l4) / (2 * d);
+                    let h = p.sqrt(p.max(0, l3 * l3 - a * a));
+                    let dx = (O4.x - A.x) / d;
+                    let dy = (O4.y - A.y) / d;
+                    let Px = A.x + a * dx;
+                    let Py = A.y + a * dy;
+                    let sign = 1;
+                    let Bx = Px - sign * h * dy;
+                    let By = Py + sign * h * dx;
+                    B = p.createVector(Bx, By);
+                    theta4 = p.atan2(By - O4.y, Bx - O4.x);
+                }
+
+                // Draw ground
+                p.stroke(0);
+                p.strokeWeight(3);
+                p.line(-20, 0, l1 + 20, 0);
+
+                // Ground hatch marks
+                for (let i = -20; i <= l1 + 20; i += 10) {
+                    p.line(i, 0, i - 5, 5);
+                }
+
+                // Draw links
+                p.stroke(0, 102, 204);
+                p.strokeWeight(3);
+                p.line(O1.x, O1.y, A.x, A.y);
+                p.line(A.x, A.y, B.x, B.y);
+                p.line(O4.x, O4.y, B.x, B.y);
+
+                // Draw joints
+                p.fill(255);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.ellipse(O1.x, O1.y, 12, 12);
+                p.ellipse(O4.x, O4.y, 12, 12);
+                p.ellipse(A.x, A.y, 10, 10);
+                p.ellipse(B.x, B.y, 10, 10);
+
+                // Velocity Analysis
+                if (showVelocity) {
+                    p.strokeWeight(2);
+                    let vAx = -omega * A.y;
+                    let vAy = omega * A.x;
+
+                    drawArrow(p, A.x, A.y, A.x + vAx * 0.5 * SCALE, A.y + vAy * 0.5 * SCALE, [0,170,0]);
+                    
+                    // Calculate velocity of B
+                    let rAB = p.createVector(B.x - A.x, B.y - A.y);
+                    let rB = p.createVector(B.x - O4.x, B.y - O4.y);
+
+                    let M = [
+                        [-rAB.y, rB.y],
+                        [rAB.x, -rB.x]
+                    ];
+                    let rhs = [-vAx, -vAy];
+                    let det = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+                    
+                    if (Math.abs(det) > 0.001) {
+                        let omega3 = (rhs[0]*M[1][1] - rhs[1]*M[0][1]) / det;
+                        let omega4 = (M[0][0]*rhs[1] - M[1][0]*rhs[0]) / det;
+                        
+                        let vBx = -omega4 * rB.y;
+                        let vBy = omega4 * rB.x;
+                        drawArrow(p, B.x, B.y, B.x + vBx * 0.5 * SCALE, B.y + vBy * 0.5 * SCALE, [0,170,0]);
+                    }
+
+                    // Acceleration Analysis
+                    if (showAcceleration) {
+                        let aAtx = -alpha * A.y;
+                        let aAty = alpha * A.x;
+                        let aAcx = -omega * omega * A.x;
+                        let aAcy = -omega * omega * A.y;
+                        
+                        drawArrow(p, A.x, A.y, A.x + aAtx * 0.2 * SCALE, A.y + aAty * 0.2 * SCALE, [0,0,255]);
+                        drawArrow(p, A.x, A.y, A.x + aAcx * 0.2 * SCALE, A.y + aAcy * 0.2 * SCALE, [255,0,0]);
+                    }
+                }
+
+                // Display values
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                let textY = -canvasHeight * 0.4;
+                p.text(`θ₂ = ${(theta % (2*p.PI)).toFixed(2)} rad`, -canvasWidth * 0.2, textY);
+                p.text(`ω₂ = ${omega.toFixed(2)} rad/s`, -canvasWidth * 0.2, textY + 20);
+                p.text(`α₂ = ${alpha.toFixed(2)} rad/s²`, -canvasWidth * 0.2, textY + 40);
+                
+                if (isPaused) {
+                    p.fill(255, 0, 0);
+                    p.text("PAUSED", -canvasWidth * 0.2, textY + 60);
+                }
+            };
+
+            function drawArrow(p, x1, y1, x2, y2, col=[0,0,0]) {
+                p.stroke(col[0], col[1], col[2]);
+                p.line(x1, y1, x2, y2);
+                let angle = p.atan2(y2 - y1, x2 - x1);
+                p.push();
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.line(0, 0, -8, -4);
+                p.line(0, 0, -8, 4);
+                p.pop();
+            }
+
+            // Controls
+            document.getElementById('fourbar-omega').addEventListener('input', function(e) {
+                omega = parseFloat(e.target.value);
+                document.getElementById('fourbar-omega-display').textContent = omega.toFixed(1) + ' rad/s';
+            });
+
+            document.getElementById('fourbar-alpha').addEventListener('input', function(e) {
+                alpha = parseFloat(e.target.value);
+                document.getElementById('fourbar-alpha-display').textContent = alpha.toFixed(1) + ' rad/s²';
+            });
+
+            document.getElementById('fourbar-show-velocity').addEventListener('change', function(e) {
+                showVelocity = e.target.checked;
+            });
+
+            document.getElementById('fourbar-show-acceleration').addEventListener('change', function(e) {
+                showAcceleration = e.target.checked;
+            });
+
+            document.getElementById('fourbar-pause').addEventListener('click', function() {
+                isPaused = !isPaused;
+                this.textContent = isPaused ? 'Resume' : 'Pause';
+                this.classList.toggle('paused');
+            });
+
+            document.getElementById('fourbar-reset').addEventListener('click', function() {
+                theta = 0;
+                omega = 2;
+                alpha = 0;
+                isPaused = false;
+                document.getElementById('fourbar-omega').value = 2;
+                document.getElementById('fourbar-alpha').value = 0;
+                document.getElementById('fourbar-omega-display').textContent = '2.0 rad/s';
+                document.getElementById('fourbar-alpha-display').textContent = '0.0 rad/s²';
+                document.getElementById('fourbar-pause').textContent = 'Pause';
+                document.getElementById('fourbar-pause').classList.remove('paused');
+            });
+        };
+        
+       // Slider-Crank Simulation
+let slidercrankSketch = function(p) {
+    let omega = 3;
+    let alpha = 0;
+    let theta = 0;
+    let showVelocity = false;
+    let showAcceleration = false;
+    let isPaused = false;
+
+    // Responsive scaling
+    let canvasWidth = 600;
+    let canvasHeight = 400;
+    let SCALE = 1.0;
+    
+    function updateCanvasSize() {
+        const container = document.getElementById('slidercrank-sketch');
+        if (container && container.offsetWidth > 0) {
+            canvasWidth = Math.min(600, container.offsetWidth - 20);
+            canvasHeight = Math.min(400, canvasWidth * 0.67);
+            SCALE = canvasWidth / 600;
+        } else {
+            canvasWidth = Math.min(600, window.innerWidth - 40);
+            canvasHeight = Math.min(400, canvasWidth * 0.67);
+            SCALE = canvasWidth / 600;
+        }
+    }
+    
+    const r = 60;
+    const l = 150;
+    
+    p.setup = function() {
+        updateCanvasSize();
+        let canvas = p.createCanvas(canvasWidth, canvasHeight);
+        canvas.parent('slidercrank-sketch');
+        p.angleMode(p.RADIANS);
+    };
+
+    p.windowResized = function() {
+        updateCanvasSize();
+        p.resizeCanvas(canvasWidth, canvasHeight);
+    };
+    
+    p.draw = function() {
+        p.background(245);
+        p.translate(canvasWidth * 0.33, canvasHeight * 0.5);
+        
+        const dt = 0.016; // ~60 fps timestep
+
+        // Update animation if not paused
+        if (!isPaused) {
+            omega += alpha * dt; // <-- integrate angular acceleration
+            theta += omega * dt; // <-- integrate angular velocity
+        }
+        
+        // Scale dimensions
+        let radius = r * SCALE;
+        let length = l * SCALE;
+        
+        // Calculate positions
+        let Ax = radius * p.cos(theta);
+        let Ay = radius * p.sin(theta);
+        
+        let beta = p.asin(radius * p.sin(theta) / length);
+        let s = radius * p.cos(theta) + length * p.cos(beta);
+        
+        // Draw ground and slider guide
+        p.stroke(0);
+        p.strokeWeight(3);
+        p.line(70 * SCALE, -17 * SCALE, 250 * SCALE, -17 * SCALE);
+        p.push();
+            p.strokeWeight(1);
+            p.drawingContext.setLineDash([20, 5, 5, 5]);
+            p.line(-20 * SCALE, 0, 270 * SCALE, 0);
+            p.drawingContext.setLineDash([]);
+        p.pop();
+        p.line(70 * SCALE, 17 * SCALE, 250 * SCALE, 17 * SCALE);
+        
+        // Ground symbols
+        for (let i = 75; i <= 250; i += 10) {
+            p.line(i * SCALE, 17 * SCALE, (i-5) * SCALE, 22 * SCALE);
+        }
+        
+        // Draw crank
+        p.stroke(0, 102, 204);
+        p.strokeWeight(2);
+        p.line(0, 0, Ax, Ay);
+        
+        // Draw connecting rod
+        p.line(Ax, Ay, s, 0);
+        
+        // Draw slider
+        p.fill(200);
+        p.stroke(0);
+        p.strokeWeight(1);
+        p.rect(s - 15 * SCALE, -15 * SCALE, 30 * SCALE, 30 * SCALE);
+        
+        // Draw joints
+        p.fill(255);
+        p.ellipse(0, 0, 10 * SCALE, 10 * SCALE);
+        p.ellipse(Ax, Ay, 10 * SCALE, 10 * SCALE);
+        p.ellipse(s, 0, 10 * SCALE, 10 * SCALE);
+        
+        // Velocity vectors
+        if (showVelocity) {
+            p.stroke(0, 170, 0);
+            p.strokeWeight(2);
+            
+            let vAx = -omega * radius * p.sin(theta);
+            let vAy = omega * radius * p.cos(theta);
+            drawArrow(p, Ax, Ay, Ax + vAx * SCALE, Ay + vAy * SCALE);
+            
+            let vs = -radius * omega * (p.sin(theta) + radius * p.sin(2*theta)/(2*length*p.cos(beta)));
+            drawArrow(p, s, 0, s + vs * SCALE, 0);
+        }
+        
+        // Acceleration vectors
+        if (showAcceleration) {
+            p.stroke(255, 0, 0);
+            p.strokeWeight(2);
+            
+            let aAtx = -alpha * radius * p.sin(theta);
+            let aAty = alpha * radius * p.cos(theta);
+            let aAcx = -omega * omega * radius * p.cos(theta);
+            let aAcy = -omega * omega * radius * p.sin(theta);
+            drawArrow(p, Ax, Ay, Ax + (aAtx + aAcx) * SCALE * 0.5, Ay + (aAty + aAcy) * SCALE * 0.5);
+            
+            let as = -radius * (alpha * p.sin(theta) + omega * omega * p.cos(theta));
+            drawArrow(p, s, 0, s + as * SCALE * 0.5, 0);
+        }
+        
+        // Display values
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT);
+        let textX = -canvasWidth * 0.3;
+        let textY = -canvasHeight * 0.4;
+        p.text(`θ = ${(theta % (2*p.PI)).toFixed(2)} rad`, textX, textY);
+        p.text(`ω = ${omega.toFixed(1)} rad/s`, textX, textY + 20);
+        p.text(`α = ${alpha.toFixed(1)} rad/s²`, textX, textY + 40);
+        p.text(`Piston = ${(s/SCALE).toFixed(1)} mm`, textX, textY + 60);
+        
+        if (isPaused) {
+            p.fill(255, 0, 0);
+            p.text("PAUSED", textX, textY + 80);
+        }
+    };
+    
+    function drawArrow(p, x1, y1, x2, y2) {
+        p.line(x1, y1, x2, y2);
+        let angle = p.atan2(y2 - y1, x2 - x1);
+        p.push();
+        p.translate(x2, y2);
+        p.rotate(angle);
+        p.line(0, 0, -8, -4);
+        p.line(0, 0, -8, 4);
+        p.pop();
+    }
+    
+    // Controls
+    document.getElementById('slidercrank-omega').addEventListener('input', function(e) {
+        omega = parseFloat(e.target.value);
+        document.getElementById('slidercrank-omega-display').textContent = omega.toFixed(1) + ' rad/s';
+    });
+    
+    document.getElementById('slidercrank-alpha').addEventListener('input', function(e) {
+        alpha = parseFloat(e.target.value);
+        document.getElementById('slidercrank-alpha-display').textContent = alpha.toFixed(1) + ' rad/s²';
+    });
+    
+    document.getElementById('slidercrank-show-velocity').addEventListener('change', function(e) {
+        showVelocity = e.target.checked;
+    });
+    
+    document.getElementById('slidercrank-show-acceleration').addEventListener('change', function(e) {
+        showAcceleration = e.target.checked;
+    });
+    
+    document.getElementById('slidercrank-pause').addEventListener('click', function() {
+        isPaused = !isPaused;
+        this.textContent = isPaused ? 'Resume' : 'Pause';
+        this.classList.toggle('paused');
+    });
+    
+    document.getElementById('slidercrank-reset').addEventListener('click', function() {
+        theta = 0;
+        omega = 3;
+        alpha = 0;
+        isPaused = false;
+        document.getElementById('slidercrank-omega').value = 3;
+        document.getElementById('slidercrank-alpha').value = 0;
+        document.getElementById('slidercrank-omega-display').textContent = '3.0 rad/s';
+        document.getElementById('slidercrank-alpha-display').textContent = '0.0 rad/s²';
+        document.getElementById('slidercrank-pause').textContent = 'Pause';
+        document.getElementById('slidercrank-pause').classList.remove('paused');
+    });
+};
+
+        
+// Whitworth Quick-Return Mechanism - refined (centered, graph fixed, QRR shown)
+let quickreturnSketch = function(p) {
+    // Kinematic state
+    let omega = 1.0;    
+    let alpha = 0.0;    
+    let theta = 0.0;    
+
+    // UI
+    let isPaused = false;
+
+    // Canvas sizing
+    let canvasWidth = 600;
+    let canvasHeight = 480;
+    let SCALE = 1.0;
+    function updateCanvasSize() {
+        const container = document.getElementById('quickreturn-sketch');
+        if (container && container.offsetWidth > 0) {
+            canvasWidth = Math.min(900, container.offsetWidth - 20);
+            canvasHeight = Math.min(650, Math.round(canvasWidth * 0.72));
+            SCALE = canvasWidth / 900;
+        } else {
+            canvasWidth = Math.min(900, window.innerWidth - 40);
+            canvasHeight = Math.min(650, Math.round(canvasWidth * 0.72));
+            SCALE = canvasWidth / 900;
+        }
+    }
+
+    // Geometry (base scale)
+    const r = 70;   
+    const leverPivotOffset = 260; 
+    const leverPivotHeight = 140; 
+    const slotGap = 24;           
+    const leverDrawLen = 600;
+
+    // Graph data
+    let graphData = [];
+    let prevThetaCycle = 0;
+    let strokeAngles = [];  // store stroke angle durations
+
+    p.setup = function() {
+        updateCanvasSize();
+        let canvas = p.createCanvas(canvasWidth, canvasHeight);
+        canvas.parent('quickreturn-sketch');
+        p.angleMode(p.RADIANS);
+        p.textFont('Helvetica', 12);
+    };
+
+    p.windowResized = function() {
+        updateCanvasSize();
+        p.resizeCanvas(canvasWidth, canvasHeight);
+    };
+
+    p.draw = function() {
+        p.background(250);
+        const dt = 1 / 60;
+        if (!isPaused) {
+            omega += alpha * dt;
+            theta += omega * dt;
+        }
+
+        // Crank origin (shifted right 50px)
+        const originX = canvasWidth * 0.28 + 50;
+        const originY = canvasHeight * 0.38;
+
+        p.push();
+        p.translate(originX, originY);
+
+        // Geometry scaled
+        const R = r * SCALE;
+        const pivotCx = leverPivotOffset * SCALE;
+        const pivotCy = -leverPivotHeight * SCALE;
+
+        // Crank pin
+        const Ax = R * p.cos(theta);
+        const Ay = R * p.sin(theta);
+
+        // Intersection of slot line with guide y=0
+        let denom = (Ay - pivotCy);
+        let t = (Math.abs(denom) < 1e-6) ? 1e6 : -pivotCy / denom;
+        const Sx = pivotCx + t * (Ax - pivotCx);
+        const Sy = 0;
+
+        // Lever angle
+        let phi = Math.atan2(Ay - pivotCy, Ax - pivotCx);
+
+        // --- Ground / guide ---
+        p.stroke(200);
+        p.strokeWeight(3 * SCALE);
+        p.line(-200*SCALE, 0, 900*SCALE, 0);
+
+        // --- Lever slot ---
+        p.push();
+        p.translate(pivotCx, pivotCy);
+        p.rotate(phi);
+        p.stroke(80);
+        p.strokeWeight(2*SCALE);
+        p.line(0, -slotGap/2*SCALE, leverDrawLen*SCALE, -slotGap/2*SCALE);
+        p.line(0, slotGap/2*SCALE, leverDrawLen*SCALE, slotGap/2*SCALE);
+        p.pop();
+
+        // --- Lever pivot ---
+        p.fill(0);
+        p.noStroke();
+        p.ellipse(pivotCx, pivotCy, 12*SCALE, 12*SCALE);
+
+        // --- Crank ---
+        p.stroke(110, 190, 120);
+        p.strokeWeight(6 * SCALE);
+        p.line(0, 0, Ax, Ay);
+        p.fill(0);
+        p.noStroke();
+        p.ellipse(0, 0, 14*SCALE, 14*SCALE);
+
+        // --- Crank pin block ---
+        p.push();
+        p.translate(Ax, Ay);
+        p.rotate(phi);
+        p.fill(170, 80, 220);
+        p.stroke(110, 30, 180);
+        p.strokeWeight(1.5 * SCALE);
+        p.rectMode(p.CENTER);
+        p.rect(0, 0, slotGap*0.9*SCALE, slotGap*0.9*SCALE, 3*SCALE);
+        p.pop();
+
+        // --- Slider/ram ---
+        p.push();
+        p.translate(Sx, Sy);
+        p.fill(200, 120, 240);
+        p.stroke(120, 30, 180);
+        p.strokeWeight(2 * SCALE);
+        p.rectMode(p.CENTER);
+        p.rect(0, -6*SCALE, 60*SCALE, 28*SCALE, 6*SCALE);
+        p.fill(0);
+        p.noStroke();
+        p.ellipse(0, -6*SCALE, 6*SCALE, 6*SCALE);
+        p.pop();
+
+        p.pop(); // restore origin
+
+        // --- Graph (slider vs θ) ---
+        let currentTheta = theta % (2*p.PI);
+        if (currentTheta < prevThetaCycle) {
+            graphData = []; // reset at full revolution
+        }
+        prevThetaCycle = currentTheta;
+
+        graphData.push({theta: currentTheta, pos: Sx});
+        if (graphData.length > 500) graphData.shift();
+
+        let gx = canvasWidth*0.65;
+        let gy = canvasHeight*0.15;
+        let gw = canvasWidth*0.3;
+        let gh = canvasHeight*0.35;
+
+        p.push();
+        p.translate(gx, gy);
+        p.stroke(0);
+        p.noFill();
+        p.rect(0, 0, gw, gh);
+
+        // axes
+        p.stroke(180);
+        p.line(0, gh/2, gw, gh/2);
+        p.line(0, 0, 0, gh);
+
+        // plot
+        p.noFill();
+        p.stroke(150, 50, 200);
+        p.beginShape();
+        for (let i=0; i<graphData.length; i++) {
+            let tnorm = graphData[i].theta/(2*p.PI);
+            let xpos = tnorm * gw;
+            let ypos = gh/2 - graphData[i].pos*0.15*SCALE;
+            p.vertex(xpos, ypos);
+        }
+        p.endShape();
+
+        p.noStroke();
+        p.fill(0);
+        p.textAlign(p.LEFT, p.TOP);
+        p.text("Slider Position vs θ", 4, 4);
+        p.pop();
+
+        // --- Quick Return Ratio (estimate) ---
+        // crude: forward = θ where slider goes right, return = θ where it comes left
+        let minX = Math.min(...graphData.map(d => d.pos));
+        let maxX = Math.max(...graphData.map(d => d.pos));
+        let forwardStroke = graphData.findIndex(d => Math.abs(d.pos - maxX) < 2);
+        let returnStroke = graphData.findIndex(d => Math.abs(d.pos - minX) < 2);
+        let QRR = "-";
+        if (forwardStroke > 0 && returnStroke > 0) {
+            let angleFwd = Math.abs(graphData[forwardStroke].theta - graphData[0].theta);
+            let angleRet = (2*p.PI - angleFwd);
+            if (angleRet > 0.01) {
+                QRR = (angleFwd/angleRet).toFixed(2);
+            }
+        }
+
+        // --- Text readout ---
+        p.noStroke();
+        p.fill(0);
+        p.textAlign(p.LEFT, p.TOP);
+        p.text(`θ = ${(theta % (2*p.PI)).toFixed(2)} rad`, 10, canvasHeight-80);
+        p.text(`ω = ${omega.toFixed(2)} rad/s`, 10, canvasHeight-60);
+        p.text(`α = ${alpha.toFixed(2)} rad/s²`, 10, canvasHeight-40);
+        p.text(`QRR ≈ ${QRR}`, 10, canvasHeight-20);
+    };
+
+    // Controls (same IDs)
+    const safeGet = id => document.getElementById(id);
+    let eOmega = safeGet('quickreturn-omega');
+    let eAlpha = safeGet('quickreturn-alpha');
+    let ePause = safeGet('quickreturn-pause');
+    let eReset = safeGet('quickreturn-reset');
+    let eOmegaDisp = safeGet('quickreturn-omega-display');
+    let eAlphaDisp = safeGet('quickreturn-alpha-display');
+
+    if (eOmega) {
+        eOmega.addEventListener('input', function(e) {
+            omega = parseFloat(e.target.value);
+            if (eOmegaDisp) eOmegaDisp.textContent = omega.toFixed(2) + ' rad/s';
+        });
+    }
+    if (eAlpha) {
+        eAlpha.addEventListener('input', function(e) {
+            alpha = parseFloat(e.target.value);
+            if (eAlphaDisp) eAlphaDisp.textContent = alpha.toFixed(2) + ' rad/s²';
+        });
+    }
+    if (ePause) {
+        ePause.addEventListener('click', function() {
+            isPaused = !isPaused;
+            this.textContent = isPaused ? 'Resume' : 'Pause';
+            this.classList.toggle('paused');
+        });
+    }
+    if (eReset) {
+        eReset.addEventListener('click', function() {
+            theta = 0;
+            omega = 1.0;
+            alpha = 0.0;
+            isPaused = false;
+            if (eOmega) eOmega.value = omega;
+            if (eAlpha) eAlpha.value = alpha;
+            if (eOmegaDisp) eOmegaDisp.textContent = omega.toFixed(2) + ' rad/s';
+            if (eAlphaDisp) eAlphaDisp.textContent = alpha.toFixed(2) + ' rad/s²';
+            if (ePause) {
+                ePause.textContent = 'Pause';
+                ePause.classList.remove('paused');
+            }
+            graphData = [];
+        });
+    }
+};
+
+
+
+        
+        // Initialize all sketches
+        new p5(fourbarSketch);
+        new p5(slidercrankSketch);
+        new p5(quickreturnSketch);
+    </script>
+</body>
+</html>

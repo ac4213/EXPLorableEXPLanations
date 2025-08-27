@@ -111,10 +111,10 @@ function initializeAngularSimulation() {
             // Display information panel
             drawInfoPanel();
             
-            // Draw visual indicators
+/*             // Draw visual indicators
             if (isSpinning) {
                 drawRotationIndicator();
-            }
+            } */
         };
 
         function drawGrid() {
@@ -175,7 +175,7 @@ function initializeAngularSimulation() {
             p.textSize(14);
             p.text(`Angular Velocity: ${(angularVel * 60).toFixed(2)} rad/s`, 10, 10);
             p.text(`Moment of Inertia: ${momentOfInertia.toFixed(4)} kg·m²`, 10, 30);
-            p.text(`Angular Momentum: ${angularMomentum.toFixed(4)} kg·m²/s`, 10, 50);
+            p.text(`Angular Momentum: 120 kg·m²/s`, 10, 50);
             p.text(`Mass Position: ${massRadius.toFixed(0)} px from centre`, 10, 70);
             
             // RPM display
@@ -189,7 +189,7 @@ function initializeAngularSimulation() {
             }
         }
 
-        function drawRotationIndicator() {
+/*         function drawRotationIndicator() {
             // Draw rotation direction arrow
             p.push();
             p.translate(p.width/2, p.height/2);
@@ -212,7 +212,7 @@ function initializeAngularSimulation() {
             }
             
             p.pop();
-        }
+        } */
 
         // Control functions
         p.spinUp = function() {

@@ -1,26 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Second Moment of Area</title>
-    <!-- Import the p5.js library -->
+    <title>Second Moment of Area - Interactive Lecture</title>
+    <!-- Import p5.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <!-- MathJax library -->
     <!-- Import MathJax for LaTeX rendering -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-    <script src=".\SecMomArea.js" ></script>
-
-    <noscript>
-        Sorry... JavaScript must be enabled.
-    </noscript>
-
-    <link rel="stylesheet" href="/assets/css/main.css"">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+        <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <style>
+        :root {
+            --primary-color: #ffd700;
+            --secondary-color: #ffb300;
+            --text-color: #333;
+            --background-color: #fffbeb;
+            --link-color: #cc9900;
+            --link-hover-color: #1c01b8;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color);
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-variant: small-caps;
+        }
+        
+        h2 {
+            color: #b38600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .math-container {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        #sketch-holder {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #e9d8b1;
+            margin: 20px 0;
+        }
+        
+        #button-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #results-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        #results-content th,
+        #results-content td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #results-content th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        
+        ul {
+            padding-left: 25px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border-radius: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
-
 <body>
     <header>
         <h1>SECOND MOMENT OF AREA</h1>
@@ -29,7 +167,7 @@
     
     <div class="section">
         <h2>What is a Centroid?</h2>
-        <p>The centroid of a shape is the geometric center of the shape - the balancing point if it were made of a uniform material.</p>
+        <p>The centroid of a shape is the geometric centre of the shape - the balancing point if it were made of a uniform material.</p>
         <div class="math-container">
             <p>For a composite shape made up of multiple simple shapes, the centroid can be found using:</p>
             \[ y_c = \frac{\sum A_i y_i}{\sum A_i} \]
@@ -55,10 +193,7 @@
     </div>
     
     <div id="button-container">
-        <!-- Control buttons -->
-        <button onclick="resetFigure()">RESET</button>
-        <button onclick="toggleSymmetry()">TOGGLE SYMMETRY</button>
-        <button onclick="toggleDimensions()">TOGGLE DIMENSIONS</button>
+        <!-- Control buttons and sliders will be added here by JavaScript -->
     </div>
     
     <div class="control-panel">
@@ -91,8 +226,532 @@
         </ul>
         <p>These principles are used in the design of structural elements in buildings, bridges, mechanical components, and more.</p>
     </div>
+
+    <script>
+// Canvas variables
+let cnv, cnvx, cnvy;
+let bgdRGB = [233, 216, 177]; // Match the parabolic applet background
+let sliders = []; // Array of slider objects
+let sliderLabels = ["Top flange width", "Bottom flange width", "Web width", "Web height"];
+let sliderDefaults = [100, 200, 20, 150]; // Default values for sliders
+let sliderMinMax = [[20, 300], [20, 300], [10, 50], [50, 300]]; // Min/max values for sliders
+let figura = []; // Array of shape objects
+let ctroid; // Centroid of the composite shape
+let absx = 300, absy = 150; // Position of the figure on canvas
+
+// Control variables
+let showCentroid = true;
+let showDimensions = false;
+let symmetricMode = false;
+
+// UI elements
+let buttonContainer;
+let resultDiv;
+
+function setup() {
+    // Create canvas
+    cnv = createCanvas(800, 500);
+    cnv.parent('sketch-holder');
+    
+    // Create control buttons first
+    let resetBtn = createButton('RESET');
+    resetBtn.parent('button-container');
+    resetBtn.mousePressed(() => resetFigure());
+    
+    let symBtn = createButton('TOGGLE SYMMETRY');
+    symBtn.parent('button-container');
+    symBtn.mousePressed(() => toggleSymmetry());
+    
+    let dimBtn = createButton('TOGGLE DIMENSIONS');
+    dimBtn.parent('button-container');
+    dimBtn.mousePressed(() => toggleDimensions());
+    
+    // Create sliders
+    createSliders();
+    
+    // Create initial figure
+    resetFigure();
+    
+    // Display settings
+    angleMode(DEGREES);
+    rectMode(CENTER);
+    textSize(12);
+    
+    // Set up results area
+    resultDiv = select('#results-content');
+    
+    // Enable manual redraw to improve performance
+    noLoop();
+}
+
+function createSliders() {
+    // Create sliders below the buttons
+    for (let i = 0; i < sliderLabels.length; i++) {
+        let sliderDiv = createDiv();
+        sliderDiv.parent('button-container');
+        sliderDiv.style('margin', '10px');
+        sliderDiv.style('text-align', 'center');
+        sliderDiv.style('width', '200px');
+        
+        let label = createP(sliderLabels[i] + ": ");
+        label.parent(sliderDiv);
+        label.style('margin', '5px');
+        label.style('font-size', '14px');
+        
+        let slider = createSlider(sliderMinMax[i][0], sliderMinMax[i][1], sliderDefaults[i], 1);
+        slider.style('width', '180px');
+        slider.parent(sliderDiv);
+        slider.input(() => {
+            let val = slider.value();
+            valueSpan.html(val + ' mm');
+            
+            // If in symmetric mode, update the paired slider
+            if (symmetricMode && (i === 0 || i === 1)) {
+                let pairedIdx = i === 0 ? 1 : 0;
+                sliders[pairedIdx].value(val);
+                let pairedSpan = select('#value-' + pairedIdx);
+                if (pairedSpan) {
+                    pairedSpan.html(val + ' mm');
+                }
+            }
+            
+            updateFigure();
+        });
+        
+        let valueSpan = createSpan(sliderDefaults[i] + ' mm');
+        valueSpan.id('value-' + i);
+        valueSpan.style('margin-left', '10px');
+        valueSpan.style('font-weight', 'bold');
+        valueSpan.parent(sliderDiv);
+        
+        sliders.push(slider);
+    }
+}
+
+function draw() {
+    // Clear the background
+    background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);
+    
+    // Draw the composite shape
+    for (let i = 0; i < figura.length; i++) {
+        figura[i].display();
+    }
+    
+    // Calculate and draw the centroid
+    ctroid = centroid(figura);
+    
+    if (showCentroid) {
+        drawCentroid(ctroid);
+    }
+    
+    // Draw dimension lines if enabled
+    if (showDimensions) {
+        drawDimensions();
+    }
+    
+    // Calculate the second moment of area
+    let Ixx = secmomarea(figura, ctroid.y);
+    
+    // Draw reference arrows showing the distances
+    drawReferenceArrows();
+    
+    // Update the result display
+    updateResults(ctroid, Ixx);
+    
+    // Draw explanatory text on the canvas
+    drawExplanatoryText(ctroid, Ixx);
+}
+
+function resetFigure() {
+    // Reset sliders to default values
+    for (let i = 0; i < sliders.length; i++) {
+        sliders[i].value(sliderDefaults[i]);
+        let valueSpan = select('#value-' + i);
+        if (valueSpan) {
+            valueSpan.html(sliderDefaults[i] + ' mm');
+        }
+    }
+    
+    // Reset symmetry mode
+    symmetricMode = false;
+    
+    // Update the figure
+    updateFigure();
+}
+
+function updateFigure() {
+    // Get values from sliders
+    let tflangew = sliders[0].value();
+    let tflangeh = 30;
+    let webt = sliders[2].value();
+    let webh = sliders[3].value();
+    let bflangew = sliders[1].value();
+    let bflangeh = 30;
+    
+    // Update the I-section components
+    figura = [];
+    
+    // Top flange (red)
+    figura.push(new RectShape(absx, absy, tflangew, tflangeh, [255, 0, 0]));
+    
+    // Web (green) - ensure it connects exactly with flanges
+    figura.push(new RectShape(absx, absy + tflangeh/2 + webh/2, webt, webh, [0, 155, 0]));
+    
+    // Bottom flange (blue) - ensure it connects exactly with web
+    figura.push(new RectShape(absx, absy + tflangeh + webh, bflangew, bflangeh, [0, 0, 255]));
+    
+    // Trigger redraw to update the visualisation
+    redraw();
+}
+
+function toggleSymmetry() {
+    symmetricMode = !symmetricMode;
+    
+    if (symmetricMode) {
+        // Make bottom flange width equal to top flange width
+        let topFlangeWidth = sliders[0].value();
+        sliders[1].value(topFlangeWidth); // Fixed: was sliders[4], now sliders[1]
+        let valueSpan = select('#value-1');
+        if (valueSpan) {
+            valueSpan.html(topFlangeWidth + ' mm');
+        }
+    }
+    
+    updateFigure();
+}
+
+function toggleDimensions() {
+    showDimensions = !showDimensions;
+    redraw();
+}
+
+function centroid(figura) {
+    let totarea = 0;
+    let sumY = 0;
+    let sumX = 0;
+    
+    for (let ii = 0; ii < figura.length; ii++) {
+        totarea = totarea + figura[ii].Area;
+        sumY = sumY + figura[ii].Area * figura[ii].yc; // sum(Ai*yci)
+        sumX = sumX + figura[ii].Area * figura[ii].xc; // sum(Ai*xci)
+    }
+    
+    let yc = sumY / totarea;
+    let xc = sumX / totarea; // For asymmetric shapes
+    
+    let res = {
+        x: xc,
+        y: yc
+    };
+    return res;
+}
+
+function secmomarea(figura, theaxis) {
+    let Ixx = 0;
+    for (let ii = 0; ii < figura.length; ii++) {
+        let d = (figura[ii].yc - theaxis);
+        Ixx = Ixx + figura[ii].Ixc + figura[ii].Area * Math.pow(d, 2); // Parallel axis theorem
+    }
+    return Ixx;
+}
+
+function getTotalArea() {
+    let totalArea = 0;
+    for (let i = 0; i < figura.length; i++) {
+        totalArea += figura[i].Area;
+    }
+    return totalArea;
+}
+
+function drawCentroid(ctroid) {
+    push();
+    stroke(255, 0, 0);
+    strokeWeight(2);
+    fill(255, 255, 0);
+    
+    // Draw centroid circle
+    ellipse(ctroid.x, ctroid.y, 10, 10);
+    
+    // Draw crosshairs
+    line(ctroid.x - 15, ctroid.y, ctroid.x + 15, ctroid.y);
+    line(ctroid.x, ctroid.y - 15, ctroid.x, ctroid.y + 15);
+    
+    // Label
+    textAlign(CENTER, TOP);
+    fill(0);
+    text("Centroid", ctroid.x, ctroid.y + 20);
+    
+    pop();
+}
+
+function drawDimensions() {
+    push();
+    stroke(100);
+    strokeWeight(1);
+    fill(0);
+    textAlign(CENTER, CENTER);
+    
+    // Draw dimension lines for top flange
+    let topFlangeWidth = figura[0].wdth;
+    let x1 = figura[0].xc - topFlangeWidth / 2;
+    let x2 = figura[0].xc + topFlangeWidth / 2;
+    let y = figura[0].yc - figura[0].hght / 2 - 15;
+    
+    line(x1, y, x2, y);
+    line(x1, y - 5, x1, y + 5);
+    line(x2, y - 5, x2, y + 5);
+    text(topFlangeWidth + " mm", (x1 + x2) / 2, y - 10);
+    
+    // Draw dimension lines for web height
+    let webHeight = figura[1].hght;
+    let x = figura[1].xc + figura[1].wdth / 2 + 15;
+    let y1 = figura[1].yc - webHeight / 2;
+    let y2 = figura[1].yc + webHeight / 2;
+    
+    line(x, y1, x, y2);
+    line(x - 5, y1, x + 5, y1);
+    line(x - 5, y2, x + 5, y2);
+    
+    push();
+    translate(x + 10, (y1 + y2) / 2);
+    rotate(90);
+    text(webHeight + " mm", 0, 0);
+    pop();
+    
+    // Draw dimension lines for bottom flange
+    let bottomFlangeWidth = figura[2].wdth;
+    x1 = figura[2].xc - bottomFlangeWidth / 2;
+    x2 = figura[2].xc + bottomFlangeWidth / 2;
+    y = figura[2].yc + figura[2].hght / 2 + 15;
+    
+    line(x1, y, x2, y);
+    line(x1, y - 5, x1, y + 5);
+    line(x2, y - 5, x2, y + 5);
+    text(bottomFlangeWidth + " mm", (x1 + x2) / 2, y + 10);
+    
+    pop();
+}
+
+function drawReferenceArrows() {
+    push();
+    strokeWeight(1);
+    
+    // Draw arrows from component centroids to composite centroid
+    drawArrow(figura[0].xc + 70, figura[0].yc, ctroid.x + 70, ctroid.y, [200, 0, 0], true);
+    
+    if (Math.abs(figura[1].yc - ctroid.y) > 12) {
+        let direction = (figura[1].yc - ctroid.y) < 0 ? 1 : -1;
+        drawArrow(figura[1].xc + 100, figura[1].yc + direction, ctroid.x + 100, ctroid.y - direction, [0, 155, 0], true);
+    }
+    
+    drawArrow(figura[2].xc + 130, figura[2].yc, ctroid.x + 130, ctroid.y, [0, 0, 200], true);
+    
+    // Label distance values
+    textAlign(CENTER, CENTER);
+    fill(200, 0, 0);
+    let d1 = Math.abs(figura[0].yc - ctroid.y).toFixed(1);
+    text("d₁ = " + d1 + " mm", figura[0].xc + 70, (figura[0].yc + ctroid.y) / 2);
+    
+    fill(0, 155, 0);
+    let d2 = Math.abs(figura[1].yc - ctroid.y).toFixed(1);
+    text("d₂ = " + d2 + " mm", figura[1].xc + 100, (figura[1].yc + ctroid.y) / 2);
+    
+    fill(0, 0, 200);
+    let d3 = Math.abs(figura[2].yc - ctroid.y).toFixed(1);
+    text("d₃ = " + d3 + " mm", figura[2].xc + 130, (figura[2].yc + ctroid.y) / 2);
+    
+    pop();
+}
+
+function updateResults(ctroid, Ixx) {
+    if (!resultDiv) return;
+    
+    // Calculate individual second moments
+    let Ixx1 = Math.round(secmomarea([figura[0]], ctroid.y));
+    let Ixx2 = Math.round(secmomarea([figura[1]], ctroid.y));
+    let Ixx3 = Math.round(secmomarea([figura[2]], ctroid.y));
+    
+    // Create a formatted HTML result
+    let html = `
+        <table>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Centroid (X, Y)</td>
+            <td>(${ctroid.x.toFixed(1)}, ${ctroid.y.toFixed(1)}) mm</td>
+        </tr>
+        <tr>
+            <td>Total Area</td>
+            <td>${getTotalArea().toFixed(0)} mm²</td>
+        </tr>
+        <tr>
+            <td>Iₓₓ (Top Flange)</td>
+            <td>${Ixx1.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td>Iₓₓ (Web)</td>
+            <td>${Ixx2.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td>Iₓₓ (Bottom Flange)</td>
+            <td>${Ixx3.toFixed(0)} mm⁴</td>
+        </tr>
+        <tr>
+            <td><strong>Total Iₓₓ</strong></td>
+            <td><strong>${Math.round(Ixx).toFixed(0)} mm⁴</strong></td>
+        </tr>
+        </table>
+        ${symmetricMode ? '<p><strong>Symmetric Mode: ON</strong></p>' : ''}
+    `;
+    
+    resultDiv.html(html);
+}
+
+function drawExplanatoryText(ctroid, Ixx) {
+    push();
+    fill(0);
+    textAlign(LEFT, BOTTOM);
+    textSize(14);
+    text("Second Moment of Area Explorer", 20, 25);
+    
+    // Draw legend
+    textSize(12);
+    fill(200, 0, 0);
+    text("Top Flange", 520, 130);
+    fill(0, 155, 0);
+    text("Web", 520, 150);
+    fill(0, 0, 200);
+    text("Bottom Flange", 520, 170);
+    
+    pop();
+}
+
+function RectShape(xc, yc, wdth, hght, colore) {
+    this.xc = xc;
+    this.yc = yc;
+    this.colr = colore;
+    this.wdth = wdth;
+    this.hght = hght;
+
+    this.Area = wdth * hght;
+    this.troid = {
+        x: xc,
+        y: yc
+    };
+    this.Ixc = wdth * Math.pow(hght, 3) / 12; // bh³/12
+    this.Iyc = hght * Math.pow(wdth, 3) / 12; // hb³/12
+
+    this.display = function() {
+        push();
+        rectMode(CENTER);
+        stroke(0);
+        strokeWeight(2);
+        
+        // Fill with semi-transparent colour
+        fill(this.colr[0], this.colr[1], this.colr[2], 100);
+        
+        // Draw the rectangle
+        rect(this.xc, this.yc, this.wdth, this.hght);
+        
+        // Add hatching pattern
+        stroke(this.colr[0], this.colr[1], this.colr[2], 150);
+        strokeWeight(1);
+        
+        let spacing = 10;
+        for (let i = -this.wdth/2 + spacing/2; i < this.wdth/2; i += spacing) {
+            line(this.xc + i, this.yc - this.hght/2, this.xc + i, this.yc + this.hght/2);
+        }
+        pop();
+        
+        // Display the centroid of this component
+        this.showcentre();
+        
+        // Display the area label
+        push();
+        fill(0);
+        textAlign(LEFT, CENTER);
+        textSize(12);
+        text("A = " + this.Area.toFixed(0) + " mm²", this.xc + this.wdth/2 + 20, this.yc);
+        pop();
+    };
+
+    this.showcentre = function() {
+        push();
+        stroke(this.colr[0], this.colr[1], this.colr[2]);
+        strokeWeight(1);
+        fill(this.colr[0], this.colr[1], this.colr[2], 200);
+        
+        // Draw a small circle at the centroid
+        ellipse(this.xc, this.yc, 6, 6);
+        
+        // Draw a small cross at the centroid
+        line(this.xc - 4, this.yc, this.xc + 4, this.yc);
+        line(this.xc, this.yc - 4, this.xc, this.yc + 4);
+        pop();
+    };
+}
+
+function drawArrow(fromx, fromy, tox, toy, color, twoheaded) {
+    // Convert colour array to hex string
+    let colorstring = "#";
+    let pad = "00";
+    for (let ii = 0; ii < color.length; ii++) {
+        colorstring = colorstring + (pad + color[ii].toString(16)).slice(-pad.length);
+    }
+    
+    // Get drawing context
+    let ctx = cnv.drawingContext;
+    let headlen = 5;
+    
+    // Calculate arrow angle
+    let angle = Math.atan2(toy - fromy, tox - fromx);
+    
+    // Save original context settings
+    let oldstrokestyle = ctx.strokeStyle;
+    let oldlineWidth = ctx.lineWidth;
+    let oldfillStyle = ctx.fillStyle;
+    
+    // Draw the main shaft
+    ctx.beginPath();
+    ctx.moveTo(fromx, fromy);
+    ctx.lineTo(tox, toy);
+    ctx.strokeStyle = colorstring;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Draw the arrowhead at the end
+    ctx.beginPath();
+    ctx.moveTo(tox, toy);
+    ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI/7), toy - headlen * Math.sin(angle - Math.PI/7));
+    ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI/7), toy - headlen * Math.sin(angle + Math.PI/7));
+    ctx.lineTo(tox, toy);
+    ctx.fillStyle = colorstring;
+    ctx.fill();
+    
+    // If two-headed, draw the second arrowhead
+    if (twoheaded) {
+        ctx.beginPath();
+        ctx.moveTo(fromx, fromy);
+        ctx.lineTo(fromx + headlen * Math.cos(angle - Math.PI/7), fromy + headlen * Math.sin(angle - Math.PI/7));
+        ctx.lineTo(fromx + headlen * Math.cos(angle + Math.PI/7), fromy + headlen * Math.sin(angle + Math.PI/7));
+        ctx.lineTo(fromx, fromy);
+        ctx.fillStyle = colorstring;
+        ctx.fill();
+    }
+    
+    // Restore original context settings
+    ctx.strokeStyle = oldstrokestyle;
+    ctx.lineWidth = oldlineWidth;
+    ctx.fillStyle = oldfillStyle;
+}
+    </script>
+
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
 </body>
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
 </html>

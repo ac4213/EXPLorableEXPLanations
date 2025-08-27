@@ -44,7 +44,7 @@ function setup() {
   
   // Initialise beam
   beam = {
-    x: 100,
+    x: 30,
     y: height/2,
     length: 600,
     height: 20
@@ -236,8 +236,8 @@ function drawSupport(support) {
     case 'roller':
       // Draw roller support (triangle with circle)
       noFill();
-      triangle(x - 15, y, x + 15, y, x, y + 20);
-      ellipse(x, y + 25, 10, 10);
+      //triangle(x - 15, y, x + 15, y, x, y + 20);
+      ellipse(x, y+15, 30, 30);
       // Ground line
       line(x - 20, y + 30, x + 20, y + 30);
       break;
@@ -245,7 +245,7 @@ function drawSupport(support) {
     case 'pin':
       // Draw pin support (triangle)
       noFill();
-      triangle(x - 15, y, x + 15, y, x, y + 25);
+      triangle(x - 15, y+30, x + 15, y+30, x, y);
       // Ground line
       line(x - 20, y + 30, x + 20, y + 30);
       break;
@@ -353,7 +353,7 @@ function drawForce(force) {
       let loadHeight = force.magnitude * 3;
       
       // Draw arrows
-      for (let px = startX; px <= endX; px += 20) {
+      for (let px = startX; px <= endX; px += 10) {
         line(px, y - loadHeight, px, y - beam.height/2);
         // Small arrowheads
         push();
@@ -437,14 +437,14 @@ function drawReaction(reaction) {
       // Label
       noStroke();
       textAlign(LEFT, CENTER);
-      text('R_y = ' + reaction.magnitude.toFixed(1) + ' kN', x + 5, (startY + endY)/2);
+      text('Ry = ' + reaction.magnitude.toFixed(1) + ' kN', x + 5, (startY + endY)/2);
     }
   } else if (reaction.type === 'moment') {
     // Draw reaction moment
     stroke(reactionColour);
     strokeWeight(2);
     noFill();
-    let radius = 30;
+    let radius = 20;
     arc(x, y, radius * 2, radius * 2, 0, TWO_PI * 0.75);
     
     // Arrow on arc
@@ -680,13 +680,13 @@ function loadExample1() {
   
   // Simply supported beam with point load and UDL
   supports = [
-    {type: 'pin', x: beam.x + 50, label: 'A'},
-    {type: 'roller', x: beam.x + beam.length - 50, label: 'B'}
+    {type: 'pin', x: beam.x, label: 'A'},
+    {type: 'roller', x: beam.x + beam.length, label: 'B'}
   ];
   
   forces = [
-    {type: 'point', x: beam.x + 200, magnitude: 20, direction: 'down'},
-    {type: 'distributed', startX: beam.x + 350, endX: beam.x + 500, magnitude: 8}
+    {type: 'point', x: beam.x + 200, magnitude: 30, direction: 'down'},
+    //{type: 'distributed', startX: beam.x + 350, endX: beam.x + 500, magnitude: 8}
   ];
   
   console.log('Example 1 loaded - Forces:', forces.length, 'Supports:', supports.length);
@@ -699,12 +699,12 @@ function loadExample2() {
   
   // Cantilever beam
   supports = [
-    {type: 'fixed', x: beam.x + 50, label: 'A'}
+    {type: 'fixed', x: beam.x, label: 'A'}
   ];
   
   forces = [
-    {type: 'point', x: beam.x + beam.length - 100, magnitude: 15, direction: 'down'},
-    {type: 'moment', x: beam.x + 300, magnitude: 20, direction: 'cw'}
+    {type: 'point', x: beam.x + beam.length, magnitude: 50, direction: 'down'},
+    //{type: 'moment', x: beam.x + 300, magnitude: 20, direction: 'cw'}
   ];
   
   console.log('Example 2 loaded - Forces:', forces.length, 'Supports:', supports.length);
@@ -717,14 +717,14 @@ function loadExample3() {
   
   // Overhanging beam
   supports = [
-    {type: 'pin', x: beam.x + 150, label: 'A'},
-    {type: 'roller', x: beam.x + 450, label: 'B'}
+    {type: 'pin', x: beam.x, label: 'A'},
+    {type: 'roller', x: beam.x + 400, label: 'B'}
   ];
   
   forces = [
-    {type: 'point', x: beam.x + 50, magnitude: 10, direction: 'down'},
-    {type: 'point', x: beam.x + beam.length - 50, magnitude: 12, direction: 'down'},
-    {type: 'distributed', startX: beam.x + 200, endX: beam.x + 400, magnitude: 6}
+    //{type: 'point', x: beam.x + 50, magnitude: 10, direction: 'down'},
+    {type: 'point', x: beam.x + beam.length - 50, magnitude: 30, direction: 'down'},
+    //{type: 'distributed', startX: beam.x + 200, endX: beam.x + 400, magnitude: 6}
   ];
   
   console.log('Example 3 loaded - Forces:', forces.length, 'Supports:', supports.length);

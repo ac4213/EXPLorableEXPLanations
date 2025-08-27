@@ -206,7 +206,7 @@
 
     <div class="simulation-section">
         <h2>Interactive Simulation 1: Billiard Ball Collisions</h2>
-        <p>Explore 2D momentum conservation with two billiard balls. Adjust the parameters below to observe different collision scenarios - straight-on or oblique impacts!</p>
+        <p>Explore 2D momentum conservation with two billiard balls. The blue ball remains centred whilst you can adjust the white ball's vertical position to create oblique (diagonal) impacts. The animation runs at reduced speed to clearly observe the collision dynamics.</p>
         
         <div class="simulation-container">
             <div class="simulation-wrapper">
@@ -226,15 +226,9 @@
             </div>
             
             <div class="control-group">
-                <label for="y-pos-white">White Ball Y Position:</label>
-                <input type="range" id="y-pos-white" min="50" max="350" step="10" value="200">
+                <label for="y-pos-white">Impact Offset (White Ball):</label>
+                <input type="range" id="y-pos-white" min="50" max="350" step="5" value="200">
                 <span id="y-pos-white-value">200</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="y-pos-blue">Blue Ball Y Position:</label>
-                <input type="range" id="y-pos-blue" min="50" max="350" step="10" value="200">
-                <span id="y-pos-blue-value">200</span>
             </div>
             
             <div class="control-group">
@@ -254,18 +248,29 @@
                 <input type="range" id="restitution" min="0" max="1" step="0.1" value="0.9">
                 <span id="restitution-value">0.9</span>
             </div>
+            
+            <div class="control-group">
+                <label for="time-scale">Animation Speed:</label>
+                <input type="range" id="time-scale" min="0.1" max="1" step="0.1" value="0.3">
+                <span id="time-scale-value">30%</span>
+            </div>
         </div>
 
         <h3>Quick Reference</h3>
         <div class="key-point">
-            <p>Adjust the coefficient of restitution slider to see different collision behaviours:</p>
+            <p><strong>Creating Different Collision Types:</strong></p>
             <ul>
-                <li><strong>e = 1.0:</strong> Perfectly elastic - no energy lost</li>
-                <li><strong>e = 0.9:</strong> Slightly inelastic - small energy loss (typical for billiard balls)</li>
-                <li><strong>e = 0.5:</strong> Moderately inelastic - significant energy loss</li>
-                <li><strong>e = 0.0:</strong> Perfectly inelastic - objects stick together</li>
+                <li><strong>Head-on Collision:</strong> Set white ball to centre (Y = 200)</li>
+                <li><strong>Oblique Collision:</strong> Move white ball up or down from centre</li>
+                <li><strong>Grazing Collision:</strong> Move white ball to extreme positions</li>
             </ul>
-            <p>Watch how the total momentum remains constant regardless of the coefficient value!</p>
+            <p><strong>Impact Parameter (b):</strong> A measure of how "off-centre" the collision is:</p>
+            <ul>
+                <li>b = 0: Perfect head-on collision</li>
+                <li>0 < b < 1: Oblique collision</li>
+                <li>b → 1: Grazing collision</li>
+            </ul>
+            <p>Watch how the total momentum remains constant regardless of the impact parameter or coefficient value!</p>
         </div>
     </div>
 

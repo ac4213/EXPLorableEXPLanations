@@ -1,5 +1,6 @@
 // Billiards Collision Simulation
 // Demonstrates 2D momentum conservation and coefficient of restitution
+// Improved version with slower animation and diagonal impact control
 
 function initializeBilliardsSimulation() {
     // Create billiards sketch
@@ -13,16 +14,23 @@ function initializeBilliardsSimulation() {
         let pixelsPerMeter = 40; // Scale factor
         let isRunning = false;
         let hasCollided = false;
+        let timeScale = 0.3; // Slow down factor for animation
         
         // Initial conditions
         let whiteYPos = 200;
-        let blueYPos = 200;
+        let blueYPos = 200; // Blue ball always centred
         let whiteSpeed = 5;
         let blueSpeed = 2;
+        
+        // Trail for visualisation
+        let whiteTrail = [];
+        let blueTrail = [];
+        let maxTrailLength = 30;
         
         // Data for display
         let collisionData = {
             impactAngle: 0,
+            impactParameter: 0,
             whiteInitial: {v: 0, angle: 0},
             blueInitial: {v: 0, angle: 0},
             whiteFinal: {v: 0, angle: 0},
@@ -42,17 +50,12 @@ function initializeBilliardsSimulation() {
 
             update() {
                 if (isRunning) {
-                    this.pos.add(this.vel);
-                }
-                
-                // Wall collisions (elastic)
-                if (this.pos.x - this.radius < 0 || this.pos.x + this.radius > tableWidth) {
-                    this.vel.x *= -1;
-                    this.pos.x = p.constrain(this.pos.x, this.radius, tableWidth - this.radius);
-                }
-                if (this.pos.y - this.radius < 0 || this.pos.y + this.radius > tableHeight) {
-                    this.vel.y *= -1;
-                    this.pos.y = p.constrain(this.pos.y, this.radius, tableHeight - this.radius);
+                    // Apply time scaling for slower animation
+                    let scaledVel = p5.Vector.mult(this.vel, timeScale);
+                    this.pos.add(scaledVel);
+                    
+                    // No wall collisions - balls continue off screen
+                    // This makes the collision the focus of the simulation
                 }
             }
 
@@ -65,8 +68,13 @@ function initializeBilliardsSimulation() {
                     let normal = p5.Vector.sub(other.pos, this.pos);
                     normal.normalize();
                     
-                    // Calculate impact angle
+                    // Calculate impact angle and impact parameter
                     collisionData.impactAngle = p.degrees(p.atan2(normal.y, normal.x));
+                    
+                    // Impact parameter b (perpendicular distance from centre line)
+                    // b = 0 for head-on collision, b = R1+R2 for grazing collision
+                    let yDiff = Math.abs(whiteYPos - blueYPos);
+                    collisionData.impactParameter = yDiff / (this.radius + other.radius);
                     
                     // Store initial velocities
                     collisionData.whiteInitial.v = whiteBall.vel.mag() / pixelsPerMeter;
@@ -122,21 +130,35 @@ function initializeBilliardsSimulation() {
 
             display() {
                 p.push();
+                
+                // Draw shadow for 3D effect
+                p.fill(0, 0, 0, 30);
+                p.noStroke();
+                p.ellipse(this.pos.x + 2, this.pos.y + 2, this.radius * 2, this.radius * 2);
+                
+                // Main ball
                 p.fill(this.colour);
                 p.stroke(0);
                 p.strokeWeight(2);
                 p.circle(this.pos.x, this.pos.y, this.radius * 2);
                 
+                // Highlight for 3D effect
+                p.fill(255, 255, 255, 100);
+                p.noStroke();
+                p.ellipse(this.pos.x - this.radius/3, this.pos.y - this.radius/3, 
+                         this.radius/2, this.radius/2);
+                
                 // Label
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.CENTER, p.CENTER);
-                p.textSize(10);
+                p.textSize(12);
+                p.textStyle(p.BOLD);
                 p.text(this.name, this.pos.x, this.pos.y);
                 
                 if (showVectors && this.vel.mag() > 0.01) {
                     p.stroke(255, 0, 0);
-                    p.strokeWeight(2);
+                    p.strokeWeight(3);
                     let velDisplay = p5.Vector.mult(this.vel, 2);
                     p.line(this.pos.x, this.pos.y, 
                            this.pos.x + velDisplay.x, this.pos.y + velDisplay.y);
@@ -147,7 +169,7 @@ function initializeBilliardsSimulation() {
                     p.rotate(velDisplay.heading());
                     p.fill(255, 0, 0);
                     p.noStroke();
-                    p.triangle(0, 0, -5, -3, -5, 3);
+                    p.triangle(0, 0, -8, -4, -8, 4);
                     p.pop();
                 }
                 p.pop();
@@ -163,13 +185,18 @@ function initializeBilliardsSimulation() {
         function resetSimulation() {
             isRunning = false;
             hasCollided = false;
+            whiteTrail = [];
+            blueTrail = [];
+            
+            // Blue ball always at centre height
+            blueYPos = tableHeight / 2;
             
             // Create balls with initial positions and velocities
             whiteBall = new Ball(
                 100, whiteYPos, 
                 whiteSpeed * pixelsPerMeter, 0, 
                 massRatio, 
-                p.color(255), 
+                p.color(255, 255, 240), 
                 'W'
             );
             
@@ -177,13 +204,14 @@ function initializeBilliardsSimulation() {
                 700, blueYPos, 
                 -blueSpeed * pixelsPerMeter, 0, 
                 1, 
-                p.color(100, 100, 255), 
+                p.color(100, 150, 255), 
                 'B'
             );
             
             // Reset collision data
             collisionData = {
                 impactAngle: 0,
+                impactParameter: 0,
                 whiteInitial: {v: whiteSpeed, angle: 0},
                 blueInitial: {v: blueSpeed, angle: 180},
                 whiteFinal: {v: 0, angle: 0},
@@ -191,20 +219,90 @@ function initializeBilliardsSimulation() {
             };
         }
 
+        function drawTrajectoryPreview() {
+            if (!isRunning && !hasCollided) {
+                p.push();
+                p.stroke(255, 255, 0, 100);
+                p.strokeWeight(2);
+                //p.setLineDash([5, 10]);
+                
+                // Draw expected path for white ball
+                p.line(whiteBall.pos.x, whiteBall.pos.y, 
+                      whiteBall.pos.x + 200, whiteBall.pos.y);
+                
+                // Draw expected path for blue ball
+                p.stroke(100, 150, 255, 100);
+                p.line(blueBall.pos.x, blueBall.pos.y, 
+                      blueBall.pos.x - 200, blueBall.pos.y);
+                
+                // Show collision point preview if balls will collide
+                let yDiff = Math.abs(whiteYPos - blueYPos);
+                if (yDiff < whiteBall.radius + blueBall.radius) {
+                    p.stroke(255, 0, 0, 100);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.circle(tableWidth/2, (whiteYPos + blueYPos)/2, 40);
+                }
+                
+                p.pop();
+            }
+        }
+
         p.draw = function() {
-            // Background
-            p.background(0, 100, 0);
+            // Background gradient
+            for (let i = 0; i <= tableHeight; i++) {
+                let inter = p.map(i, 0, tableHeight, 0, 1);
+                let c = p.lerpColor(p.color(0, 120, 0), p.color(0, 80, 0), inter);
+                p.stroke(c);
+                p.line(0, i, tableWidth, i);
+            }
             
-            // Table border
-            p.stroke(139, 69, 19);
-            p.strokeWeight(20);
-            p.noFill();
-            p.rect(0, 0, tableWidth, tableHeight);
+            // Draw grid for reference
+            p.stroke(255, 255, 255, 20);
+            p.strokeWeight(1);
+            for (let x = 0; x < tableWidth; x += 50) {
+                p.line(x, 0, x, tableHeight);
+            }
+            for (let y = 0; y < tableHeight; y += 50) {
+                p.line(0, y, tableWidth, y);
+            }
             
             // Centre line
-            p.stroke(255, 255, 255, 50);
-            p.strokeWeight(1);
+            p.stroke(255, 255, 255, 40);
+            p.strokeWeight(2);
             p.line(tableWidth/2, 0, tableWidth/2, tableHeight);
+            
+            // Draw trajectory preview
+            drawTrajectoryPreview();
+            
+            // Add to trails
+            if (isRunning) {
+                whiteTrail.push({x: whiteBall.pos.x, y: whiteBall.pos.y});
+                blueTrail.push({x: blueBall.pos.x, y: blueBall.pos.y});
+                
+                if (whiteTrail.length > maxTrailLength) whiteTrail.shift();
+                if (blueTrail.length > maxTrailLength) blueTrail.shift();
+            }
+            
+            // Draw trails
+            p.noFill();
+            p.strokeWeight(2);
+            
+            // White ball trail
+            for (let i = 0; i < whiteTrail.length - 1; i++) {
+                let alpha = p.map(i, 0, whiteTrail.length, 20, 150);
+                p.stroke(255, 255, 240, alpha);
+                p.line(whiteTrail[i].x, whiteTrail[i].y, 
+                      whiteTrail[i + 1].x, whiteTrail[i + 1].y);
+            }
+            
+            // Blue ball trail
+            for (let i = 0; i < blueTrail.length - 1; i++) {
+                let alpha = p.map(i, 0, blueTrail.length, 20, 150);
+                p.stroke(100, 150, 255, alpha);
+                p.line(blueTrail[i].x, blueTrail[i].y, 
+                      blueTrail[i + 1].x, blueTrail[i + 1].y);
+            }
             
             // Update and display balls
             whiteBall.update();
@@ -216,7 +314,23 @@ function initializeBilliardsSimulation() {
             whiteBall.display();
             blueBall.display();
             
+            // Draw collision indicator
+            if (hasCollided && p.frameCount % 30 < 15) {
+                p.push();
+                p.stroke(255, 255, 0);
+                p.strokeWeight(3);
+                p.noFill();
+                let collisionX = (whiteBall.pos.x + blueBall.pos.x) / 2;
+                let collisionY = (whiteBall.pos.y + blueBall.pos.y) / 2;
+                p.circle(collisionX, collisionY, 50);
+                p.pop();
+            }
+            
             // Display collision data overlay
+            displayDataOverlay();
+        };
+        
+        function displayDataOverlay() {
             p.fill(255);
             p.stroke(0);
             p.strokeWeight(1);
@@ -226,23 +340,27 @@ function initializeBilliardsSimulation() {
             // Background for text
             p.fill(0, 0, 0, 180);
             p.noStroke();
-            p.rect(5, 5, 350, 180, 5);
+            p.rect(5, 5, 380, 200, 5);
             
             p.fill(255);
             p.text('Initial Conditions:', 10, 10);
             p.text(`  White: v₀ = ${whiteSpeed.toFixed(1)} m/s, θ = 0°`, 10, 30);
-            p.text(`  Blue:  v₀ = ${blueSpeed.toFixed(1)} m/s, θ = 180°`, 10, 50);
+            p.text(`  Blue:  v₀ = ${blueSpeed.toFixed(1)} m/s, θ = 180° (centred)`, 10, 50);
             p.text(`  Mass Ratio (W/B): ${massRatio.toFixed(1)}`, 10, 70);
             p.text(`  Coefficient of Restitution: ${restitution.toFixed(1)}`, 10, 90);
+            p.text(`  White Ball Y Offset: ${(whiteYPos - tableHeight/2).toFixed(0)} px`, 10, 110);
             
             if (hasCollided) {
-                p.text(`Impact Angle: ${collisionData.impactAngle.toFixed(1)}°`, 10, 115);
-                p.text('Final Velocities:', 10, 135);
-                p.text(`  White: v = ${collisionData.whiteFinal.v.toFixed(2)} m/s, θ = ${collisionData.whiteFinal.angle.toFixed(1)}°`, 10, 155);
-                p.text(`  Blue:  v = ${collisionData.blueFinal.v.toFixed(2)} m/s, θ = ${collisionData.blueFinal.angle.toFixed(1)}°`, 10, 175);
+                p.fill(255, 255, 0);
+                p.text(`Impact Parameter b: ${collisionData.impactParameter.toFixed(2)}`, 10, 135);
+                p.text(`  (0 = head-on, 1 = grazing)`, 10, 155);
+                p.fill(255);
+                p.text('Final Velocities:', 10, 175);
+                p.text(`  White: v = ${collisionData.whiteFinal.v.toFixed(2)} m/s, θ = ${collisionData.whiteFinal.angle.toFixed(1)}°`, 10, 195);
+                p.text(`  Blue:  v = ${collisionData.blueFinal.v.toFixed(2)} m/s, θ = ${collisionData.blueFinal.angle.toFixed(1)}°`, 10, 215);
             }
             
-            // Display momentum
+            // Display momentum and energy
             let totalMomentumX = whiteBall.mass * whiteBall.vel.x + blueBall.mass * blueBall.vel.x;
             let totalMomentumY = whiteBall.mass * whiteBall.vel.y + blueBall.mass * blueBall.vel.y;
             let totalMomentum = p.sqrt(totalMomentumX * totalMomentumX + totalMomentumY * totalMomentumY);
@@ -254,7 +372,7 @@ function initializeBilliardsSimulation() {
             
             p.fill(0, 0, 0, 180);
             p.noStroke();
-            p.rect(tableWidth - 255, 5, 250, 80, 5);
+            p.rect(tableWidth - 255, 5, 250, 100, 5);
             
             p.fill(255);
             p.textAlign(p.RIGHT, p.TOP);
@@ -262,7 +380,8 @@ function initializeBilliardsSimulation() {
             p.text(`Px: ${(totalMomentumX/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 30);
             p.text(`Py: ${(totalMomentumY/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 50);
             p.text(`Kinetic Energy: ${kineticEnergy.toFixed(2)} J`, tableWidth - 10, 70);
-        };
+            p.text(`Animation Speed: ${(timeScale * 100).toFixed(0)}%`, tableWidth - 10, 90);
+        }
 
         // External controls
         p.resetSimulation = function() {
@@ -286,9 +405,6 @@ function initializeBilliardsSimulation() {
                 case 'whiteY':
                     whiteYPos = value;
                     break;
-                case 'blueY':
-                    blueYPos = value;
-                    break;
                 case 'whiteSpeed':
                     whiteSpeed = value;
                     break;
@@ -297,6 +413,9 @@ function initializeBilliardsSimulation() {
                     break;
                 case 'restitution':
                     restitution = value;
+                    break;
+                case 'timeScale':
+                    timeScale = value;
                     break;
             }
             resetSimulation();
@@ -330,11 +449,6 @@ function initializeBilliardsSimulation() {
         billiards.setParameter('whiteY', parseInt(this.value));
     });
     
-    document.getElementById('y-pos-blue').addEventListener('input', function() {
-        document.getElementById('y-pos-blue-value').textContent = this.value;
-        billiards.setParameter('blueY', parseInt(this.value));
-    });
-    
     document.getElementById('speed-white').addEventListener('input', function() {
         document.getElementById('speed-white-value').textContent = parseFloat(this.value).toFixed(1);
         billiards.setParameter('whiteSpeed', parseFloat(this.value));
@@ -349,4 +463,12 @@ function initializeBilliardsSimulation() {
         document.getElementById('restitution-value').textContent = this.value;
         billiards.setParameter('restitution', parseFloat(this.value));
     });
+    
+    // Animation speed control (if added to HTML)
+    if (document.getElementById('time-scale')) {
+        document.getElementById('time-scale').addEventListener('input', function() {
+            document.getElementById('time-scale-value').textContent = (parseFloat(this.value) * 100).toFixed(0) + '%';
+            billiards.setParameter('timeScale', parseFloat(this.value));
+        });
+    }
 }

@@ -28,6 +28,7 @@
             border-radius: 4px;
             background-color: #f9f9f9;
             margin: 10px 0;
+            overflow: hidden;
         }
         
         .energy-bars {
@@ -264,11 +265,15 @@
         <div class="controls-panel">
             <button id="slide-reset">Reset</button>
             <button id="slide-release">Release Bead</button>
-            <button id="toggle-friction">Toggle Friction: OFF</button>
             <div class="control-item">
                 <label>Initial Height:</label>
                 <input type="range" id="slide-height" min="50" max="150" value="100">
                 <div class="control-value">Height: <span id="height-value">100</span> mm</div>
+            </div>
+            <div class="control-item">
+                <label>Friction Force:</label>
+                <input type="range" id="slide-friction" min="0" max="2" step="0.1" value="0">
+                <div class="control-value">Friction: <span id="friction-force-value">0.0</span> N</div>
             </div>
         </div>
         
@@ -280,26 +285,9 @@
     <!-- Simulation 2: Block on incline -->
     <div class="simulation-container">
         <h2>Simulation 2: Block Sliding Down an Incline</h2>
-        <p>Watch how potential energy converts to kinetic energy as the block slides down. The energy bars show the distribution of energy in real-time.</p>
+        <p>Watch how potential energy converts to kinetic energy as the block slides down. The energy bars show both absolute (Joules) and percentage values, including energy dissipated by friction.</p>
         
         <div id="incline-sim" class="sim-holder"></div>
-        
-        <div class="energy-bars">
-            <div class="energy-bar-container">
-                <div class="energy-bar-label">Potential Energy</div>
-                <div class="energy-bar-wrapper">
-                    <div id="pe-bar" class="energy-bar" style="height: 100%; background: linear-gradient(to top, #2196F3, #64B5F6);"></div>
-                </div>
-                <div class="energy-value">PE: <span id="pe-value">100</span>%</div>
-            </div>
-            <div class="energy-bar-container">
-                <div class="energy-bar-label">Kinetic Energy</div>
-                <div class="energy-bar-wrapper">
-                    <div id="ke-bar" class="energy-bar" style="height: 0%;"></div>
-                </div>
-                <div class="energy-value">KE: <span id="ke-value">0</span>%</div>
-            </div>
-        </div>
         
         <div class="controls-panel">
             <button id="incline-reset">Reset</button>
@@ -320,46 +308,13 @@
     <!-- Simulation 3: Rolling race -->
     <div class="simulation-container">
         <h2>Simulation 3: Rolling Race - Different Objects</h2>
-        <p>Compare how different shaped objects roll down an incline. Each object has a different distribution of rotational and translational kinetic energy.</p>
+        <p>Compare how different shaped objects roll down an incline. Each object has the same mass and radius, but a different moment of inertia, leading to a different distribution of rotational and translational kinetic energy.</p>
         
         <div id="race-sim" class="sim-holder"></div>
-        
-        <div class="energy-bars">
-            <div class="energy-bar-container">
-                <div class="energy-bar-label">Potential</div>
-                <div class="energy-bar-wrapper">
-                    <div id="race-pe-bar" class="energy-bar" style="height: 100%; background: linear-gradient(to top, #2196F3, #64B5F6);"></div>
-                </div>
-                <div class="energy-value"><span id="race-pe-value">100</span>%</div>
-            </div>
-            <div class="energy-bar-container">
-                <div class="energy-bar-label">Translational KE</div>
-                <div class="energy-bar-wrapper">
-                    <div id="race-tke-bar" class="energy-bar" style="height: 0%;"></div>
-                </div>
-                <div class="energy-value"><span id="race-tke-value">0</span>%</div>
-            </div>
-            <div class="energy-bar-container">
-                <div class="energy-bar-label">Rotational KE</div>
-                <div class="energy-bar-wrapper">
-                    <div id="race-rke-bar" class="energy-bar" style="height: 0%; background: linear-gradient(to top, #FF9800, #FFC107);"></div>
-                </div>
-                <div class="energy-value"><span id="race-rke-value">0</span>%</div>
-            </div>
-        </div>
         
         <div class="controls-panel">
             <button id="race-reset">Reset</button>
             <button id="race-start">Start Race</button>
-            <div class="control-item">
-                <label>Select Object:</label>
-                <select id="object-select">
-                    <option value="sphere">Solid Sphere (I = 2/5 MR²)</option>
-                    <option value="hollow-sphere">Hollow Sphere (I = 2/3 MR²)</option>
-                    <option value="cylinder">Solid Cylinder (I = 1/2 MR²)</option>
-                    <option value="hollow-cylinder">Hollow Cylinder (I = MR²)</option>
-                </select>
-            </div>
         </div>
         
         <div class="key-point">
@@ -491,8 +446,8 @@
                         <td>Fundamental principle</td>
                     </tr>
                     <tr>
-                        <td>Conservation of Mechanical Energy</td>
-                        <td>\(E_1 + W_{nc} = E_2\)</td>
+                        <td>Conservation of Energy</td>
+                        <td>\(E_1 + W_{\text{nc}} = E_2\)</td>
                         <td>Including non-conservative work</td>
                     </tr>
                 </tbody>
@@ -501,7 +456,7 @@
     </div>
 
     <footer>
-        <script src="../common/footer.js"></script>
+        <script src="/assets/common/footer.js"></script>
     </footer>
 
     <script>
@@ -517,246 +472,432 @@
             }
         }
 
-        // Simulation 1: U-shaped slide
-        let slideSketch = function(p) {
-            let beadX, beadY, beadVx, beadVy;
-            let initialHeight = 100;
-            let isReleased = false;
-            let hasFriction = false;
-            let g = 0.5; // Gravity
-            let frictionCoeff = 0.02;
-            let slideWidth = 200;
-            let slideBottom = 250;
-            let radius = 10;
-            let trail = [];
-            
-            p.setup = function() {
-                let canvas = p.createCanvas(800, 400);
-                canvas.parent('slide-sim');
-                p.resetSimulation();
-            };
-            
-            p.resetSimulation = function() {
-                beadX = p.width/2 - slideWidth/2;
-                beadY = slideBottom - initialHeight;
-                beadVx = 0;
-                beadVy = 0;
-                isReleased = false;
-                trail = [];
-            };
-            
-            p.draw = function() {
-                p.background(245);
-                
-                // Draw U-shaped slide
-                p.stroke(50);
-                p.strokeWeight(3);
-                p.noFill();
-                p.beginShape();
-                p.vertex(p.width/2 - slideWidth/2 - 50, 50);
-                p.vertex(p.width/2 - slideWidth/2, slideBottom);
-                p.bezierVertex(
-                    p.width/2 - slideWidth/4, slideBottom + 50,
-                    p.width/2 + slideWidth/4, slideBottom + 50,
-                    p.width/2 + slideWidth/2, slideBottom
-                );
-                p.vertex(p.width/2 + slideWidth/2 + 50, 50);
-                p.endShape();
-                
-                // Draw trail
-                p.stroke(100, 100, 255, 100);
-                p.strokeWeight(2);
-                p.noFill();
-                p.beginShape();
-                for(let i = 0; i < trail.length; i++) {
-                    p.vertex(trail[i].x, trail[i].y);
-                }
-                p.endShape();
-                
-                // Update physics
-                if(isReleased) {
-                    // Calculate position on slide
-                    let slidePos = getSlidePosition(beadX);
-                    let normal = getSlideNormal(beadX);
-                    
-                    // Apply gravity
-                    beadVy += g;
-                    
-                    // Apply constraint to stay on slide
-                    if(Math.abs(beadY - slidePos.y) > 1) {
-                        beadY = slidePos.y;
-                        
-                        // Project velocity along slide
-                        let tangent = {x: -normal.y, y: normal.x};
-                        let vDotT = beadVx * tangent.x + beadVy * tangent.y;
-                        
-                        // Apply friction if enabled
-                        if(hasFriction) {
-                            vDotT *= (1 - frictionCoeff);
-                        }
-                        
-                        beadVx = vDotT * tangent.x;
-                        beadVy = vDotT * tangent.y;
-                    }
-                    
-                    // Update position
-                    beadX += beadVx;
-                    beadY += beadVy;
-                    
-                    // Add to trail
-                    trail.push({x: beadX, y: beadY});
-                    if(trail.length > 100) trail.shift();
-                    
-                    // Stop at edges
-                    if(beadX < p.width/2 - slideWidth/2 - 45 || beadX > p.width/2 + slideWidth/2 + 45) {
-                        isReleased = false;
-                    }
-                }
-                
-                // Draw bead
-                p.fill(255, 100, 100);
-                p.noStroke();
-                p.ellipse(beadX, beadY, radius * 2);
-                
-                // Draw energy indicator
-                let ke = 0.5 * (beadVx * beadVx + beadVy * beadVy);
-                let pe = (slideBottom - beadY) * g;
-                let totalE = ke + pe;
-                
-                p.fill(0);
-                p.noStroke();
-                p.textAlign(p.LEFT);
-                p.text(`Kinetic Energy: ${ke.toFixed(1)}`, 10, 20);
-                p.text(`Potential Energy: ${pe.toFixed(1)}`, 10, 40);
-                p.text(`Total Energy: ${totalE.toFixed(1)}`, 10, 60);
-                p.text(`Friction: ${hasFriction ? 'ON' : 'OFF'}`, 10, 80);
-                
-                // Helper function to get slide position
-                function getSlidePosition(x) {
-                    let relX = (x - p.width/2) / (slideWidth/2);
-                    relX = p.constrain(relX, -1, 1);
-                    let y = slideBottom - Math.sqrt(1 - relX * relX) * slideBottom * 0.3;
-                    return {x: x, y: y};
-                }
-                
-                // Helper function to get slide normal
-                function getSlideNormal(x) {
-                    let relX = (x - p.width/2) / (slideWidth/2);
-                    relX = p.constrain(relX, -1, 1);
-                    let angle = Math.asin(relX);
-                    return {x: Math.sin(angle), y: -Math.cos(angle)};
-                }
-            };
-            
-            document.getElementById('slide-reset').onclick = function() {
-                p.resetSimulation();
-            };
-            
-            document.getElementById('slide-release').onclick = function() {
-                isReleased = true;
-            };
-            
-            document.getElementById('toggle-friction').onclick = function() {
-                hasFriction = !hasFriction;
-                this.textContent = `Toggle Friction: ${hasFriction ? 'ON' : 'OFF'}`;
-            };
-            
-            document.getElementById('slide-height').oninput = function() {
-                initialHeight = parseInt(this.value);
-                document.getElementById('height-value').textContent = this.value;
-                p.resetSimulation();
-            };
-        };
+// Simulation 1: U-shaped slide (vertical – semicircle – vertical)
+// Physics in SI units (m, s, N, J). Rendering converts to pixels.
+
+let slideSketch = function(p) {
+  // --- Constants & settings ---
+  const g = 9.81;            // m/s^2
+  const mass = 1;            // kg
+  const scale = 100;         // px per metre
+  const slideRadiusPx = 80;  // px
+  const slideBottomPx = 350; // y pixel for the bottom of the semicircle
+  const maxHeightPx = 200;   // vertical leg length in px (each side)
+  const vEps = 1e-3;         // m/s threshold for "at rest"
+  const aEps = 5e-2;         // m/s^2 threshold to prevent false sticking
+
+  // --- State (physics in metres, seconds) ---
+  let beadPos_m = 0;     // arclength position along track [0, totalLength_m]
+  let beadVel_mps = 0;   // tangential velocity along track
+  let frictionForce_N = 0; // constant kinetic friction magnitude (N)
+  let isReleased = false;
+
+  // UI-provided: initial height from top of left vertical (in PX for slider), convert on reset
+  let initialHeightPx = 100;
+
+  // Track geometry (metres)
+  let R_m, leftVertical_m, rightVertical_m, arcLength_m, totalLength_m;
+
+  // Energy bookkeeping
+  let energyLost_J = 0;
+  let initialEnergy_J = 0; // computed at reset from actual start height
+
+  // --- Helpers (geometry & kinematics) ---
+
+  function slideTopPx() {
+    // top y of the vertical legs (they end at the top of the semicircle)
+    return slideBottomPx - (leftVertical_m * scale) - (R_m * scale);
+  }
+
+  // Return bead (x,y) in pixels from a position s (metres) along the track
+  function getBeadCoordinatesPx(s_m) {
+    const topPx = slideTopPx();
+
+    if (s_m <= leftVertical_m) {
+      // Left vertical (downwards along +s)
+      return {
+        x: p.width / 2 - 50 - R_m * scale,
+        y: topPx + s_m * scale
+      };
+    }
+
+    if (s_m <= leftVertical_m + arcLength_m) {
+      // Bottom semicircle from leftmost (angle π) to rightmost (angle 0)
+      const arcPos_m = s_m - leftVertical_m;
+      const angle = Math.PI - (arcPos_m / R_m); // s increases as angle decreases
+      const cx = p.width / 2 - 50;
+      const cy = slideBottomPx - R_m * scale;
+      const x = cx + (R_m * scale) * Math.cos(angle);
+      const y = cy + (R_m * scale) * Math.sin(angle);
+      return { x, y };
+    }
+
+    // Right vertical (upwards along +s)
+    const vertPos_m = s_m - leftVertical_m - arcLength_m;
+    return {
+      x: p.width / 2 - 50 + R_m * scale,
+      y: slideBottomPx - R_m * scale - vertPos_m * scale
+    };
+  }
+
+  // Tangential component of gravity along +s (metres-based)
+  function gravityAlongTrack_mps2(s_m) {
+    if (s_m <= leftVertical_m) {
+      // +s downward: gravity aids motion
+      return +g;
+    }
+    if (s_m <= leftVertical_m + arcLength_m) {
+      // Semicircle: angle as in getBeadCoordinatesPx
+      const arcPos_m = s_m - leftVertical_m;
+      const angle = Math.PI - (arcPos_m / R_m);
+
+      // IMPORTANT: sign! For +s defined from leftmost (π) to rightmost (0),
+      // the unit tangent is (sinθ, -cosθ). Dot with gravity (0, +g) gives -g*cosθ.
+      return -g * Math.cos(angle);
+    }
+    // Right vertical: +s is upward, gravity opposes motion
+    return -g;
+  }
+
+  // --- Setup & reset ---
+
+  p.setup = function() {
+    const canvas = p.createCanvas(800, 400);
+    canvas.parent('slide-sim');
+    resetSimulation();
+  };
+
+  function resetSimulation() {
+    R_m = slideRadiusPx / scale;
+    leftVertical_m = maxHeightPx / scale;
+    rightVertical_m = maxHeightPx / scale;
+    arcLength_m = Math.PI * R_m;
+    totalLength_m = leftVertical_m + arcLength_m + rightVertical_m;
+
+    // Clamp UI height to [0, leftVertical] in px
+    const clampedInitPx = p.constrain(initialHeightPx, 0, maxHeightPx);
+    const initHeight_m = clampedInitPx / scale;
+
+    // Start on left vertical at given height from the top
+    beadPos_m = leftVertical_m - initHeight_m; // metres along track
+    beadVel_mps = 0;
+    isReleased = false;
+    energyLost_J = 0;
+
+    // Compute initial energy from actual starting height (relative to the very bottom)
+    const startXY = getBeadCoordinatesPx(beadPos_m);
+    const startHeight_m = (slideBottomPx - startXY.y) / scale; // vertical height above bottom
+    initialEnergy_J = mass * g * startHeight_m; // initial KE = 0
+  }
+
+  // --- Draw loop ---
+
+  p.draw = function() {
+    p.background(245);
+
+    // Draw track
+    const topPx = slideTopPx();
+    p.stroke(50);
+    p.strokeWeight(4);
+    p.noFill();
+
+    // left vertical
+    p.line(p.width / 2 - 50 - R_m * scale, topPx, p.width / 2 - 50 - R_m * scale, slideBottomPx - R_m * scale);
+    // semicircle (bottom half)
+    p.arc(p.width / 2 -50 , slideBottomPx - R_m * scale, 2 * R_m * scale, 2 * R_m * scale, 0, Math.PI);
+    // right vertical
+    p.line(p.width / 2 - 50 + R_m * scale, slideBottomPx - R_m * scale, p.width / 2 -50 + R_m * scale, topPx);
+
+    // Physics step (semi-implicit Euler; uses frame time for stability)
+    if (isReleased) {
+      const dt = Math.min(0.03, p.deltaTime / 1000); // clamp dt for stability
+
+      const a_g = gravityAlongTrack_mps2(beadPos_m);
+
+      // Kinetic friction opposing motion (constant magnitude), off when essentially stopped
+      let a_f = 0;
+      if (frictionForce_N > 0 && Math.abs(beadVel_mps) > 1e-5) {
+        a_f = -(frictionForce_N / mass) * Math.sign(beadVel_mps);
+      }
+
+      const a_total = a_g + a_f;
+
+      // Update
+      const oldPos_m = beadPos_m;
+      beadVel_mps += a_total * dt;
+      beadPos_m += beadVel_mps * dt;
+
+      // Work done by friction (always dissipative)
+      if (frictionForce_N > 0) {
+        energyLost_J += Math.abs(frictionForce_N * (beadPos_m - oldPos_m));
+      }
+
+      // Keep bead on the track
+      if (beadPos_m < 0) {
+        beadPos_m = 0;
+        beadVel_mps = 0; // stop at hard end
+      } else if (beadPos_m > totalLength_m) {
+        beadPos_m = totalLength_m;
+        beadVel_mps = 0;
+      }
+
+      // Only consider "rest" if both almost zero velocity and near-zero tangential accel
+      if (Math.abs(beadVel_mps) < vEps && Math.abs(a_total) < aEps) {
+        beadVel_mps = 0;
+        isReleased = false;
+      }
+    }
+
+    // Draw bead
+    const beadXY = getBeadCoordinatesPx(beadPos_m);
+    p.fill(255, 100, 100);
+    p.noStroke();
+    p.ellipse(beadXY.x, beadXY.y, 20);
+
+    // Energies
+    const height_m = (slideBottomPx - beadXY.y) / scale;
+    const KE = 0.5 * mass * beadVel_mps * beadVel_mps;
+    const PE = mass * g * height_m;
+    const totalE = KE + PE;
+
+    // UI text
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.LEFT);
+    p.text(`Kinetic Energy: ${KE.toFixed(2)} J`, 10, 20);
+    p.text(`Potential Energy: ${PE.toFixed(2)} J`, 10, 40);
+    p.text(`Total Mechanical Energy: ${totalE.toFixed(2)} J`, 10, 60);
+    p.text(`Initial Energy: ${initialEnergy_J.toFixed(2)} J`, 10, 80);
+    p.text(`Energy Lost to Friction: ${energyLost_J.toFixed(2)} J`, 10, 100);
+    p.text(`Friction Force: ${frictionForce_N.toFixed(2)} N`, 10, 120);
+
+    // Reference lines: initial height & current height
+    p.stroke(200);
+    p.strokeWeight(1);
+    p.drawingContext.setLineDash([5, 5]);
+
+    const initXY = getBeadCoordinatesPx(leftVertical_m - (initialHeightPx / scale));
+    p.line(p.width / 2 - 50 - R_m * scale - 20, initXY.y, p.width / 2 - 50 + R_m * scale + 20, initXY.y);
+    p.line(beadXY.x - 30, beadXY.y, beadXY.x + 30, beadXY.y);
+
+    p.drawingContext.setLineDash([]);
+  };
+
+  // --- Controls wiring (keep existing element IDs) ---
+
+  document.getElementById('slide-reset').onclick = function () {
+    resetSimulation();
+  };
+
+  document.getElementById('slide-release').onclick = function () {
+    isReleased = true;
+  };
+
+  document.getElementById('slide-height').oninput = function () {
+    // This slider is assumed to be in PIXELS (0..200). We clamp and convert on reset.
+    initialHeightPx = parseFloat(this.value);
+    document.getElementById('height-value').textContent = this.value;
+    resetSimulation();
+  };
+
+  document.getElementById('slide-friction').oninput = function () {
+    frictionForce_N = parseFloat(this.value);
+    document.getElementById('friction-force-value').textContent = this.value;
+  };
+};
+
         
-        // Simulation 2: Block on incline
+        // Simulation 2: Block on incline with no-slip condition indicator
         let inclineSketch = function(p) {
             let blockX, blockY;
             let velocity = 0;
             let angle = 30;
             let friction = 0.1;
             let isMoving = false;
-            let inclineLength = 400;
-            let blockSize = 40;
+            let inclineLength = 350;
+            let blockSize = 30;
+            let mass = 5; // kg
+            let g = 9.81; // m/s²
+            let scale = 100; // pixels per metre
             let startHeight;
             let initialPE;
+            let dissipatedEnergy = 0;
+            let startX, startY;
+            let endX, endY;
+            let distance = 0;
+            let groundY = 400;
+            let cannotSlide = false;
             
             p.setup = function() {
-                let canvas = p.createCanvas(800, 400);
+                let canvas = p.createCanvas(800, 500);
                 canvas.parent('incline-sim');
                 p.resetSimulation();
             };
             
             p.resetSimulation = function() {
-                blockX = 150;
-                blockY = 200 - inclineLength * Math.sin(angle * Math.PI / 180);
+                // Calculate incline endpoints - end point is on the ground
+                endX = 500;
+                endY = groundY;
+                
+                // Start point is calculated based on angle and length
+                startX = endX - inclineLength * Math.cos(angle * Math.PI / 180);
+                startY = endY - inclineLength * Math.sin(angle * Math.PI / 180);
+                
+                // Position block at top of incline, properly sitting on the surface
+                blockX = startX + blockSize/2 * Math.sin(angle * Math.PI / 180);
+                blockY = startY - blockSize/2 * Math.cos(angle * Math.PI / 180);
+                
                 velocity = 0;
+                distance = 0;
                 isMoving = false;
-                startHeight = 350 - blockY;
-                initialPE = startHeight;
-                updateEnergyBars(100, 0);
+                dissipatedEnergy = 0;
+                
+                // Check if sliding is possible
+                cannotSlide = (friction >= Math.tan(angle * Math.PI / 180));
+                
+                // Calculate initial height
+                startHeight = (groundY - blockY) / scale; // in metres
+                initialPE = mass * g * startHeight;
             };
             
             p.draw = function() {
                 p.background(245);
                 
-                // Draw incline
-                p.push();
-                p.translate(150, 200);
-                p.rotate(angle * Math.PI / 180);
-                p.stroke(50);
-                p.strokeWeight(3);
-                p.line(0, 0, inclineLength, 0);
-                p.pop();
-                
                 // Draw ground
                 p.stroke(50);
                 p.strokeWeight(2);
-                p.line(0, 350, p.width, 350);
+                p.line(0, groundY, p.width, groundY);
+                
+                // Draw incline
+                p.stroke(50);
+                p.strokeWeight(4);
+                p.line(startX, startY, endX, endY);
+                
+                // Show warning if cannot slide
+                if(cannotSlide && distance < 1) {
+                    // Draw warning box
+                    p.push();
+                    p.fill(255, 230, 230);
+                    p.stroke(200, 0, 0);
+                    p.strokeWeight(2);
+                    p.rect(200, 50, 350, 120, 10);
+                    
+                    p.fill(200, 0, 0);
+                    p.noStroke();
+                    p.textAlign(p.CENTER);
+                    p.textSize(16);
+                    p.text('⚠ NO SLIDING CONDITION', 370, 70);
+                    p.textSize(14);
+                    p.text(`μ ≥ tan(θ)`, 370, 100);
+                    p.text(`${friction.toFixed(2)} ≥ ${Math.tan(angle * Math.PI / 180).toFixed(2)}`, 370, 130);
+                    p.textSize(12);
+                    p.text('Block will not slide: friction balances gravity', 370, 160);
+                    p.pop();
+                }
                 
                 // Update physics
-                if(isMoving) {
-                    let g = 0.3;
-                    let a = g * Math.sin(angle * Math.PI / 180) - friction * g * Math.cos(angle * Math.PI / 180);
+                if(isMoving && !cannotSlide) {
+                    let dt = 1/60;
+                    let sinTheta = Math.sin(angle * Math.PI / 180);
+                    let cosTheta = Math.cos(angle * Math.PI / 180);
                     
-                    if(a > 0) {
-                        velocity += a;
-                        blockX += velocity * Math.cos(angle * Math.PI / 180);
-                        blockY += velocity * Math.sin(angle * Math.PI / 180);
+                    // Calculate acceleration
+                    let a = g * (sinTheta - friction * cosTheta);
+                    
+                    if(a > 0 && distance < inclineLength) {
+                        velocity += a * dt;
+                        let ds = velocity * dt * scale; // displacement in pixels
+                        distance += ds;
+                        
+                        // Update block position along incline
+                        let distFromStart = distance;
+                        blockX = startX + distFromStart * cosTheta + blockSize/2 * sinTheta;
+                        blockY = startY + distFromStart * sinTheta - blockSize/2 * cosTheta;
+                        
+                        // Calculate energy dissipated by friction
+                        let frictionWork = friction * mass * g * cosTheta * ds / scale;
+                        dissipatedEnergy += frictionWork;
                     }
-                    
-                    // Calculate energies
-                    let currentHeight = 350 - blockY;
-                    let pe = (currentHeight / startHeight) * 100;
-                    let ke = 100 - pe;
-                    updateEnergyBars(Math.max(0, pe), Math.min(100, ke));
                     
                     // Stop at bottom
-                    if(blockY >= 350 - blockSize/2) {
+                    if(distance >= inclineLength || blockY >= groundY - blockSize/2) {
                         isMoving = false;
-                        blockY = 350 - blockSize/2;
-                        updateEnergyBars(0, 100);
+                        if(blockY > groundY - blockSize/2) {
+                            blockY = groundY - blockSize/2;
+                            blockX = endX;
+                        }
                     }
                 }
+                
+                // Calculate current energies
+                let currentHeight = (groundY - blockY) / scale;
+                let pe = mass * g * currentHeight;
+                let ke = 0.5 * mass * velocity * velocity;
+                let total = pe + ke + dissipatedEnergy;
                 
                 // Draw block
                 p.push();
                 p.translate(blockX, blockY);
                 p.rotate(angle * Math.PI / 180);
-                p.fill(100, 150, 255);
+                p.fill(cannotSlide ? [255, 150, 150] : [100, 150, 255]);
                 p.stroke(50);
                 p.strokeWeight(2);
                 p.rectMode(p.CENTER);
                 p.rect(0, 0, blockSize, blockSize);
                 p.pop();
                 
-                // Draw force arrows
-                if(!isMoving) {
-                    p.stroke(255, 0, 0);
+                // Draw force vectors if not moving
+                if(!isMoving && distance < inclineLength - 1) {
                     p.strokeWeight(2);
+                    
+                    // Weight (mg)
+                    p.stroke(255, 0, 0);
                     p.fill(255, 0, 0);
-                    // Weight
-                    p.drawArrow(blockX, blockY, blockX, blockY + 60);
-                    p.text('mg', blockX + 10, blockY + 50);
+                    p.drawArrow(blockX, blockY, blockX, blockY + 80);
+                    p.noStroke();
+                    p.text('mg', blockX + 10, blockY + 75);
+                    
+                    // Normal force
+                    p.stroke(0, 255, 0);
+                    p.fill(0, 255, 0);
+                    let normalAngle = angle - 90;
+                    let nx = blockX + 60 * Math.cos(normalAngle * Math.PI / 180);
+                    let ny = blockY + 60 * Math.sin(normalAngle * Math.PI / 180);
+                    p.drawArrow(blockX, blockY, nx, ny);
+                    p.noStroke();
+                    p.text('N', nx + 5, ny - 5);
+                    
+                    // Friction force (if present)
+                    if(friction > 0) {
+                        p.stroke(255, 165, 0);
+                        p.fill(255, 165, 0);
+                        let fx = blockX - 50 * Math.cos(angle * Math.PI / 180);
+                        let fy = blockY - 50 * Math.sin(angle * Math.PI / 180);
+                        p.drawArrow(blockX, blockY, fx, fy);
+                        p.noStroke();
+                        p.text('f', fx - 10, fy);
+                    }
+                }
+                
+                // Draw energy bars on canvas
+                p.drawEnergyBars(pe, ke, dissipatedEnergy, initialPE);
+                
+                // Draw info panel
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.text(`Angle: ${angle}°`, 10, 20);
+                p.text(`Coefficient of Friction: ${friction.toFixed(2)}`, 10, 40);
+                p.text(`Velocity: ${velocity.toFixed(2)} m/s`, 10, 60);
+                p.text(`Distance: ${(distance/scale).toFixed(2)} m`, 10, 80);
+                
+                // Show sliding condition status
+                if(cannotSlide) {
+                    p.fill(200, 0, 0);
+                    p.text(`Status: Block will NOT slide`, 10, 100);
+                } else {
+                    p.fill(0, 150, 0);
+                    p.text(`Status: Block can slide`, 10, 100);
                 }
             };
             
@@ -770,12 +911,83 @@
                 p.pop();
             };
             
+            p.drawEnergyBars = function(pe, ke, dissipated, initial) {
+                // Energy bar dimensions
+                let barX = 600;
+                let barY = 100;
+                let barWidth = 40;
+                let barHeight = 200;
+                let barSpacing = 60;
+                
+                // Background for bars
+                p.fill(240);
+                p.noStroke();
+                p.rect(barX - 20, barY - 40, barWidth * 3 + barSpacing * 2 + 40, barHeight + 100);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.text('Energy Distribution', barX + barWidth * 1.5 + barSpacing, barY - 20);
+                
+                // Calculate percentages
+                let pePercent = (pe / initial) * 100;
+                let kePercent = (ke / initial) * 100;
+                let dissPercent = (dissipated / initial) * 100;
+                
+                // PE Bar
+                p.fill(200);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rect(barX, barY, barWidth, barHeight);
+                p.fill(33, 150, 243);
+                p.noStroke();
+                let peHeight = (pePercent / 100) * barHeight;
+                p.rect(barX, barY + barHeight - peHeight, barWidth, peHeight);
+                
+                // KE Bar
+                p.fill(200);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rect(barX + barSpacing, barY, barWidth, barHeight);
+                p.fill(76, 175, 80);
+                p.noStroke();
+                let keHeight = (kePercent / 100) * barHeight;
+                p.rect(barX + barSpacing, barY + barHeight - keHeight, barWidth, keHeight);
+                
+                // Dissipated Energy Bar
+                p.fill(200);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rect(barX + barSpacing * 2, barY, barWidth, barHeight);
+                p.fill(255, 152, 0);
+                p.noStroke();
+                let dissHeight = (dissPercent / 100) * barHeight;
+                p.rect(barX + barSpacing * 2, barY + barHeight - dissHeight, barWidth, dissHeight);
+                
+                // Labels
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.text('PE', barX + barWidth/2, barY + barHeight + 20);
+                p.text(`${pe.toFixed(1)} J`, barX + barWidth/2, barY + barHeight + 35);
+                p.text(`${pePercent.toFixed(0)}%`, barX + barWidth/2, barY + barHeight + 50);
+                
+                p.text('KE', barX + barSpacing + barWidth/2, barY + barHeight + 20);
+                p.text(`${ke.toFixed(1)} J`, barX + barSpacing + barWidth/2, barY + barHeight + 35);
+                p.text(`${kePercent.toFixed(0)}%`, barX + barSpacing + barWidth/2, barY + barHeight + 50);
+                
+                p.text('Lost', barX + barSpacing * 2 + barWidth/2, barY + barHeight + 20);
+                p.text(`${dissipated.toFixed(1)} J`, barX + barSpacing * 2 + barWidth/2, barY + barHeight + 35);
+                p.text(`${dissPercent.toFixed(0)}%`, barX + barSpacing * 2 + barWidth/2, barY + barHeight + 50);
+            };
+            
             document.getElementById('incline-reset').onclick = function() {
                 p.resetSimulation();
             };
             
             document.getElementById('incline-start').onclick = function() {
-                isMoving = true;
+                if(!cannotSlide) {
+                    isMoving = true;
+                }
             };
             
             document.getElementById('incline-angle').oninput = function() {
@@ -789,139 +1001,232 @@
                 document.getElementById('friction-value').textContent = this.value;
                 p.resetSimulation();
             };
-            
-            function updateEnergyBars(pe, ke) {
-                document.getElementById('pe-bar').style.height = pe + '%';
-                document.getElementById('ke-bar').style.height = ke + '%';
-                document.getElementById('pe-value').textContent = Math.round(pe);
-                document.getElementById('ke-value').textContent = Math.round(ke);
-            }
         };
         
-        // Simulation 3: Rolling race
+        // Simulation 3: Rolling race - All objects race simultaneously
         let raceSketch = function(p) {
-            let objectX, objectY;
-            let velocity = 0;
-            let omega = 0;
             let angle = 30;
             let isRacing = false;
-            let inclineLength = 500;
-            let objectRadius = 20;
-            let objectType = 'sphere';
-            let momentCoeff = 2/5; // For sphere
+            let inclineLength = 300;
+            let objectRadius = 15;
             let startHeight;
+            let startX, startY;
+            let endX, endY;
+            let groundY = 350;
             
-            const momentCoeffs = {
-                'sphere': 2/5,
-                'hollow-sphere': 2/3,
-                'cylinder': 1/2,
-                'hollow-cylinder': 1
-            };
+            // Objects data
+            let objects = [
+                {type: 'sphere', momentCoeff: 2/5, colour: [100, 150, 255], label: 'Solid   Sphere', hollow: false},
+                {type: 'hollow-sphere', momentCoeff: 2/3, colour: [150, 100, 255], label: 'Hollow  Sphere', hollow: true},
+                {type: 'cylinder', momentCoeff: 1/2, colour: [255, 150, 100], label: 'Solid  Cylinder', hollow: false},
+                {type: 'hollow-cylinder', momentCoeff: 1, colour: [150, 255, 100], label: 'Hollow Cylinder', hollow: true}
+            ];
+            
+            // Track each object's state
+            let objectStates = [];
             
             p.setup = function() {
-                let canvas = p.createCanvas(800, 400);
+                let canvas = p.createCanvas(800, 450);
                 canvas.parent('race-sim');
                 p.resetSimulation();
             };
             
             p.resetSimulation = function() {
-                objectX = 100;
-                objectY = 200 - inclineLength * Math.sin(angle * Math.PI / 180) + objectRadius;
-                velocity = 0;
-                omega = 0;
+                // Calculate incline endpoints
+                endX = 350;
+                endY = groundY;
+                
+                startX = endX - inclineLength * Math.cos(angle * Math.PI / 180);
+                startY = endY - inclineLength * Math.sin(angle * Math.PI / 180);
+                
                 isRacing = false;
-                startHeight = 350 - objectY;
-                updateRaceEnergyBars(100, 0, 0);
+                startHeight = groundY - (startY - objectRadius * Math.cos(angle * Math.PI / 180));
+                
+                // Initialize states for each object
+                objectStates = objects.map((obj, index) => ({
+                    x: startX + objectRadius * Math.sin(angle * Math.PI / 180),
+                    y: startY - objectRadius * Math.cos(angle * Math.PI / 180) - index * 40,
+                    velocity: 0,
+                    omega: 0,
+                    distance: 0,
+                    pe: 100,
+                    tke: 0,
+                    rke: 0
+                }));
             };
             
             p.draw = function() {
                 p.background(245);
                 
-                // Draw incline
-                p.push();
-                p.translate(100, 200);
-                p.rotate(angle * Math.PI / 180);
-                p.stroke(50);
-                p.strokeWeight(3);
-                p.line(0, 0, inclineLength, 0);
-                p.pop();
-                
                 // Draw ground
                 p.stroke(50);
                 p.strokeWeight(2);
-                p.line(0, 350, p.width, 350);
+                p.line(0, groundY, p.width, groundY);
                 
-                // Update physics for rolling
+                // Draw multiple inclines for each object
+                p.stroke(50);
+                p.strokeWeight(4);
+                for(let i = 0; i < objects.length; i++) {
+                    let offsetY = -i * 40;
+                    p.line(startX, startY + offsetY, endX, endY + offsetY);
+                }
+                
+                // Update physics for all objects
                 if(isRacing) {
                     let g = 0.3;
                     let sinTheta = Math.sin(angle * Math.PI / 180);
+                    let cosTheta = Math.cos(angle * Math.PI / 180);
                     
-                    // Acceleration for rolling object
-                    let a = g * sinTheta / (1 + momentCoeff);
-                    
-                    velocity += a;
-                    omega = velocity / objectRadius; // Rolling condition
-                    
-                    objectX += velocity * Math.cos(angle * Math.PI / 180);
-                    objectY += velocity * Math.sin(angle * Math.PI / 180);
-                    
-                    // Calculate energies
-                    let currentHeight = 350 - objectY;
-                    let pe = (currentHeight / startHeight) * 100;
-                    let totalKE = 100 - pe;
-                    
-                    // Split KE into translational and rotational
-                    let tke = totalKE / (1 + momentCoeff);
-                    let rke = totalKE * momentCoeff / (1 + momentCoeff);
-                    
-                    updateRaceEnergyBars(Math.max(0, pe), tke, rke);
-                    
-                    // Stop at bottom
-                    if(objectY >= 350 - objectRadius) {
-                        isRacing = false;
-                        objectY = 350 - objectRadius;
-                    }
+                    objects.forEach((obj, index) => {
+                        let state = objectStates[index];
+                        
+                        // Acceleration for rolling object
+                        let a = g * sinTheta / (1 + obj.momentCoeff);
+
+                        // Only update if not at bottom
+                        if(state.distance < inclineLength) {
+                            state.velocity += a;
+                            state.omega = state.velocity / objectRadius;
+                            state.distance += state.velocity;
+                            
+                            // Update position
+                            state.x = startX + state.distance * cosTheta + objectRadius * sinTheta;
+                            state.y = startY + state.distance * sinTheta - objectRadius * cosTheta - index * 40;
+                            
+                            // Calculate energies
+                            let currentHeight = groundY - state.y - index * 40;
+                            state.pe = Math.max(0, (currentHeight / startHeight) * 100);
+                            let totalKE = 100 - state.pe;
+                            state.tke = totalKE / (1 + obj.momentCoeff);
+                            state.rke = totalKE * obj.momentCoeff / (1 + obj.momentCoeff);
+                        } else {
+                            // Stop at bottom - freeze everything
+                            state.velocity = 0;
+                            state.omega = 0;
+                            state.x = endX;
+                            state.y = groundY - objectRadius - index * 40;
+                            state.pe = 0;
+                            state.tke = 100 / (1 + obj.momentCoeff);
+                            state.rke = 100 * obj.momentCoeff / (1 + obj.momentCoeff);
+                        }
+                    });
                 }
                 
-                // Draw object
-                p.push();
-                p.translate(objectX, objectY);
-                p.rotate(omega * p.frameCount * 0.1);
-                
-                if(objectType === 'sphere' || objectType === 'hollow-sphere') {
-                    p.fill(objectType === 'sphere' ? [100, 150, 255] : [150, 100, 255]);
+                // Draw all objects
+                objects.forEach((obj, index) => {
+                    let state = objectStates[index];
+                    
+                    p.push();
+                    p.translate(state.x, state.y);
+                    p.rotate(state.distance / objectRadius);
+                    
+                    // Draw as circles with different styles
+                    p.fill(obj.colour);
                     p.stroke(50);
                     p.strokeWeight(2);
                     p.ellipse(0, 0, objectRadius * 2);
-                    if(objectType === 'hollow-sphere') {
-                        p.noFill();
-                        p.ellipse(0, 0, objectRadius * 1.4);
+                    
+                    // Inner circle for hollow objects
+                    if(obj.hollow) {
+                        p.fill(255);
+                        p.ellipse(0, 0, objectRadius * 1.2);
                     }
-                } else {
-                    p.fill(objectType === 'cylinder' ? [255, 150, 100] : [150, 255, 100]);
-                    p.stroke(50);
+                    
+                    // Reference mark for rotation
+                    p.stroke(255, 0, 0);
                     p.strokeWeight(2);
-                    p.rectMode(p.CENTER);
-                    p.rect(0, 0, objectRadius * 2, objectRadius * 2);
-                    if(objectType === 'hollow-cylinder') {
-                        p.noFill();
-                        p.rect(0, 0, objectRadius * 1.4, objectRadius * 1.4);
-                    }
-                }
+                    p.line(0, 0, objectRadius - 2, 0);
+                    p.pop();
+                });
                 
-                // Draw reference mark
-                p.stroke(255, 0, 0);
-                p.strokeWeight(3);
-                p.line(0, 0, objectRadius, 0);
-                p.pop();
+                // Draw energy bars matrix (4x3)
+                p.drawEnergyMatrix();
                 
-                // Display info
+                // Draw labels
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.LEFT);
-                p.text(`Object: ${objectType}`, 10, 20);
-                p.text(`I = ${momentCoeff === 1 ? '' : momentCoeff === 0.5 ? '1/2' : momentCoeff === 2/3 ? '2/3' : '2/5'} MR²`, 10, 40);
-                p.text(`Velocity: ${velocity.toFixed(2)} m/s`, 10, 60);
+                p.textSize(10);
+                objects.forEach((obj, i) => {
+                    p.text(obj.label + ` (I = ${obj.momentCoeff === 1 ? '' : 
+                        obj.momentCoeff === 0.5 ? '1/2' : 
+                        obj.momentCoeff === 2/3 ? '2/3' : '2/5'} MR²)`, 
+                        10, startY- 25 - i * 40 + 5,73);
+                });
+                
+                // Title for energy bars
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text('Energy Distribution (%)', 500, 15);
+            };
+            
+            p.drawEnergyMatrix = function() {
+                // Matrix position and dimensions
+                let matrixX = 450;
+                let matrixY = 45;
+                let barWidth = 25;
+                let barHeight = 60;
+                let colSpacing = 40;
+                let rowSpacing = 75;
+                
+                // Column headers
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.noStroke();
+                p.textSize(10);
+                p.text('PE', matrixX + barWidth/2, matrixY - 10);
+                p.text('Trans', matrixX + colSpacing + barWidth/2, matrixY - 10);
+                p.text('Rot', matrixX + colSpacing * 2 + barWidth/2, matrixY - 10);
+                
+                // Draw bars for each object
+                objectStates.toReversed().forEach((state, row) => {
+                    let y = matrixY + row * rowSpacing;
+                    
+                    // Row label
+                    p.fill(objects.toReversed()[row].colour);
+                    p.noStroke();
+                    p.ellipse(matrixX - 20, y + barHeight/2, 12);
+                    
+                    // PE bar
+                    p.fill(200);
+                    p.stroke(50);
+                    p.strokeWeight(1);
+                    p.rect(matrixX, y, barWidth, barHeight);
+                    p.fill(33, 150, 243);
+                    p.noStroke();
+                    let peHeight = (state.pe / 100) * barHeight;
+                    p.rect(matrixX, y + barHeight - peHeight, barWidth, peHeight);
+                    p.fill(0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(9);
+                    p.text(Math.round(state.pe), matrixX + barWidth/2, y + barHeight + 12);
+                    
+                    // Translational KE bar
+                    p.fill(200);
+                    p.stroke(50);
+                    p.strokeWeight(1);
+                    p.rect(matrixX + colSpacing, y, barWidth, barHeight);
+                    p.fill(76, 175, 80);
+                    p.noStroke();
+                    let tkeHeight = (state.tke / 100) * barHeight;
+                    p.rect(matrixX + colSpacing, y + barHeight - tkeHeight, barWidth, tkeHeight);
+                    p.fill(0);
+                    p.textSize(9);
+                    p.text(Math.round(state.tke), matrixX + colSpacing + barWidth/2, y + barHeight + 12);
+                    
+                    // Rotational KE bar
+                    p.fill(200);
+                    p.stroke(50);
+                    p.strokeWeight(1);
+                    p.rect(matrixX + colSpacing * 2, y, barWidth, barHeight);
+                    p.fill(255, 152, 0);
+                    p.noStroke();
+                    let rkeHeight = (state.rke / 100) * barHeight;
+                    p.rect(matrixX + colSpacing * 2, y + barHeight - rkeHeight, barWidth, rkeHeight);
+                    p.fill(0);
+                    p.textSize(9);
+                    p.text(Math.round(state.rke), matrixX + colSpacing * 2 + barWidth/2, y + barHeight + 12);
+                });
             };
             
             document.getElementById('race-reset').onclick = function() {
@@ -931,21 +1236,6 @@
             document.getElementById('race-start').onclick = function() {
                 isRacing = true;
             };
-            
-            document.getElementById('object-select').onchange = function() {
-                objectType = this.value;
-                momentCoeff = momentCoeffs[objectType];
-                p.resetSimulation();
-            };
-            
-            function updateRaceEnergyBars(pe, tke, rke) {
-                document.getElementById('race-pe-bar').style.height = pe + '%';
-                document.getElementById('race-tke-bar').style.height = tke + '%';
-                document.getElementById('race-rke-bar').style.height = rke + '%';
-                document.getElementById('race-pe-value').textContent = Math.round(pe);
-                document.getElementById('race-tke-value').textContent = Math.round(tke);
-                document.getElementById('race-rke-value').textContent = Math.round(rke);
-            }
         };
         
         // Initialize all simulations
@@ -953,8 +1243,5 @@
         new p5(inclineSketch);
         new p5(raceSketch);
     </script>
-    <footer>
-        <script src="/assets/common/footer.js"></script>
-    </footer>
 </body>
 </html>

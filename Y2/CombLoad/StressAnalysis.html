@@ -4,493 +4,531 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stresses Due to Different Loadings - Interactive Lecture</title>
-    <!-- Import p5.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+    <title>Stress Analysis - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <!-- Import MathJax for LaTeX rendering -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <!-- Main script -->
-    <script src="stressAnalysis.js"></script>
-    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- External CSS -->
+    <!-- Your script goes here -->
+    <script src="StressAnalysis.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    
+    <style>
+        /* Additional styles for the enhanced shear simulation */
+        .section-inputs { 
+            display: none; 
+            margin: 6px 0 12px; 
+            gap: 12px; 
+            align-items: center; 
+        }
+        
+        .section-inputs label {
+            font-size: 14px;
+        }
+        
+        .section-inputs input[type="number"] {
+            width: 70px;
+            margin-left: 6px;
+        }
+    </style>
 </head>
 
 <body>
     <header>
-        <h1>STRESSES DUE TO DIFFERENT LOADINGS</h1>
-        <p class="small-caps">Understanding mechanical stresses through interactive exploration</p>
+        <h1>Stress Analysis</h1>
+        <p class="subtitle">Understanding Stresses Due to Different Loadings</p>
     </header>
-    
-    <nav>
+
+    <div class="content-section">
+        <h2>Introduction to Mechanical Stresses</h2>
+        <p>Mechanical stress is a fundamental concept in engineering, representing the internal resistance of a body to external forces. Understanding how different types of loading create different stress patterns is crucial for designing safe and efficient structures.</p>
+        
+        <div class="equation-box">
+            <p>The fundamental definition of stress:</p>
+            <p>\[\sigma = \frac{F}{A}\]</p>
+            <p>where \(\sigma\) is stress (Pa or N/m²), \(F\) is force (N), and \(A\) is the cross-sectional area (m²)</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Types of Stress:</strong></p>
+            <ul>
+                <li><strong>Normal stress (\(\sigma\)):</strong> Acts perpendicular to the cross-section</li>
+                <li><strong>Shear stress (\(\tau\)):</strong> Acts parallel to the cross-section</li>
+            </ul>
+            <p>Different loading conditions produce different combinations of these fundamental stress types.</p>
+        </div>
+
+        <h3>Why Stress Analysis Matters</h3>
+        <p>Engineers must ensure that stresses in structures and components remain below critical values to prevent:</p>
         <ul>
-            <li><a href="#axial">Axial Stresses</a></li>
-            <li><a href="#shear">Shear Stresses</a></li>
-            <li><a href="#bending">Bending Stresses</a></li>
-            <li><a href="#torsion">Torsional Stresses</a></li>
-            <li><a href="#combined">Combined Stresses</a></li>
+            <li>Yielding (permanent deformation)</li>
+            <li>Fracture (sudden failure)</li>
+            <li>Fatigue (failure after repeated loading)</li>
+            <li>Excessive deflection</li>
         </ul>
-    </nav>
+    </div>
 
-    <main>
-        <section id="introduction">
-            <h2>Introduction to Mechanical Stresses</h2>
-            <p>Mechanical stress is a fundamental concept in engineering, representing the internal resistance of a body to external forces. Stress is defined as the force per unit area:</p>
-            <div class="equation-box">
-                <p>\[\sigma = \frac{F}{A}\]</p>
-                <p>where \(\sigma\) is stress, \(F\) is force, and \(A\) is the cross-sectional area.</p>
+    <div class="simulation-section">
+        <h2>Axial Stress</h2>
+        <p>Axial stress occurs when forces act along the longitudinal axis of a member, creating uniform tension or compression across the cross-section.</p>
+        
+        <div class="equation-box">
+            <p>\[\sigma_{\text{axial}} = \frac{N}{A}\]</p>
+            <p>where \(N\) is the Normal Force (axial load) and \(A\) is the cross-sectional area</p>
+        </div>
+
+        <h3>Interactive Simulation</h3>
+        <div id="sketch-holder-axial" class="sketch-holder">
+            <!-- Axial stress simulation goes here -->
+        </div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="axialForce">Axial Force (kN): <span id="axialForceVal">50</span></label>
+                <input type="range" id="axialForce" min="-200" max="200" step="10" value="50">
             </div>
-            <p>Different types of loading produce different stress patterns within a material. Understanding these stresses is crucial for designing safe and efficient structures and mechanical components.</p>
+            <div class="control-group">
+                <label for="crossArea">Cross-sectional Area (mm²): <span id="crossAreaVal">1000</span></label>
+                <input type="range" id="crossArea" min="100" max="2500" step="100" value="1000">
+            </div>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Engineering Applications:</strong> Axial stress analysis is critical for:</p>
+            <ul>
+                <li>Columns in buildings (compression)</li>
+                <li>Tie rods and cables (tension)</li>
+                <li>Bolts and fasteners</li>
+                <li>Pressure vessel walls</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Shear Stress Distribution — Jourawski Method</h2>
+        <p>Shear stress develops when forces act parallel to a cross-section, causing layers of material to slide relative to each other. The Jourawski method shows how shear stress varies across different cross-sectional shapes, with parabolic distribution in rectangular sections.</p>
+        
+        <div class="equation-box">
+            <p>Jourawski's formula: \[\tau = \frac{VQ}{It}\]</p>
+            <p>where \(V\) = shear force, \(Q\) = first moment of area above/below the cut, \(I\) = second moment of area, \(t\) = width at the cut</p>
+            <p>Average shear stress: \[\tau_{avg} = \frac{V}{A}\]</p>
+            <p>Maximum shear stress in rectangular beams: \[\tau_{max} = \frac{3V}{2A}\]</p>
+        </div>
+
+        <h3>Interactive Simulation</h3>
+        
+        <div id="sketch-holder-shear" class="sketch-holder">
+            <!-- Enhanced shear stress simulation goes here -->
+        </div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="shearForce">Shear Force (kN): <span id="shearForceVal">130</span></label>
+                <input id="shearForce" type="range" min="10" max="150" step="5" value="130">
+            </div>
             
-            <div class="key-point">
-                <p><strong>Key Types of Stress:</strong></p>
-                <ul>
-                    <li><strong>Normal stress (\(\sigma\)):</strong> Acts perpendicular to the cross-section (tension/compression)</li>
-                    <li><strong>Shear stress (\(\tau\)):</strong> Acts parallel to the cross-section</li>
-                </ul>
+            <div class="control-group">
+                <label for="cutSlider">Cut Position: <span id="cutReadout">Cut @ y = 0.0 mm</span></label>
+                <input id="cutSlider" type="range" min="0" max="100" step="1" value="50" title="Cut position (0% top → 100% bottom)">
+            </div>
+            
+            <div class="control-group">
+                <label for="shearSection">Section Type:</label>
+                <select id="shearSection">
+                    <option value="rectangular" selected>Rectangular</option>
+                    <option value="t-section">T-section</option>
+                    <option value="i-section">I-section</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Section-specific dimension inputs -->
+        <div id="rectangular-inputs" class="section-inputs">
+            <label> b: <input type="number" id="rect_b" value="120", min="50"> mm</label>
+            <label> h: <input type="number" id="rect_h" value="200", min="50"> mm</label>
+        </div>
+
+        <div id="t-section-inputs" class="section-inputs">
+            <label> b<sub>f</sub>: <input type="number" id="t_bf" value="140", min="20"> mm</label>
+            <label> t<sub>f</sub>: <input type="number" id="t_tf" value="30", min="20"> mm</label>
+            <label> t<sub>w</sub>: <input type="number" id="t_tw" value="20", min="15"> mm</label>
+            <label> h<sub>w</sub>: <input type="number" id="t_hw" value="160", min="50"> mm</label>
+        </div>
+
+        <div id="i-section-inputs" class="section-inputs">
+            <label> b<sub>f</sub>: <input type="number" id="i_bf" value="140", min="20"> mm</label>
+            <label> t<sub>f</sub>: <input type="number" id="i_tf" value="20", min="15"> mm</label>
+            <label> t<sub>w</sub>: <input type="number" id="i_tw" value="20", min="15"> mm</label>
+            <label> h<sub>w</sub>: <input type="number" id="i_hw" value="160", min="20"> mm</label>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Engineering Applications:</strong> Understanding shear stress distribution is critical for:</p>
+            <ul>
+                <li>Beam design and shear reinforcement</li>
+                <li>Connection design (bolts, welds)</li>
+                <li>Composite beam analysis</li>
+                <li>Web crippling and local buckling</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Bending Stress</h2>
+        <p>Bending creates normal stresses that vary linearly across the beam height - tensile on one side and compressive on the other.</p>
+        
+        <div class="equation-box">
+            <p>Flexure formula: \[\sigma_{\text{bend}} = \frac{My}{I}\]</p>
+            <p>Maximum stress: \[\sigma_{max} = \frac{Mc}{I} = \frac{M}{Z}\]</p>
+            <p>where \(M\) = bending moment, \(y\) = distance from neutral axis, \(I\) = second moment of area,</p>
+            <p>\(c=y_{max}\) = distance of furthest fibre, \(Z\) = section modulus</p>
+        </div>
+
+        <h3>Interactive Simulation</h3>
+        <div id="sketch-holder-bending" class="sketch-holder">
+            <!-- Bending stress simulation goes here -->
+        </div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="bendingForce">Tip Force F (kN): <span id="bendingForceVal">10</span></label>
+                <input type="range" id="bendingForce" min="0" max="150" step="1" value="10">
             </div>
 
-            <p>In this interactive lecture, we'll explore four fundamental loading scenarios and the stresses they produce.</p>
-        </section>
+            <div class="control-group">
+                <label for="bendingSection">Section Type:</label>
+                <select id="bendingSection">
+                    <option value="rectangular" selected>Rectangular</option>
+                    <option value="t-section">T-section</option>
+                </select>
+            </div>
+        </div>
 
-        <section id="axial">
-            <h2>Axial Stresses</h2>
-            <p>Axial stress occurs when a force acts along the longitudinal axis of a member, creating tension or compression.</p>
-            
-            <div class="equation-box">
-                <p>\[\sigma_{axial} = \frac{P}{A}\]</p>
-                <p>where \(P\) is the axial load and \(A\) is the cross-sectional area.</p>
-            </div>
-            
-            <p>Axial stress is uniform across the cross-section for prismatic members, meaning it has the same value at every point in the cross-section.</p>
-            
-            <div class="simulation-container">
-                <div id="axial-simulation" class="simulation"></div>
-                <div class="controls">
-                    <label for="axial-force">Axial Force (P):</label>
-                    <input type="range" id="axial-force" min="0" max="100" value="50" class="slider">
-                    <label for="axial-area">Cross-Sectional Area (A):</label>
-                    <input type="range" id="axial-area" min="1" max="10" value="5" step="0.1" class="slider">
-                </div>
-            </div>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> Material behavior under axial loading follows Hooke's Law for small deformations, where strain is proportional to stress: \(\sigma = E \cdot \varepsilon\), with \(E\) being Young's modulus.</p>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem</h3>
-                <p>A steel rod with a diameter of 25 mm is subjected to a tensile force of 20 kN. Calculate the axial stress in the rod.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
-                <div class="solution" id="solution1">
-                    <p>Given:</p>
-                    <ul>
-                        <li>Diameter, d = 25 mm = 0.025 m</li>
-                        <li>Tensile force, P = 20 kN = 20,000 N</li>
-                    </ul>
-                    <p>Step 1: Calculate the cross-sectional area</p>
-                    <p>\[A = \pi \cdot \left(\frac{d}{2}\right)^2 = \pi \cdot \left(\frac{0.025}{2}\right)^2 = 4.91 \times 10^{-4} \text{ m}^2\]</p>
-                    <p>Step 2: Calculate the axial stress</p>
-                    <p>\[\sigma_{axial} = \frac{P}{A} = \frac{20,000}{4.91 \times 10^{-4}} = 40.7 \times 10^6 \text{ Pa} = 40.7 \text{ MPa}\]</p>
-                </div>
-            </div>
-        </section>
+        <div id="bend-rect-inputs" class="section-inputs" style="display:flex;">
+            <label> b: <input type="number" id="bend_rect_b" value="120" min="40"> mm</label>
+            <label> h: <input type="number" id="bend_rect_h" value="200" min="40"> mm</label>
+        </div>
 
-        <section id="shear">
-            <h2>Shear Stresses</h2>
-            <p>Shear stress develops when forces act parallel to a cross-section, causing layers of the material to slide relative to each other.</p>
-            
-            <div class="equation-box">
-                <p>\[\tau = \frac{V}{A}\]</p>
-                <p>where \(\tau\) is the average shear stress, \(V\) is the shear force, and \(A\) is the area resisting the shear.</p>
-            </div>
-            
-            <p>In reality, shear stress is not uniform across most cross-sections. For rectangular sections, the maximum shear stress occurs at the neutral axis and is:</p>
-            
-            <div class="equation-box">
-                <p>\[\tau_{max} = \frac{3V}{2A}\]</p>
-            </div>
-            
-            <div class="simulation-container">
-                <div id="shear-simulation" class="simulation"></div>
-                <div class="controls">
-                    <label for="shear-force">Shear Force (V):</label>
-                    <input type="range" id="shear-force" min="0" max="100" value="50" class="slider">
-                    <label for="beam-height">Beam Height:</label>
-                    <input type="range" id="beam-height" min="2" max="10" value="5" step="0.5" class="slider">
-                </div>
-            </div>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> In beams, shear stress varies parabolically across the height of rectangular sections, with maximum value at the neutral axis. This is why I-beams have thick webs at the neutral axis to resist shear forces efficiently.</p>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem</h3>
-                <p>A wooden beam with rectangular cross-section (width = 100 mm, height = 200 mm) is subjected to a shear force of 15 kN. Calculate the maximum shear stress in the beam.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
-                <div class="solution" id="solution2">
-                    <p>Given:</p>
-                    <ul>
-                        <li>Width, b = 100 mm = 0.1 m</li>
-                        <li>Height, h = 200 mm = 0.2 m</li>
-                        <li>Shear force, V = 15 kN = 15,000 N</li>
-                    </ul>
-                    <p>Step 1: Calculate the cross-sectional area</p>
-                    <p>\[A = b \cdot h = 0.1 \cdot 0.2 = 0.02 \text{ m}^2\]</p>
-                    <p>Step 2: Calculate the maximum shear stress using the formula for rectangular sections</p>
-                    <p>\[\tau_{max} = \frac{3V}{2A} = \frac{3 \cdot 15,000}{2 \cdot 0.02} = \frac{45,000}{0.04} = 1.125 \times 10^6 \text{ Pa} = 1.125 \text{ MPa}\]</p>
-                </div>
-            </div>
-        </section>
+        <div id="bend-t-inputs" class="section-inputs">
+            <label> b<sub>f</sub>: <input type="number" id="bend_t_bf" value="140" min="20"> mm</label>
+            <label> t<sub>f</sub>: <input type="number" id="bend_t_tf" value="30" min="10"> mm</label>
+            <label> t<sub>w</sub>: <input type="number" id="bend_t_tw" value="20" min="20"> mm</label>
+            <label> h<sub>w</sub>: <input type="number" id="bend_t_hw" value="160" min="20"> mm</label>
+        </div>
 
-        <section id="bending">
-            <h2>Bending Stresses</h2>
-            <p>Bending causes normal stresses that vary linearly across the height of a beam. These stresses are tensile on one side and compressive on the other, with zero stress at the neutral axis.</p>
-            
-            <div class="equation-box">
-                <p>\[\sigma_{bending} = \frac{My}{I}\]</p>
-                <p>where \(M\) is the bending moment, \(y\) is the distance from the neutral axis, and \(I\) is the moment of inertia of the cross-section.</p>
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="bendX">Element x-position along beam (m): <span id="bendXVal">0.30</span></label>
+                <input type="range" id="bendX" min="0" max="2.00" step="0.01" value="0.30">
             </div>
-            
-            <p>The maximum bending stress occurs at the furthest distance from the neutral axis:</p>
-            
-            <div class="equation-box">
-                <p>\[\sigma_{max} = \frac{Mc}{I} = \frac{M}{Z}\]</p>
-                <p>where \(c\) is the maximum distance from the neutral axis, and \(Z = I/c\) is the section modulus.</p>
-            </div>
-            
-            <div class="simulation-container">
-                <div id="bending-simulation" class="simulation"></div>
-                <div class="controls">
-                    <label for="bending-moment">Bending Moment (M):</label>
-                    <input type="range" id="bending-moment" min="0" max="1000" value="500" class="slider">
-                    <label for="beam-type">Section Type:</label>
-                    <select id="beam-type">
-                        <option value="rectangular">Rectangular</option>
-                        <option value="i-beam">I-Beam</option>
-                        <option value="circular">Circular</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> I-beams are efficient for resisting bending because they concentrate material far from the neutral axis, maximizing the moment of inertia (I) while minimizing weight.</p>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem</h3>
-                <p>A steel beam with a rectangular cross-section (width = 80 mm, height = 150 mm) is subjected to a bending moment of 10 kN·m. Calculate the maximum bending stress in the beam.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
-                <div class="solution" id="solution3">
-                    <p>Given:</p>
-                    <ul>
-                        <li>Width, b = 80 mm = 0.08 m</li>
-                        <li>Height, h = 150 mm = 0.15 m</li>
-                        <li>Bending moment, M = 10 kN·m = 10,000 N·m</li>
-                    </ul>
-                    <p>Step 1: Calculate the moment of inertia for a rectangular section</p>
-                    <p>\[I = \frac{bh^3}{12} = \frac{0.08 \cdot (0.15)^3}{12} = 2.25 \times 10^{-5} \text{ m}^4\]</p>
-                    <p>Step 2: Find the maximum distance from the neutral axis</p>
-                    <p>\[c = \frac{h}{2} = \frac{0.15}{2} = 0.075 \text{ m}\]</p>
-                    <p>Step 3: Calculate the maximum bending stress</p>
-                    <p>\[\sigma_{max} = \frac{Mc}{I} = \frac{10,000 \cdot 0.075}{2.25 \times 10^{-5}} = 33.33 \times 10^6 \text{ Pa} = 33.33 \text{ MPa}\]</p>
-                </div>
-            </div>
-        </section>
 
-        <section id="torsion">
-            <h2>Torsional Stresses</h2>
-            <p>Torsion creates shear stresses that act perpendicular to the radius of the cross-section. For circular shafts, these stresses vary linearly with the radius.</p>
-            
-            <div class="equation-box">
-                <p>\[\tau = \frac{Tr}{J}\]</p>
-                <p>where \(T\) is the applied torque, \(r\) is the distance from the center, and \(J\) is the polar moment of inertia.</p>
+            <div class="control-group">
+                <label for="bendY">Element y across depth (−top … +bottom): <span id="bendYVal">-1.00</span></label>
+                <input type="range" id="bendY" min="-1" max="1" step="0.01" value="-1">
             </div>
-            
-            <p>The maximum torsional stress occurs at the outer surface of the shaft:</p>
-            
-            <div class="equation-box">
-                <p>\[\tau_{max} = \frac{TR}{J} = \frac{T}{Z_p}\]</p>
-                <p>where \(R\) is the outer radius, and \(Z_p = J/R\) is the polar section modulus.</p>
-            </div>
-            
-            <div class="simulation-container">
-                <div id="torsion-simulation" class="simulation"></div>
-                <div class="controls">
-                    <label for="torque">Torque (T):</label>
-                    <input type="range" id="torque" min="0" max="100" value="50" class="slider">
-                    <label for="shaft-diameter">Shaft Diameter:</label>
-                    <input type="range" id="shaft-diameter" min="2" max="10" value="5" step="0.5" class="slider">
-                    <label for="shaft-type">Shaft Type:</label>
-                    <select id="shaft-type">
-                        <option value="solid">Solid</option>
-                        <option value="hollow">Hollow</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> Hollow shafts are more efficient for resisting torsion than solid shafts of the same weight. This is why drive shafts in vehicles are typically hollow tubes.</p>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem</h3>
-                <p>A solid circular shaft with a diameter of 50 mm is subjected to a torque of 2 kN·m. Calculate the maximum shear stress in the shaft.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution4')">Show Solution</div>
-                <div class="solution" id="solution4">
-                    <p>Given:</p>
-                    <ul>
-                        <li>Diameter, d = 50 mm = 0.05 m</li>
-                        <li>Torque, T = 2 kN·m = 2,000 N·m</li>
-                    </ul>
-                    <p>Step 1: Calculate the polar moment of inertia for a solid circular shaft</p>
-                    <p>\[J = \frac{\pi d^4}{32} = \frac{\pi \cdot (0.05)^4}{32} = 6.14 \times 10^{-7} \text{ m}^4\]</p>
-                    <p>Step 2: Find the outer radius</p>
-                    <p>\[R = \frac{d}{2} = \frac{0.05}{2} = 0.025 \text{ m}\]</p>
-                    <p>Step 3: Calculate the maximum shear stress</p>
-                    <p>\[\tau_{max} = \frac{TR}{J} = \frac{2,000 \cdot 0.025}{6.14 \times 10^{-7}} = 81.43 \times 10^6 \text{ Pa} = 81.43 \text{ MPa}\]</p>
-                </div>
-            </div>
-        </section>
+        </div>
 
-        <section id="combined">
-            <h2>Combined Stresses</h2>
-            <p>In real-world applications, structural elements often experience multiple types of stresses simultaneously. For example, a shaft might undergo both bending and torsion.</p>
-            
-            <p>To analyze combined stresses, we use the principal stress theory and failure criteria like von Mises stress:</p>
-            
-            <div class="equation-box">
-                <p>\[\sigma_1, \sigma_2 = \frac{\sigma_x + \sigma_y}{2} \pm \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}\]</p>
-                <p>von Mises stress: \[\sigma_{vm} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2}\]</p>
-            </div>
-            
-            <div class="simulation-container">
-                <div id="combined-simulation" class="simulation"></div>
-                <div class="controls">
-                    <label for="normal-stress-x">Normal Stress X:</label>
-                    <input type="range" id="normal-stress-x" min="-100" max="100" value="50" class="slider">
-                    <label for="normal-stress-y">Normal Stress Y:</label>
-                    <input type="range" id="normal-stress-y" min="-100" max="100" value="-20" class="slider">
-                    <label for="shear-stress-xy">Shear Stress XY:</label>
-                    <input type="range" id="shear-stress-xy" min="-50" max="50" value="30" class="slider">
-                </div>
-            </div>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> When designing components subject to combined loading, engineers typically use the von Mises stress criterion to predict failure. This approach considers that materials typically fail due to shear strain energy rather than just maximum normal stress.</p>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem</h3>
-                <p>A point in a loaded structural member is subjected to normal stresses of σx = 80 MPa and σy = 20 MPa, and a shear stress of τxy = 40 MPa. Calculate the principal stresses and the von Mises stress.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution5')">Show Solution</div>
-                <div class="solution" id="solution5">
-                    <p>Given:</p>
-                    <ul>
-                        <li>σx = 80 MPa</li>
-                        <li>σy = 20 MPa</li>
-                        <li>τxy = 40 MPa</li>
-                    </ul>
-                    <p>Step 1: Calculate the principal stresses</p>
-                    <p>\[\sigma_{avg} = \frac{\sigma_x + \sigma_y}{2} = \frac{80 + 20}{2} = 50 \text{ MPa}\]</p>
-                    <p>\[R = \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2} = \sqrt{\left(\frac{80 - 20}{2}\right)^2 + (40)^2} = \sqrt{900 + 1600} = \sqrt{2500} = 50 \text{ MPa}\]</p>
-                    <p>\[\sigma_1 = \sigma_{avg} + R = 50 + 50 = 100 \text{ MPa}\]</p>
-                    <p>\[\sigma_2 = \sigma_{avg} - R = 50 - 50 = 0 \text{ MPa}\]</p>
-                    <p>Step 2: Calculate the von Mises stress</p>
-                    <p>\[\sigma_{vm} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2} = \sqrt{(100)^2 - (100)(0) + (0)^2} = 100 \text{ MPa}\]</p>
-                </div>
-            </div>
-        </section>
+        <div class="key-point">
+            <p><strong>Engineering Applications:</strong> Bending stress analysis is essential for:</p>
+            <ul>
+                <li>Beam design in buildings and bridges</li>
+                <li>Aircraft wing spars and fuselage frames</li>
+                <li>Machine shafts under transverse loading</li>
+                <li>Crane booms and cantilever structures</li>
+                <li>Floor joists and roof rafters</li>
+                <li>Railway tracks and supporting sleepers</li>
+            </ul>
+        </div>
+    </div>
 
-        <section id="self-assessment">
-            <h2>Self-Assessment Quiz</h2>
+    <div class="simulation-section">
+        <h2>Torsional Stress</h2>
+        <p>Torsion creates shear stresses that act perpendicular to the radius. In circular shafts, these stresses vary linearly from zero at the centre to maximum at the outer surface.</p>
+        
+        <div class="equation-box">
+            <p>Torsion formula: \[\tau = \frac{Tr}{J}\]</p>
+            <p>Maximum stress: \[\tau_{max} = \frac{TR}{J} = \frac{T}{Z_p}\]</p>
+            <p>where \(T\) = torque, \(r\) = radius of fibre of interest, \(J\) = polar moment of inertia,</p>
+            <p>\(R\) = radius of outermost fibre, \(Z_p\) = Section modulus (polar) </p>
+        </div>
+
+        <h3>Interactive Simulation</h3>
+        <div id="sketch-holder-torsion" class="sketch-holder">
+            <!-- Torsion stress simulation goes here -->
+        </div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="torTorque">Torque T (kN·m): <span id="torTorqueVal">5.0</span></label>
+                <input type="range" id="torTorque" min="-20" max="20" step="1" value="5">
+            </div>
+
+            <div class="control-group">
+                <label for="torSection">Section Type:</label>
+                <select id="torSection">
+                    <option value="solid" selected>Solid circular</option>
+                    <option value="hollow">Hollow circular</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="torElementPos">Infinitesimal Position: <span id="torElementPosVal">1.0</span></label>
+                <input type="range" id="torElementPos" min="0" max="1" step="0.05" value="1">
+            </div>
+
+            <div class="control-group" id="torSolidDims" style="display:flex; gap:12px; align-items:center;">
+                <label> Diameter D (mm): <input type="number" id="torD" min="50" max="250" step="1" value="200"></label>
+            </div>
+
+            <div class="control-group" id="torHollowDims" style="display:none; gap:12px; align-items:center;">
+                <label> Diameter D (mm): <input type="number" id="torDo" min="50" max="250" step="1" value="200"></label>
+                <label> Thickness t (mm): <input type="number" id="torThk" min="5" max="200" step="1" value="20"></label>
+            </div>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Engineering Applications:</strong> Torsional stress analysis is crucial for:</p>
+            <ul>
+                <li>Drive shafts in automotive and marine applications</li>
+                <li>Power transmission shafts in machinery</li>
+                <li>Propeller shafts in aircraft and ships</li>
+                <li>Torsion bars in vehicle suspension systems</li>
+                <li>Drill bits and cutting tools</li>
+                <li>Wind turbine shafts</li>
+                <li>Screwdrivers and torque wrenches</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Axial Stress</h3>
+            <p>A steel rod with diameter 25 mm is subjected to a tensile force of 20 kN. Calculate the axial stress.</p>
             
-            <div class="quiz-container">
-                <div class="quiz-question">
-                    <h3>Question 1: Which of the following statements about axial stress is FALSE?</h3>
-                    <form id="q1">
-                        <input type="radio" id="q1a" name="q1" value="a">
-                        <label for="q1a">a) Axial stress is uniform across the cross-section for prismatic members</label><br>
-                        <input type="radio" id="q1b" name="q1" value="b">
-                        <label for="q1b">b) Axial stress is directly proportional to the applied force</label><br>
-                        <input type="radio" id="q1c" name="q1" value="c">
-                        <label for="q1c">c) Axial stress is inversely proportional to the cross-sectional area</label><br>
-                        <input type="radio" id="q1d" name="q1" value="d">
-                        <label for="q1d">d) Axial stress is maximum at the center of the cross-section</label><br>
-                        <button type="button" onclick="checkAnswer('q1', 'd')">Check Answer</button>
-                    </form>
-                    <div id="q1-feedback" class="feedback"></div>
-                </div>
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: d = 25 mm = 0.025 m, P = 20 kN = 20,000 N</p>
+                <p>Area: \(A = \frac{\pi d^2}{4} = \frac{\pi \times 0.025^2}{4} = 4.91 \times 10^{-4} \text{ m}^2\)</p>
+                <p>Stress: \(\sigma = \frac{P}{A} = \frac{20,000}{4.91 \times 10^{-4}} = 40.7 \text{ MPa}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Shear Stress Using Jourawski's Formula</h3>
+            <p>A rectangular beam (100 mm × 200 mm) has a shear force of 80 kN. Calculate the maximum shear stress and the shear stress at 25 mm from the top.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: b = 100 mm, h = 200 mm, V = 80 kN = 80,000 N</p>
+                <p>Area: A = 100 × 200 = 20,000 mm²</p>
+                <p>I = bh³/12 = 100 × 200³/12 = 66.67 × 10⁶ mm⁴</p>
                 
-                <div class="quiz-question">
-                    <h3>Question 2: In a beam subjected to pure bending, where is the maximum bending stress located?</h3>
-                    <form id="q2">
-                        <input type="radio" id="q2a" name="q2" value="a">
-                        <label for="q2a">a) At the neutral axis</label><br>
-                        <input type="radio" id="q2b" name="q2" value="b">
-                        <label for="q2b">b) At the furthest point from the neutral axis</label><br>
-                        <input type="radio" id="q2c" name="q2" value="c">
-                        <label for="q2c">c) At the centroid of the cross-section</label><br>
-                        <input type="radio" id="q2d" name="q2" value="d">
-                        <label for="q2d">d) Uniformly distributed across the cross-section</label><br>
-                        <button type="button" onclick="checkAnswer('q2', 'b')">Check Answer</button>
-                    </form>
-                    <div id="q2-feedback" class="feedback"></div>
-                </div>
+                <p><strong>Maximum shear stress (at neutral axis):</strong></p>
+                <p>Q = b × (h/2) × (h/4) = 100 × 100 × 50 = 500,000 mm³</p>
+                <p>τ_max = VQ/(It) = (80,000 × 500,000)/(66.67 × 10⁶ × 100) = 6.0 MPa</p>
                 
-                <div class="quiz-question">
-                    <h3>Question 3: For a solid circular shaft under torsion, how does the shear stress vary?</h3>
-                    <form id="q3">
-                        <input type="radio" id="q3a" name="q3" value="a">
-                        <label for="q3a">a) It is uniform throughout the cross-section</label><br>
-                        <input type="radio" id="q3b" name="q3" value="b">
-                        <label for="q3b">b) It varies linearly with the radius, maximum at the outer surface</label><br>
-                        <input type="radio" id="q3c" name="q3" value="c">
-                        <label for="q3c">c) It varies parabolically, maximum at the center</label><br>
-                        <input type="radio" id="q3d" name="q3" value="d">
-                        <label for="q3d">d) It varies inversely with the radius, maximum at the center</label><br>
-                        <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
-                    </form>
-                    <div id="q3-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 4: Why are I-beams efficient for resisting bending loads?</h3>
-                    <form id="q4">
-                        <input type="radio" id="q4a" name="q4" value="a">
-                        <label for="q4a">a) They distribute material uniformly across the cross-section</label><br>
-                        <input type="radio" id="q4b" name="q4" value="b">
-                        <label for="q4b">b) They concentrate material at the neutral axis</label><br>
-                        <input type="radio" id="q4c" name="q4" value="c">
-                        <label for="q4c">c) They concentrate material far from the neutral axis</label><br>
-                        <input type="radio" id="q4d" name="q4" value="d">
-                        <label for="q4d">d) They minimize the moment of inertia</label><br>
-                        <button type="button" onclick="checkAnswer('q4', 'c')">Check Answer</button>
-                    </form>
-                    <div id="q4-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 5: What is the von Mises stress criterion used for?</h3>
-                    <form id="q5">
-                        <input type="radio" id="q5a" name="q5" value="a">
-                        <label for="q5a">a) Calculating the moment of inertia</label><br>
-                        <input type="radio" id="q5b" name="q5" value="b">
-                        <label for="q5b">b) Predicting failure in ductile materials under combined loading</label><br>
-                        <input type="radio" id="q5c" name="q5" value="c">
-                        <label for="q5c">c) Determining the neutral axis location</label><br>
-                        <input type="radio" id="q5d" name="q5" value="d">
-                        <label for="q5d">d) Calculating the shear center of asymmetric sections</label><br>
-                        <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
-                    </form>
-                    <div id="q5-feedback" class="feedback"></div>
-                </div>
+                <p><strong>Shear stress at 25 mm from top:</strong></p>
+                <p>Distance from NA = 100 - 25 = 75 mm</p>
+                <p>Q = 100 × 25 × (100 - 12.5) = 218,750 mm³</p>
+                <p>τ = VQ/(It) = (80,000 × 218,750)/(66.67 × 10⁶ × 100) = 2.625 MPa</p>
             </div>
-        </section>
+        </div>
 
-        <section id="summary">
-            <h2>Summary: Key Equations Reference</h2>
+        <div class="practice-problems">
+            <h3>Problem 3: Bending Stress</h3>
+            <p>A rectangular beam (80 mm × 150 mm) experiences a bending moment of 10 kN·m. Find the maximum bending stress.</p>
             
-            <div class="equation-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Loading Type</th>
-                            <th>Stress Formula</th>
-                            <th>Variables</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Axial</td>
-                            <td>\(\sigma = \frac{P}{A}\)</td>
-                            <td>P = axial force<br>A = cross-sectional area</td>
-                        </tr>
-                        <tr>
-                            <td>Shear (Average)</td>
-                            <td>\(\tau = \frac{V}{A}\)</td>
-                            <td>V = shear force<br>A = cross-sectional area</td>
-                        </tr>
-                        <tr>
-                            <td>Bending</td>
-                            <td>\(\sigma = \frac{My}{I} = \frac{M}{Z}\)</td>
-                            <td>M = bending moment<br>y = distance from neutral axis<br>I = moment of inertia<br>Z = section modulus</td>
-                        </tr>
-                        <tr>
-                            <td>Torsion (Circular)</td>
-                            <td>\(\tau = \frac{Tr}{J} = \frac{T}{Z_p}\)</td>
-                            <td>T = torque<br>r = radius<br>J = polar moment of inertia<br>Z<sub>p</sub> = polar section modulus</td>
-                        </tr>
-                        <tr>
-                            <td>Principal Stresses</td>
-                            <td>\(\sigma_{1,2} = \frac{\sigma_x + \sigma_y}{2} \pm \sqrt{\left(\frac{\sigma_x - \sigma_y}{2}\right)^2 + \tau_{xy}^2}\)</td>
-                            <td>σ<sub>x</sub>, σ<sub>y</sub> = normal stresses<br>τ<sub>xy</sub> = shear stress</td>
-                        </tr>
-                        <tr>
-                            <td>von Mises Stress</td>
-                            <td>\(\sigma_{vm} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2}\)</td>
-                            <td>σ<sub>1</sub>, σ<sub>2</sub> = principal stresses</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: b = 80 mm = 0.08 m, h = 150 mm = 0.15 m, M = 10 kN·m = 10,000 N·m</p>
+                <p>Second moment of area: \(I = \frac{bh^3}{12} = \frac{0.08 \times 0.15^3}{12} = 2.25 \times 10^{-5} \text{ m}^4\)</p>
+                <p>Distance to extreme fibre: \(c = \frac{h}{2} = 0.075 \text{ m}\)</p>
+                <p>Maximum stress: \(\sigma_{max} = \frac{Mc}{I} = \frac{10,000 \times 0.075}{2.25 \times 10^{-5}} = 33.3 \text{ MPa}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Torsional Stress</h3>
+            <p>A solid circular shaft (diameter 50 mm) transmits a torque of 2 kN·m. Calculate the maximum shear stress.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p>Given: d = 50 mm = 0.05 m, T = 2 kN·m = 2,000 N·m</p>
+                <p>Polar moment of inertia: \(J = \frac{\pi d^4}{32} = \frac{\pi \times 0.05^4}{32} = 6.14 \times 10^{-7} \text{ m}^4\)</p>
+                <p>Radius: \(R = \frac{d}{2} = 0.025 \text{ m}\)</p>
+                <p>Maximum shear stress: \(\tau_{max} = \frac{TR}{J} = \frac{2,000 \times 0.025}{6.14 \times 10^{-7}} = 81.4 \text{ MPa}\)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: Which stress is uniform across a prismatic member's cross-section?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Bending stress</label>
+                    <label><input type="radio" name="q1" value="b"> b) Axial stress</label>
+                    <label><input type="radio" name="q1" value="c"> c) Shear stress</label>
+                    <label><input type="radio" name="q1" value="d"> d) Torsional stress</label>
+                </div>
             </div>
             
-            <div class="key-point">
-                <h3>Conclusion</h3>
-                <p>Understanding the different types of stresses and how they develop under various loading conditions is fundamental to mechanical and structural engineering. The key insights to remember are:</p>
-                <ol>
-                    <li>Axial stress is uniform across the cross-section and directly related to the applied load and cross-sectional area</li>
-                    <li>Shear stress distribution depends on the cross-section geometry, with maximum values typically at the neutral axis for beams</li>
-                    <li>Bending stress varies linearly with distance from the neutral axis, with maximum values at the extreme fibers</li>
-                    <li>Torsional stress in circular shafts varies linearly with radius, with maximum values at the outer surface</li>
-                    <li>Real components often experience combined loading, requiring analysis of principal stresses and application of failure theories</li>
-                </ol>
-                <p>These principles form the foundation for structural analysis and the design of safe, efficient mechanical components and structures.</p>
+            <div class="quiz-question">
+                <h3>Question 2: In Jourawski's formula τ = VQ/(It), what does Q represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Second moment of area</label>
+                    <label><input type="radio" name="q2" value="b"> b) First moment of area above the cut</label>
+                    <label><input type="radio" name="q2" value="c"> c) Total cross-sectional area</label>
+                    <label><input type="radio" name="q2" value="d"> d) Width of the section</label>
+                </div>
             </div>
-        </section>
-    </main>
+            
+            <div class="quiz-question">
+                <h3>Question 3: In a circular shaft under torsion, shear stress varies:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Parabolically with radius</label>
+                    <label><input type="radio" name="q3" value="b"> b) Linearly with radius</label>
+                    <label><input type="radio" name="q3" value="c"> c) Inversely with radius</label>
+                    <label><input type="radio" name="q3" value="d"> d) Uniformly across the section</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: Maximum shear stress in a rectangular beam occurs at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) The top surface</label>
+                    <label><input type="radio" name="q4" value="b"> b) The bottom surface</label>
+                    <label><input type="radio" name="q4" value="c"> c) The neutral axis</label>
+                    <label><input type="radio" name="q4" value="d"> d) The quarter points</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2>Summary: Key Equations Reference</h2>
+        
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Loading Type</th>
+                        <th>Stress Formula</th>
+                        <th>Variables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Axial</td>
+                        <td>\(\sigma = \frac{N}{A}\)</td>
+                        <td>\(N\) = normal force<br>\(A\) = cross-sectional area</td>
+                    </tr>
+                    <tr>
+                        <td>Shear (Jourawski)</td>
+                        <td>\(\tau = \frac{VQ}{It}\)</td>
+                        <td>\(V\) = shear force<br>\(Q\) = first moment of area above/below cut<br>\(I\) = second moment of area<br>\(t\) = width at cut</td>
+                    </tr>
+                    <tr>
+                        <td>Shear (average)</td>
+                        <td>\(\tau = \frac{V}{A}\)</td>
+                        <td>\(V\) = shear force<br>\(A\) = area</td>
+                    </tr>
+                    <tr>
+                        <td>Shear (max, rectangular)</td>
+                        <td>\(\tau_{max} = \frac{3V}{2A}\)</td>
+                        <td>At neutral axis</td>
+                    </tr>
+                    <tr>
+                        <td>Bending</td>
+                        <td>\(\sigma = \frac{My}{I}\)</td>
+                        <td>\(M\) = bending moment<br>\(y\) = distance from NA<br>\(I\) = second moment of area</td>
+                    </tr>
+                    <tr>
+                        <td>Torsion (circular)</td>
+                        <td>\(\tau = \frac{Tr}{J}\)</td>
+                        <td>\(T\) = torque<br>\(r\) = radius<br>\(J\) = polar moment of inertia</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="key-point">
+            <h3>Summary</h3>
+            <p>Understanding stress analysis is fundamental to mechanical and structural engineering. Key takeaways:</p>
+            <ol>
+                <li>Different loading conditions produce characteristic stress distributions</li>
+                <li>Axial stress is uniform; bending stress varies linearly; shear stress distributions depend on cross-section geometry</li>
+                <li>Jourawski's method provides accurate shear stress calculation for any cross-section</li>
+                <li>Torsional stress in circular shafts varies linearly with radius</li>
+                <li>Proper stress analysis ensures safe, efficient, and economical designs</li>
+            </ol>
+        </div>
+    </div>
 
     <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-        <p class="small-caps">explorable explanations: discovering engineering through interactive learning</p>
-        <a class="back-link" href="index.html">Return to Explorable Explanations Home</a>
-        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
+        <script src="/assets/common/footer.js"></script>
     </footer>
 
     <script>
         // Function to toggle solution visibility
         function toggleSolution(id) {
             const solution = document.getElementById(id);
-            if (solution.style.display === "block") {
-                solution.style.display = "none";
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Hide Solution";
             } else {
-                solution.style.display = "block";
+                solution.classList.add('hidden');
+                const toggleElement = solution.previousElementSibling;
+                toggleElement.textContent = "Show Solution";
             }
         }
         
-        // Function to check quiz answers
-        function checkAnswer(questionId, correctAnswer) {
-            const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-            const feedbackElement = document.getElementById(`${questionId}-feedback`);
-            
-            if (!selectedOption) {
-                feedbackElement.innerHTML = "Please select an answer.";
-                feedbackElement.className = "feedback";
-                return;
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Axial stress is uniform
+                        q2: 'b', // Q is first moment of area above cut
+                        q3: 'b', // Shear stress varies linearly with radius
+                        q4: 'c'  // Maximum shear at neutral axis
+                    };
+                    
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+                    
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+                    
+                    feedback += `<p>Your score: ${score}/4</p>`;
+                    
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
             }
-            
-            if (selectedOption.value === correctAnswer) {
-                feedbackElement.innerHTML = "Correct! Well done.";
-                feedbackElement.className = "feedback correct";
-            } else {
-                feedbackElement.innerHTML = "Incorrect. Try again!";
-                feedbackElement.className = "feedback incorrect";
-            }
-        }
+        });
     </script>
+
 </body>
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
 </html>
