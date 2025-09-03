@@ -3,798 +3,647 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stress-Based Fatigue Analysis</title>
+    <title>Stress-Based Fatigue Analysis - Interactive Lecture</title>
     
-    <!--p5 library-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.dom.js"></script>
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
     
-    <!--Plotly library-->
+    <!-- Plotly library -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     
-    <!-- Import MathJax for LaTeX rendering -->
+    <!-- MathJax for LaTeX rendering -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <!-- Load the fatigue analysis script -->
+    <script src="fatigue-analysis.js"></script>
     
-    <!--Custom styles-->
-    <!-- <link rel="stylesheet" type="text/css" href="/assets/css/main.css"> -->
-    <link rel="stylesheet" type="text/css" href="./fatigue_styles.css">
+    <!-- Common styles -->
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
     
-    <!--Custom scripts-->
-    <script src="./fatigue_ui.js"></script>
-    <script src="./fatigue_stress_time.js"></script>
-    <script src="./fatigue_sn_curve.js"></script>
-    <script src="./fatigue_haigh_diagram.js"></script>
-    <script src="./fatigue_damage.js"></script>
-    <script src="./fatigue_analysis.js"></script>
-
+    <style>
+        /* Additional styles specific to fatigue module */
+        .simulation-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .simulation-controls {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .simulation-display {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .plot-container {
+            width: 100%;
+            height: 400px;
+            margin: 10px 0;
+        }
+        
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #b38600;
+        }
+        
+        .slider-container input[type="range"] {
+            width: 70%;
+            margin-right: 10px;
+        }
+        
+        .slider-value {
+            display: inline-block;
+            width: 60px;
+            text-align: right;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .material-selector {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .material-selector h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #b38600;
+        }
+        
+        .material-selector select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid var(--primary-color);
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .material-selector select:hover {
+            border-color: var(--secondary-color);
+            background-color: #fffef5;
+        }
+        
+        .material-selector select:focus {
+            outline: none;
+            border-color: var(--link-hover-color);
+            box-shadow: 0 0 5px rgba(28, 1, 184, 0.2);
+        }
+        
+        .preset-buttons {
+            margin: 15px 0;
+        }
+        
+        .preset-buttons button,
+        .control-button {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .preset-buttons button:hover,
+        .control-button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .calculated-params {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .calculated-params h4 {
+            margin-top: 0;
+            color: #b38600;
+        }
+        
+        .calculated-params p {
+            margin: 5px 0;
+        }
+        
+        .damage-block {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .damage-results {
+            background-color: #f9f9f9;
+            border: 2px solid #ddd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .damage-status {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .status-safe {
+            color: #155724;
+        }
+        
+        .status-warning {
+            color: #856404;
+        }
+        
+        .status-failure {
+            color: #721c24;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .plot-container {
+                height: 300px;
+            }
+            
+            .slider-container input[type="range"] {
+                width: 60%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .plot-container {
+                height: 250px;
+            }
+            
+            .preset-buttons button {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>stress-based fatigue analysis</h1>
-        <p class="small-caps">understanding mechanical failure under cyclic loading</p>
-        <p>Dr. Arnaldo Delli Carri</p>
+        <h1>Stress-Based Fatigue Analysis</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
     
-    <nav>
-        <ul>
-            <li><a href="#intro">Introduction</a></li>
-            <li><a href="#basics">Fatigue Basics</a></li>
-            <li><a href="#sn-curves">S-N Curves</a></li>
-            <li><a href="#mean-stress">Mean Stress Effects</a></li>
-            <li><a href="#damage">Cumulative Damage</a></li>
-            <li><a href="#problems">Solved Problems</a></li>
-            <li><a href="#quiz">Quiz</a></li>
-        </ul>
-    </nav>
-    
-    <main>
-        <section id="intro">
-            <h2>Introduction to Fatigue Analysis</h2>
-            <p>Fatigue is a failure mechanism that occurs in materials subjected to cyclic loading, even when the stresses are well below the material's ultimate tensile strength. This phenomenon accounts for a significant percentage of mechanical failures in engineering components.</p>
-            
-            <p>Key aspects that differentiate fatigue from static failure:</p>
+    <div class="content-section">
+        <h2 id="intro">Introduction to Fatigue Analysis</h2>
+        <p>Fatigue is a failure mechanism that occurs in materials subjected to cyclic loading, even when the stresses are well below the material's ultimate tensile strength. This phenomenon accounts for a significant percentage of mechanical failures in engineering components.</p>
+        
+        <div class="key-point">
+            <p><strong>Key aspects that differentiate fatigue from static failure:</strong></p>
             <ul>
                 <li>Failure occurs after many loading cycles, not immediately</li>
                 <li>Failure can occur at stress levels well below the yield strength</li>
-                <li>Failure typically begins at a localized defect or stress concentration</li>
+                <li>Failure typically begins at a localised defect or stress concentration</li>
                 <li>The process involves three stages: crack initiation, crack propagation, and final fracture</li>
             </ul>
-            
-            <p>This interactive module explores the fundamental principles of stress-based fatigue analysis, providing visualizations and simulations to develop your intuition about this complex failure mode.</p>
-        </section>
+        </div>
         
-        <section id="basics">
-            <h2>Fundamentals of Fatigue Loading</h2>
-            
-            <h3>Stress Cycle Parameters</h3>
-            <p>In fatigue analysis, we characterize cyclic loading using several key parameters:</p>
-            
-            <div id="stressCycleDefinition">
-                \[\sigma_{max} = \text{Maximum stress in cycle}\]
-                \[\sigma_{min} = \text{Minimum stress in cycle}\]
-                \[\sigma_a = \frac{\sigma_{max} - \sigma_{min}}{2} = \text{Stress amplitude}\]
-                \[\sigma_m = \frac{\sigma_{max} + \sigma_{min}}{2} = \text{Mean stress}\]
-                \[R = \frac{\sigma_{min}}{\sigma_{max}} = \text{Stress ratio}\]
-            </div>
-            
-            <div class="simulation-container">
-                <div class="simulation-controls">
-                    <h3>Loading Parameters</h3>
-                    
-                    <div class="slider-container">
-                        <label for="max-stress">Maximum Stress (MPa):</label>
-                        <input type="range" id="max-stress" min="0" max="500" value="200" step="10">
-                        <span id="max-stress-value" class="slider-value">200</span>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="min-stress">Minimum Stress (MPa):</label>
-                        <input type="range" id="min-stress" min="-300" max="400" value="-100" step="10">
-                        <span id="min-stress-value" class="slider-value">-100</span>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="frequency">Frequency (Hz):</label>
-                        <input type="range" id="frequency" min="0.1" max="2" value="0.5" step="0.1">
-                        <span id="frequency-value" class="slider-value">0.5</span>
-                    </div>
-                    
-                    <div>
-                        <h4>Calculated Parameters:</h4>
-                        <p>Stress Amplitude (σa): <span id="stress-amplitude">150</span> MPa</p>
-                        <p>Mean Stress (σm): <span id="mean-stress-value">50</span> MPa</p>
-                        <p>Stress Ratio (R): <span id="stress-ratio">-0.50</span></p>
-                    </div>
-                    
-                    <div class="loading-presets">
-                        <h4>Common Loading Types:</h4>
-                        <button id="fully-reversed">Fully Reversed (R = -1)</button>
-                        <button id="zero-to-max">Zero-to-Max (R = 0)</button>
-                        <button id="fluctuating-tension">Fluctuating Tension (R = 0.5)</button>
-                        <button id="fluctuating-compression">Fluctuating Compression (R = 2)</button>
-                    </div>
+        <p>This interactive module explores the fundamental principles of stress-based fatigue analysis, providing visualisations and simulations to develop your intuition about this complex failure mode.</p>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="basics">Fundamentals of Fatigue Loading</h2>
+        
+        <h3>Stress Cycle Parameters</h3>
+        <p>In fatigue analysis, we characterise cyclic loading using several key parameters:</p>
+        
+        <div class="equation-box">
+            <p>\[\sigma_{max} = \text{Maximum stress in cycle}\]</p>
+            <p>\[\sigma_{min} = \text{Minimum stress in cycle}\]</p>
+            <p>\[\sigma_a = \frac{\sigma_{max} - \sigma_{min}}{2} = \text{Stress amplitude}\]</p>
+            <p>\[\sigma_m = \frac{\sigma_{max} + \sigma_{min}}{2} = \text{Mean stress}\]</p>
+            <p>\[R = \frac{\sigma_{min}}{\sigma_{max}} = \text{Stress ratio}\]</p>
+        </div>
+        
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3>Loading Parameters</h3>
+                
+                <div class="slider-container">
+                    <label for="max-stress">Maximum Stress (MPa):</label>
+                    <input type="range" id="max-stress" min="0" max="500" value="200" step="10">
+                    <span id="max-stress-value" class="slider-value">200</span>
                 </div>
                 
-                <div class="simulation-display">
-                    <h3>Stress-Time History</h3>
-                    <div id="stress-time-plot" class="plot-container"></div>
+                <div class="slider-container">
+                    <label for="min-stress">Minimum Stress (MPa):</label>
+                    <input type="range" id="min-stress" min="-300" max="400" value="-100" step="10">
+                    <span id="min-stress-value" class="slider-value">-100</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="frequency">Frequency (Hz):</label>
+                    <input type="range" id="frequency" min="0.1" max="2" value="0.5" step="0.1">
+                    <span id="frequency-value" class="slider-value">0.5</span>
+                </div>
+                
+                <div class="calculated-params">
+                    <h4>Calculated Parameters:</h4>
+                    <p>Stress Amplitude (σₐ): <strong><span id="stress-amplitude">150</span> MPa</strong></p>
+                    <p>Mean Stress (σₘ): <strong><span id="mean-stress-value">50</span> MPa</strong></p>
+                    <p>Stress Ratio (R): <strong><span id="stress-ratio">-0.50</span></strong></p>
+                </div>
+                
+                <div class="preset-buttons">
+                    <h4>Common Loading Types:</h4>
+                    <button id="fully-reversed">Fully Reversed (R = -1)</button>
+                    <button id="zero-to-max">Zero-to-Max (R = 0)</button>
+                    <button id="fluctuating-tension">Fluctuating Tension</button>
+                    <button id="fluctuating-compression">Fluctuating Compression</button>
                 </div>
             </div>
             
-            <h3>Common Types of Fatigue Loading</h3>
-            <ul>
-                <li><strong>Fully Reversed Loading (R = -1):</strong> Equal tension and compression, with mean stress = 0</li>
-                <li><strong>Zero-to-Max Loading (R = 0):</strong> Cycles from zero to a maximum value, common in pressurized systems</li>
-                <li><strong>Fluctuating Tension (0 < R < 1):</strong> Cycling occurs entirely in tension</li>
-                <li><strong>Fluctuating Compression (R > 1 or R < -1):</strong> Cycling occurs entirely in compression</li>
-            </ul>
-        </section>
-        
-        <section id="sn-curves">
-            <h2>S-N Curves and Fatigue Life Prediction</h2>
-            
-            <h3>The Wöhler Experiment</h3>
-            <p>August Wöhler conducted the first systematic investigation of fatigue failure in the 1850s while studying railway axle failures. His experiments involved applying cyclic loads to test specimens until failure and plotting the results.</p>
-            
-            <p>The resulting S-N curve (Stress vs Number of cycles) represents the relationship between stress amplitude and the number of cycles to failure for a specific mean stress (often zero).</p>
-            
-            <h3>Basquin's Equation</h3>
-            <p>The relationship between stress amplitude and fatigue life can be described by Basquin's equation:</p>
-            
-            <div id="basquinsEquation">
-                \[\sigma_a = \sigma'_f (2N_f)^b\]
+            <div class="simulation-display">
+                <h3>Stress-Time History</h3>
+                <div id="stress-time-plot" class="plot-container"></div>
             </div>
-            
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="sn-curves">S-N Curves and Fatigue Life Prediction</h2>
+        
+        <h3>The Wöhler Experiment</h3>
+        <p>August Wöhler conducted the first systematic investigation of fatigue failure in the 1850s whilst studying railway axle failures. His experiments involved applying cyclic loads to test specimens until failure and plotting the results.</p>
+        
+        <h3>Basquin's Equation</h3>
+        <div class="equation-box">
+            <p>The relationship between stress amplitude and fatigue life:</p>
+            <p>\[\sigma_a = \sigma'_f (2N_f)^b\]</p>
             <p>Where:</p>
             <ul>
                 <li>\(\sigma_a\) = Stress amplitude</li>
                 <li>\(\sigma'_f\) = Fatigue strength coefficient</li>
                 <li>\(N_f\) = Number of cycles to failure</li>
-                <li>\(b\) = Fatigue strength exponent (typically between -0.05 and -0.12)</li>
+                <li>\(b\) = Fatigue strength exponent (typically -0.05 to -0.12)</li>
             </ul>
-            
-            <div class="simulation-container">
-                <div class="simulation-controls">
-                    <h3>Material Parameters</h3>
-                    
-                    <div class="slider-container">
-                        <label for="fatigue-strength">Fatigue Strength Coefficient (MPa):</label>
-                        <input type="range" id="fatigue-strength" min="500" max="1500" value="1000" step="50">
-                        <span id="fatigue-strength-value" class="slider-value">1000</span>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="fatigue-exponent">Fatigue Strength Exponent:</label>
-                        <input type="range" id="fatigue-exponent" min="-0.15" max="-0.05" value="-0.09" step="0.01">
-                        <span id="fatigue-exponent-value" class="slider-value">-0.09</span>
-                    </div>
-                    
-                    <div class="material-presets">
-                        <h4>Material Presets:</h4>
-                        <button id="steel-1045">Steel 1045</button>
-                        <button id="aluminum-7075">Aluminum 7075</button>
-                        <button id="titanium-alloy">Titanium Alloy</button>
-                        <button id="cast-iron">Cast Iron</button>
-                    </div>
-                    
-                    <div>
-                        <h4>Endurance Limits:</h4>
-                        <p>Endurance Limit (1e6 cycles): <span id="endurance-limit">310</span> MPa</p>
-                        <p>Endurance Limit (1e7 cycles): <span id="long-endurance-limit">250</span> MPa</p>
-                    </div>
+            <p><strong>On log-log scale:</strong> Appears as a straight line with slope = b</p>
+            <p><strong>On semi-log scale:</strong> Appears as a curved (power law) line</p>
+        </div>
+        
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3>Material Parameters</h3>
+                
+                <div class="slider-container">
+                    <label for="fatigue-strength">Fatigue Strength Coefficient (MPa):</label>
+                    <input type="range" id="fatigue-strength" min="500" max="1500" value="1000" step="50">
+                    <span id="fatigue-strength-value" class="slider-value">1000</span>
                 </div>
                 
-                <div class="simulation-display">
-                    <h3>S-N Curve</h3>
-                    <div id="sn-curve-plot" class="plot-container"></div>
+                <div class="slider-container">
+                    <label for="fatigue-exponent">Fatigue Strength Exponent:</label>
+                    <input type="range" id="fatigue-exponent" min="-0.15" max="-0.05" value="-0.09" step="0.01">
+                    <span id="fatigue-exponent-value" class="slider-value">-0.09</span>
+                </div>
+                
+                <div class="material-selector">
+                    <h4>Material Presets:</h4>
+                    <select id="material-preset">
+                        <option value="">-- Select a Material --</option>
+                        <option value="steel-1045">Steel 1045 (Normalised)</option>
+                        <option value="steel-4340">Steel 4340 (Tempered)</option>
+                        <option value="steel-316">Stainless Steel 316</option>
+                        <option value="aluminum-2024">Aluminium 2024-T3</option>
+                        <option value="aluminum-6061">Aluminium 6061-T6</option>
+                        <option value="aluminum-7075">Aluminium 7075-T6</option>
+                        <option value="titanium-6al4v">Titanium Ti-6Al-4V</option>
+                        <option value="titanium-pure">Titanium (Pure)</option>
+                        <option value="cast-iron-grey">Grey Cast Iron</option>
+                        <option value="cast-iron-ductile">Ductile Cast Iron</option>
+                        <option value="magnesium-az31">Magnesium AZ31</option>
+                        <option value="copper-c11000">Copper C11000</option>
+                        <option value="brass-360">Brass 360</option>
+                        <option value="nickel-200">Nickel 200</option>
+                        <option value="inconel-718">Inconel 718</option>
+                    </select>
+                </div>
+                
+                <div style="margin: 15px 0; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #b38600;">
+                        <input type="checkbox" id="log-log-scale" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                        Use Log-Log Scale (straight line)
+                    </label>
+                    <p style="margin: 5px 0 0 28px; font-size: 0.9em; color: #666;">
+                        <strong>Log-log:</strong> Both axes logarithmic - shows power law as straight line<br>
+                        <strong>Semi-log:</strong> Only N-axis logarithmic - shows power law as curve
+                    </p>
+                </div>
+                
+                <div class="calculated-params">
+                    <h4>Endurance Limits:</h4>
+                    <p>At 10⁶ cycles: <strong><span id="endurance-limit">310</span> MPa</strong></p>
+                    <p>At 10⁷ cycles: <strong><span id="long-endurance-limit">250</span> MPa</strong></p>
                 </div>
             </div>
             
-            <h3>Characteristics of S-N Curves</h3>
-            <ul>
-                <li><strong>Ferrous Metals:</strong> Typically exhibit a distinct endurance limit (horizontal asymptote)</li>
-                <li><strong>Non-ferrous Metals:</strong> Generally do not show a distinct endurance limit and continue to decline</li>
-                <li><strong>High Cycle Fatigue:</strong> Typically above 10³ cycles, elastic deformation dominates</li>
-                <li><strong>Low Cycle Fatigue:</strong> Below 10³ cycles, plastic deformation is significant</li>
-            </ul>
-        </section>
+            <div class="simulation-display">
+                <h3>S-N Curve (Wöhler Diagram)</h3>
+                <div id="sn-curve-plot" class="plot-container"></div>
+                <div class="key-point" style="margin-top: 15px;">
+                    <p><strong>Understanding Scale Types:</strong></p>
+                    <ul>
+                        <li><strong>Log-log scale:</strong> Makes power laws appear linear, useful for determining material constants (slope = b)</li>
+                        <li><strong>Semi-log scale:</strong> Better shows absolute stress values, commonly used in design handbooks</li>
+                        <li>Toggle between scales to understand how the same data can be visualised differently</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="mean-stress">Effect of Mean Stress on Fatigue Life</h2>
         
-        <section id="mean-stress">
-            <h2>Effect of Mean Stress on Fatigue Life</h2>
-            
-            <p>In practical applications, many components experience cyclic loading with a non-zero mean stress. Tensile mean stress generally reduces fatigue life, while compressive mean stress tends to improve it.</p>
-            
-            <h3>Mean Stress Correction Models</h3>
-            <p>Various models exist to account for mean stress effects:</p>
-            
-            <div id="meanStressEquations">
-                \[\text{Goodman: } \frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = 1\]
-                \[\text{Gerber: } \frac{\sigma_a}{S_e} + \left(\frac{\sigma_m}{S_{ut}}\right)^2 = 1\]
-                \[\text{Soderberg: } \frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_y} = 1\]
-                \[\text{Modified Goodman: } \frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} \leq 1 \text{ and } \sigma_{max} \leq S_y\]
+        <p>In practical applications, many components experience cyclic loading with a non-zero mean stress. Tensile mean stress generally reduces fatigue life, whilst compressive mean stress tends to improve it.</p>
+        
+        <h3>Mean Stress Correction Models</h3>
+        <div class="equation-box">
+            <p><strong>Goodman:</strong> \(\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = 1\)</p>
+            <p><strong>Gerber:</strong> \(\frac{\sigma_a}{S_e} + \left(\frac{\sigma_m}{S_{ut}}\right)^2 = 1\)</p>
+            <p><strong>Soderberg:</strong> \(\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_y} = 1\)</p>
+        </div>
+        
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3>Material Properties</h3>
+                
+                <div class="slider-container">
+                    <label for="ultimate-strength">Ultimate Tensile Strength (MPa):</label>
+                    <input type="range" id="ultimate-strength" min="300" max="1600" value="800" step="50">
+                    <span id="ultimate-strength-value" class="slider-value">800</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="yield-strength">Yield Strength (MPa):</label>
+                    <input type="range" id="yield-strength" min="200" max="1400" value="600" step="50">
+                    <span id="yield-strength-value" class="slider-value">600</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="endurance-limit-input">Endurance Limit (MPa):</label>
+                    <input type="range" id="endurance-limit-input" min="100" max="700" value="300" step="25">
+                    <span id="endurance-limit-input-value" class="slider-value">300</span>
+                </div>
+                
+                <h4>Assessment Point:</h4>
+                <div class="slider-container">
+                    <label for="point-mean-stress">Mean Stress (MPa):</label>
+                    <input type="range" id="point-mean-stress" min="0" max="800" value="200" step="25">
+                    <span id="point-mean-stress-value" class="slider-value">200</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="point-stress-amplitude">Stress Amplitude (MPa):</label>
+                    <input type="range" id="point-stress-amplitude" min="0" max="600" value="150" step="25">
+                    <span id="point-stress-amplitude-value" class="slider-value">150</span>
+                </div>
+                
+                <div class="calculated-params">
+                    <h4>Safety Factors:</h4>
+                    <p>Goodman: <strong><span id="goodman-sf">1.2</span></strong></p>
+                    <p>Gerber: <strong><span id="gerber-sf">1.5</span></strong></p>
+                    <p>Soderberg: <strong><span id="soderberg-sf">0.9</span></strong></p>
+                </div>
             </div>
             
+            <div class="simulation-display">
+                <h3>Haigh Diagram</h3>
+                <div id="haigh-diagram" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="damage">Cumulative Damage Theory</h2>
+        
+        <p>In real applications, components often experience variable amplitude loading. The Palmgren-Miner rule provides a way to assess cumulative damage.</p>
+        
+        <h3>Palmgren-Miner Linear Damage Rule</h3>
+        <div class="equation-box">
+            <p>\[D = \sum_{i=1}^{k} \frac{n_i}{N_i}\]</p>
             <p>Where:</p>
             <ul>
-                <li>\(S_e\) = Endurance limit for fully reversed loading</li>
-                <li>\(S_{ut}\) = Ultimate tensile strength</li>
-                <li>\(S_y\) = Yield strength</li>
+                <li>\(D\) = Cumulative damage (failure when D ≥ 1)</li>
+                <li>\(n_i\) = Cycles applied at stress level i</li>
+                <li>\(N_i\) = Cycles to failure at stress level i</li>
             </ul>
-            
-            <div class="simulation-container">
-                <div class="simulation-controls">
-                    <h3>Material Properties</h3>
-                    
-                    <div class="slider-container">
-                        <label for="ultimate-strength">Ultimate Tensile Strength (MPa):</label>
-                        <input type="range" id="ultimate-strength" min="300" max="1600" value="800" step="50">
-                        <span id="ultimate-strength-value" class="slider-value">800</span>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="yield-strength">Yield Strength (MPa):</label>
-                        <input type="range" id="yield-strength" min="200" max="1400" value="600" step="50">
-                        <span id="yield-strength-value" class="slider-value">600</span>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="endurance-limit-input">Endurance Limit (MPa):</label>
-                        <input type="range" id="endurance-limit-input" min="100" max="700" value="300" step="25">
-                        <span id="endurance-limit-input-value" class="slider-value">300</span>
-                    </div>
-                    
-                    <div class="assessment-point">
-                        <h4>Assess Point:</h4>
-                        <div class="slider-container">
-                            <label for="point-mean-stress">Mean Stress (MPa):</label>
-                            <input type="range" id="point-mean-stress" min="0" max="800" value="200" step="25">
-                            <span id="point-mean-stress-value" class="slider-value">200</span>
-                        </div>
-                        
-                        <div class="slider-container">
-                            <label for="point-stress-amplitude">Stress Amplitude (MPa):</label>
-                            <input type="range" id="point-stress-amplitude" min="0" max="600" value="150" step="25">
-                            <span id="point-stress-amplitude-value" class="slider-value">150</span>
-                        </div>
-                        
-                        <div>
-                            <p>Safety Factor (Goodman): <span id="goodman-sf">1.2</span></p>
-                            <p>Safety Factor (Gerber): <span id="gerber-sf">1.5</span></p>
-                            <p>Safety Factor (Soderberg): <span id="soderberg-sf">0.9</span></p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="simulation-display">
-                    <h3>Haigh Diagram</h3>
-                    <div id="haigh-diagram" class="plot-container"></div>
-                </div>
-            </div>
-            
-            <h3>Interpreting the Haigh Diagram</h3>
-            <ul>
-                <li>Points inside the boundary represent safe operation</li>
-                <li>Points on the boundary represent failure at the specified number of cycles</li>
-                <li>Points outside the boundary exceed the fatigue failure criteria</li>
-                <li>The diagonal line represents the yield criterion where σmax = Sy</li>
-            </ul>
-            
-            <h3>Selecting a Mean Stress Correction Model</h3>
-            <ul>
-                <li><strong>Goodman:</strong> Conservative for most metals, widely used in industry</li>
-                <li><strong>Gerber:</strong> Better fit for ductile materials, less conservative</li>
-                <li><strong>Soderberg:</strong> Most conservative, considers yielding</li>
-                <li><strong>Modified Goodman:</strong> Accounts for both fatigue and static yielding</li>
-            </ul>
-        </section>
+        </div>
         
-        <section id="damage">
-            <h2>Cumulative Damage Theory</h2>
-            
-            <p>In real applications, components often experience variable amplitude loading rather than constant amplitude cycles. The Palmgren-Miner rule provides a way to assess cumulative damage.</p>
-            
-            <h3>Palmgren-Miner Linear Damage Rule</h3>
-            <p>This rule states that the damage fraction at any stress level is linearly proportional to the number of cycles applied divided by the number of cycles to failure at that stress level.</p>
-            
-            <div id="palmgrenMinerEquation">
-                \[D = \sum_{i=1}^{k} \frac{n_i}{N_i}\]
-            </div>
-            
-            <p>Where:</p>
-            <ul>
-                <li>\(D\) = Cumulative damage (failure occurs when D ≥ 1)</li>
-                <li>\(n_i\) = Number of cycles applied at stress level i</li>
-                <li>\(N_i\) = Number of cycles to failure at stress level i</li>
-                <li>\(k\) = Number of different stress levels</li>
-            </ul>
-            
-            <div class="simulation-container">
-                <div class="simulation-controls">
-                    <h3>Variable Amplitude Loading</h3>
-                    
-                    <div class="stress-block-container">
-                        <h4>Stress Block 1:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-1">Stress Amplitude (MPa):</label>
-                            <input type="range" id="stress-amp-1" min="50" max="500" value="300" step="25">
-                            <span id="stress-amp-1-value" class="slider-value">300</span>
-                        </div>
-                        
-                        <div class="slider-container">
-                            <label for="cycles-1">Cycles Applied:</label>
-                            <input type="range" id="cycles-1" min="100" max="100000" value="10000" step="1000">
-                            <span id="cycles-1-value" class="slider-value">10000</span>
-                        </div>
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3>Variable Amplitude Loading</h3>
+                
+                <div class="damage-block">
+                    <h4>Stress Block 1:</h4>
+                    <div class="slider-container">
+                        <label for="stress-amp-1">Stress Amplitude (MPa):</label>
+                        <input type="range" id="stress-amp-1" min="50" max="500" value="300" step="25">
+                        <span id="stress-amp-1-value" class="slider-value">300</span>
                     </div>
-                    
-                    <div class="stress-block-container">
-                        <h4>Stress Block 2:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-2">Stress Amplitude (MPa):</label>
-                            <input type="range" id="stress-amp-2" min="50" max="500" value="200" step="25">
-                            <span id="stress-amp-2-value" class="slider-value">200</span>
-                        </div>
-                        
-                        <div class="slider-container">
-                            <label for="cycles-2">Cycles Applied:</label>
-                            <input type="range" id="cycles-2" min="100" max="500000" value="50000" step="5000">
-                            <span id="cycles-2-value" class="slider-value">50000</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stress-block-container">
-                        <h4>Stress Block 3:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-3">Stress Amplitude (MPa):</label>
-                            <input type="range" id="stress-amp-3" min="50" max="500" value="150" step="25">
-                            <span id="stress-amp-3-value" class="slider-value">150</span>
-                        </div>
-                        
-                        <div class="slider-container">
-                            <label for="cycles-3">Cycles Applied:</label>
-                            <input type="range" id="cycles-3" min="100" max="1000000" value="100000" step="10000">
-                            <span id="cycles-3-value" class="slider-value">100000</span>
-                        </div>
-                    </div>
-                    
-                    <div class="damage-results">
-                        <h4>Cumulative Damage Results:</h4>
-                        <p>Total Damage: <span id="total-damage">0.73</span></p>
-                        <p>Remaining Life: <span id="remaining-life">27%</span></p>
-                        <p>Status: <span id="damage-status">Safe</span></p>
+                    <div class="slider-container">
+                        <label for="cycles-1">Cycles Applied:</label>
+                        <input type="range" id="cycles-1" min="100" max="100000" value="10000" step="1000">
+                        <span id="cycles-1-value" class="slider-value">10000</span>
                     </div>
                 </div>
                 
-                <div class="simulation-display">
-                    <h3>Cumulative Damage Visualization</h3>
-                    <div id="damage-plot" class="plot-container"></div>
+                <div class="damage-block">
+                    <h4>Stress Block 2:</h4>
+                    <div class="slider-container">
+                        <label for="stress-amp-2">Stress Amplitude (MPa):</label>
+                        <input type="range" id="stress-amp-2" min="50" max="500" value="200" step="25">
+                        <span id="stress-amp-2-value" class="slider-value">200</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="cycles-2">Cycles Applied:</label>
+                        <input type="range" id="cycles-2" min="100" max="500000" value="50000" step="5000">
+                        <span id="cycles-2-value" class="slider-value">50000</span>
+                    </div>
+                </div>
+                
+                <div class="damage-block">
+                    <h4>Stress Block 3:</h4>
+                    <div class="slider-container">
+                        <label for="stress-amp-3">Stress Amplitude (MPa):</label>
+                        <input type="range" id="stress-amp-3" min="50" max="500" value="150" step="25">
+                        <span id="stress-amp-3-value" class="slider-value">150</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="cycles-3">Cycles Applied:</label>
+                        <input type="range" id="cycles-3" min="100" max="1000000" value="100000" step="10000">
+                        <span id="cycles-3-value" class="slider-value">100000</span>
+                    </div>
+                </div>
+                
+                <div class="damage-results">
+                    <h4>Cumulative Damage Results:</h4>
+                    <p>Total Damage (D): <strong><span id="total-damage">0.73</span></strong></p>
+                    <p>Remaining Life: <strong><span id="remaining-life">27%</span></strong></p>
+                    <p>Status: <strong><span id="damage-status" class="damage-status status-safe">Safe</span></strong></p>
                 </div>
             </div>
             
-            <h3>Limitations of the Palmgren-Miner Rule</h3>
+            <div class="simulation-display">
+                <h3>Palmgren-Miner Damage Accumulation</h3>
+                <div id="damage-plot" class="plot-container"></div>
+            </div>
+        </div>
+        
+        <div class="key-point">
+            <p><strong>Limitations of the Palmgren-Miner Rule:</strong></p>
             <ul>
-                <li>Does not account for sequence effects (high-low vs low-high stress sequences)</li>
-                <li>Does not consider stress interactions</li>
+                <li>Does not account for sequence effects</li>
                 <li>Assumes linear damage accumulation</li>
                 <li>Observed failure often occurs at D values between 0.7 and 1.5</li>
                 <li>Conservative design often uses a target D value of 0.7 or lower</li>
             </ul>
-        </section>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="problems">Practice Problems</h2>
         
-        <section id="problems">
-            <h2>Solved Problems</h2>
+        <div class="practice-problems">
+            <h3>Problem 1: Fatigue Life Prediction</h3>
+            <p>A steel component (σ'f = 1000 MPa, b = -0.09) experiences fully reversed loading with a stress amplitude of 300 MPa. Calculate the expected fatigue life.</p>
             
-            <div class="tabs">
-                <button class="tab-button active" onclick="openTab(event, 'problem1')">Problem 1</button>
-                <button class="tab-button" onclick="openTab(event, 'problem2')">Problem 2</button>
-                <button class="tab-button" onclick="openTab(event, 'problem3')">Problem 3</button>
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using Basquin's equation: σₐ = σ'f(2Nf)^b</p>
+                <p>300 = 1000 × (2Nf)^(-0.09)</p>
+                <p>0.3 = (2Nf)^(-0.09)</p>
+                <p>(2Nf) = 0.3^(-1/0.09) = 1.38 × 10^5</p>
+                <p>Nf = 6.90 × 10^4 cycles</p>
             </div>
-            
-            <div id="problem1" class="tab-content">
-                <h3>Problem 1: Fatigue Life Prediction</h3>
-                <p><strong>Problem:</strong> Three mechanical components made of the same steel alloy (fatigue strength coefficient σ'f = 1000 MPa, fatigue strength exponent b = -0.09) are subjected to different cyclic loading conditions:</p>
-                <ul>
-                    <li>Component A: Stress varies between +300 MPa and -300 MPa</li>
-                    <li>Component B: Stress varies between +400 MPa and 0 MPa</li>
-                    <li>Component C: Stress varies between +250 MPa and +50 MPa</li>
-                </ul>
-                    
-                    <p>Classify each loading type, calculate the stress parameters, and determine which component will fail first using Basquin's equation.</p>
-                    
-                <button class="solution-btn" onclick="toggleSolution('solution1')">Show Solution</button>
-
-                <div id="solution1" class="solution" style="display: none;">
-    <p><strong>Solution:</strong></p>
-    
-    <p><strong>Component A:</strong></p>
-    <ul>
-        <li>Maximum stress: σmax = +300 MPa</li>
-        <li>Minimum stress: σmin = -300 MPa</li>
-        <li>Stress amplitude: σa = (σmax - σmin)/2 = (300 - (-300))/2 = 300 MPa</li>
-        <li>Mean stress: σm = (σmax + σmin)/2 = (300 + (-300))/2 = 0 MPa</li>
-        <li>Stress ratio: R = σmin/σmax = -300/300 = -1</li>
-        <li>Loading type: Fully reversed loading (R = -1, σm = 0)</li>
-    </ul>
-    
-    <p><strong>Component B:</strong></p>
-    <ul>
-        <li>Maximum stress: σmax = +400 MPa</li>
-        <li>Minimum stress: σmin = 0 MPa</li>
-        <li>Stress amplitude: σa = (σmax - σmin)/2 = (400 - 0)/2 = 200 MPa</li>
-        <li>Mean stress: σm = (σmax + σmin)/2 = (400 + 0)/2 = 200 MPa</li>
-        <li>Stress ratio: R = σmin/σmax = 0/400 = 0</li>
-        <li>Loading type: Zero-to-max loading (R = 0)</li>
-    </ul>
-    
-    <p><strong>Component C:</strong></p>
-    <ul>
-        <li>Maximum stress: σmax = +250 MPa</li>
-        <li>Minimum stress: σmin = +50 MPa</li>
-        <li>Stress amplitude: σa = (σmax - σmin)/2 = (250 - 50)/2 = 100 MPa</li>
-        <li>Mean stress: σm = (σmax + σmin)/2 = (250 + 50)/2 = 150 MPa</li>
-        <li>Stress ratio: R = σmin/σmax = 50/250 = 0.2</li>
-        <li>Loading type: Fluctuating tension (0 < R < 1)</li>
-    </ul>
-    
-    <p><strong>Fatigue Life Calculation:</strong></p>
-    <p>Using Basquin's equation: σa = σ'f(2Nf)^b</p>
-    
-    <p>For Component A (fully reversed, mean stress correction not needed):</p>
-    <p>\[300 = 1000 \times (2N_f)^{-0.09}\]</p>
-    <p>\[\frac{300}{1000} = (2N_f)^{-0.09}\]</p>
-    <p>\[0.3 = (2N_f)^{-0.09}\]</p>
-    <p>\[(2N_f) = 0.3^{-1/0.09} = 0.3^{-11.11} = 1.38 \times 10^5\]</p>
-    <p>\[N_{f,A} = 6.90 \times 10^4 \text{ cycles}\]</p>
-    
-    <p>For Component B (zero-to-max, requires mean stress correction):</p>
-    <p>Using Goodman relation: \[\sigma_{a,eq} = \frac{\sigma_a}{1 - \sigma_m/S_u}\]</p>
-    <p>Assuming Su = 800 MPa for this steel:</p>
-    <p>\[\sigma_{a,eq} = \frac{200}{1 - 200/800} = \frac{200}{0.75} = 267 \text{ MPa}\]</p>
-    <p>\[267 = 1000 \times (2N_f)^{-0.09}\]</p>
-    <p>\[0.267 = (2N_f)^{-0.09}\]</p>
-    <p>\[(2N_f) = 0.267^{-1/0.09} = 0.267^{-11.11} = 2.47 \times 10^5\]</p>
-    <p>\[N_{f,B} = 1.24 \times 10^5 \text{ cycles}\]</p>
-    
-    <p>For Component C (fluctuating tension, requires mean stress correction):</p>
-    <p>\[\sigma_{a,eq} = \frac{100}{1 - 150/800} = \frac{100}{0.8125} = 123.1 \text{ MPa}\]</p>
-    <p>\[123.1 = 1000 \times (2N_f)^{-0.09}\]</p>
-    <p>\[0.1231 = (2N_f)^{-0.09}\]</p>
-    <p>\[(2N_f) = 0.1231^{-1/0.09} = 0.1231^{-11.11} = 4.02 \times 10^6\]</p>
-    <p>\[N_{f,C} = 2.01 \times 10^6 \text{ cycles}\]</p>
-    
-    <p><strong>Conclusion:</strong></p>
-    <p>The fatigue lives of the three components are:</p>
-    <ul>
-        <li>Component A: 6.90 × 10⁴ cycles</li>
-        <li>Component B: 1.24 × 10⁵ cycles</li>
-        <li>Component C: 2.01 × 10⁶ cycles</li>
-    </ul>
-    <p>Component A will fail first, despite having the same stress amplitude as Component B, because it experiences a fully reversed load cycle with double the stress range. Component C will last the longest due to its lower stress amplitude, despite having a positive mean stress.</p>
-</div>
-            
-            <div id="problem2" class="tab-content">
-                <h3>Problem 2: Safety Factor for Variable Amplitude Loading</h3>
-                
-                <p><strong>Problem:</strong> A mechanical component made of AISI 4340 steel (Su = 1200 MPa, Sy = 1000 MPa, Se = 500 MPa) experiences the following stress history:</p>
-                <ul>
-                    <li>Stress Block 1: σa = 300 MPa, σm = 200 MPa, 10,000 cycles</li>
-                    <li>Stress Block 2: σa = 250 MPa, σm = 150 MPa, 30,000 cycles</li>
-                    <li>Stress Block 3: σa = 400 MPa, σm = 100 MPa, 5,000 cycles</li>
-                </ul>
-                <p>Calculate the cumulative damage using Palmgren-Miner's rule with the Goodman mean stress correction. What factor of safety exists against fatigue failure?</p>
-                
-                <button class="solution-btn" onclick="toggleSolution('solution2')">Show Solution</button>
-                
-                <div id="solution2" class="solution" style="display: none;">
-                    <p><strong>Solution:</strong></p>
-                    <ol>
-                        <li>Convert each stress block to equivalent fully-reversed stress amplitude using Goodman relation:
-                            \[\sigma_{a,eq} = \frac{\sigma_a}{1 - \sigma_m/S_u}\]
-                            
-                            For Block 1:
-                            \[\sigma_{a,eq,1} = \frac{300}{1 - 200/1200} = \frac{300}{0.833} = 360 \text{ MPa}\]
-                            
-                            For Block 2:
-                            \[\sigma_{a,eq,2} = \frac{250}{1 - 150/1200} = \frac{250}{0.875} = 286 \text{ MPa}\]
-                            
-                            For Block 3:
-                            \[\sigma_{a,eq,3} = \frac{400}{1 - 100/1200} = \frac{400}{0.917} = 436 \text{ MPa}\]
-                        </li>
-                        <li>Calculate the number of cycles to failure for each equivalent stress amplitude using Basquin's equation:
-                            \[\sigma_{a,eq} = \sigma'_f (2N_f)^b\]
-                            
-                            Assuming fatigue strength coefficient \(\sigma'_f = 1500\) MPa and \(b = -0.09\):
-                            
-                            For Block 1:
-                            \[360 = 1500 \times (2N_{f,1})^{-0.09}\]
-                            \[N_{f,1} = 67,920 \text{ cycles}\]
-                            
-                            For Block 2:
-                            \[286 = 1500 \times (2N_{f,2})^{-0.09}\]
-                            \[N_{f,2} = 223,810 \text{ cycles}\]
-                            
-                            For Block 3:
-                            \[436 = 1500 \times (2N_{f,3})^{-0.09}\]
-                            \[N_{f,3} = 25,180 \text{ cycles}\]
-                        </li>
-                        <li>Apply Palmgren-Miner's rule to calculate cumulative damage:
-                            \[D = \sum_{i=1}^{k} \frac{n_i}{N_i} = \frac{10,000}{67,920} + \frac{30,000}{223,810} + \frac{5,000}{25,180} = 0.147 + 0.134 + 0.199 = 0.480\]
-                        </li>
-                        <li>Calculate the factor of safety against fatigue failure:
-                            \[FS = \frac{1}{D} = \frac{1}{0.480} = 2.08\]
-                        </li>
-                    </ol>
-                    
-                    <p><strong>Conclusion:</strong> The cumulative damage is 0.480, which is less than 1, indicating that the component should not fail under the given loading conditions. The factor of safety against fatigue failure is 2.08, meaning the component could theoretically withstand approximately twice the applied loading cycles before failure would be expected.</p>
-                </div>
-            </div>
-            
-            <div id="problem3" class="tab-content">
-                <h3>Problem 3: Design for Infinite Life</h3>
-                
-                <p><strong>Problem:</strong> A machine component made of SAE 1045 steel (Su = 650 MPa, Sy = 530 MPa) will be subjected to fluctuating stresses with a mean stress of 100 MPa. The endurance limit for fully reversed loading (σm = 0) is 300 MPa. If the component is to be designed for infinite life with a factor of safety of 1.5, determine the maximum allowable stress amplitude using:</p>
-                <ol type="a">
-                    <li>Goodman criterion</li>
-                    <li>Gerber criterion</li>
-                    <li>Soderberg criterion</li>
-                </ol>
-                
-                <button class="solution-btn" onclick="toggleSolution('solution3')">Show Solution</button>
-                
-                <div id="solution3" class="solution" style="display: none;">
-                    <p><strong>Solution:</strong></p>
-                    
-                    <p>First, let's adjust the endurance limit by the factor of safety:</p>
-                    \[S_e = \frac{300}{1.5} = 200 \text{ MPa}\]
-                    
-                    <p><strong>a) Using the Goodman criterion:</strong></p>
-                    \[\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_u} = 1\]
-                    \[\frac{\sigma_a}{200} + \frac{100}{650} = 1\]
-                    \[\frac{\sigma_a}{200} = 1 - \frac{100}{650} = 1 - 0.154 = 0.846\]
-                    \[\sigma_a = 200 \times 0.846 = 169.2 \text{ MPa}\]
-                    
-                    <p><strong>b) Using the Gerber criterion:</strong></p>
-                    \[\frac{\sigma_a}{S_e} + \left(\frac{\sigma_m}{S_u}\right)^2 = 1\]
-                    \[\frac{\sigma_a}{200} + \left(\frac{100}{650}\right)^2 = 1\]
-                    \[\frac{\sigma_a}{200} = 1 - \left(\frac{100}{650}\right)^2 = 1 - 0.024 = 0.976\]
-                    \[\sigma_a = 200 \times 0.976 = 195.2 \text{ MPa}\]
-                    
-                    <p><strong>c) Using the Soderberg criterion:</strong></p>
-                    \[\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_y} = 1\]
-                    \[\frac{\sigma_a}{200} + \frac{100}{530} = 1\]
-                    \[\frac{\sigma_a}{200} = 1 - \frac{100}{530} = 1 - 0.189 = 0.811\]
-                    \[\sigma_a = 200 \times 0.811 = 162.2 \text{ MPa}\]
-                    
-                    <p><strong>Conclusion:</strong> For a design with a factor of safety of 1.5 and a mean stress of 100 MPa, the maximum allowable stress amplitudes are:</p>
-                    <ul>
-                        <li>Goodman criterion: 169.2 MPa</li>
-                        <li>Gerber criterion: 195.2 MPa</li>
-                        <li>Soderberg criterion: 162.2 MPa</li>
-                    </ul>
-                    
-                    <p>The Gerber criterion gives the highest allowable stress amplitude because it is the least conservative of the three criteria. The Soderberg criterion results in the lowest allowable stress amplitude because it is the most conservative, taking into account the possibility of yielding.</p>
-                </div>
-            </div>
-        </section>
+        </div>
         
-        <section id="quiz">
-            <h2>Quiz</h2>
+        <div class="practice-problems">
+            <h3>Problem 2: Mean Stress Correction</h3>
+            <p>A component experiences σₐ = 200 MPa and σₘ = 150 MPa. If Se = 400 MPa and Sut = 800 MPa, calculate the safety factor using the Goodman criterion.</p>
             
-            <div class="quiz-container">
-                <div class="quiz-question">
-                    <h3>Question 1:</h3>
-                    <p>A component is subjected to a stress that varies between 50 MPa and 250 MPa. What are the stress amplitude and mean stress values?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q1" id="q1a" value="a">
-                            <label for="q1a">σa = 100 MPa, σm = 150 MPa</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q1" id="q1b" value="b">
-                            <label for="q1b">σa = 150 MPa, σm = 100 MPa</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q1" id="q1c" value="c">
-                            <label for="q1c">σa = 200 MPa, σm = 150 MPa</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q1" id="q1d" value="d">
-                            <label for="q1d">σa = 150 MPa, σm = 200 MPa</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q1', 'a')">Check Answer</button>
-                    <div id="q1-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 2:</h3>
-                    <p>For fully reversed loading, which of the following is true?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q2" id="q2a" value="a">
-                            <label for="q2a">R = 0</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q2" id="q2b" value="b">
-                            <label for="q2b">R = -1</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q2" id="q2c" value="c">
-                            <label for="q2c">σm = σa</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q2" id="q2d" value="d">
-                            <label for="q2d">σmin = 0</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q2', 'b')">Check Answer</button>
-                    <div id="q2-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 3:</h3>
-                    <p>Which of the following materials typically exhibits a distinct endurance limit in its S-N curve?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q3" id="q3a" value="a">
-                            <label for="q3a">Aluminum alloys</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q3" id="q3b" value="b">
-                            <label for="q3b">Titanium alloys</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q3" id="q3c" value="c">
-                            <label for="q3c">Steel</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q3" id="q3d" value="d">
-                            <label for="q3d">Magnesium alloys</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q3', 'c')">Check Answer</button>
-                    <div id="q3-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 4:</h3>
-                    <p>If a material follows Basquin's equation with σ'f = 1000 MPa and b = -0.1, what is the predicted fatigue life when the fully-reversed stress amplitude is 250 MPa?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q4" id="q4a" value="a">
-                            <label for="q4a">10,000 cycles</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q4" id="q4b" value="b">
-                            <label for="q4b">100,000 cycles</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q4" id="q4c" value="c">
-                            <label for="q4c">1,000,000 cycles</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q4" id="q4d" value="d">
-                            <label for="q4d">10,000,000 cycles</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-                    <div id="q4-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 5:</h3>
-                    <p>Which mean stress correction model is considered the most conservative for design purposes?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q5" id="q5a" value="a">
-                            <label for="q5a">Goodman</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q5" id="q5b" value="b">
-                            <label for="q5b">Gerber</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q5" id="q5c" value="c">
-                            <label for="q5c">Soderberg</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q5" id="q5d" value="d">
-                            <label for="q5d">Morrow</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q5', 'c')">Check Answer</button>
-                    <div id="q5-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 6:</h3>
-                    <p>According to the Palmgren-Miner rule, when does fatigue failure occur?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q6" id="q6a" value="a">
-                            <label for="q6a">When the cumulative damage equals 0</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q6" id="q6b" value="b">
-                            <label for="q6b">When the cumulative damage equals or exceeds 1</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q6" id="q6c" value="c">
-                            <label for="q6c">When the applied cycles exceed the fatigue life at any stress level</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q6" id="q6d" value="d">
-                            <label for="q6d">When the stress amplitude exceeds the endurance limit</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q6', 'b')">Check Answer</button>
-                    <div id="q6-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 7:</h3>
-                    <p>If a component has experienced three stress blocks with damage fractions of 0.2, 0.3, and 0.15 respectively, what is the remaining life percentage according to Palmgren-Miner's rule?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q7" id="q7a" value="a">
-                            <label for="q7a">35%</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q7" id="q7b" value="b">
-                            <label for="q7b">65%</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q7" id="q7c" value="c">
-                            <label for="q7c">50%</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q7" id="q7d" value="d">
-                            <label for="q7d">75%</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q7', 'a')">Check Answer</button>
-                    <div id="q7-feedback" class="feedback"></div>
-                </div>
-                
-                <div class="quiz-question">
-                    <h3>Question 8:</h3>
-                    <p>A tensile mean stress typically has what effect on fatigue life compared to fully reversed loading at the same stress amplitude?</p>
-                    <div class="quiz-options">
-                        <div class="quiz-option">
-                            <input type="radio" name="q8" id="q8a" value="a">
-                            <label for="q8a">Increases fatigue life</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q8" id="q8b" value="b">
-                            <label for="q8b">Decreases fatigue life</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q8" id="q8c" value="c">
-                            <label for="q8c">Has no effect on fatigue life</label>
-                        </div>
-                        <div class="quiz-option">
-                            <input type="radio" name="q8" id="q8d" value="d">
-                            <label for="q8d">Effect depends on the material's ductility</label>
-                        </div>
-                    </div>
-                    <button class="btn-check" onclick="checkAnswer('q8', 'b')">Check Answer</button>
-                    <div id="q8-feedback" class="feedback"></div>
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Goodman equation: σₐ/Se + σₘ/Sut = 1/SF</p>
+                <p>200/400 + 150/800 = 1/SF</p>
+                <p>0.5 + 0.1875 = 1/SF</p>
+                <p>0.6875 = 1/SF</p>
+                <p>SF = 1.45</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 3: Cumulative Damage</h3>
+            <p>A component experiences three stress blocks: Block 1: 400 MPa for 1000 cycles (Nf = 10,000), Block 2: 300 MPa for 20,000 cycles (Nf = 100,000), Block 3: 200 MPa for 500,000 cycles (Nf = 10^6). Calculate the cumulative damage.</p>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using Palmgren-Miner rule: D = Σ(ni/Ni)</p>
+                <p>D₁ = 1000/10,000 = 0.1</p>
+                <p>D₂ = 20,000/100,000 = 0.2</p>
+                <p>D₃ = 500,000/1,000,000 = 0.5</p>
+                <p>Total D = 0.1 + 0.2 + 0.5 = 0.8</p>
+                <p>Component is safe (D < 1) with 20% remaining life</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content-section">
+        <h2 id="quiz">Interactive Quiz</h2>
+        
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Stress amplitude for a cycle between 50 MPa and 250 MPa is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 100 MPa</label>
+                    <label><input type="radio" name="q1" value="b"> b) 150 MPa</label>
+                    <label><input type="radio" name="q1" value="c"> c) 200 MPa</label>
+                    <label><input type="radio" name="q1" value="d"> d) 250 MPa</label>
                 </div>
             </div>
             
-            <div class="quiz-results">
-                <button id="check-all" class="btn-check">Check All Answers</button>
-                <p id="quiz-score"></p>
+            <div class="quiz-question">
+                <h3>Question 2: For fully reversed loading, the stress ratio R equals:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 0</label>
+                    <label><input type="radio" name="q2" value="b"> b) -1</label>
+                    <label><input type="radio" name="q2" value="c"> c) 1</label>
+                    <label><input type="radio" name="q2" value="d"> d) ∞</label>
+                </div>
             </div>
-        </section>
-    </main>
+            
+            <div class="quiz-question">
+                <h3>Question 3: Which material typically shows a distinct endurance limit?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Aluminium</label>
+                    <label><input type="radio" name="q3" value="b"> b) Copper</label>
+                    <label><input type="radio" name="q3" value="c"> c) Steel</label>
+                    <label><input type="radio" name="q3" value="d"> d) Titanium</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4: According to Palmgren-Miner, failure occurs when D equals:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) 0</label>
+                    <label><input type="radio" name="q4" value="b"> b) 0.5</label>
+                    <label><input type="radio" name="q4" value="c"> c) 1.0</label>
+                    <label><input type="radio" name="q4" value="d"> d) 2.0</label>
+                </div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5: Which mean stress correction is most conservative?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Goodman</label>
+                    <label><input type="radio" name="q5" value="b"> b) Gerber</label>
+                    <label><input type="radio" name="q5" value="c"> c) Soderberg</label>
+                    <label><input type="radio" name="q5" value="d"> d) Modified Goodman</label>
+                </div>
+            </div>
+            
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
     
     <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
+        <script src="/assets/common/footer.js"></script>
     </footer>
+    
+
 </body>
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
 </html>

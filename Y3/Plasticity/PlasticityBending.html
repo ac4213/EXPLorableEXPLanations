@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plasticity in Bending - Interactive Lecture (Monotone NA)</title>
+  <!-- p5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <!-- MathJax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="/assets/css/main.css" />
+  <style>
+    .stress-stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:15px 0}
+    .stage-card{background:#f9f9f9;border:2px solid #ddd;border-radius:5px;padding:10px;text-align:center;transition:.3s}
+    .stage-card.active{background:#fff3cd;border-color:#ffc107;font-weight:700}
+    .simulation-container{background:#fff;border-radius:8px;padding:20px;margin:20px 0;box-shadow:0 2px 5px rgba(0,0,0,.1)}
+    .simulation-title{background:var(--primary-color);color:var(--text-color);padding:10px;margin:-20px -20px 20px;border-radius:8px 8px 0 0;text-align:center;font-weight:700}
+    .controls{display:flex;flex-wrap:wrap;gap:15px;margin:15px 0;padding:15px;background:#f9f9f9;border-radius:5px}
+    .control-group{display:flex;align-items:center;gap:10px}
+    .value-display{display:inline-block;min-width:50px;padding:4px 8px;background:#fff;border:1px solid #ddd;border-radius:3px;text-align:center;font-weight:700;color:#cc9900}
+    .info-panel{background:#e6f7ff;border-left:4px solid #1890ff;padding:15px;margin:15px 0;border-radius:0 4px 4px 0}
+    .info-panel p{margin:5px 0}
+    #sketch-holder-1,#sketch-holder-2{width:100%;height:440px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;margin:20px 0}
+    .section-inputs{display:none;margin:10px 0;padding:10px;background:#f0f0f0;border-radius:5px}
+    .section-inputs.active{display:block}
+    .section-inputs input[type=number]{width:70px;padding:4px;margin:0 5px}
+    .legend{font-size:12px;color:#555}
+    .legend span{display:inline-block;padding:2px 6px;margin-right:8px;border-radius:3px}
+    .chip-blue{background:#d9ecff;border:1px solid #82b6ff}
+    .chip-red{background:#ffd9d9;border:1px solid #ff8a8a}
+    .chip-grey{background:#eee;border:1px solid #ccc}
+    .chip-gold{background:#fff4d6;border:1px solid #ffc107}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Plasticity in Bending</h1>
+  <p class="subtitle">Understanding Elastic–Plastic Behaviour in Structural Members</p>
+</header>
+
+<div class="content-section">
+  <h2>Introduction to Plasticity in Bending</h2>
+  <p>When structural members are subjected to bending moments beyond their elastic limit, they undergo plastic deformation. Understanding this behaviour is crucial for modern limit state design, allowing engineers to utilise the full strength of materials safely and economically.</p>
+
+  <div class="key-point">
+    <h3>Material Models</h3>
+    <ul>
+      <li><strong>Perfectly Elastic:</strong> \(\sigma = E\varepsilon\)</li>
+      <li><strong>Perfectly Plastic:</strong> constant \(\sigma=\sigma_y\) beyond yield</li>
+      <li><strong>Elastic–Perfectly Plastic:</strong> elastic up to yield, then perfectly plastic</li>
+    </ul>
+  </div>
+
+  <div class="equation-box">
+    <h3>Fundamental Relationships</h3>
+    <p>\[\sigma = \frac{My}{I}\]</p>
+    <p>\[M_e = \frac{\sigma_y I}{y_{max}},\quad M_p = \sigma_y Z,\quad f=\frac{M_p}{M_e}=\frac{Z}{S}\]</p>
+  </div>
+</div>
+
+<!-- SIMULATION 1 -->
+<div class="simulation-section">
+  <div class="simulation-container">
+    <div class="simulation-title">Simulation 1: Plasticity Progression in Cross-Sections</div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Section Type:</label>
+        <select id="sectionType1">
+          <option value="rectangular">Rectangular</option>
+          <option value="t-section">T-Section</option>
+          <option value="i-section">I-Section</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Bending Moment (kN·m):</label>
+        <input type="range" id="momentSlider1" min="0" max="300" value="0" step="1"/>
+        <span class="value-display" id="momentValue1">0</span>
+      </div>
+      <div class="control-group">
+        <label>Yield Stress (MPa):</label>
+        <input type="range" id="yieldStress1" min="200" max="500" value="250" step="10"/>
+        <span class="value-display" id="yieldValue1">250</span>
+      </div>
+      <button id="resetBtn1">Reset</button>
+      <div class="legend">
+        <span class="chip-blue">Elastic</span>
+        <span class="chip-red">Plastic</span>
+        <span class="chip-grey">Yield lines ±σ<sub>y</sub></span>
+        <span class="chip-gold">Bisectrix (full plastic NA)</span>
+      </div>
+    </div>
+
+    <!-- Section inputs -->
+    <div id="rect-inputs" class="section-inputs active">
+      <label>Width b (mm): <input type="number" id="rect-b" value="120" min="20" max="600"/></label>
+      <label>Height h (mm): <input type="number" id="rect-h" value="200" min="20" max="800"/></label>
+    </div>
+
+    <div id="t-inputs" class="section-inputs">
+      <label>Flange width b<sub>f</sub> (mm): <input type="number" id="t-bf" value="180" min="40" max="800"/></label>
+      <label>Flange thickness t<sub>f</sub> (mm): <input type="number" id="t-tf" value="30" min="4" max="200"/></label>
+      <label>Web thickness t<sub>w</sub> (mm): <input type="number" id="t-tw" value="20" min="4" max="200"/></label>
+      <label>Web height h<sub>w</sub> (mm): <input type="number" id="t-hw" value="170" min="20" max="800"/></label>
+    </div>
+
+    <div id="i-inputs" class="section-inputs">
+      <label>Flange width b<sub>f</sub> (mm): <input type="number" id="i-bf" value="150" min="40" max="800"/></label>
+      <label>Flange thickness t<sub>f</sub> (mm): <input type="number" id="i-tf" value="25" min="4" max="200"/></label>
+      <label>Web thickness t<sub>w</sub> (mm): <input type="number" id="i-tw" value="15" min="4" max="200"/></label>
+      <label>Total height h (mm): <input type="number" id="i-h" value="200" min="20" max="800"/></label>
+    </div>
+
+    <div class="info-panel">
+      <div class="stress-stages">
+        <div class="stage-card" id="elastic-stage"><strong>Elastic</strong><p>M &lt; M<sub>e</sub></p></div>
+        <div class="stage-card" id="first-yield-stage"><strong>First Yield</strong><p>M ≈ M<sub>e</sub></p></div>
+        <div class="stage-card" id="elastoplastic-stage"><strong>Elastic–Plastic</strong><p>M<sub>e</sub> &lt; M &lt; M<sub>p</sub></p></div>
+        <div class="stage-card" id="fully-plastic-stage"><strong>Fully Plastic</strong><p>M ≈ M<sub>p</sub></p></div>
+      </div>
+    </div>
+
+    <div id="sketch-holder-1"></div>
+  </div>
+</div>
+
+<!-- SIMULATION 2 -->
+<div class="simulation-section">
+  <div class="simulation-container">
+    <div class="simulation-title">Simulation 2: Residual Stress Formation</div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Applied Moment (kN·m):</label>
+        <input type="range" id="momentSlider2" min="0" max="300" value="0" step="1" disabled/>
+        <span class="value-display" id="momentValue2">0</span>
+      </div>
+      <div class="control-group">
+        <label>Fibre Position (y/h):</label>
+        <input type="range" id="fibrePosition" min="-1" max="1" value="0.5" step="0.05"/>
+        <span class="value-display" id="fibreValue">0.50</span>
+      </div>
+      <div class="control-group">
+        <button id="loadBtn">Load</button>
+        <button id="unloadBtn" disabled>Unload to 0</button>
+        <button id="resetBtn2">Reset</button>
+      </div>
+      <div class="legend">
+        <span class="chip-blue">Current stress (loading)</span>
+        <span class="chip-red">Residual (after unload)</span>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <p><strong>Loading State:</strong> <span id="loadingState">Unloaded</span></p>
+      <p><strong>Maximum Moment Reached:</strong> <span id="maxMoment">0</span> kN·m</p>
+      <p><strong>Residual Stress at Selected Fibre:</strong> <span id="residualStress">0</span> MPa</p>
+    </div>
+
+    <div id="sketch-holder-2"></div>
+  </div>
+</div>
+
+<footer><script src="/assets/common/footer.js"></script></footer>
+
+<script>
+// ---------- Geometry helper ----------
+function makeSectionGeometry(sectionType, dims){
+  let H=0, widthAtY;
+  if(sectionType==='rectangular'){
+    H = dims.h;
+    widthAtY = y => (y>=0 && y<=H) ? dims.b : 0;
+  } else if(sectionType==='t-section'){
+    H = dims.tf + dims.hw;
+    widthAtY = y => {
+      if(y<0||y>H) return 0;
+      if(y<=dims.tf) return dims.bf;
+      return dims.tw;
+    };
+  } else { // i-section
+    H = dims.h;
+    widthAtY = y => {
+      if(y<0||y>H) return 0;
+      if(y<=dims.tf) return dims.bf;
+      if(y>=H-dims.tf) return dims.bf;
+      return dims.tw;
+    };
+  }
+  const N=700, dy=H/N;
+  let A=0, Ay=0, I=0;
+  const ys=[], bs=[];
+  for(let i=0;i<N;i++){
+    const y=(i+0.5)*dy, b=widthAtY(y);
+    ys.push(y); bs.push(b);
+    A += b*dy; Ay += b*y*dy;
+  }
+  const yc=Ay/A;
+  for(let i=0;i<N;i++){
+    const y=ys[i], b=bs[i];
+    I += b*(y-yc)*(y-yc)*dy;
+  }
+  function areaAbove(y0){
+    let a=0; for(let i=0;i<N;i++){ if(ys[i]<=y0) a+=bs[i]*dy; } return a;
+  }
+  let lo=0, hi=H;
+  for(let it=0; it<40; it++){
+    const mid=0.5*(lo+hi);
+    if(areaAbove(mid) < A/2) lo=mid; else hi=mid;
+  }
+  const y_pna=0.5*(lo+hi);
+  let Zp=0; for(let i=0;i<N;i++){ Zp += Math.abs(ys[i]-y_pna)*bs[i]*dy; }
+  const yTop = yc - 0, yBot = H - yc, yMax = Math.max(yTop, yBot);
+  return {H,N,dy,ys,bs,A,yc,I,yTop,yBot,yMax,y_pna,Zp,widthAtY};
+}
+
+// ---------- helpers (graphics) ----------
+function drawArrowH(p, x0, y0, x1){
+  // horizontal arrow from (x0,y0) -> (x1,y0)
+  p.line(x0,y0,x1,y0);
+  const dir = Math.sign(x1-x0) || 1;
+  const ah = 5; // arrow head size
+  p.triangle(x1, y0, x1 - dir*ah, y0 - 0.6*ah, x1 - dir*ah, y0 + 0.6*ah);
+}
+function setDashed(p, on){ p.drawingContext.setLineDash(on? [6,6] : []); }
+
+// ---------- SIMULATION 1 ----------
+function createSimulation1(){
+  return (p)=>{
+    const WIDTH=980, HEIGHT=440;
+    let yieldStress=250, M_target=0, sectionType='rectangular';
+    let dims={b:120,h:200};
+    let geom = makeSectionGeometry(sectionType, dims);
+    let Me=0, Mp=0, S=0, shapeFactor=0;
+    let solved=null;
+
+    // MONOTONE NA: persistent previous NA
+    let y0_prev = geom.yc;
+
+    function recalcProps(){
+      geom = makeSectionGeometry(sectionType, dims);
+      S = geom.I/geom.yMax;
+      Me = (yieldStress*S)/1e6;
+      Mp = (yieldStress*geom.Zp)/1e6;
+      shapeFactor = Mp/Me;
+      if(M_target>Mp) M_target=Mp;
+      solved=null;
+      y0_prev = geom.yc; // reset
+      updateStageIndicators();
+    }
+
+    function updateStageIndicators(){
+      document.querySelectorAll('.stage-card').forEach(c=>c.classList.remove('active'));
+      if(M_target < Me*0.98) document.getElementById('elastic-stage').classList.add('active');
+      else if(M_target <= Me*1.02) document.getElementById('first-yield-stage').classList.add('active');
+      else if(M_target < Mp*0.98) document.getElementById('elastoplastic-stage').classList.add('active');
+      else document.getElementById('fully-plastic-stage').classList.add('active');
+    }
+
+    function readDims(){
+      if(sectionType==='rectangular'){
+        dims = {b:+document.getElementById('rect-b').value||120,
+                h:+document.getElementById('rect-h').value||200};
+      } else if(sectionType==='t-section'){
+        dims = {bf:+document.getElementById('t-bf').value||180,
+                tf:+document.getElementById('t-tf').value||30,
+                tw:+document.getElementById('t-tw').value||20,
+                hw:+document.getElementById('t-hw').value||170};
+      } else {
+        dims = {bf:+document.getElementById('i-bf').value||150,
+                tf:+document.getElementById('i-tf').value||25,
+                tw:+document.getElementById('i-tw').value||15,
+                h:+document.getElementById('i-h').value||200};
+      }
+      recalcProps();
+    }
+
+    // resultants for given (y0,c)
+    function computeFM(y0,c){
+      const {ys,bs,dy,yc} = geom;
+      let F=0, MM=0;
+      for(let i=0;i<ys.length;i++){
+        const y=ys[i], b=bs[i];
+        let sig;
+        if(y <= y0-c) sig = -yieldStress;
+        else if(y >= y0+c) sig = +yieldStress;
+        else sig = (yieldStress/c)*(y - y0);
+        F  += sig*b*dy;
+        MM += sig*(y - yc)*b*dy;
+      }
+      return {F, M:MM/1e6};
+    }
+
+    // Find NA for given c, constrained + monotone toward bisectrix
+    function y0ForC_monotone(c, y0_hint){
+      // Core must lie inside geometry
+      const loPhys = Math.max(c, 1e-6);
+      const hiPhys = Math.min(geom.H - c, geom.H - 1e-6);
+
+      // Allowed segment: strictly between yc and y_pna
+      let a = Math.min(geom.yc, geom.y_pna);
+      let b = Math.max(geom.yc, geom.y_pna);
+      a = Math.max(a, loPhys);
+      b = Math.min(b, hiPhys);
+
+      if(!(a < b)) return y0_prev;
+
+      let y0c = Math.max(a, Math.min((y0_hint ?? geom.yc), b));
+
+      const F_at = (y0)=> computeFM(y0,c).F;
+
+      let lo=a, hi=b, Flo=F_at(lo), Fhi=F_at(hi);
+      if(Flo*Fhi > 0) return y0_prev;
+
+      let mid = y0c;
+      for(let it=0; it<60; it++){
+        mid = 0.5*(lo+hi);
+        const Fm = F_at(mid);
+        if(Math.abs(Fm) < 1e-6) break;
+        if(Flo*Fm <= 0){ hi = mid; Fhi = Fm; } else { lo = mid; Flo = Fm; }
+      }
+      let y0_root = mid;
+
+      const dir = Math.sign(geom.y_pna - geom.yc) || 1;
+      if(dir > 0) return Math.max(y0_prev, y0_root);
+      return Math.min(y0_prev, y0_root);
+    }
+
+    function solveDistribution(){
+      if(solved && solved.M===M_target && solved.yield===yieldStress) return solved;
+
+      if(M_target <= Me*0.999){
+        const k=(M_target*1e6)/geom.I;
+        const out = geom.ys.map(y=>({y, sigma:k*(y-geom.yc)}));
+        y0_prev = geom.yc;
+        solved = {stage:'elastic', dist:out, y0:geom.yc, c:geom.yMax, M:M_target, yield:yieldStress};
+        return solved;
+      }
+
+      if(M_target >= Mp*0.999){
+        const out = geom.ys.map(y=>({y, sigma:(y<geom.y_pna? -yieldStress : +yieldStress)}));
+        y0_prev = geom.y_pna;
+        solved = {stage:'plastic', dist:out, y0:geom.y_pna, c:0, M:M_target, yield:yieldStress};
+        return solved;
+      }
+
+      // Elastoplastic
+      let c_lo = 1e-6, c_hi = geom.yMax - 1e-6;
+      let y0_guess = y0_prev;
+      let y0_best = y0_prev, c_best = c_hi, M_best = Me;
+
+      for(let it=0; it<70; it++){
+        const c_try = 0.5*(c_lo + c_hi);
+        const y0_try = y0ForC_monotone(c_try, y0_guess);
+        const M_try = computeFM(y0_try, c_try).M;
+
+        if(Math.abs(M_try - M_target) < 1e-3){
+          y0_best=y0_try; c_best=c_try; M_best=M_try; break;
+        }
+        if(M_try < M_target) c_hi = c_try; else c_lo = c_try;
+
+        y0_best=y0_try; c_best=c_try; M_best=M_try;
+        y0_guess = y0_try;
+      }
+
+      const out = geom.ys.map(y=>{
+        let sig;
+        if(y <= y0_best - c_best) sig = -yieldStress;
+        else if(y >= y0_best + c_best) sig = +yieldStress;
+        else sig = (yieldStress/c_best)*(y - y0_best);
+        return {y, sigma:sig};
+      });
+
+      y0_prev = y0_best;
+
+      solved = {stage:'elastoplastic', dist:out, y0:y0_best, c:c_best, M:M_best, yield:yieldStress};
+      return solved;
+    }
+
+    p.setup = function(){
+      const canvas = p.createCanvas(WIDTH, HEIGHT);
+      canvas.parent('sketch-holder-1');
+
+      document.getElementById('sectionType1').addEventListener('change', e=>{
+        sectionType = e.target.value;
+        document.querySelectorAll('.section-inputs').forEach(el=>el.classList.remove('active'));
+        if(sectionType==='rectangular') document.getElementById('rect-inputs').classList.add('active');
+        else if(sectionType==='t-section') document.getElementById('t-inputs').classList.add('active');
+        else document.getElementById('i-inputs').classList.add('active');
+        readDims();
+      });
+
+      document.getElementById('momentSlider1').addEventListener('input', e=>{
+        M_target = parseFloat(e.target.value);
+        document.getElementById('momentValue1').textContent = M_target.toFixed(0);
+        solved=null; updateStageIndicators();
+      });
+
+      document.getElementById('yieldStress1').addEventListener('input', e=>{
+        yieldStress = parseFloat(e.target.value);
+        document.getElementById('yieldValue1').textContent = yieldStress.toFixed(0);
+        recalcProps();
+      });
+
+      document.getElementById('resetBtn1').addEventListener('click', ()=>{
+        M_target=0; document.getElementById('momentSlider1').value=0;
+        document.getElementById('momentValue1').textContent='0';
+        y0_prev = geom.yc;
+        solved=null; updateStageIndicators();
+      });
+
+      document.querySelectorAll('.section-inputs input').forEach(inp=>{
+        inp.addEventListener('input', readDims);
+      });
+
+      recalcProps();
+    };
+
+    function drawPlasticBands(sol){
+      // shade plastic regions as horizontal red bands over the section area
+      if(sol.stage==='elastic') return;
+      const x0=220, pixPerMm=300/geom.H;
+      const bandX = 170; // half width of overlay band (covers the section graphics)
+      const yNA = sol.stage==='plastic' ? geom.y_pna : sol.y0;
+      const c   = sol.c || 0;
+
+      const yTopBand = (Math.min(geom.H, yNA + c) - geom.H/2)*pixPerMm;
+      const yTopEnd  = (geom.H/2)*pixPerMm;
+      const yBotBand = (-geom.H/2)*pixPerMm;
+      const yBotEnd  = (Math.max(0, yNA - c) - geom.H/2)*pixPerMm;
+
+      p.push();
+      p.translate(x0, HEIGHT/2);
+      p.noStroke();
+      p.fill(231,76,60,70); // translucent red
+      // top band
+      if(yTopBand < yTopEnd) p.rect(-bandX, yTopBand, 2*bandX, yTopEnd - yTopBand);
+      // bottom band
+      if(yBotBand < yBotEnd) p.rect(-bandX, yBotBand, 2*bandX, yBotEnd - yBotBand);
+      p.pop();
+    }
+
+    function drawSectionPanel(sol){
+      const x0=220, y0=HEIGHT/2, pixPerMm=300/geom.H;
+      p.push(); p.translate(x0, y0);
+      p.stroke(51); p.strokeWeight(2); p.fill(255);
+      if(sectionType==='rectangular'){
+        const w = Math.min(260, geom.widthAtY(geom.H/2)*pixPerMm);
+        p.rect(-w/2, -geom.H*pixPerMm/2, w, geom.H*pixPerMm);
+      } else if(sectionType==='t-section'){
+        const bf=Math.min(260, (dims.bf)*pixPerMm);
+        const tf=dims.tf*pixPerMm, tw=Math.min(260, (dims.tw)*pixPerMm), hw=dims.hw*pixPerMm;
+        p.rect(-bf/2, -geom.H*pixPerMm/2, bf, tf);
+        p.rect(-tw/2, -geom.H*pixPerMm/2 + tf, tw, hw);
+      } else {
+        const bf=Math.min(260, (dims.bf)*pixPerMm), tf=dims.tf*pixPerMm, tw=Math.min(260,(dims.tw)*pixPerMm), h=geom.H*pixPerMm;
+        p.rect(-bf/2, -h/2, bf, tf);
+        p.rect(-tw/2, -h/2+tf, tw, h-2*tf);
+        p.rect(-bf/2,  h/2-tf, bf, tf);
+      }
+
+      // Elastic centroidal NA (gray)
+      p.stroke(150); p.strokeWeight(1);
+      p.line(-170, (geom.yc - geom.H/2)*pixPerMm, 170, (geom.yc - geom.H/2)*pixPerMm);
+
+      // Current NA (dashed black)
+      const naY = sol.stage==='plastic' ? geom.y_pna : sol.y0;
+      p.stroke(0); p.strokeWeight(1); setDashed(p,true);
+      p.line(-170, (naY - geom.H/2)*pixPerMm, 170, (naY - geom.H/2)*pixPerMm);
+      setDashed(p,false);
+
+      // Plastic NA / Bisectrix (gold)
+      if(sectionType!=='rectangular'){
+        p.stroke(218,165,32); p.strokeWeight(2);
+        p.line(-170, (geom.y_pna - geom.H/2)*pixPerMm, 170, (geom.y_pna - geom.H/2)*pixPerMm);
+      }
+
+      p.noStroke(); p.fill(51); p.textAlign(p.CENTER);
+      p.text('Cross-Section', 0, -HEIGHT/2 + 24);
+      p.pop();
+
+      // plastic bands overlay (draw after to sit on top)
+      drawPlasticBands(sol);
+    }
+
+    function drawDistributionPanel(sol){
+      const x0=720, y0=HEIGHT/2, pixPerMmY=300/geom.H, scaleX=120/yieldStress;
+      p.push(); p.translate(x0, y0);
+
+      // axes
+      p.stroke(51); p.strokeWeight(1);
+      p.line(0,-160,0,160); p.line(-140,0,140,0);
+
+      // yield lines
+      p.stroke(120); setDashed(p,true);
+      p.line(+yieldStress*scaleX, -160, +yieldStress*scaleX, 160);
+      p.line(-yieldStress*scaleX, -160, -yieldStress*scaleX, 160);
+      setDashed(p,false);
+
+      // draw stress curve: elastic (green) vs plastic (red)
+      p.noFill();
+      // elastic (|σ| < σy)
+      p.stroke(46, 204, 113); p.strokeWeight(2);
+      p.beginShape();
+      for(let i=0;i<geom.N;i++){
+        const s=sol.dist[i].sigma, y=sol.dist[i].y;
+        if(Math.abs(s) < yieldStress-1e-6) p.vertex(s*scaleX, (y - geom.H/2)*pixPerMmY);
+      }
+      p.endShape();
+
+      // plastic (|σ| ~ σy)
+      p.stroke(231,76,60); p.strokeWeight(2);
+      p.beginShape();
+      for(let i=0;i<geom.N;i++){
+        const s=sol.dist[i].sigma; if(Math.abs(s) < yieldStress-1e-6) continue;
+        const y=sol.dist[i].y;
+        p.vertex(s*scaleX, (y - geom.H/2)*pixPerMmY);
+      }
+      p.endShape();
+
+      // horizontal arrows from centerline to curve (sampled)
+      const step = Math.max(1, Math.floor(geom.N/12));
+      for(let i=0;i<geom.N;i+=step){
+        const s=sol.dist[i].sigma, y=sol.dist[i].y;
+        const yp = (y - geom.H/2)*pixPerMmY;
+        const xp = s*scaleX;
+        if(Math.abs(s) < yieldStress-1e-6) p.stroke(46,204,113);
+        else p.stroke(231,76,60);
+        p.strokeWeight(2);
+        drawArrowH(p, 0, yp, xp);
+      }
+
+      p.noStroke(); p.fill(51); p.textAlign(p.CENTER);
+      p.text('Stress Distribution (σ vs y)', 0, -HEIGHT/2 + 24);
+      p.textAlign(p.RIGHT); p.text('σ = +σy', +yieldStress*scaleX-4, -HEIGHT/2+38);
+      p.textAlign(p.LEFT);  p.text('σ = -σy', -yieldStress*scaleX+4, -HEIGHT/2+38);
+      p.pop();
+    }
+
+    p.setup(); // ensure p5 calls setup
+    p.draw = function(){
+      p.background(245);
+      const sol = solveDistribution();
+      drawSectionPanel(sol);
+      drawDistributionPanel(sol);
+      p.fill(51); p.noStroke(); p.textAlign(p.LEFT); p.textSize(12);
+      p.text(`Elastic Limit: M_e = ${Me.toFixed(1)} kN·m`, 20, HEIGHT-60);
+      p.text(`Plastic Limit: M_p = ${Mp.toFixed(1)} kN·m`, 20, HEIGHT-40);
+      p.text(`Shape Factor: f = ${shapeFactor.toFixed(3)}`, 20, HEIGHT-20);
+    };
+  };
+}
+
+// ---------- SIMULATION 2 ----------
+function createSimulation2(){
+  return (p)=>{
+    const WIDTH=980, HEIGHT=440;
+    const b=120, h=200;
+    const N=400, dy=h/N;
+    const ys = Array.from({length:N}, (_,i)=> -h/2 + (i+0.5)*dy);
+    const bs = Array.from({length:N}, ()=> b);
+    const I = b*Math.pow(h,3)/12;
+    const yMax=h/2, S=I/yMax;
+    let sigY=250, E=200000;
+    const Me=(sigY*S)/1e6, Zp=b*h*h/4, Mp=(sigY*Zp)/1e6;
+
+    // Animation control for unloading
+    const UNLOAD_FRAMES = 45; // <— change this for faster/slower animated unload
+
+    let epsP=new Float64Array(N).fill(0);
+    let sigma=new Float64Array(N).fill(0);
+    let kappa=0;
+    let M_current=0, M_target=0, M_max=0;
+    let isLoading=false;
+    let fibreAlpha=0.5;
+    let showResidual=false;
+
+    // unloading animation state
+    let isUnloading=false;
+    let unloadStepsLeft=0;
+    let unloadStartM=0;
+
+    // σ–ε history (segments array)
+    const hist = []; // {x1,y1,x2,y2, color:[r,g,b]}
+    let prevPt = null;
+
+    // colors
+    const colElastic=[46,204,113], colPlastic=[231,76,60], colUnload=[255,159,67];
+
+    function resetState(){
+      epsP.fill(0); sigma.fill(0);
+      kappa=0; M_current=0; M_target=0; M_max=0;
+      isLoading=false; showResidual=false;
+      isUnloading=false; unloadStepsLeft=0; unloadStartM=0;
+      prevPt=null; hist.length=0;
+      const s2=document.getElementById('momentSlider2'); if(s2){s2.value=0; s2.disabled=true;}
+      const mv2=document.getElementById('momentValue2'); if(mv2){mv2.textContent='0';}
+      const mm=document.getElementById('maxMoment'); if(mm){mm.textContent='0';}
+      const ls=document.getElementById('loadingState'); if(ls){ls.textContent='Unloaded';}
+      const ub=document.getElementById('unloadBtn'); if(ub){ub.disabled=true;}
+      const rs=document.getElementById('residualStress'); if(rs){rs.textContent='0';}
+    }
+
+    function momentFromKappaTrial(k){
+      let M=0; const sig=new Float64Array(N), epsP_trial=new Float64Array(N);
+      for(let i=0;i<N;i++){
+        const eps=k*ys[i], sig_trial=E*(eps - epsP[i]);
+        if(Math.abs(sig_trial) <= sigY){
+          sig[i]=sig_trial; epsP_trial[i]=epsP[i];
+        }else{
+          const sgn=Math.sign(sig_trial);
+          sig[i]=sgn*sigY; epsP_trial[i]=eps - sig[i]/E;
+        }
+        M += sig[i]*ys[i]*bs[i]*dy;
+      }
+      return {M:M/1e6, sig, epsP_trial};
+    }
+
+    function setToCurvatureForTargetMoment(Mt){
+      let k_lo=0, k_hi=(sigY/E)*(2/yMax)*10;
+      let best=momentFromKappaTrial(k_lo);
+      for(let it=0; it<60; it++){
+        const k_mid=0.5*(k_lo+k_hi);
+        const trial=momentFromKappaTrial(k_mid);
+        if(trial.M < Mt){ k_lo=k_mid; best=trial; } else { k_hi=k_mid; }
+        if(Math.abs(trial.M - Mt) < 0.001){ best=trial; break; }
+      }
+      kappa=0.5*(k_lo+k_hi);
+      sigma=best.sig; epsP=best.epsP_trial; M_current=best.M;
+    }
+
+    function unloadTo(Mt){
+      function momentForK(k){
+        let M=0;
+        for(let i=0;i<N;i++){
+          const sig_i=E*(k*ys[i]-epsP[i]);
+          const sig_c=Math.max(-2*sigY, Math.min(2*sigY, sig_i));
+          M += sig_c*ys[i]*bs[i]*dy;
+        }
+        return M/1e6;
+      }
+      let k_lo=-kappa, k_hi=kappa, k_best=0;
+      for(let it=0; it<60; it++){
+        const k_mid=0.5*(k_lo+k_hi), M_mid=momentForK(k_mid);
+        if(Math.abs(M_mid - Mt) < 0.001){ k_best=k_mid; break; }
+        if(M_mid < Mt) k_lo=k_mid; else k_hi=k_mid;
+        k_best=k_mid;
+      }
+      kappa=k_best;
+      for(let i=0;i<N;i++){
+        const sig_un=E*(kappa*ys[i]-epsP[i]);
+        sigma[i]=Math.max(-2*sigY, Math.min(2*sigY, sig_un));
+      }
+      M_current=momentForK(kappa);
+    }
+
+    p.setup=function(){
+      const canvas=p.createCanvas(WIDTH, HEIGHT);
+      canvas.parent('sketch-holder-2');
+
+      const loadBtn=document.getElementById('loadBtn');
+      const unloadBtn=document.getElementById('unloadBtn');
+      const s2=document.getElementById('momentSlider2');
+      const mv2=document.getElementById('momentValue2');
+      const fibrePos=document.getElementById('fibrePosition');
+      const fibreVal=document.getElementById('fibreValue');
+
+      if(loadBtn){
+        loadBtn.addEventListener('click', ()=>{
+          isLoading=true; isUnloading=false;
+          const ls=document.getElementById('loadingState'); if(ls) ls.textContent='Loading';
+          if(s2) s2.disabled=false;
+          if(unloadBtn) unloadBtn.disabled=false;
+        });
+      }
+      if(unloadBtn){
+        unloadBtn.addEventListener('click', ()=>{
+          if(isUnloading) return;
+          isLoading=false; isUnloading=true; showResidual=false;
+          unloadStepsLeft = UNLOAD_FRAMES;
+          unloadStartM = M_current;
+          const ls=document.getElementById('loadingState'); if(ls) ls.textContent='Unloading';
+          const s2=document.getElementById('momentSlider2'); if(s2) s2.disabled=true;
+        });
+      }
+      const resetBtn2=document.getElementById('resetBtn2');
+      if(resetBtn2) resetBtn2.addEventListener('click', resetState);
+
+      if(s2){
+        s2.addEventListener('input', e=>{
+          if(!isLoading) return;
+          M_target=+e.target.value;
+          if(mv2) mv2.textContent=M_target.toFixed(0);
+          if(M_target > M_max) M_max=M_target;
+          const mm=document.getElementById('maxMoment'); if(mm) mm.textContent=M_max.toFixed(0);
+          setToCurvatureForTargetMoment(M_target);
+        });
+      }
+      if(fibrePos){
+        fibrePos.addEventListener('input', e=>{
+          fibreAlpha=+e.target.value;
+          if(fibreVal) fibreVal.textContent=fibreAlpha.toFixed(2);
+        });
+      }
+      resetState();
+    };
+
+    p.mousePressed=function(){
+      const pixPerMm=300/h;
+      const ySel=fibreAlpha*(h/2);
+      const elemY=HEIGHT/2 + ySel*pixPerMm;
+      if(Math.abs(p.mouseX - 220) < 80 && Math.abs(p.mouseY - elemY) < 15){
+        document.body.style.cursor='ns-resize';
+      }
+    };
+    p.mouseReleased=function(){ document.body.style.cursor='default'; };
+
+    function drawLeftPanel(){
+      const x0=220, y0=HEIGHT/2, pixPerMm=300/h;
+      p.push(); p.translate(x0, y0);
+      p.stroke(51); p.fill(255); p.strokeWeight(2);
+      p.rect(-b*pixPerMm/2, -h*pixPerMm/2, b*pixPerMm, h*pixPerMm);
+      p.stroke(150); p.strokeWeight(1); setDashed(p,true);
+      p.line(-90,0,90,0); setDashed(p,false);
+      const ySel=fibreAlpha*(h/2), ypix=ySel*pixPerMm;
+      p.fill(255,193,7,160); p.stroke(255,193,7); p.strokeWeight(2);
+      p.rect(-8, ypix-8, 16, 16, 2);
+      p.noStroke(); p.fill(51); p.textAlign(p.CENTER);
+      p.text('Section', 0, -HEIGHT/2 + 24);
+      p.textSize(10); p.text(`y = ${ySel.toFixed(0)} mm`, 0, ypix + 24);
+      p.pop();
+    }
+
+    function drawMidPanel(){
+  const x0 = 520, y0 = HEIGHT/2;
+  const pixPerMmY = 300/h, scaleX = 120/sigY;
+
+  p.push(); 
+  p.translate(x0, y0);
+
+  // Axes
+  p.stroke(51); p.strokeWeight(1);
+  p.line(0, -160, 0, 160); 
+  p.line(-140, 0, 140, 0);
+
+  // Yield lines
+  p.stroke(120); setDashed(p, true);
+  p.line(sigY*scaleX, -160, sigY*scaleX, 160);
+  p.line(-sigY*scaleX, -160, -sigY*scaleX, 160);
+  setDashed(p, false);
+
+  // 🔸 Orange whenever unloading OR fully unloaded
+  const drawOrange = isUnloading || (showResidual && Math.abs(M_current) < 1e-3);
+
+  if (drawOrange) {
+    // Whole curve in orange
+    p.noFill();
+    p.stroke(colUnload[0], colUnload[1], colUnload[2]); // [255,159,67]
+    p.strokeWeight(2);
+    p.beginShape();
+    for (let i = 0; i < N; i++) {
+      const s = sigma[i], y = ys[i];
+      p.vertex(s*scaleX, y*pixPerMmY);
+    }
+    p.endShape();
+
+    // Orange arrows
+    const step = Math.max(1, Math.floor(N/12));
+    for (let i = 0; i < N; i += step) {
+      const s = sigma[i], y = ys[i];
+      p.stroke(colUnload[0], colUnload[1], colUnload[2]);
+      p.strokeWeight(2);
+      drawArrowH(p, 0, y*pixPerMmY, s*scaleX);
+    }
+  } else {
+    // Green elastic part
+    p.noFill();
+    p.stroke(46, 204, 113); 
+    p.strokeWeight(2);
+    p.beginShape();
+    for (let i = 0; i < N; i++) {
+      const s = sigma[i], y = ys[i];
+      if (Math.abs(s) < sigY - 1e-6) p.vertex(s*scaleX, y*pixPerMmY);
+    }
+    p.endShape();
+
+    // Red plastic part
+    p.stroke(231, 76, 60); 
+    p.strokeWeight(2);
+    p.beginShape();
+    for (let i = 0; i < N; i++) {
+      const s = sigma[i], y = ys[i];
+      if (Math.abs(s) >= sigY - 1e-6) p.vertex(s*scaleX, y*pixPerMmY);
+    }
+    p.endShape();
+
+    // Arrows colored to match segment type
+    const step = Math.max(1, Math.floor(N/12));
+    for (let i = 0; i < N; i += step) {
+      const s = sigma[i], y = ys[i];
+      if (Math.abs(s) < sigY - 1e-6) p.stroke(46, 204, 113); else p.stroke(231, 76, 60);
+      p.strokeWeight(2);
+      drawArrowH(p, 0, y*pixPerMmY, s*scaleX);
+    }
+  }
+
+  // Title
+  p.noStroke(); p.fill(51); p.textAlign(p.CENTER);
+  p.text('Stress Distribution', 0, -HEIGHT/2 + 24);
+
+  p.pop();
+}
+
+    function drawRightPanel(){
+      const x0=820, y0=HEIGHT/2;
+      const iSel = Math.max(0, Math.min(N-1, Math.round( ( (fibreAlpha*(h/2)) + h/2)/dy - 0.5 )));
+      const eps=kappa*ys[iSel], sig=sigma[iSel];
+      const scaleEps=30000, scaleSig=120/sigY;
+      const epsY=sigY/E;
+
+      // determine color state
+      let col = isUnloading ? colUnload : (Math.abs(sig) < sigY-1e-6 ? colElastic : colPlastic);
+
+      // add history segment
+      const x = Math.max(-120, Math.min(120, eps*scaleEps));
+      const y = Math.max(-160, Math.min(160, -sig*scaleSig));
+      if(prevPt){
+        hist.push({x1:prevPt.x, y1:prevPt.y, x2:x, y2:y, color:col});
+      }
+      prevPt = {x,y};
+
+      p.push(); p.translate(x0, y0);
+      // axes
+      p.stroke(51); p.strokeWeight(1);
+      p.line(-120,0,120,0); p.line(0,-160,0,160);
+      p.stroke(120); setDashed(p,true);
+      p.line(-120, -sigY*scaleSig, 120, -sigY*scaleSig);
+      p.line(-120,  sigY*scaleSig, 120,  sigY*scaleSig);
+      setDashed(p,false);
+
+      // base bilinear curve (blue)
+      p.stroke(100,150,200); p.strokeWeight(2);
+      p.line(0,0, epsY*scaleEps, -sigY*scaleSig);
+      if(epsY*scaleEps<120) p.line(epsY*scaleEps, -sigY*scaleSig, 120, -sigY*scaleSig);
+      p.line(0,0, -epsY*scaleEps, sigY*scaleSig);
+      if(epsY*scaleEps<120) p.line(-epsY*scaleEps, sigY*scaleSig, -120, sigY*scaleSig);
+
+      // draw history
+      for(const seg of hist){
+        p.stroke(seg.color[0], seg.color[1], seg.color[2]);
+        p.strokeWeight(2);
+        p.line(seg.x1, seg.y1, seg.x2, seg.y2);
+      }
+
+      // current point (yellow)
+      p.noStroke(); p.fill(255,0,100);
+      p.circle(x, y, 8);
+
+      p.noStroke(); p.fill(51); p.textAlign(p.CENTER);
+      p.text('σ–ε at selected fibre', 0, -HEIGHT/2 + 24);
+      p.textSize(10); p.text(`ε = ${eps.toExponential(2)}, σ = ${sig.toFixed(1)} MPa`, 0, 150);
+      p.pop();
+    }
+
+    // animate unloading smoothly
+    function stepUnloading(){
+      if(!isUnloading) return;
+      if(unloadStepsLeft<=0){
+        isUnloading=false; showResidual=true;
+        const ls=document.getElementById('loadingState'); if(ls) ls.textContent='Unloaded';
+        const ySel=fibreAlpha*(h/2);
+        const idx=Math.max(0, Math.min(N-1, Math.round((ySel + h/2)/dy - 0.5)));
+        const rs=document.getElementById('residualStress'); if(rs) rs.textContent=sigma[idx].toFixed(1);
+        return;
+      }
+      const frac = (unloadStepsLeft-1)/UNLOAD_FRAMES;
+      const Mt = unloadStartM*frac;
+      unloadTo(Mt);
+      unloadStepsLeft--;
+    }
+
+    p.draw=function(){
+      // advance unloading if active
+      stepUnloading();
+
+      p.background(245);
+      drawLeftPanel();
+      drawMidPanel();
+      drawRightPanel();
+    };
+  };
+}
+
+// -------- Boot both simulations --------
+window.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    new p5(createSimulation1());
+    new p5(createSimulation2());
+  }catch(e){
+    console.error('Error initializing simulations:', e);
+    const holder1=document.getElementById('sketch-holder-1');
+    const holder2=document.getElementById('sketch-holder-2');
+    if(holder1) holder1.innerHTML='<div style="padding:12px;color:#b00;font-weight:600;">Simulation 1 failed to load.</div>';
+    if(holder2) holder2.innerHTML='<div style="padding:12px;color:#b00;font-weight:600;">Simulation 2 failed to load.</div>';
+  }
+});
+</script>
+
+</body>
+</html>

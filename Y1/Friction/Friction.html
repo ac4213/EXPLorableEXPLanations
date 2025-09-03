@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Static and Kinetic Friction - Interactive Lecture</title>
+  <!-- p5.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <!-- MathJax -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+  <!-- External CSS -->
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Static and Kinetic Friction</h1>
+    <p class="subtitle">Interactive Lecture & Simulation</p>
+  </header>
+
+  <div class="content-section">
+    <h2>Understanding Friction</h2>
+    <p>Friction is a force that opposes the relative motion between two surfaces in contact. It's one of the most important forces in everyday life and engineering applications, enabling us to walk, drive, and hold objects.</p>
+
+    <h3>Why Friction Develops at Contact Surfaces</h3>
+    <p>Friction arises from the microscopic interactions between surfaces:</p>
+    <ul>
+      <li><strong>Surface Roughness:</strong> Even seemingly smooth surfaces have microscopic irregularities (asperities) that interlock when pressed together</li>
+      <li><strong>Adhesive Forces:</strong> At the molecular level, attractive forces develop between atoms of the two surfaces</li>
+      <li><strong>Elastic and Plastic Deformation:</strong> Contact points undergo deformation under load, creating resistance to motion</li>
+      <li><strong>Real Contact Area:</strong> Only a small fraction of the apparent surface area is in actual contact at the microscopic level</li>
+    </ul>
+
+    <div class="key-point">
+      <p><strong>Fundamental Principle:</strong> The friction force is approximately proportional to the normal force between surfaces, not to the apparent contact area. This surprising result occurs because increasing the normal force increases the real contact area proportionally.</p>
+    </div>
+
+    <h3>Coulomb's Model of Friction</h3>
+    <p>The classical model of friction, developed by Charles-Augustin de Coulomb, distinguishes between two types:</p>
+
+    <h4>Static Friction</h4>
+    <div class="equation-box">
+      <p><strong>Static Friction:</strong> \(F_s \leq \mu_s N\)</p>
+      <p>Where:</p>
+      <ul>
+        <li>\(F_s\) = static friction force</li>
+        <li>\(\mu_s\) = coefficient of static friction</li>
+        <li>\(N\) = normal force</li>
+      </ul>
+      <p>The actual friction force adjusts to match the applied force up to the maximum value \(\mu_s N\)</p>
+    </div>
+
+    <h4>Kinetic Friction</h4>
+    <div class="equation-box">
+      <p><strong>Kinetic Friction:</strong> \(F_k = \mu_k N\)</p>
+      <p>Where:</p>
+      <ul>
+        <li>\(F_k\) = kinetic friction force</li>
+        <li>\(\mu_k\) = coefficient of kinetic friction</li>
+        <li>Generally, \(\mu_k < \mu_s\)</li>
+      </ul>
+    </div>
+
+    <h3>Typical Friction Coefficients</h3>
+    <div class="equation-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Material Pair</th>
+            <th>Static Coefficient (μₛ)</th>
+            <th>Kinetic Coefficient (μₖ)</th>
+            <th>Applications</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Steel on Steel (dry)</td>
+            <td>0.6 - 0.8</td>
+            <td>0.4 - 0.6</td>
+            <td>Machine components, bearings</td>
+          </tr>
+          <tr>
+            <td>Steel on Steel (lubricated)</td>
+            <td>0.1 - 0.15</td>
+            <td>0.05 - 0.1</td>
+            <td>Lubricated bearings, engines</td>
+          </tr>
+          <tr>
+            <td>Aluminium on Steel</td>
+            <td>0.61</td>
+            <td>0.47</td>
+            <td>Structural connections</td>
+          </tr>
+          <tr>
+            <td>Copper on Steel</td>
+            <td>0.53</td>
+            <td>0.36</td>
+            <td>Electrical contacts, bushings</td>
+          </tr>
+          <tr>
+            <td>Rubber on Dry Concrete</td>
+            <td>1.0 - 1.2</td>
+            <td>0.8 - 1.0</td>
+            <td>Tyres, footwear</td>
+          </tr>
+          <tr>
+            <td>Rubber on Wet Concrete</td>
+            <td>0.5 - 0.7</td>
+            <td>0.4 - 0.6</td>
+            <td>Wet road conditions</td>
+          </tr>
+          <tr>
+            <td>Wood on Wood (dry)</td>
+            <td>0.4 - 0.6</td>
+            <td>0.2 - 0.4</td>
+            <td>Furniture, construction</td>
+          </tr>
+          <tr>
+            <td>Ice on Ice</td>
+            <td>0.1</td>
+            <td>0.03</td>
+            <td>Ice skating, winter sports</td>
+          </tr>
+          <tr>
+            <td>Teflon on Teflon</td>
+            <td>0.04</td>
+            <td>0.04</td>
+            <td>Non-stick coatings</td>
+          </tr>
+          <tr>
+            <td>Glass on Glass</td>
+            <td>0.9 - 1.0</td>
+            <td>0.4</td>
+            <td>Optical equipment</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key-point">
+      <p><strong>Engineering Note:</strong> Friction coefficients can vary significantly based on surface conditions, temperature, humidity, contamination, and wear. Engineers typically use conservative values with appropriate safety factors in design.</p>
+    </div>
+  </div>
+
+  <div class="simulation-section">
+    <h2>Simulation 1: Static vs Kinetic Friction</h2>
+    <p>Apply force to the block and observe the transition from static to kinetic friction. The graph shows the friction force response.</p>
+
+    <div class="interactive-controls">
+      <div class="control-group">
+        <label for="materialSelect">Material Pair:</label>
+        <select id="materialSelect">
+          <option value="steel-steel">Steel on Steel (dry)</option>
+          <option value="steel-steel-lub">Steel on Steel (lubricated)</option>
+          <option value="rubber-concrete">Rubber on Dry Concrete</option>
+          <option value="wood-wood">Wood on Wood</option>
+          <option value="ice-ice">Ice on Ice</option>
+          <option value="custom">Custom Values</option>
+        </select>
+      </div>
+      <div class="control-group" id="customControls" style="display: none;">
+        <label for="staticCoeff">Static Coefficient (μₛ): <span id="staticValue">0.6</span></label>
+        <input type="range" id="staticCoeff" min="0" max="1.5" step="0.01" value="0.6" />
+        <label for="kineticCoeff">Kinetic Coefficient (μₖ): <span id="kineticValue">0.4</span></label>
+        <input type="range" id="kineticCoeff" min="0" max="1.5" step="0.01" value="0.4" />
+      </div>
+      <div class="control-group">
+        <label for="massSlider">Block Mass (kg): <span id="massValue">10</span></label>
+        <input type="range" id="massSlider" min="5" max="50" step="1" value="10" />
+      </div>
+      <div class="control-group">
+        <label for="forceSlider">Applied Force (N): <span id="forceValue">0</span></label>
+        <input type="range" id="forceSlider" min="0" max="150" step="0.5" value="0" />
+      </div>
+    </div>
+
+    <div id="friction-sim-holder" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+      <!-- Friction simulation will go here -->
+    </div>
+
+    <div id="friction-data" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
+      <h4>Friction Analysis:</h4>
+      <p>Normal Force: <span id="normalForce">--</span> N</p>
+      <p>Maximum Static Friction: <span id="maxStaticFriction">--</span> N</p>
+      <p>Kinetic Friction: <span id="kineticFriction">--</span> N</p>
+      <p>Current Friction Force: <span id="currentFriction">--</span> N</p>
+      <p>Block Status: <span id="blockStatus">Stationary</span></p>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Pure Rolling Motion</h2>
+    <p>Pure rolling occurs when an object rolls without slipping. This is possible due to static friction at the contact point.</p>
+
+    <h3>How Static Friction Enables Pure Rolling</h3>
+    <p>For pure rolling to occur:</p>
+    <ul>
+      <li>The contact point must have zero velocity relative to the ground (no slip condition)</li>
+      <li>Static friction prevents slipping at the contact point</li>
+      <li>The relationship \(v = \omega R\) must be satisfied (where \(v\) is linear velocity, \(\omega\) is angular velocity, and \(R\) is radius)</li>
+      <li>Every point on the wheel has a velocity that's the vector sum of translational and rotational components</li>
+    </ul>
+
+    <div class="equation-box">
+      <p><strong>Pure Rolling Condition:</strong></p>
+      <p>\(v_{cm} = \omega R\)</p>
+      <p>Where:</p>
+      <ul>
+        <li>\(v_{cm}\) = velocity of centre of mass</li>
+        <li>\(\omega\) = angular velocity</li>
+        <li>\(R\) = radius of the rolling object</li>
+      </ul>
+      <p>The velocity of any point on the wheel: \(\vec{v}_{point} = \vec{v}_{cm} + \vec{\omega} \times \vec{r}\)</p>
+    </div>
+
+    <div class="key-point">
+      <p><strong>Important Insight:</strong> In pure rolling, the bottom point of the wheel is instantaneously at rest (zero velocity), whilst the top point moves at twice the centre's velocity. This creates the characteristic velocity distribution shown in the simulation below.</p>
+    </div>
+  </div>
+
+  <div class="simulation-section">
+    <h2>Simulation 2: Pure Rolling Motion</h2>
+    <p>Observe the velocity vectors showing the combination of translation and rotation in pure rolling motion.</p>
+
+    <div class="interactive-controls">
+      <div class="control-group">
+        <label for="speedSlider">Rolling Speed: <span id="speedValue">1.0</span></label>
+        <input type="range" id="speedSlider" min="0" max="3" step="0.1" value="1.0" />
+      </div>
+      <div class="control-group">
+        <label for="vectorMode">Vector Display Mode:</label>
+        <select id="vectorMode">
+          <option value="none">None</option>
+          <option value="translation">Pure Translation (Green)</option>
+          <option value="rotation">Pure Rotation (Red)</option>
+          <option value="combined" selected>Combined Rolling (All Vectors)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>
+          <input type="checkbox" id="showTrace" checked /> Show Contact Point Trace
+        </label>
+      </div>
+    </div>
+
+    <div id="rolling-sim-holder" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+      <!-- Rolling simulation will go here -->
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Advanced Concept: Rolling Friction</h2>
+    <p>Whilst pure rolling theoretically requires no energy to maintain, real objects experience rolling resistance due to material deformation.</p>
+
+    <h3>Causes of Rolling Friction</h3>
+    <ul>
+      <li><strong>Elastic Hysteresis:</strong> Energy is lost during cyclic deformation of the rolling object (especially in tyres)</li>
+      <li><strong>Surface Deformation:</strong> Both the rolling object and the surface deform, creating resistance</li>
+      <li><strong>Adhesive Effects:</strong> Molecular adhesion at the contact creates additional resistance</li>
+      <li><strong>Microslip:</strong> Small regions of slip within the contact patch</li>
+    </ul>
+
+    <div class="equation-box">
+      <p><strong>Rolling Resistance Force:</strong></p>
+      <p>\(F_{rr} = C_{rr} N\)</p>
+      <p>Where:</p>
+      <ul>
+        <li>\(C_{rr}\) = coefficient of rolling resistance (dimensionless, typically 0.001-0.03)</li>
+        <li>\(N\) = normal force</li>
+      </ul>
+      <p>Alternatively: \(F_{rr} = \frac{b}{R} N\)</p>
+      <p>Where \(b\) is the rolling resistance arm (distance)</p>
+    </div>
+
+    <h3>Typical Rolling Resistance Coefficients</h3>
+    <div class="equation-table">
+      <table>
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>C_rr Value</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Steel wheel on steel rail</td>
+            <td>0.0010 - 0.0025</td>
+            <td>Trains - very efficient</td>
+          </tr>
+          <tr>
+            <td>Car tyre on concrete (optimal pressure)</td>
+            <td>0.010 - 0.015</td>
+            <td>Standard road conditions</td>
+          </tr>
+          <tr>
+            <td>Car tyre (underinflated)</td>
+            <td>0.020 - 0.030</td>
+            <td>Increased deformation</td>
+          </tr>
+          <tr>
+            <td>Truck tyre on road</td>
+            <td>0.006 - 0.010</td>
+            <td>High pressure tyres</td>
+          </tr>
+          <tr>
+            <td>Bicycle tyre on road</td>
+            <td>0.002 - 0.005</td>
+            <td>High pressure, narrow contact</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key-point">
+      <p><strong>Practical Application:</strong> Rolling resistance is why a car in neutral will eventually stop on a level road. For typical car tyres, rolling resistance accounts for about 20% of fuel consumption at highway speeds, making proper tyre inflation crucial for fuel economy.</p>
+    </div>
+
+    <h2>Energy Considerations</h2>
+    <p>The power required to overcome rolling resistance:</p>
+    <div class="equation-box">
+      <p>\(P = F_{rr} \cdot v = C_{rr} N v\)</p>
+      <p>This power is dissipated as heat in the deformed material, primarily in the tyres for vehicles.</p>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+      <h3>Problem 1: Block on Incline</h3>
+      <p>A 5 kg wooden block rests on a wooden incline. If μₛ = 0.5 and μₖ = 0.3:</p>
+      <ol>
+        <li>What is the maximum angle before the block starts sliding?</li>
+        <li>Once sliding, what is the acceleration down the incline at 35°?</li>
+      </ol>
+
+      <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+      <div id="solution1" class="hidden">
+        <p><strong>Part a:</strong></p>
+        <p>At the critical angle, static friction equals the component of weight down the slope:</p>
+        <p>\(\mu_s N = mg\sin\theta_{max}\)</p>
+        <p>\(\mu_s mg\cos\theta_{max} = mg\sin\theta_{max}\)</p>
+        <p>\(\tan\theta_{max} = \mu_s = 0.5\)</p>
+        <p>\(\theta_{max} = \arctan(0.5) = 26.6°\)</p>
+
+        <p><strong>Part b:</strong></p>
+        <p>Forces down the incline: \(F_{down} = mg\sin(35°) - \mu_k mg\cos(35°)\)</p>
+        <p>\(ma = mg(\sin(35°) - \mu_k\cos(35°))\)</p>
+        <p>\(a = g(\sin(35°) - 0.3\cos(35°))\)</p>
+        <p>\(a = 9.81(0.574 - 0.3 \times 0.819) = 9.81(0.328) = 3.22 \text{ m/s}^2\)</p>
+      </div>
+    </div>
+
+    <div class="practice-problems">
+      <h3>Problem 2: Pushing a Crate</h3>
+      <p>A 100 kg crate on a concrete floor has μₛ = 0.7 and μₖ = 0.5. If you push horizontally:</p>
+      <ol>
+        <li>What force is needed to start it moving?</li>
+        <li>What force maintains constant velocity once moving?</li>
+        <li>If you apply 800 N, what is the acceleration?</li>
+      </ol>
+
+      <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+      <div id="solution2" class="hidden">
+        <p><strong>Part a:</strong></p>
+        <p>Normal force: \(N = mg = 100 \times 9.81 = 981 \text{ N}\)</p>
+        <p>Force to overcome static friction: \(F = \mu_s N = 0.7 \times 981 = 687 \text{ N}\)</p>
+
+        <p><strong>Part b:</strong></p>
+        <p>Force to maintain constant velocity: \(F = \mu_k N = 0.5 \times 981 = 490.5 \text{ N}\)</p>
+
+        <p><strong>Part c:</strong></p>
+        <p>Net force: \(F_{net} = 800 - \mu_k N = 800 - 490.5 = 309.5 \text{ N}\)</p>
+        <p>Acceleration: \(a = \frac{F_{net}}{m} = \frac{309.5}{100} = 3.1 \text{ m/s}^2\)</p>
+      </div>
+    </div>
+
+    <div class="practice-problems">
+      <h3>Problem 3: Rolling Resistance</h3>
+      <p>A 1500 kg car with C_rr = 0.015 travels at 100 km/h on level ground. Calculate:</p>
+      <ol>
+        <li>The rolling resistance force</li>
+        <li>The power needed to overcome rolling resistance</li>
+        <li>If the tyres are underinflated (C_rr = 0.025), how much extra power is needed?</li>
+      </ol>
+
+      <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+      <div id="solution3" class="hidden">
+        <p><strong>Part a:</strong></p>
+        <p>Normal force: \(N = mg = 1500 \times 9.81 = 14,715 \text{ N}\)</p>
+        <p>Rolling resistance: \(F_{rr} = C_{rr} N = 0.015 \times 14,715 = 220.7 \text{ N}\)</p>
+
+        <p><strong>Part b:</strong></p>
+        <p>Velocity: \(v = 100 \text{ km/h} = 27.78 \text{ m/s}\)</p>
+        <p>Power: \(P = F_{rr} \times v = 220.7 \times 27.78 = 6,131 \text{ W} = 6.13 \text{ kW}\)</p>
+
+        <p><strong>Part c:</strong></p>
+        <p>New rolling resistance: \(F_{rr} = 0.025 \times 14,715 = 367.9 \text{ N}\)</p>
+        <p>New power: \(P = 367.9 \times 27.78 = 10,218 \text{ W} = 10.22 \text{ kW}\)</p>
+        <p>Extra power needed: \(10.22 - 6.13 = 4.09 \text{ kW}\) (67% increase!)</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Interactive Quiz</h2>
+    <div class="quiz-container">
+      <div class="quiz-question">
+        <h3>Question 1: Why is the coefficient of static friction typically greater than kinetic friction?</h3>
+        <div class="quiz-options">
+          <label><input type="radio" name="q1" value="a" /> a) Moving surfaces are smoother</label>
+          <label><input type="radio" name="q1" value="b" /> b) Surface asperities have time to interlock when stationary</label>
+          <label><input type="radio" name="q1" value="c" /> c) Kinetic energy reduces friction</label>
+          <label><input type="radio" name="q1" value="d" /> d) Temperature increases during motion</label>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <h3>Question 2: In pure rolling motion, the velocity of the contact point is:</h3>
+        <div class="quiz-options">
+          <label><input type="radio" name="q2" value="a" /> a) Equal to the centre velocity</label>
+          <label><input type="radio" name="q2" value="b" /> b) Twice the centre velocity</label>
+          <label><input type="radio" name="q2" value="c" /> c) Zero</label>
+          <label><input type="radio" name="q2" value="d" /> d) Half the centre velocity</label>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <h3>Question 3: A 10 kg block requires 60 N to start moving on a surface. What is μₛ?</h3>
+        <div class="quiz-options">
+          <label><input type="radio" name="q3" value="a" /> a) 0.61</label>
+          <label><input type="radio" name="q3" value="b" /> b) 6.0</label>
+          <label><input type="radio" name="q3" value="c" /> c) 0.16</label>
+          <label><input type="radio" name="q3" value="d" /> d) 1.63</label>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <h3>Question 4: Rolling resistance is primarily caused by:</h3>
+        <div class="quiz-options">
+          <label><input type="radio" name="q4" value="a" /> a) Air resistance</label>
+          <label><input type="radio" name="q4" value="b" /> b) Material deformation and hysteresis</label>
+          <label><input type="radio" name="q4" value="c" /> c) Gravity</label>
+          <label><input type="radio" name="q4" value="d" /> d) Surface roughness only</label>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <h3>Question 5: For a wheel in pure rolling, if v = 10 m/s and R = 0.5 m, what is ω?</h3>
+        <div class="quiz-options">
+          <label><input type="radio" name="q5" value="a" /> a) 5 rad/s</label>
+          <label><input type="radio" name="q5" value="b" /> b) 20 rad/s</label>
+          <label><input type="radio" name="q5" value="c" /> c) 10 rad/s</label>
+          <label><input type="radio" name="q5" value="d" /> d) 0.05 rad/s</label>
+        </div>
+      </div>
+
+      <button id="submit-quiz">Submit Quiz</button>
+      <div id="quiz-results" class="hidden"></div>
+    </div>
+  </div>
+
+  <footer>
+    <script src="/assets/common/footer.js"></script>
+  </footer>
+
+  <script>
+// ------------------------------
+// Globals & constants
+// ------------------------------
+
+// Friction simulation variables
+let frictionSim;
+let block = {
+  x: 100,
+  y: 240,
+  width: 80,
+  height: 60,
+  mass: 10,
+  velocity: 0,
+  isMoving: false
+};
+let appliedForce = 0;
+let muS = 0.6;
+let muK = 0.4;
+const g = 9.81;
+
+// Rolling simulation variables
+let rollingSim;
+let wheel = {
+  x: 100,
+  y: 240,
+  radius: 60,
+  angle: 0,
+  speed: 1.0 // treated as linear speed v for translation & combined modes
+};
+let vectorMode = 'combined'; // 'none' | 'translation' | 'rotation' | 'combined'
+let showTrace = true;
+let tracePoints = [];
+const rimMarkerAngle = Math.PI / 2; // fixed edge point on rim (bottom at t=0)
+
+// Material properties
+const materials = {
+  'steel-steel': { muS: 0.7, muK: 0.5 },
+  'steel-steel-lub': { muS: 0.125, muK: 0.075 },
+  'rubber-concrete': { muS: 1.1, muK: 0.9 },
+  'wood-wood': { muS: 0.5, muK: 0.3 },
+  'ice-ice': { muS: 0.1, muK: 0.03 }
+};
+
+// ------------------------------
+// p5 instance #1: Friction sketch
+// ------------------------------
+const frictionSketch = (p) => {
+  p.setup = function () {
+    const canvas = p.createCanvas(800, 400);
+    canvas.parent('friction-sim-holder');
+    p.textAlign(p.CENTER, p.CENTER);
+  };
+
+  p.draw = function () {
+    p.background(240);
+
+    // Ground
+    const groundY = 300;
+    p.stroke(100);
+    p.strokeWeight(3);
+    p.line(0, groundY, p.width, groundY);
+
+    // Hatch
+    p.strokeWeight(1);
+    for (let i = 0; i < p.width; i += 10) {
+      p.line(i, groundY, i + 5, groundY + 10);
+    }
+
+    // Forces
+    const normalForce = block.mass * g;
+    const maxStaticFriction = muS * normalForce;
+    const kineticFriction = muK * normalForce;
+    let frictionForce;
+
+    if (!block.isMoving) {
+      if (appliedForce <= maxStaticFriction) {
+        frictionForce = appliedForce;
+      } else {
+        block.isMoving = true;
+        frictionForce = kineticFriction;
+      }
+    } else {
+      frictionForce = kineticFriction;
+      if (appliedForce < kineticFriction + 0.5) {
+        block.isMoving = false;
+        block.velocity = 0;
+      }
+    }
+
+    // Motion
+    if (block.isMoving) {
+      const netForce = appliedForce - frictionForce;
+      const acceleration = netForce / block.mass;
+      block.velocity += acceleration * 0.016; // ~60fps
+      block.x += block.velocity;
+
+      // bounds
+      if (block.x > p.width - block.width - 50) {
+        block.x = p.width - block.width - 50;
+        block.velocity = 0;
+      }
+      if (block.x < 50) {
+        block.x = 50;
+        block.velocity = 0;
+      }
+    }
+
+    // Block
+    const blockY = groundY - block.height;
+    p.push();
+    p.fill(block.isMoving ? p.color(255, 150, 150) : p.color(150, 150, 255));
+    p.stroke(0);
+    p.strokeWeight(2);
+    p.rect(block.x, blockY, block.width, block.height);
+    p.pop();
+
+    // Applied force arrow (left)
+    if (appliedForce > 0) {
+      p.stroke(0, 200, 0);
+      p.fill(0, 200, 0);
+      const arrowLength = p.map(appliedForce, 0, 150, 0, 100);
+      const forceY = blockY + block.height / 2;
+      p.line(block.x - 20, forceY, block.x - 20 - arrowLength, forceY);
+      p.triangle(block.x - 15, forceY - 5, block.x - 15, forceY + 5, block.x - 10, forceY);
+      p.noStroke();
+      p.text(`F = ${appliedForce.toFixed(1)} N`, block.x - 20 - arrowLength / 2, forceY - 15);
+    }
+
+    // Friction arrow (left, opposing motion)
+    if (frictionForce > 0) {
+      p.stroke(200, 0, 0);
+      p.fill(200, 0, 0);
+      const arrowLength = p.map(frictionForce, 0, 150, 0, 100);
+      p.line(block.x + block.width / 2, groundY - 5, block.x + block.width / 2 - arrowLength, groundY - 5);
+      p.triangle(
+        block.x + block.width / 2 - arrowLength + 5,
+        groundY - 10,
+        block.x + block.width / 2 - arrowLength + 5,
+        groundY,
+        block.x + block.width / 2 - arrowLength,
+        groundY - 5
+      );
+      p.noStroke();
+      p.text(`f = ${frictionForce.toFixed(1)} N`, block.x + block.width / 2 - arrowLength / 2, groundY + 15);
+    }
+
+    // Graph
+    p.push();
+    p.translate(420, 10);
+
+    p.fill(255);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.rect(0, 0, 300, 200);
+
+    // Axes
+    p.strokeWeight(2);
+    p.line(0, 200, 300, 200);
+    p.line(0, 0, 0, 200);
+
+    // Labels
+    p.noStroke();
+    p.fill(0);
+    p.textAlign(p.CENTER, p.TOP);
+    p.textSize(12);
+    p.text('Applied Force (F)', 150, 210);
+    p.push();
+    p.rotate(-p.PI / 2);
+    p.text('Friction (f)', -100, -20);
+    p.pop();
+
+    // Static line
+    p.stroke(100, 100, 255);
+    p.strokeWeight(2);
+    const staticEndX = p.map(maxStaticFriction, 0, 150, 0, 300);
+    const staticEndY = p.map(maxStaticFriction, 0, 150, 200, 0);
+    p.line(0, 200, staticEndX, staticEndY);
+
+    // Kinetic line
+    p.stroke(255, 100, 100);
+    const kineticY = p.map(kineticFriction, 0, 150, 200, 0);
+    p.line(staticEndX, kineticY, 300, kineticY);
+
+    // Transition dash
+    p.stroke(150);
+    p.strokeWeight(1);
+    p.setLineDash([5, 5]);
+    p.line(staticEndX, staticEndY, staticEndX, kineticY);
+    p.setLineDash([]);
+
+    // Current point
+    p.fill(0, 200, 0);
+    p.noStroke();
+    const currentX = p.map(appliedForce, 0, 150, 0, 300);
+    const currentY = p.map(frictionForce, 0, 150, 200, 0);
+    p.ellipse(currentX, currentY, 8, 8);
+
+    // Region labels
+    p.fill(100, 100, 255, 100);
+    p.textAlign(p.CENTER, p.CENTER);
+    p.text('STATIC', staticEndX / 2, 100);
+    p.fill(255, 100, 100, 100);
+    p.text('KINETIC', (staticEndX + 300) / 2, 100);
+
+    p.pop();
+
+    // Update data panel
+    updateFrictionData(normalForce, maxStaticFriction, kineticFriction, frictionForce);
+  };
+
+  // dashed lines helper
+  p.setLineDash = function (list) {
+    p.drawingContext.setLineDash(list);
+  };
+};
+
+// ------------------------------
+// p5 instance #2: Rolling sketch (adjusted vectors, cycloid trace, COM vectors)
+// ------------------------------
+const rollingSketch = (p) => {
+  p.setup = function () {
+    const canvas = p.createCanvas(800, 400);
+    canvas.parent('rolling-sim-holder');
+  };
+
+  p.draw = function () {
+    p.background(240);
+
+    // Ground
+    const groundY = 300;
+    p.stroke(100);
+    p.strokeWeight(3);
+    p.line(0, groundY, p.width, groundY);
+
+    // Marks
+    p.strokeWeight(1);
+    for (let i = 0; i < p.width; i += 20) p.line(i, groundY, i, groundY + 5);
+
+    // --- Motion control by mode ---
+    const dt = (p.deltaTime || 16.67) / 1000; // seconds
+    const Rpx = wheel.radius / 60;            // "meters" per pixel scaling
+    const v = (vectorMode === 'rotation') ? 0 : wheel.speed;                // linear speed for translation & combined
+    const omega = (vectorMode === 'translation') ? 0 : (wheel.speed / Rpx); // rad/s (so that ωR ≈ v in "visual m/s")
+
+    // Update translation
+    if (vectorMode === 'combined') {
+      // Enforce rolling condition in pixels: x_dot = ωR
+      wheel.x += (omega * wheel.radius) * dt;
+    } else if (vectorMode === 'translation') {
+      // Keep extra visual scale for clarity
+      wheel.x += v * 2;
+    }
+    if (wheel.x > p.width + wheel.radius) {
+      wheel.x = -wheel.radius;
+      tracePoints = [];
+    }
+
+    // CLOCKWISE rotation: increase angle
+    wheel.angle += omega * dt;
+
+    const wheelY = groundY - wheel.radius;
+
+    // Edge point (fixed marker on rim) -> cycloid in combined mode
+    if (showTrace) {
+      const angMarker = wheel.angle + rimMarkerAngle;
+      const px = wheel.x + wheel.radius * Math.cos(angMarker);
+      const py = wheelY + wheel.radius * Math.sin(angMarker);
+      tracePoints.push({ x: px, y: py });
+      if (tracePoints.length > 300) tracePoints.shift();
+
+      p.stroke(150, 150, 255, 150);
+      p.strokeWeight(3);
+      p.noFill();
+      p.beginShape();
+      for (const pt of tracePoints) p.vertex(pt.x, pt.y);
+      p.endShape();
+    }
+
+    // Wheel body
+    p.push();
+    p.translate(wheel.x, wheelY);
+    p.rotate(wheel.angle);
+
+    p.stroke(0);
+    p.strokeWeight(3);
+    p.noFill();
+    p.ellipse(0, 0, wheel.radius * 2, wheel.radius * 2);
+
+    // Spokes (no gray dots)
+    p.strokeWeight(2);
+    for (let i = 0; i < 8; i++) {
+      p.push();
+      p.rotate((i * p.PI) / 4);
+      p.line(0, 0, wheel.radius, 0);
+      p.pop();
+    }
+
+    // Edge point marker at bottom (current contact if rolling)
+    p.fill(255, 0, 0);
+    p.noStroke();
+    p.ellipse(0, wheel.radius, 10, 10);
+
+    p.pop();
+
+    // --- Vectors ---
+    if (vectorMode !== 'none' && (v > 0 || omega > 0)) {
+      const scale = 60;
+
+      // IMPORTANT: Scale red (rotational) vectors to match green magnitudes visually.
+      // With our ω definition, ωR (px/s) ~ wheel.speed * 60. To keep parity with green (which uses v),
+      // use a "visible rotational speed" rotMagVis = ω * Rpx = (wheel.speed / Rpx) * Rpx = wheel.speed.
+      const rotMagVis = omega * Rpx; // now comparable to v
+
+      // Rim vectors
+      for (let i = 0; i < 8; i++) {
+        const ang = wheel.angle + (i * p.PI) / 4;
+        const px = wheel.x + wheel.radius * Math.cos(ang);
+        const py = wheelY + wheel.radius * Math.sin(ang);
+
+        // Translation (green)
+        if (vectorMode === 'translation' || vectorMode === 'combined') {
+          p.stroke(0, 200, 0);
+          p.strokeWeight(2);
+          p.fill(0, 200, 0);
+          drawArrow(p, px, py, px + v * scale, py);
+        }
+
+        // Rotation (red), tangent direction (clockwise)
+        if (vectorMode === 'rotation' || vectorMode === 'combined') {
+          const rotX = -rotMagVis * Math.sin(ang);
+          const rotY =  rotMagVis * Math.cos(ang);
+          p.stroke(200, 0, 0);
+          p.strokeWeight(2);
+          p.fill(200, 0, 0);
+          drawArrow(p, px, py, px + rotX * scale, py + rotY * scale);
+        }
+
+        // Combined (purple) = translation + rotation
+        if (vectorMode === 'combined') {
+          const rotX = -rotMagVis * Math.sin(ang);
+          const rotY =  rotMagVis * Math.cos(ang);
+          const totalX = v + rotX;
+          const totalY = rotY;
+          p.stroke(150, 0, 200);
+          p.strokeWeight(3);
+          p.fill(150, 0, 200);
+          drawArrow(p, px, py, px + totalX * scale, py + totalY * scale);
+        }
+      }
+
+      // COM vectors (centre of mass at (wheel.x, wheelY))
+      const cx = wheel.x;
+      const cy = wheelY;
+
+      if (vectorMode === 'translation') {
+        // COM shows green only
+        p.stroke(0, 200, 0);
+        p.strokeWeight(3);
+        p.fill(0, 200, 0);
+        drawArrow(p, cx, cy, cx + v * scale, cy);
+      } else if (vectorMode === 'combined') {
+        // Rotation about COM => red at COM is zero; show purple (equals green length)
+        p.stroke(150, 0, 200);
+        p.strokeWeight(3);
+        p.fill(150, 0, 200);
+        drawArrow(p, cx, cy, cx + v * scale, cy);
+      }
+      // rotation-only: COM rotational velocity is zero -> no COM vector drawn
+
+      // Labels for combined pure rolling
+      if (vectorMode === 'combined') {
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.CENTER);
+        p.textSize(14);
+        p.text('2v', wheel.x, wheelY - wheel.radius - 20); // top
+        p.text('v = 0', wheel.x, groundY + 20);             // bottom
+        p.text('v_cm', wheel.x, wheelY - 10);               // centre
+      }
+    }
+
+    // Info
+    p.fill(0);
+    p.noStroke();
+    p.textAlign(p.LEFT, p.TOP);
+    p.textSize(14);
+    p.text(`Linear velocity (v): ${v.toFixed(1)} m/s`, 10, 10);
+    p.text(`Angular velocity (ω): ${omega.toFixed(2)} rad/s`, 10, 30);
+    p.text(
+      vectorMode === 'combined'
+        ? `Pure rolling: v = ωR ✔`
+        : vectorMode === 'translation'
+          ? `Mode: Pure Translation`
+          : vectorMode === 'rotation'
+            ? `Mode: Pure Rotation`
+            : `Mode: None`,
+      10, 50
+    );
+  };
+
+  // dashed helper
+  p.setLineDash = function (list) {
+    p.drawingContext.setLineDash(list);
+  };
+
+  function drawArrow(p, x1, y1, x2, y2) {
+    const len = p.dist(x1, y1, x2, y2);
+    if (len < 2) return;
+    p.line(x1, y1, x2, y2);
+    const ang = p.atan2(y2 - y1, x2 - x1);
+    const arrowSize = 6;
+    p.push();
+    p.translate(x2, y2);
+    p.rotate(ang);
+    p.triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
+    p.pop();
+  }
+};
+
+// ------------------------------
+// DOM wiring & UI
+// ------------------------------
+document.addEventListener('DOMContentLoaded', function () {
+  // p5 instances
+  frictionSim = new p5(frictionSketch);
+  rollingSim = new p5(rollingSketch);
+
+  // ------- Friction controls -------
+  const materialSelect = document.getElementById('materialSelect');
+  const customControls = document.getElementById('customControls');
+  const staticCoeff = document.getElementById('staticCoeff');
+  const kineticCoeff = document.getElementById('kineticCoeff');
+  const massSlider = document.getElementById('massSlider');
+  const forceSlider = document.getElementById('forceSlider');
+
+  materialSelect.addEventListener('change', function () {
+    if (this.value === 'custom') {
+      customControls.style.display = 'block';
+    } else {
+      customControls.style.display = 'none';
+      const material = materials[this.value];
+      if (material) {
+        muS = material.muS;
+        muK = material.muK;
+      }
+    }
+    resetBlock();
+  });
+
+  staticCoeff.addEventListener('input', function () {
+    muS = parseFloat(this.value);
+    document.getElementById('staticValue').textContent = muS.toFixed(2);
+    resetBlock();
+  });
+
+  kineticCoeff.addEventListener('input', function () {
+    muK = parseFloat(this.value);
+    document.getElementById('kineticValue').textContent = muK.toFixed(2);
+    resetBlock();
+  });
+
+  massSlider.addEventListener('input', function () {
+    block.mass = parseFloat(this.value);
+    document.getElementById('massValue').textContent = block.mass;
+    resetBlock();
+  });
+
+  forceSlider.addEventListener('input', function () {
+    appliedForce = parseFloat(this.value);
+    document.getElementById('forceValue').textContent = appliedForce.toFixed(1);
+  });
+
+  // ------- Rolling controls -------
+  const speedSlider = document.getElementById('speedSlider');
+  const vectorModeSelect = document.getElementById('vectorMode');
+  const showTraceCheck = document.getElementById('showTrace');
+
+  // Change the label to "Speed (v)" and add a dynamic helper note
+  const speedLabel = document.querySelector('label[for="speedSlider"]');
+  if (speedLabel) {
+    speedLabel.innerHTML = `Speed (v): <span id="speedValue">${wheel.speed.toFixed(1)}</span> <small id="speedNote" style="margin-left:8px;opacity:.7"></small>`;
+  }
+  function updateSpeedNote() {
+    const note = document.getElementById('speedNote');
+    if (!note) return;
+    if (vectorMode === 'rotation') {
+      note.textContent = '(controls ω via ω = v/R)';
+    } else if (vectorMode === 'translation') {
+      note.textContent = '(linear speed)';
+    } else if (vectorMode === 'combined') {
+      note.textContent = '(pure rolling: ω = v/R)';
+    } else {
+      note.textContent = '';
+    }
+  }
+  updateSpeedNote();
+
+  speedSlider.addEventListener('input', function () {
+    wheel.speed = parseFloat(this.value);
+    const valEl = document.getElementById('speedValue');
+    if (valEl) valEl.textContent = wheel.speed.toFixed(1);
+  });
+
+  vectorModeSelect.addEventListener('change', function () {
+    vectorMode = this.value;
+    updateSpeedNote();
+  });
+
+  // Change checkbox label text to "Edge point trace"
+  if (showTraceCheck) {
+    const showTraceLabel = showTraceCheck.closest('label');
+    if (showTraceLabel) {
+      // preserve the checkbox node; replace label text
+      const cb = showTraceCheck;
+      showTraceLabel.innerHTML = '';
+      showTraceLabel.appendChild(cb);
+      showTraceLabel.append(' Edge point trace');
+    }
+  }
+  showTraceCheck.addEventListener('change', function () {
+    showTrace = this.checked;
+    if (!showTrace) tracePoints = [];
+  });
+
+  // ------- Quiz -------
+  const quizBtn = document.getElementById('submit-quiz');
+  if (quizBtn) {
+    quizBtn.addEventListener('click', function () {
+      const answers = {
+        q1: 'b', // Surface asperities interlock
+        q2: 'c', // Contact point velocity is zero
+        q3: 'a', // μs = 60/(10×9.81) ≈ 0.61
+        q4: 'b', // Material deformation and hysteresis
+        q5: 'b'  // ω = v/R = 10/0.5 = 20 rad/s
+      };
+
+      let score = 0;
+      let feedback = '<h3>Quiz Results:</h3>';
+
+      for (const q in answers) {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        if (selected) {
+          if (selected.value === answers[q]) {
+            score++;
+            feedback += `<p>Question ${q.substring(1)}: Correct! ✓</p>`;
+          } else {
+            feedback += `<p>Question ${q.substring(1)}: Incorrect. The correct answer was ${answers[q]}. ✗</p>`;
+          }
+        } else {
+          feedback += `<p>Question ${q.substring(1)}: No answer selected. ✗</p>`;
+        }
+      }
+
+      feedback += `<p>Your score: ${score}/5</p>`;
+      const resultsDiv = document.getElementById('quiz-results');
+      resultsDiv.innerHTML = feedback;
+      resultsDiv.classList.remove('hidden');
+    });
+  }
+});
+
+// ------------------------------
+// Helpers
+// ------------------------------
+function resetBlock() {
+  block.x = 100;
+  block.y = 240;
+  block.velocity = 0;
+  block.isMoving = false;
+  appliedForce = 0;
+  const slider = document.getElementById('forceSlider');
+  const label = document.getElementById('forceValue');
+  if (slider) slider.value = 0;
+  if (label) label.textContent = '0';
+}
+
+function updateFrictionData(normalForce, maxStaticFriction, kineticFriction, currentFriction) {
+  document.getElementById('normalForce').textContent = normalForce.toFixed(1);
+  document.getElementById('maxStaticFriction').textContent = maxStaticFriction.toFixed(1);
+  document.getElementById('kineticFriction').textContent = kineticFriction.toFixed(1);
+  document.getElementById('currentFriction').textContent = currentFriction.toFixed(1);
+  const statusEl = document.getElementById('blockStatus');
+  statusEl.textContent = block.isMoving ? 'Moving' : 'Stationary';
+  statusEl.style.color = block.isMoving ? '#cc0000' : '#00cc00';
+  statusEl.style.fontWeight = 'bold';
+}
+
+// Toggle solution visibility
+function toggleSolution(id) {
+  const solution = document.getElementById(id);
+  if (!solution) return;
+  if (solution.classList.contains('hidden')) {
+    solution.classList.remove('hidden');
+    const toggleElement = solution.previousElementSibling;
+    if (toggleElement) toggleElement.textContent = 'Hide Solution';
+  } else {
+    solution.classList.add('hidden');
+    const toggleElement = solution.previousElementSibling;
+    if (toggleElement) toggleElement.textContent = 'Show Solution';
+  }
+}
+
+// MathJax configuration (kept simple)
+window.MathJax = window.MathJax || {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['\\[', '\\]']]
+  }
+};
+
+  </script>
+</body>
+</html>

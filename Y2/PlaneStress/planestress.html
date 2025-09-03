@@ -1,58 +1,490 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>2D STRESS TRANSFORMATION</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-<!--     <link rel="stylesheet" type="text/css" href="/assets/css/main.css"> -->
-
-    <!--HERE BE SCRIPTS-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plane Stress Transformations & Failure Criteria - Interactive Lecture</title>
     
-    <!--p5 library-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.10/addons/p5.dom.js"></script>
+    <!-- Import p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     
-    <!--Mathjs and MathJax library-->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
 
-    <!--Chart library-->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script> -->
+    <!-- Single JavaScript for both simulations -->
+    <script defer src="planestress.js"></script>
+    
+    <style>
+        /* Additional styles for this page */
+        .simulation-wrapper {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .controls-panel {
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+            color: #b38600;
+        }
+        
+        .control-group input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .control-group input[type="range"] {
+            width: 200px;
+            vertical-align: middle;
+        }
+        
+        .results-panel {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .stress-element {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .failure-criteria-chart {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        
+        /* Tab system for advanced topics */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ffd700;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button.active {
+            background-color: #ffd700;
+        }
+        
+        .tab-button:hover {
+            background-color: #ffb300;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .control-group label {
+                display: block;
+                margin-bottom: 5px;
+            }
+            
+            .control-group input[type="range"] {
+                width: 100%;
+            }
+        }
+/* Two-row layout for FAILURE CRITERIA controls */
+#failure-criteria-sketch + .controls-panel {
+  display: grid;
+  grid-template-columns: 200px repeat(2, minmax(160px, 1fr)); /* Label col + two control cols */
+  grid-auto-rows: auto;
+  column-gap: 18px;
+  row-gap: 12px;
+  align-items: end;  /* align inputs nicely with labels */
+}
 
-    <!--arnarrow function-->
-    <!--<script src="/Users/Arn/Dropbox/UCov/Applets/206MAE/PlaneStress/arrow.js" ></script>-->
+/* Place the two headings as row labels (left column) */
+#failure-criteria-sketch + .controls-panel h4:nth-of-type(1) { grid-column: 1; grid-row: 1; }
+#failure-criteria-sketch + .controls-panel h4:nth-of-type(2) { grid-column: 1; grid-row: 2; }
 
-    <!--the script-->
-    <script src="./planestress.js"></script>
+/* Place the 4 control groups into two rows, two columns */
+#failure-criteria-sketch + .controls-panel .control-group:nth-of-type(1) { grid-column: 2; grid-row: 1; } /* Yield */
+#failure-criteria-sketch + .controls-panel .control-group:nth-of-type(2) { grid-column: 3; grid-row: 1; } /* Ultimate */
+#failure-criteria-sketch + .controls-panel .control-group:nth-of-type(3) { grid-column: 2; grid-row: 2; } /* σ1 */
+#failure-criteria-sketch + .controls-panel .control-group:nth-of-type(4) { grid-column: 3; grid-row: 2; } /* σ2 */
 
-    <noscript> Sorry... JavaScript must be enabled. </noscript>
+/* Tidy up labels/inputs inside */
+#failure-criteria-sketch + .controls-panel .control-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0; /* override any vertical spacing */
+}
+#failure-criteria-sketch + .controls-panel .control-group label {
+  width: auto !important; /* don't force 120px in this panel */
+}
+
+/* Optional: small-screen fallback — stack vertically */
+@media (max-width: 600px) {
+  #failure-criteria-sketch + .controls-panel {
+    display: block;
+  }
+  #failure-criteria-sketch + .controls-panel .control-group {
+    display: block;
+    margin-bottom: 12px;
+  }
+}
+
+    </style>
 </head>
 
 <body>
     <header>
-        <h1>PLANE STRESS TRANSFORMATION</h1>
+        <h1>Plane Stress Transformations & Failure Criteria</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
-    <div id="sketch-holder">
-        <!-- Our sketch will go here! -->
+
+    <div class="content-section">
+        <h2>Understanding Stress Transformations</h2>
+        
+        <h3>The Reference Frame Problem</h3>
+        <p>When analysing stress at a point in a material, we represent it using an infinitesimal element. However, this element can be oriented in different directions, and the normal and shear stresses acting on its faces depend on the chosen reference frame. This dependency on orientation is not ideal for understanding the true stress state at a point.</p>
+        
+        <div class="key-point">
+            <p><strong>Key Insight:</strong> The stress state at a point is invariant, but its representation changes with the coordinate system. We need a way to describe stress that is independent of the reference frame.</p>
+        </div>
+
+        <h3>Principal Stresses and Directions</h3>
+        <div class="equation-box">
+            <p><strong>Definition:</strong> Principal stresses are the normal stresses that act on planes where the shear stress is zero. These represent the maximum and minimum normal stresses at a point.</p>
+            <p>For 2D stress state:</p>
+            <p>\(\sigma_{1,2} = \frac{\sigma_{xx} + \sigma_{yy}}{2} \pm \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\)</p>
+            <p>where \(\sigma_1 \geq \sigma_2\) by convention.</p>
+        </div>
+        
+        <p>The <strong>principal directions</strong> are the orientations of the planes on which these principal stresses act:</p>
+        <div class="equation-box">
+            <p>\(\tan(2\theta_p) = \frac{2\tau_{xy}}{\sigma_{xx} - \sigma_{yy}}\)</p>
+        </div>
+
+        <h3>Maximum In-Plane Shear Stress</h3>
+        <div class="equation-box">
+            <p><strong>Definition:</strong> The maximum in-plane shear stress occurs on planes oriented at 45° to the principal planes.</p>
+            <p>\(\tau_{max} = \frac{\sigma_1 - \sigma_2}{2} = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\)</p>
+            <p>The orientation of maximum shear planes:</p>
+            <p>\(\tan(2\theta_s) = -\frac{\sigma_{xx} - \sigma_{yy}}{2\tau_{xy}}\)</p>
+        </div>
     </div>
-    <h2>HOW TO PLAY: </h2>
-    <p>Input the initial stress state using the input boxes in the lower-left corner.
-        <br> The slider controls the orientation of the infinitesimal.
-        <br> The Mohr's circle on the right shows the principal axis and stresses in blue.
-        <br> The max shear axis and stress are shown in green.
-        <br> The red line on the Mohr's circle represents the initial stress state.
-        <br> The gray line represents the current orientation and its stress state.
-        <br>
-    </p>
-    <!-- <p>Ciao mondo! This is Arn.</p>
-      <div id="div1"><br>I want to be $\sqrt{\int^{2\pi}_\pi \frac{t^2}{2}\mathrm{d}t+b^2-\sqrt{\sin(x)}}$<br><br><br> </div>
-      <div id="div2"><br>HELLO ARNALDO HERE<br><br><br> </div> -->
+
+    <div class="content-section">
+        <h2>Mohr's Circle</h2>
+        <p>Mohr's circle is a graphical representation of the stress transformation equations. It provides a visual way to determine stresses on any plane and to find principal stresses and maximum shear stress.</p>
+        
+        <h3>Steps to Construct Mohr's Circle</h3>
+        <ol>
+            <li><strong>Establish axes:</strong> Draw horizontal axis for normal stress (σ) and vertical axis for shear stress (τ)</li>
+            <li><strong>Plot initial points:</strong> 
+                <ul>
+                    <li>Point A: (\(\sigma_{xx}\), \(\tau_{xy}\))</li>
+                    <li>Point B: (\(\sigma_{yy}\), -\(\tau_{xy}\))</li>
+                </ul>
+            </li>
+            <li><strong>Find centre:</strong> Centre C is at \(\left(\frac{\sigma_{xx} + \sigma_{yy}}{2}, 0\right)\)</li>
+            <li><strong>Draw circle:</strong> Draw a circle with centre C passing through points A and B</li>
+            <li><strong>Identify key points:</strong>
+                <ul>
+                    <li>Principal stresses: Intersections with horizontal axis</li>
+                    <li>Maximum shear stress: Top and bottom of circle</li>
+                </ul>
+            </li>
+            <li><strong>Determine angles:</strong> Angles on Mohr's circle are twice the physical angles</li>
+        </ol>
+    </div>
+
+    <div class="simulation-wrapper">
+        <h2>Interactive Stress Transformation Simulation</h2>
+        <p>Explore how stress components change with orientation. The left panel shows the stress element, while the right panel displays the corresponding Mohr's circle.</p>
+        
+        <div id="stress-transform-sketch">
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Failure Criteria</h2>
+        <p>When testing materials, we typically obtain a single failure stress value (yield stress for ductile materials, ultimate stress for brittle materials) from a uniaxial tensile test. However, real components experience complex multiaxial stress states. Failure criteria allow us to convert these complex stress states into an equivalent stress that can be compared with the material's failure stress.</p>
+        
+        <h3>Factor of Safety</h3>
+        <div class="equation-box">
+            <p><strong>Definition:</strong> The factor of safety (FS) is the ratio of the material's failure stress to the equivalent stress:</p>
+            <p>\(FS = \frac{\sigma_{failure}}{\sigma_{equivalent}}\)</p>
+            <p>A component is considered safe if FS > 1 (typically FS ≥ 1.5-3 for design)</p>
+        </div>
+
+        <h3>1. Rankine Criterion (Maximum Principal Stress)</h3>
+        <div class="equation-box">
+            <p><strong>Application:</strong> Brittle materials</p>
+            <p><strong>Theory:</strong> Failure occurs when the maximum principal stress reaches the material's ultimate tensile or compressive strength.</p>
+            <p>For tensile failure: \(\sigma_1 = \sigma_{ut}\)</p>
+            <p>For compressive failure: \(|\sigma_2| = \sigma_{uc}\)</p>
+            <p><strong>Equivalent stress:</strong> \(\sigma_{eq} = \max(\sigma_1, |\sigma_2|)\)</p>
+        </div>
+
+        <h3>2. Tresca Criterion (Maximum Shear Stress)</h3>
+        <div class="equation-box">
+            <p><strong>Application:</strong> Ductile materials</p>
+            <p><strong>Theory:</strong> Yielding occurs when the maximum shear stress reaches the shear yield strength.</p>
+            <p>For plane stress: \(\tau_{max} = \frac{\sigma_1 - \sigma_2}{2} = \frac{\sigma_y}{2}\)</p>
+            <p><strong>Equivalent stress:</strong> \(\sigma_{eq} = \sigma_1 - \sigma_2\)</p>
+        </div>
+
+        <h3>3. Von Mises Criterion (Maximum Distortion Energy)</h3>
+        <div class="equation-box">
+            <p><strong>Application:</strong> Ductile materials</p>
+            <p><strong>Theory:</strong> Yielding occurs when the distortion energy reaches a critical value.</p>
+            <p>For plane stress: \(\sigma_{eq} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2}\)</p>
+            <p>Or in terms of stress components:</p>
+            <p>\(\sigma_{eq} = \sqrt{\sigma_{xx}^2 - \sigma_{xx}\sigma_{yy} + \sigma_{yy}^2 + 3\tau_{xy}^2}\)</p>
+        </div>
+    </div>
+
+    <div class="simulation-wrapper">
+        <h2>Failure Criteria Visualisation</h2>
+        <p>This diagram shows the failure envelopes for different criteria on the principal stress plane. Points inside the envelope are safe; points on or outside indicate failure.</p>
+        
+        <div id="failure-criteria-sketch"></div>
+        
+        <div class="controls-panel">
+            <h4>Material Properties</h4>
+            <div class="control-group">
+                <label for="yield-stress">Yield Stress (MPa):</label>
+                <input type="number" id="yield-stress" min="100", max="500" value="250" step="10">
+            </div>
+            <div class="control-group">
+                <label for="ultimate-tensile">Ultimate Tensile (MPa):</label>
+                <input type="number" id="ultimate-tensile" min="200" max="600" value="400" step="10">
+            </div>
+            
+            <h4>Test Stress State</h4>
+            <div class="control-group">
+                <label for="test-s1">σ₁ (MPa):</label>
+                <input type="number" id="test-s1" value="150" step="10">
+            </div>
+            <div class="control-group">
+                <label for="test-s2">σ₂ (MPa):</label>
+                <input type="number" id="test-s2" value="50" step="10">
+            </div>
+        </div>
+        
+        <div class="results-panel">
+            <h4>Safety Factors</h4>
+            <p><strong>Rankine (Brittle):</strong> FS = <span id="fs-rankine">2.67</span></p>
+            <p><strong>Tresca (Ductile):</strong> FS = <span id="fs-tresca">2.50</span></p>
+            <p><strong>Von Mises (Ductile):</strong> FS = <span id="fs-vonmises">1.93</span></p>
+            <p id="safety-status" style="font-weight: bold; color: green;">Component is SAFE</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Advanced Topics</h2>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'mohr3d')">3D Mohr's Circles</button>
+            <button class="tab-button" onclick="openTab(event, 'vonmises-derivation')">Von Mises Derivation</button>
+        </div>
+        
+        <div id="mohr3d" class="tab-content active">
+            <h3>Mohr's Circles for 3D Stress State</h3>
+            <p>For a three-dimensional stress state with principal stresses σ₁ ≥ σ₂ ≥ σ₃, we have three Mohr's circles:</p>
+            
+            <div class="equation-box">
+                <p><strong>Circle 1:</strong> Between σ₂ and σ₃ (centre at \(\frac{\sigma_2 + \sigma_3}{2}\), radius \(\frac{\sigma_2 - \sigma_3}{2}\))</p>
+                <p><strong>Circle 2:</strong> Between σ₁ and σ₃ (centre at \(\frac{\sigma_1 + \sigma_3}{2}\), radius \(\frac{\sigma_1 - \sigma_3}{2}\))</p>
+                <p><strong>Circle 3:</strong> Between σ₁ and σ₂ (centre at \(\frac{\sigma_1 + \sigma_2}{2}\), radius \(\frac{\sigma_1 - \sigma_2}{2}\))</p>
+            </div>
+            
+            <p>The absolute maximum shear stress is:</p>
+            <div class="equation-box">
+                <p>\(\tau_{max,abs} = \frac{\sigma_1 - \sigma_3}{2}\)</p>
+            </div>
+            
+            <p>This occurs on planes inclined at 45° to the σ₁ and σ₃ directions.</p>
+        </div>
+        
+        <div id="vonmises-derivation" class="tab-content">
+            <h3>Mathematical Derivation of Von Mises Criterion</h3>
+            <p>The Von Mises criterion is based on the distortion energy theory. Here's the mathematical derivation:</p>
+            
+            <h4>Step 1: Total Strain Energy</h4>
+            <div class="equation-box">
+                <p>The total strain energy density in a material is:</p>
+                <p>\(U = \frac{1}{2E}[\sigma_1^2 + \sigma_2^2 + \sigma_3^2 - 2\nu(\sigma_1\sigma_2 + \sigma_2\sigma_3 + \sigma_3\sigma_1)]\)</p>
+            </div>
+            
+            <h4>Step 2: Hydrostatic and Deviatoric Components</h4>
+            <div class="equation-box">
+                <p>Decompose stress into hydrostatic (volumetric) and deviatoric (distortional) parts:</p>
+                <p>Hydrostatic stress: \(\sigma_h = \frac{\sigma_1 + \sigma_2 + \sigma_3}{3}\)</p>
+                <p>Deviatoric stresses: \(\sigma'_i = \sigma_i - \sigma_h\)</p>
+            </div>
+            
+            <h4>Step 3: Distortion Energy</h4>
+            <div class="equation-box">
+                <p>The distortion energy density is:</p>
+                <p>\(U_d = \frac{1+\nu}{3E}[(\sigma_1 - \sigma_2)^2 + (\sigma_2 - \sigma_3)^2 + (\sigma_3 - \sigma_1)^2]\)</p>
+            </div>
+            
+            <h4>Step 4: Failure Criterion</h4>
+            <div class="equation-box">
+                <p>For uniaxial tension at yield: \(\sigma_1 = \sigma_y\), \(\sigma_2 = \sigma_3 = 0\)</p>
+                <p>Therefore: \(U_{d,yield} = \frac{1+\nu}{3E} \cdot 2\sigma_y^2\)</p>
+                <p>Setting \(U_d = U_{d,yield}\) gives the Von Mises criterion:</p>
+                <p>\(\sqrt{\frac{1}{2}[(\sigma_1 - \sigma_2)^2 + (\sigma_2 - \sigma_3)^2 + (\sigma_3 - \sigma_1)^2]} = \sigma_y\)</p>
+            </div>
+            
+            <h4>Plane Stress Simplification</h4>
+            <div class="equation-box">
+                <p>For plane stress (\(\sigma_3 = 0\)):</p>
+                <p>\(\sigma_{VM} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2}\)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Principal Stress Calculation</h3>
+            <p>A stress element has σ<sub>xx</sub> = 80 MPa, σ<sub>yy</sub> = 20 MPa, and τ<sub>xy</sub> = 30 MPa. Calculate:</p>
+            <ol>
+                <li>Principal stresses σ₁ and σ₂</li>
+                <li>Principal angle θ<sub>p</sub></li>
+                <li>Maximum shear stress τ<sub>max</sub></li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Average stress: σ<sub>avg</sub> = (80 + 20)/2 = 50 MPa</p>
+                <p>Radius: R = √[(80-20)/2]² + 30²] = √[900 + 900] = 42.43 MPa</p>
+                <p>σ₁ = 50 + 42.43 = 92.43 MPa</p>
+                <p>σ₂ = 50 - 42.43 = 7.57 MPa</p>
+                <p>tan(2θ<sub>p</sub>) = 2(30)/(80-20) = 1</p>
+                <p>θ<sub>p</sub> = 22.5°</p>
+                <p>τ<sub>max</sub> = 42.43 MPa</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 2: Failure Analysis</h3>
+            <p>A component made of steel (σ<sub>y</sub> = 300 MPa) has principal stresses σ₁ = 200 MPa and σ₂ = -100 MPa. Calculate the factor of safety using:</p>
+            <ol>
+                <li>Tresca criterion</li>
+                <li>Von Mises criterion</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Tresca:</strong></p>
+                <p>σ<sub>eq</sub> = σ₁ - σ₂ = 200 - (-100) = 300 MPa</p>
+                <p>FS = 300/300 = 1.0</p>
+                <p><strong>Von Mises:</strong></p>
+                <p>σ<sub>eq</sub> = √[200² - 200(-100) + (-100)²]</p>
+                <p>σ<sub>eq</sub> = √[40000 + 20000 + 10000] = √70000 = 264.58 MPa</p>
+                <p>FS = 300/264.58 = 1.13</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Stress transformation:</strong> Stress components change with coordinate system rotation, but the stress state itself is invariant</li>
+                <li><strong>Principal stresses:</strong> Maximum and minimum normal stresses occur on planes with zero shear stress</li>
+                <li><strong>Mohr's circle:</strong> Graphical tool for visualising stress transformations and finding principal values</li>
+                <li><strong>Failure criteria:</strong> Different theories for predicting failure based on material behaviour:
+                    <ul>
+                        <li>Rankine: Brittle materials (maximum principal stress)</li>
+                        <li>Tresca: Ductile materials (maximum shear stress)</li>
+                        <li>Von Mises: Ductile materials (distortion energy)</li>
+                    </ul>
+                </li>
+                <li><strong>Factor of safety:</strong> Design parameter ensuring components operate below failure conditions</li>
+            </ol>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+    
+    <script>
+        // Tab functionality
+        function openTab(evt, tabName) {
+            var i, tabContent, tabButtons;
+            
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].classList.remove("active");
+            }
+            
+            tabButtons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Solution toggle
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            if (solution.classList.contains('hidden')) {
+                solution.classList.remove('hidden');
+                solution.previousElementSibling.textContent = "Hide Solution";
+            } else {
+                solution.classList.add('hidden');
+                solution.previousElementSibling.textContent = "Show Solution";
+            }
+        }
+    </script>
 </body>
-
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
-
 </html>

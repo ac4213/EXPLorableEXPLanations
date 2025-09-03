@@ -698,9 +698,9 @@ function createBendingSketch() {
       const dir = FN >= 0 ? 1 : -1;
       p.push();
       p.stroke(0); p.fill(0); p.strokeWeight(2);
-      drawArrow(xTip, yTop - 6, xTip, yTop - 6 + dir * len, 9);
+      drawArrow(xTip, yTop, xTip, yTop + dir * len, 9);
       p.noStroke(); p.fill(0); p.textAlign(p.LEFT, p.CENTER);
-      p.text(`${FkN.toFixed(1)} kN`, xTip + 8, yTop - 6 + dir * len * 0.5);
+      p.text(`${FkN.toFixed(0)} kN`, xTip + 8, yTop - 6 + dir * len * 0.5);
       p.pop();
 
       // Position marker + small square
@@ -777,7 +777,7 @@ function createBendingSketch() {
         const sgn = Math.sign(sig);
         p.push();
         p.stroke(...RED); p.fill(...RED); p.strokeWeight(1.6);
-        if (sgn >= 0) drawArrow(xMid, yy, xMid + mag, yy, 7);
+        if (sgn <= 0) drawArrow(xMid, yy, xMid + mag, yy, 7);
         else          drawArrow(xMid, yy, xMid - mag, yy, 7);
         p.pop();
       }
@@ -789,7 +789,7 @@ function createBendingSketch() {
       for (let i = 0; i <= 120; i++) {
         const t = i / 120;
         const yFromTop_m = props.h * t;
-        const sig = sigma(Mx, yFromTop_m - props.yc, I);
+        const sig = sigma(-Mx, yFromTop_m - props.yc, I);
         const yy  = yTopPx + yFromTop_m * PX_PER_M;
         const xOff = sig * stressArrowScale;
         p.vertex(xMid + xOff, yy);
@@ -869,7 +869,7 @@ function createBendingSketch() {
 
       p.push();
       p.stroke(...RED); p.fill(...RED); p.strokeWeight(2);
-      if (sgn >= 0) {
+      if (sgn <= 0) {
         drawArrow(ex + eSize / 2, ey, ex + eSize / 2 + mag, ey, 9);
         drawArrow(ex - eSize / 2, ey, ex - eSize / 2 - mag, ey, 9);
       } else {

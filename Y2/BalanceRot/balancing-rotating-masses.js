@@ -1,1313 +1,1286 @@
-// Global variables for both simulations
-let isInitialized = false;
-let singleSimulation = {
-    rpm: 0,
-    angle: 0,
-    isPaused: false,
-    unbalance: { mass: 50, radius: 60, angle: 0 },
-    balance: { mass: 0, radius: 60, angle: 180, enabled: false },
-    totalForce: 0,
-    vibrationX: 0,
-    vibrationY: 0
+
+/* balancing-rotating-masses.js
+ * Enhanced version with gravity equilibrium, balancing calculations, and vibration
+ * Wired angle sliders; dashed 0° reference that ROTATES with rotor; auto-remove balance on any non-RPM input change
+ * British English spelling and comments throughout
+ */
+
+/* -----------------------------------------------------------
+   Global parameters and state
+----------------------------------------------------------- */
+let timeScale = 1;
+const SLOWMO_SCALE = 0.15;
+const GRAVITY_DAMPING = 0.95; // Damping for settling to equilibrium
+const MR_FIXED_SCALE = 0.2; // pixels per (gmm) for Single MR polygon
+const FORCE_FIXED_SCALE = 0.004; // pixels per (gmmrad^2) for Forces & Reactions
+const MR_MULTI_FIXED_SCALE  = 0.02;   // pixels per (gmm) for Multi MR polygon
+const MRL_MULTI_FIXED_SCALE = 0.0001; // pixels per (gmm) for Multi MRL polygon
+let singlePaused = false; // shared pause state for all single-plane canvases
+let multiPaused  = false; // shared pause state for all multi-plane canvases
+
+const colours = {
+  red:    [220, 60, 60],
+  blue:   [20, 120, 255],
+  orange: [255, 140, 0],
+  green:  [40, 170, 40],
+  gray:   [120, 120, 120],
+  purple: [150, 50, 200],
 };
 
-let multiSimulation = {
-    rpm: 0,
-    angle: 0,
-    isPaused: false,
-    unbalances: [
-        { mass: 50, radius: 60, position: 25, angle: 0, color: [255, 0, 0] },
-        { mass: 30, radius: 80, position: 50, angle: 120, color: [0, 100, 255] },
-        { mass: 40, radius: 50, position: 75, angle: 240, color: [255, 150, 0] }
-    ],
-    balances: [
-        { mass: 0, radius: 60, position: 10, angle: 0, enabled: false },
-        { mass: 0, radius: 60, position: 90, angle: 0, enabled: false }
-    ],
-    totalForce: { x: 0, y: 0 },
-    totalMoment: 0,
-    leftBearing: 0,
-    rightBearing: 0,
-    vibrationX: 0,
-    vibrationY: 0
+/* -----------------------------------------------------------
+   Helpers: angles + dashed ray
+----------------------------------------------------------- */
+const deg2rad = d => (d * Math.PI) / 180;
+const rad2deg = r => (r * 180) / Math.PI;
+const normAngRad = r => {
+  let a = r % (2*Math.PI);
+  if (a < 0) a += 2*Math.PI;
+  return a;
 };
 
-// Shaft parameters
-const SHAFT_LENGTH = 400;
-const SHAFT_DIAMETER = 30;
+function dashedZeroRay(p, len, thetaRad) {
+  p.push();
+  p.rotate(thetaRad);                 // spin with the rotor/body
+  p.stroke(120);
+  p.strokeWeight(1.5);
+  p.drawingContext.setLineDash([6, 6]);
+  p.line(0, 0, len, 0);               // 0° is +x in the body frame
+  p.drawingContext.setLineDash([]);
+  p.pop();
+}
 
-// P5.js sketches
-let singleSideView, singleFrontView, singleMRDiagram, singleForceDiagram;
-let multiSideView, multiFrontView, multiMRDiagram, multiMRLDiagram;
+/* -----------------------------------------------------------
+   Parameters
+----------------------------------------------------------- */
+// Single plane parameters
+const singleParams = {
+  omega: 0,
+  radius_mm: 60,
+  mass_g: 50,
+  rotorRadius_mm: 110,
+  isBalanced: false,
+  balanceMass_g: 0,
+  balanceRadius_mm: 80,
+  balanceAngle: 0,
+  equilibriumAngle: 0,
+  angularVel: 0, // For gravity settling
+};
+const SINGLE_DEFAULTS = { 
+  rpm: 0,
+  mass_g: singleParams.mass_g,
+  radius_mm: singleParams.radius_mm,
+  balanceRadius_mm: singleParams.balanceRadius_mm,
+  balanceAngle: Math.PI,
+  isBalanced: false
+};
 
-function setup() {
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeSimulations);
-    } else {
-        initializeSimulations();
+// Multi-plane parameters
+const multiParams = {
+  omega: 0,
+  shaftHalfLen_mm: 220,
+  rotorRadius_mm: 120,
+  isBalanced: false,
+  masses: [
+    { id: 1, m_g: 50, r_mm: 60, posPct: 25, colour: colours.red,    phase: 0 },
+    { id: 2, m_g: 30, r_mm: 80, posPct: 50, colour: colours.blue,   phase: Math.PI/3 },
+    { id: 3, m_g: 40, r_mm: 50, posPct: 75, colour: colours.orange, phase: 2*Math.PI/3 },
+  ],
+  // Planes at 10% (L) and 90% (M)
+  balanceMasses: [
+    { plane: 'L', posPct: 10, m_g: 0, r_mm: 80, angle: 0, colour: colours.green },
+    { plane: 'M', posPct: 90, m_g: 0, r_mm: 80, angle: 0, colour: colours.green },
+  ],
+  equilibriumAngle: 0,
+  angularVel: 0,
+};
+const MULTI_DEFAULTS = {
+  rpm: 0,
+  isBalanced: false,
+  rotorRadius_mm: multiParams.rotorRadius_mm,
+  shaftHalfLen_mm: multiParams.shaftHalfLen_mm,
+  masses: JSON.parse(JSON.stringify(multiParams.masses)),
+  balanceMasses: JSON.parse(JSON.stringify(multiParams.balanceMasses)),
+};
+
+/* -----------------------------------------------------------
+   DOM helpers
+----------------------------------------------------------- */
+const $ = (id) => document.getElementById(id);
+
+function updateSlowmoLabel(id) {
+  const el = $(id);
+  if (el) el.textContent = timeScale !== 1 ? 'Slow-mo: ON' : 'Slow-mo';
+}
+
+function updateBalanceLabel(id, balanced) {
+  const el = $(id);
+  if (el) el.textContent = balanced ? 'Remove Balance' : 'Apply Balance';
+}
+
+function measureBox(parentEl, aspect = 0.62, minH = 300) {
+  const w = parentEl?.clientWidth || 600;
+  const h = Math.max(minH, Math.floor(w * aspect));
+  return { w, h };
+}
+
+function bindRangeNumber(rangeId, numberId, onChange) {
+  const rng = $(rangeId);
+  const num = $(numberId);
+  if (!rng || !num) return;
+  const apply = (val) => { rng.value = String(val); num.value = String(val); onChange(Number(val)); };
+  rng.addEventListener('input', e => apply(e.target.value));
+  num.addEventListener('input', e => apply(e.target.value));
+  // initialise
+  apply(rng.value);
+}
+
+/* -----------------------------------------------------------
+   Balancing calculations
+----------------------------------------------------------- */
+function calculateSingleCentreOfMass() {
+  if (singleParams.isBalanced) return 0;
+  return 0;
+}
+
+function calculateMultiCentreOfMass(theta) {
+  let totalMx = 0, totalMy = 0;
+  for (const m of multiParams.masses) {
+    const angle = theta + m.phase;
+    totalMx += m.m_g * m.r_mm * Math.cos(angle);
+    totalMy += m.m_g * m.r_mm * Math.sin(angle);
+  }
+  if (multiParams.isBalanced) {
+    for (const bm of multiParams.balanceMasses) {
+      totalMx += bm.m_g * bm.r_mm * Math.cos(theta + bm.angle);
+      totalMy += bm.m_g * bm.r_mm * Math.sin(theta + bm.angle);
     }
+  }
+  return Math.atan2(totalMy, totalMx);
 }
-
-function initializeSimulations() {
-    // Prevent multiple initialization
-    if (isInitialized) return;
-    isInitialized = true;
-    
-    // Create single plane simulation views
-    createSingleSideView();
-    createSingleFrontView();
-    createSingleMRDiagram();
-    createSingleForceDiagram();
-    
-    // Create multi-plane simulation views
-    createMultiSideView();
-    createMultiFrontView();
-    createMultiMRDiagram();
-    createMultiMRLDiagram();
-    
-    // Setup control listeners
-    setupSingleControls();
-    setupMultiControls();
-}
-
-// Start setup when script loads
-setup();
-
-// ========== SINGLE PLANE SIMULATION ==========
-
-function createSingleSideView() {
-    singleSideView = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('single-side-view');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('single-side-view');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Apply vibration if unbalanced and rotating
-            if (!singleSimulation.balance.enabled && singleSimulation.rpm > 0) {
-                p.translate(singleSimulation.vibrationX * 5, singleSimulation.vibrationY * 5);
-            }
-            
-            // Draw shaft
-            p.fill(180);
-            p.stroke(100);
-            p.strokeWeight(2);
-            let shaftDrawLength = p.width * 0.7;
-            p.rect(-shaftDrawLength/2, -SHAFT_DIAMETER/2, shaftDrawLength, SHAFT_DIAMETER);
-            
-            // Draw bearings
-            p.fill(100);
-            p.noStroke();
-            p.rect(-shaftDrawLength/2 - 20, -SHAFT_DIAMETER, 20, SHAFT_DIAMETER * 2);
-            p.rect(shaftDrawLength/2, -SHAFT_DIAMETER, 20, SHAFT_DIAMETER * 2);
-            
-            // Draw unbalance mass (always at centre for single plane)
-            p.fill(255, 0, 0, 200);
-            let massSize = p.map(singleSimulation.unbalance.mass, 0, 200, 15, 40);
-            p.ellipse(0, 0, massSize, massSize);
-            
-            // Draw balance mass if enabled
-            if (singleSimulation.balance.enabled) {
-                p.fill(0, 255, 0, 200);
-                let balanceSize = p.map(singleSimulation.balance.mass, 0, 200, 15, 40);
-                p.ellipse(0, 0, balanceSize, balanceSize);
-            }
-            
-            // Labels
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('Side View', 0, -p.height/2 + 30);
-            
-            // Show position markers
-            p.stroke(150);
-            p.strokeWeight(1);
-            p.line(-shaftDrawLength/2, SHAFT_DIAMETER/2 + 10, shaftDrawLength/2, SHAFT_DIAMETER/2 + 10);
-            p.text('0%', -shaftDrawLength/2, SHAFT_DIAMETER/2 + 25);
-            p.text('50%', 0, SHAFT_DIAMETER/2 + 25);
-            p.text('100%', shaftDrawLength/2, SHAFT_DIAMETER/2 + 25);
-        };
-    });
-}
-
-function createSingleFrontView() {
-    singleFrontView = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('single-front-view');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('single-front-view');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Update rotation
-            if (!singleSimulation.isPaused) {
-                updateSingleRotation(p);
-            }
-            
-            // Apply vibration
-            if (!singleSimulation.balance.enabled && singleSimulation.rpm > 0) {
-                p.translate(singleSimulation.vibrationX * 10, singleSimulation.vibrationY * 10);
-            }
-            
-            // Draw shaft circle
-            p.fill(180);
-            p.stroke(100);
-            p.strokeWeight(2);
-            let shaftRadius = SHAFT_DIAMETER * 2;
-            p.ellipse(0, 0, shaftRadius * 2, shaftRadius * 2);
-            
-            // Draw reference line
-            p.stroke(0);
-            p.strokeWeight(1);
-            p.line(shaftRadius, 0, shaftRadius + 20, 0);
-            
-            // Rotate for animation
-            p.push();
-            p.rotate(singleSimulation.angle);
-            
-            // Draw unbalance mass
-            p.push();
-            p.rotate(p.radians(singleSimulation.unbalance.angle));
-            p.translate(singleSimulation.unbalance.radius, 0);
-            p.fill(255, 0, 0);
-            p.noStroke();
-            let massSize = p.map(singleSimulation.unbalance.mass, 0, 200, 10, 30);
-            p.ellipse(0, 0, massSize, massSize);
-            p.pop();
-            
-            // Draw connection line to unbalance
-            p.stroke(255, 0, 0, 100);
-            p.strokeWeight(2);
-            p.push();
-            p.rotate(p.radians(singleSimulation.unbalance.angle));
-            p.line(0, 0, singleSimulation.unbalance.radius, 0);
-            p.pop();
-            
-            // Draw balance mass if enabled
-            if (singleSimulation.balance.enabled) {
-                p.push();
-                p.rotate(p.radians(singleSimulation.balance.angle));
-                p.translate(singleSimulation.balance.radius, 0);
-                p.fill(0, 255, 0);
-                p.noStroke();
-                let balanceSize = p.map(singleSimulation.balance.mass, 0, 200, 10, 30);
-                p.ellipse(0, 0, balanceSize, balanceSize);
-                p.pop();
-                
-                // Draw connection line to balance
-                p.stroke(0, 255, 0, 100);
-                p.strokeWeight(2);
-                p.push();
-                p.rotate(p.radians(singleSimulation.balance.angle));
-                p.line(0, 0, singleSimulation.balance.radius, 0);
-                p.pop();
-            }
-            
-            p.pop(); // End rotation
-            
-            // Draw labels
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('Front View', 0, -p.height/2 + 30);
-            p.text(`Angle: ${(singleSimulation.angle * 180/Math.PI).toFixed(0)}°`, 0, p.height/2 - 20);
-        };
-    });
-}
-
-function createSingleMRDiagram() {
-    singleMRDiagram = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('single-mr-diagram');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('single-mr-diagram');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Draw axes
-            p.stroke(200);
-            p.strokeWeight(1);
-            p.line(-p.width/2 + 30, 0, p.width/2 - 30, 0);
-            p.line(0, -p.height/2 + 30, 0, p.height/2 - 30);
-            
-            // Calculate MR vectors
-            let scale = 0.015;
-            let vectors = [];
-            
-            // Unbalance vector
-            let mr = singleSimulation.unbalance.mass * singleSimulation.unbalance.radius;
-            let vecAngle = singleSimulation.unbalance.angle * Math.PI/180 + singleSimulation.angle;
-            vectors.push({
-                x: mr * Math.cos(vecAngle) * scale,
-                y: mr * Math.sin(vecAngle) * scale,
-                color: [255, 0, 0],
-                label: 'Unbalance'
-            });
-            
-            // Balance vector if enabled
-            if (singleSimulation.balance.enabled) {
-                mr = singleSimulation.balance.mass * singleSimulation.balance.radius;
-                vecAngle = singleSimulation.balance.angle * Math.PI/180 + singleSimulation.angle;
-                vectors.push({
-                    x: mr * Math.cos(vecAngle) * scale,
-                    y: mr * Math.sin(vecAngle) * scale,
-                    color: [0, 255, 0],
-                    label: 'Balance'
-                });
-            }
-            
-            // Draw vector polygon
-            p.stroke(100);
-            p.strokeWeight(2);
-            p.noFill();
-            p.beginShape();
-            p.vertex(0, 0);
-            let currentX = 0, currentY = 0;
-            vectors.forEach(v => {
-                currentX += v.x;
-                currentY += v.y;
-                p.vertex(currentX, currentY);
-            });
-            p.endShape();
-            
-            // Draw individual vectors
-            currentX = 0;
-            currentY = 0;
-            vectors.forEach(v => {
-                p.stroke(v.color[0], v.color[1], v.color[2]);
-                p.strokeWeight(3);
-                p.line(currentX, currentY, currentX + v.x, currentY + v.y);
-                
-                // Draw arrowhead
-                p.push();
-                p.translate(currentX + v.x, currentY + v.y);
-                p.rotate(p.atan2(v.y, v.x));
-                p.line(0, 0, -8, -4);
-                p.line(0, 0, -8, 4);
-                p.pop();
-                
-                currentX += v.x;
-                currentY += v.y;
-            });
-            
-            // Draw resultant (closing vector)
-            if (Math.abs(currentX) > 0.1 || Math.abs(currentY) > 0.1) {
-                p.stroke(255, 0, 255);
-                p.strokeWeight(3);
-                p.line(currentX, currentY, 0, 0);
-                
-                // Arrowhead
-                p.push();
-                p.translate(0, 0);
-                p.rotate(p.atan2(-currentY, -currentX));
-                p.line(0, 0, -8, -4);
-                p.line(0, 0, -8, 4);
-                p.pop();
-                
-                // Label
-                p.fill(255, 0, 255);
-                p.noStroke();
-                p.textAlign(p.CENTER);
-                p.text('Resultant', currentX/2, currentY/2 - 10);
-            }
-            
-            // Title
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('MR Polygon (g·mm)', 0, -p.height/2 + 30);
-        };
-    });
-}
-
-function createSingleForceDiagram() {
-    singleForceDiagram = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('single-force-diagram');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('single-force-diagram');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Calculate forces
-            updateSingleForces();
-            
-            // Draw shaft representation
-            p.stroke(100);
-            p.strokeWeight(3);
-            let shaftDrawLength = p.width * 0.7;
-            p.line(-shaftDrawLength/2, 0, shaftDrawLength/2, 0);
-            
-            // Draw bearings
-            p.fill(100);
-            p.noStroke();
-            p.triangle(-shaftDrawLength/2 - 10, 10, -shaftDrawLength/2, 0, -shaftDrawLength/2 + 10, 10);
-            p.triangle(shaftDrawLength/2 - 10, 10, shaftDrawLength/2, 0, shaftDrawLength/2 + 10, 10);
-            
-            // Draw centrifugal force
-            if (singleSimulation.totalForce > 0.1) {
-                let forceScale = Math.min(50, singleSimulation.totalForce * 2);
-                let forceAngle = singleSimulation.unbalance.angle * Math.PI/180 + singleSimulation.angle;
-                
-                // Force vector at centre
-                p.stroke(255, 0, 0);
-                p.strokeWeight(3);
-                let fx = Math.cos(forceAngle) * forceScale;
-                let fy = Math.sin(forceAngle) * forceScale;
-                p.line(0, 0, fx, fy);
-                
-                // Arrowhead
-                p.push();
-                p.translate(fx, fy);
-                p.rotate(p.atan2(fy, fx));
-                p.line(0, 0, -8, -4);
-                p.line(0, 0, -8, 4);
-                p.pop();
-                
-                // Reaction forces at bearings (simplified - equal and opposite)
-                p.stroke(255, 0, 255);
-                p.strokeWeight(2);
-                p.line(-shaftDrawLength/2, 0, -shaftDrawLength/2 - fx/2, -fy/2);
-                p.line(shaftDrawLength/2, 0, shaftDrawLength/2 - fx/2, -fy/2);
-            }
-            
-            // Labels
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('Forces & Reactions', 0, -p.height/2 + 30);
-            p.text(`Force: ${singleSimulation.totalForce.toFixed(1)} N`, 0, p.height/2 - 20);
-        };
-    });
-}
-
-// ========== MULTI-PLANE SIMULATION ==========
-
-function createMultiSideView() {
-    multiSideView = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('multi-side-view');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('multi-side-view');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Apply vibration if unbalanced
-            if (!multiSimulation.balances[0].enabled && !multiSimulation.balances[1].enabled && multiSimulation.rpm > 0) {
-                p.translate(multiSimulation.vibrationX * 5, multiSimulation.vibrationY * 5);
-            }
-            
-            // Draw shaft
-            p.fill(180);
-            p.stroke(100);
-            p.strokeWeight(2);
-            let shaftDrawLength = p.width * 0.7;
-            p.rect(-shaftDrawLength/2, -SHAFT_DIAMETER/2, shaftDrawLength, SHAFT_DIAMETER);
-            
-            // Draw bearings
-            p.fill(100);
-            p.noStroke();
-            p.rect(-shaftDrawLength/2 - 20, -SHAFT_DIAMETER, 20, SHAFT_DIAMETER * 2);
-            p.rect(shaftDrawLength/2, -SHAFT_DIAMETER, 20, SHAFT_DIAMETER * 2);
-            
-            // Draw unbalance masses
-            multiSimulation.unbalances.forEach((mass, i) => {
-                if (mass.mass > 0) {
-                    let xPos = p.map(mass.position, 0, 100, -shaftDrawLength/2, shaftDrawLength/2);
-                    p.fill(mass.color[0], mass.color[1], mass.color[2], 200);
-                    let size = p.map(mass.mass, 0, 150, 10, 35);
-                    p.ellipse(xPos, 0, size, size);
-                    
-                    // Label
-                    p.fill(0);
-                    p.noStroke();
-                    p.textAlign(p.CENTER);
-                    p.textSize(10);
-                    p.text(`M${i+1}`, xPos, -size/2 - 5);
-                }
-            });
-            
-            // Draw balance masses if enabled
-            multiSimulation.balances.forEach((balance, i) => {
-                if (balance.enabled && balance.mass > 0) {
-                    let xPos = p.map(balance.position, 0, 100, -shaftDrawLength/2, shaftDrawLength/2);
-                    p.fill(0, 255, 0, 200);
-                    let size = p.map(balance.mass, 0, 150, 10, 35);
-                    p.ellipse(xPos, 0, size, size);
-                    
-                    // Label
-                    p.fill(0);
-                    p.noStroke();
-                    p.textAlign(p.CENTER);
-                    p.textSize(10);
-                    p.text(`B${i === 0 ? 'A' : 'B'}`, xPos, -size/2 - 5);
-                }
-            });
-            
-            // Position markers
-            p.stroke(150);
-            p.strokeWeight(1);
-            p.line(-shaftDrawLength/2, SHAFT_DIAMETER/2 + 10, shaftDrawLength/2, SHAFT_DIAMETER/2 + 10);
-            
-            // Mark balance plane positions
-            p.stroke(0, 200, 0);
-            p.strokeWeight(2);
-            let posA = p.map(10, 0, 100, -shaftDrawLength/2, shaftDrawLength/2);
-            let posB = p.map(90, 0, 100, -shaftDrawLength/2, shaftDrawLength/2);
-            p.line(posA, SHAFT_DIAMETER/2 + 5, posA, SHAFT_DIAMETER/2 + 15);
-            p.line(posB, SHAFT_DIAMETER/2 + 5, posB, SHAFT_DIAMETER/2 + 15);
-            
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(10);
-            p.text('0%', -shaftDrawLength/2, SHAFT_DIAMETER/2 + 25);
-            p.text('50%', 0, SHAFT_DIAMETER/2 + 25);
-            p.text('100%', shaftDrawLength/2, SHAFT_DIAMETER/2 + 25);
-        };
-    });
-}
-
-function createMultiFrontView() {
-    multiFrontView = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('multi-front-view');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('multi-front-view');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Update rotation
-            if (!multiSimulation.isPaused) {
-                updateMultiRotation(p);
-            }
-            
-            // Apply vibration
-            if (!multiSimulation.balances[0].enabled && !multiSimulation.balances[1].enabled && multiSimulation.rpm > 0) {
-                p.translate(multiSimulation.vibrationX * 10, multiSimulation.vibrationY * 10);
-            }
-            
-            // Draw shaft circle
-            p.fill(180);
-            p.stroke(100);
-            p.strokeWeight(2);
-            let shaftRadius = SHAFT_DIAMETER * 2;
-            p.ellipse(0, 0, shaftRadius * 2, shaftRadius * 2);
-            
-            // Draw reference line
-            p.stroke(0);
-            p.strokeWeight(1);
-            p.line(shaftRadius, 0, shaftRadius + 20, 0);
-            
-            // Rotate for animation
-            p.push();
-            p.rotate(multiSimulation.angle);
-            
-            // Draw unbalance masses
-            multiSimulation.unbalances.forEach((mass, i) => {
-                if (mass.mass > 0) {
-                    p.push();
-                    p.rotate(p.radians(mass.angle));
-                    p.translate(mass.radius, 0);
-                    p.fill(mass.color[0], mass.color[1], mass.color[2]);
-                    p.noStroke();
-                    let size = p.map(mass.mass, 0, 150, 8, 25);
-                    p.ellipse(0, 0, size, size);
-                    p.pop();
-                    
-                    // Connection line
-                    p.stroke(mass.color[0], mass.color[1], mass.color[2], 100);
-                    p.strokeWeight(2);
-                    p.push();
-                    p.rotate(p.radians(mass.angle));
-                    p.line(0, 0, mass.radius, 0);
-                    p.pop();
-                }
-            });
-            
-            // Draw balance masses if enabled
-            multiSimulation.balances.forEach((balance, i) => {
-                if (balance.enabled && balance.mass > 0) {
-                    p.push();
-                    p.rotate(p.radians(balance.angle));
-                    p.translate(balance.radius, 0);
-                    p.fill(0, 255, 0);
-                    p.noStroke();
-                    let size = p.map(balance.mass, 0, 150, 8, 25);
-                    p.ellipse(0, 0, size, size);
-                    p.pop();
-                    
-                    // Connection line
-                    p.stroke(0, 255, 0, 100);
-                    p.strokeWeight(2);
-                    p.push();
-                    p.rotate(p.radians(balance.angle));
-                    p.line(0, 0, balance.radius, 0);
-                    p.pop();
-                }
-            });
-            
-            p.pop(); // End rotation
-            
-            // Labels
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('Front View', 0, -p.height/2 + 30);
-            p.text(`Angle: ${(multiSimulation.angle * 180/Math.PI).toFixed(0)}°`, 0, p.height/2 - 20);
-        };
-    });
-}
-
-function createMultiMRDiagram() {
-    multiMRDiagram = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('multi-mr-diagram');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('multi-mr-diagram');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Draw axes
-            p.stroke(200);
-            p.strokeWeight(1);
-            p.line(-p.width/2 + 30, 0, p.width/2 - 30, 0);
-            p.line(0, -p.height/2 + 30, 0, p.height/2 - 30);
-            
-            // Calculate MR vectors
-            let scale = 0.008; // Reduced scale for better fit
-            let vectors = [];
-            
-            // Add unbalance vectors
-            multiSimulation.unbalances.forEach((mass, i) => {
-                if (mass.mass > 0) {
-                    let mr = mass.mass * mass.radius;
-                    let vecAngle = mass.angle * Math.PI/180 + multiSimulation.angle;
-                    vectors.push({
-                        x: mr * Math.cos(vecAngle) * scale,
-                        y: mr * Math.sin(vecAngle) * scale,
-                        color: mass.color,
-                        label: `M${i+1}`
-                    });
-                }
-            });
-            
-            // Add balance vectors if enabled
-            multiSimulation.balances.forEach((balance, i) => {
-                if (balance.enabled && balance.mass > 0) {
-                    let mr = balance.mass * balance.radius;
-                    let vecAngle = balance.angle * Math.PI/180 + multiSimulation.angle;
-                    vectors.push({
-                        x: mr * Math.cos(vecAngle) * scale,
-                        y: mr * Math.sin(vecAngle) * scale,
-                        color: [0, 255, 0],
-                        label: i === 0 ? 'BA' : 'BB'
-                    });
-                }
-            });
-            
-            // Draw vector polygon
-            if (vectors.length > 0) {
-                p.stroke(100);
-                p.strokeWeight(2);
-                p.noFill();
-                p.beginShape();
-                p.vertex(0, 0);
-                let currentX = 0, currentY = 0;
-                vectors.forEach(v => {
-                    currentX += v.x;
-                    currentY += v.y;
-                    p.vertex(currentX, currentY);
-                });
-                p.endShape();
-                
-                // Draw individual vectors
-                currentX = 0;
-                currentY = 0;
-                vectors.forEach(v => {
-                    p.stroke(v.color[0], v.color[1], v.color[2]);
-                    p.strokeWeight(3);
-                    p.line(currentX, currentY, currentX + v.x, currentY + v.y);
-                    
-                    // Label
-                    p.fill(v.color[0], v.color[1], v.color[2]);
-                    p.noStroke();
-                    p.textAlign(p.CENTER);
-                    p.textSize(10);
-                    p.text(v.label, currentX + v.x/2, currentY + v.y/2 - 5);
-                    
-                    currentX += v.x;
-                    currentY += v.y;
-                });
-                
-                // Draw resultant
-                if (Math.abs(currentX) > 0.1 || Math.abs(currentY) > 0.1) {
-                    p.stroke(255, 0, 255);
-                    p.strokeWeight(3);
-                    p.line(currentX, currentY, 0, 0);
-                    
-                    p.fill(255, 0, 255);
-                    p.noStroke();
-                    p.text('R', currentX/2, currentY/2 + 10);
-                }
-            }
-            
-            // Title
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('MR Polygon (g·mm)', 0, -p.height/2 + 30);
-        };
-    });
-}
-
-function createMultiMRLDiagram() {
-    multiMRLDiagram = new p5(function(p) {
-        p.setup = function() {
-            let container = document.getElementById('multi-mrl-diagram');
-            if (container) {
-                p.createCanvas(container.offsetWidth - 20, 280).parent('multi-mrl-diagram');
-            }
-        };
-        
-        p.draw = function() {
-            p.clear();
-            p.background(255);
-            p.translate(p.width/2, p.height/2);
-            
-            // Draw axes
-            p.stroke(200);
-            p.strokeWeight(1);
-            p.line(-p.width/2 + 30, 0, p.width/2 - 30, 0);
-            p.line(0, -p.height/2 + 30, 0, p.height/2 - 30);
-            
-            // Calculate MRL vectors
-            let scale = 0.0001; // Reduced scale for better fit
-            let vectors = [];
-            
-            // Add unbalance MRL vectors
-            multiSimulation.unbalances.forEach((mass, i) => {
-                if (mass.mass > 0) {
-                    let mrl = mass.mass * mass.radius * (mass.position - 50) * 4;
-                    let vecAngle = mass.angle * Math.PI/180 + multiSimulation.angle;
-                    vectors.push({
-                        x: mrl * Math.cos(vecAngle) * scale,
-                        y: mrl * Math.sin(vecAngle) * scale,
-                        color: mass.color,
-                        label: `M${i+1}L`
-                    });
-                }
-            });
-            
-            // Add balance MRL vectors if enabled
-            multiSimulation.balances.forEach((balance, i) => {
-                if (balance.enabled && balance.mass > 0) {
-                    let mrl = balance.mass * balance.radius * (balance.position - 50) * 4;
-                    let vecAngle = balance.angle * Math.PI/180 + multiSimulation.angle;
-                    vectors.push({
-                        x: mrl * Math.cos(vecAngle) * scale,
-                        y: mrl * Math.sin(vecAngle) * scale,
-                        color: [0, 255, 0],
-                        label: i === 0 ? 'BAL' : 'BBL'
-                    });
-                }
-            });
-            
-            // Draw vector polygon
-            if (vectors.length > 0) {
-                p.stroke(100);
-                p.strokeWeight(2);
-                p.noFill();
-                p.beginShape();
-                p.vertex(0, 0);
-                let currentX = 0, currentY = 0;
-                vectors.forEach(v => {
-                    currentX += v.x;
-                    currentY += v.y;
-                    p.vertex(currentX, currentY);
-                });
-                p.endShape();
-                
-                // Draw individual vectors
-                currentX = 0;
-                currentY = 0;
-                vectors.forEach(v => {
-                    p.stroke(v.color[0], v.color[1], v.color[2]);
-                    p.strokeWeight(3);
-                    p.line(currentX, currentY, currentX + v.x, currentY + v.y);
-                    
-                    // Label
-                    p.fill(v.color[0], v.color[1], v.color[2]);
-                    p.noStroke();
-                    p.textAlign(p.CENTER);
-                    p.textSize(10);
-                    p.text(v.label, currentX + v.x/2, currentY + v.y/2 - 5);
-                    
-                    currentX += v.x;
-                    currentY += v.y;
-                });
-                
-                // Draw resultant
-                if (Math.abs(currentX) > 0.1 || Math.abs(currentY) > 0.1) {
-                    p.stroke(255, 0, 255);
-                    p.strokeWeight(3);
-                    p.line(currentX, currentY, 0, 0);
-                    
-                    p.fill(255, 0, 255);
-                    p.noStroke();
-                    p.text('R', currentX/2, currentY/2 + 10);
-                }
-            }
-            
-            // Title
-            p.fill(0);
-            p.noStroke();
-            p.textAlign(p.CENTER);
-            p.textSize(12);
-            p.text('MRL Polygon (g·mm²)', 0, -p.height/2 + 30);
-        };
-    });
-}
-
-// ========== UPDATE FUNCTIONS ==========
-
-function updateSingleRotation(p) {
-    if (singleSimulation.rpm === 0) {
-        // Static balance - heavy side down
-        let targetAngle = Math.PI/2 - singleSimulation.unbalance.angle * Math.PI/180;
-        if (singleSimulation.balance.enabled) {
-            // Calculate net unbalance
-            let netX = singleSimulation.unbalance.mass * singleSimulation.unbalance.radius * 
-                      Math.cos(singleSimulation.unbalance.angle * Math.PI/180);
-            let netY = singleSimulation.unbalance.mass * singleSimulation.unbalance.radius * 
-                      Math.sin(singleSimulation.unbalance.angle * Math.PI/180);
-            netX += singleSimulation.balance.mass * singleSimulation.balance.radius * 
-                   Math.cos(singleSimulation.balance.angle * Math.PI/180);
-            netY += singleSimulation.balance.mass * singleSimulation.balance.radius * 
-                   Math.sin(singleSimulation.balance.angle * Math.PI/180);
-            
-            if (Math.abs(netX) > 0.1 || Math.abs(netY) > 0.1) {
-                targetAngle = Math.PI/2 - Math.atan2(netY, netX);
-            }
-        }
-        
-        // Smooth approach to target
-        let diff = targetAngle - singleSimulation.angle;
-        while (diff > Math.PI) diff -= 2 * Math.PI;
-        while (diff < -Math.PI) diff += 2 * Math.PI;
-        singleSimulation.angle += diff * 0.1;
-    } else {
-        // Rotate at specified RPM
-        let omega = (singleSimulation.rpm * p.TWO_PI) / (60 * 60); // rad/frame at 60fps
-        singleSimulation.angle += omega;
-    }
-    
-    // Update vibration
-    updateSingleVibration();
-}
-
-function updateMultiRotation(p) {
-    if (multiSimulation.rpm === 0) {
-        // Calculate net unbalance for static position
-        let netX = 0, netY = 0;
-        
-        multiSimulation.unbalances.forEach(mass => {
-            if (mass.mass > 0) {
-                netX += mass.mass * mass.radius * Math.cos(mass.angle * Math.PI/180);
-                netY += mass.mass * mass.radius * Math.sin(mass.angle * Math.PI/180);
-            }
-        });
-        
-        multiSimulation.balances.forEach(balance => {
-            if (balance.enabled && balance.mass > 0) {
-                netX += balance.mass * balance.radius * Math.cos(balance.angle * Math.PI/180);
-                netY += balance.mass * balance.radius * Math.sin(balance.angle * Math.PI/180);
-            }
-        });
-        
-        if (Math.abs(netX) > 0.1 || Math.abs(netY) > 0.1) {
-            let targetAngle = Math.PI/2 - Math.atan2(netY, netX);
-            let diff = targetAngle - multiSimulation.angle;
-            while (diff > Math.PI) diff -= 2 * Math.PI;
-            while (diff < -Math.PI) diff += 2 * Math.PI;
-            multiSimulation.angle += diff * 0.1;
-        }
-    } else {
-        // Rotate at specified RPM
-        let omega = (multiSimulation.rpm * Math.PI * 2) / (60 * 60);
-        multiSimulation.angle += omega;
-    }
-    
-    // Update vibration and forces
-    updateMultiVibration();
-    updateMultiForces();
-}
-
-function updateSingleForces() {
-    let omega = (singleSimulation.rpm * 2 * Math.PI) / 60; // rad/s
-    
-    // Calculate unbalance force
-    let force = (singleSimulation.unbalance.mass / 1000) * 
-                (singleSimulation.unbalance.radius / 1000) * 
-                omega * omega;
-    
-    // Add balance force if enabled
-    if (singleSimulation.balance.enabled) {
-        let balanceForce = (singleSimulation.balance.mass / 1000) * 
-                          (singleSimulation.balance.radius / 1000) * 
-                          omega * omega;
-        let unbalanceAngle = singleSimulation.unbalance.angle * Math.PI/180;
-        let balanceAngle = singleSimulation.balance.angle * Math.PI/180;
-        
-        let fx = force * Math.cos(unbalanceAngle) + balanceForce * Math.cos(balanceAngle);
-        let fy = force * Math.sin(unbalanceAngle) + balanceForce * Math.sin(balanceAngle);
-        force = Math.sqrt(fx * fx + fy * fy);
-    }
-    
-    singleSimulation.totalForce = force;
-    
-    // Update display
-    let forceDisplay = document.getElementById('single-force');
-    if (forceDisplay) {
-        forceDisplay.textContent = force.toFixed(2) + ' N';
-    }
-    
-    // Update status
-    let statusDiv = document.querySelector('#single-status .status-value');
-    if (statusDiv) {
-        if (force < 0.5 || singleSimulation.balance.enabled && force < 0.5) {
-            statusDiv.textContent = 'Balanced';
-            statusDiv.className = 'status-value balanced';
-        } else {
-            statusDiv.textContent = 'Unbalanced';
-            statusDiv.className = 'status-value unbalanced';
-        }
-    }
-}
-
-function updateMultiForces() {
-    let omega = (multiSimulation.rpm * 2 * Math.PI) / 60;
-    let totalFx = 0, totalFy = 0, totalMoment = 0;
-    
-    // Calculate forces from unbalances
-    multiSimulation.unbalances.forEach(mass => {
-        if (mass.mass > 0) {
-            let force = (mass.mass / 1000) * (mass.radius / 1000) * omega * omega;
-            let angle = mass.angle * Math.PI/180 + multiSimulation.angle;
-            totalFx += force * Math.cos(angle);
-            totalFy += force * Math.sin(angle);
-            
-            // Moment about left bearing
-            let leverArm = (mass.position / 100) * (SHAFT_LENGTH / 1000);
-            totalMoment += force * leverArm;
-        }
-    });
-    
-    // Add balance forces if enabled
-    multiSimulation.balances.forEach(balance => {
-        if (balance.enabled && balance.mass > 0) {
-            let force = (balance.mass / 1000) * (balance.radius / 1000) * omega * omega;
-            let angle = balance.angle * Math.PI/180 + multiSimulation.angle;
-            totalFx += force * Math.cos(angle);
-            totalFy += force * Math.sin(angle);
-            
-            let leverArm = (balance.position / 100) * (SHAFT_LENGTH / 1000);
-            totalMoment += force * leverArm;
-        }
-    });
-    
-    multiSimulation.totalForce = { x: totalFx, y: totalFy };
-    multiSimulation.totalMoment = totalMoment;
-    
-    let totalForceMag = Math.sqrt(totalFx * totalFx + totalFy * totalFy);
-    
-    // Calculate bearing reactions
-    multiSimulation.rightBearing = Math.abs(totalMoment / (SHAFT_LENGTH / 1000)) + totalForceMag / 2;
-    multiSimulation.leftBearing = totalForceMag - multiSimulation.rightBearing;
-    
-    // Update display with null checks
-    let forceDisplay = document.getElementById('multi-force');
-    if (forceDisplay) forceDisplay.textContent = totalForceMag.toFixed(2) + ' N';
-    
-    let momentDisplay = document.getElementById('multi-moment');
-    if (momentDisplay) momentDisplay.textContent = Math.abs(totalMoment).toFixed(3) + ' N·m';
-    
-    let leftDisplay = document.getElementById('multi-left-bearing');
-    if (leftDisplay) leftDisplay.textContent = Math.abs(multiSimulation.leftBearing).toFixed(2) + ' N';
-    
-    let rightDisplay = document.getElementById('multi-right-bearing');
-    if (rightDisplay) rightDisplay.textContent = Math.abs(multiSimulation.rightBearing).toFixed(2) + ' N';
-    
-    // Update status
-    let statusDiv = document.querySelector('#multi-status .status-value');
-    if (statusDiv) {
-        if (totalForceMag < 0.5 && Math.abs(totalMoment) < 0.01) {
-            statusDiv.textContent = 'Balanced';
-            statusDiv.className = 'status-value balanced';
-        } else {
-            statusDiv.textContent = 'Unbalanced';
-            statusDiv.className = 'status-value unbalanced';
-        }
-    }
-}
-
-function updateSingleVibration() {
-    if (!singleSimulation.balance.enabled && singleSimulation.rpm > 0) {
-        let vibrationMag = Math.min(1, singleSimulation.totalForce / 10);
-        let angle = singleSimulation.unbalance.angle * Math.PI/180 + singleSimulation.angle;
-        singleSimulation.vibrationX = Math.cos(angle) * vibrationMag;
-        singleSimulation.vibrationY = Math.sin(angle) * vibrationMag;
-    } else {
-        singleSimulation.vibrationX = 0;
-        singleSimulation.vibrationY = 0;
-    }
-}
-
-function updateMultiVibration() {
-    if ((!multiSimulation.balances[0].enabled || !multiSimulation.balances[1].enabled) && multiSimulation.rpm > 0) {
-        let forceMag = Math.sqrt(multiSimulation.totalForce.x ** 2 + multiSimulation.totalForce.y ** 2);
-        let vibrationMag = Math.min(1, forceMag / 10);
-        let angle = Math.atan2(multiSimulation.totalForce.y, multiSimulation.totalForce.x);
-        multiSimulation.vibrationX = Math.cos(angle) * vibrationMag;
-        multiSimulation.vibrationY = Math.sin(angle) * vibrationMag;
-    } else {
-        multiSimulation.vibrationX = 0;
-        multiSimulation.vibrationY = 0;
-    }
-}
-
-// ========== BALANCING CALCULATIONS ==========
 
 function calculateSingleBalance() {
-    // Simple single plane balance
-    singleSimulation.balance.mass = singleSimulation.unbalance.mass * 
-                                   singleSimulation.unbalance.radius / 
-                                   singleSimulation.balance.radius;
-    singleSimulation.balance.angle = (singleSimulation.unbalance.angle + 180) % 360;
-    
-    // Update display
-    let massDisplay = document.getElementById('single-balance-mass');
-    let angleDisplay = document.getElementById('single-balance-angle');
-    if (massDisplay) massDisplay.textContent = singleSimulation.balance.mass.toFixed(1) + ' g';
-    if (angleDisplay) angleDisplay.textContent = singleSimulation.balance.angle.toFixed(0) + '°';
+  const MR_unbalance = singleParams.mass_g * singleParams.radius_mm;
+  singleParams.balanceRadius_mm = 80;
+  singleParams.balanceMass_g = MR_unbalance / singleParams.balanceRadius_mm;
+  singleParams.balanceAngle = Math.PI;
 }
 
+/* Use plane L as the reference for balancing */
 function calculateMultiBalance() {
-    // Calculate total MR and MRL
-    let totalMRx = 0, totalMRy = 0;
-    let totalMRLx = 0, totalMRLy = 0;
-    
-    multiSimulation.unbalances.forEach(mass => {
-        if (mass.mass > 0) {
-            let mr = mass.mass * mass.radius;
-            let angle = mass.angle * Math.PI / 180;
-            totalMRx += mr * Math.cos(angle);
-            totalMRy += mr * Math.sin(angle);
-            
-            let l = (mass.position - 50) * 4; // Scaled position
-            totalMRLx += mr * l * Math.cos(angle);
-            totalMRLy += mr * l * Math.sin(angle);
-        }
+  // Reference z at plane L
+  const zL = posPctToZmm(multiParams.balanceMasses[0].posPct, multiParams.shaftHalfLen_mm);
+  const zM = posPctToZmm(multiParams.balanceMasses[1].posPct, multiParams.shaftHalfLen_mm);
+  const LB = zM - zL;         // distance M from L
+
+  // Sum MR and MRL (about L)
+  let MRx = 0, MRy = 0;
+  let MRLx = 0, MRLy = 0;
+
+  for (const m of multiParams.masses) {
+    const MR = m.m_g * m.r_mm;
+    const z  = posPctToZmm(m.posPct, multiParams.shaftHalfLen_mm);
+    const L  = z - zL;
+    MRx  += MR * Math.cos(m.phase);
+    MRy  += MR * Math.sin(m.phase);
+    MRLx += MR * L * Math.cos(m.phase);
+    MRLy += MR * L * Math.sin(m.phase);
+  }
+
+  // Solve:
+  // MR_L + MR_M = -MR
+  // (0)*MR_L + (LB)*MR_M = -(MR*L)
+  const MR_Mx = (-MRLx) / LB;
+  const MR_My = (-MRLy) / LB;
+  const MR_Lx = -MRx - MR_Mx;
+  const MR_Ly = -MRy - MR_My;
+
+  const MR_M_mag = Math.hypot(MR_Mx, MR_My);
+  const MR_M_ang = Math.atan2(MR_My, MR_Mx);
+  const MR_L_mag = Math.hypot(MR_Lx, MR_Ly);
+  const MR_L_ang = Math.atan2(MR_Ly, MR_Lx);
+
+  // Set balance masses
+  const bmL = multiParams.balanceMasses[0];
+  const bmM = multiParams.balanceMasses[1];
+  bmM.m_g = MR_M_mag / bmM.r_mm;
+  bmM.angle = MR_M_ang;
+  bmL.m_g = MR_L_mag / bmL.r_mm;
+  bmL.angle = MR_L_ang;
+
+  updateBalanceDisplay();
+}
+
+function updateBalanceDisplay() {
+  const singleBalanceEl = $('single-balance-mass');
+  const singleAngleEl = $('single-balance-angle');
+  if (singleBalanceEl && singleAngleEl) {
+    if (singleParams.isBalanced) {
+      singleBalanceEl.textContent = singleParams.balanceMass_g.toFixed(1) + ' g';
+      singleAngleEl.textContent = '180';
+    } else {
+      singleBalanceEl.textContent = '-- g';
+      singleAngleEl.textContent = '-- ';
+    }
+  }
+
+  const planeAEl = $('multi-balance-a');
+  const planeBEl = $('multi-balance-b');
+  if (planeAEl && planeBEl) {
+    if (multiParams.isBalanced) {
+      const angleL = (rad2deg(multiParams.balanceMasses[0].angle) + 360) % 360;
+      const angleM = (rad2deg(multiParams.balanceMasses[1].angle) + 360) % 360;
+      planeAEl.textContent = `L: ${multiParams.balanceMasses[0].m_g.toFixed(1)} g @ ${angleL.toFixed(0)}`;
+      planeBEl.textContent = `M: ${multiParams.balanceMasses[1].m_g.toFixed(1)} g @ ${angleM.toFixed(0)}`;
+    } else {
+      planeAEl.textContent = 'L: -- g @ -- ';
+      planeBEl.textContent = 'M: -- g @ -- ';
+    }
+  }
+}
+
+/* -----------------------------------------------------------
+   Utility
+----------------------------------------------------------- */
+function posPctToZmm(pct, halfLen) {
+  const clamped = Math.max(0, Math.min(100, pct));
+  return -halfLen + (2 * halfLen) * (clamped / 100);
+}
+
+function drawArrow(p, x1, y1, x2, y2, headLen = 10, headAng = Math.PI/7, weight = 2) {
+  p.strokeWeight(weight);
+  p.line(x1, y1, x2, y2);
+  const ang = Math.atan2(y2 - y1, x2 - x1);
+  const hx1 = x2 - headLen * Math.cos(ang - headAng);
+  const hy1 = y2 - headLen * Math.sin(ang - headAng);
+  const hx2 = x2 - headLen * Math.cos(ang + headAng);
+  const hy2 = y2 - headLen * Math.sin(ang + headAng);
+  p.line(x2, y2, hx1, hy1);
+  p.line(x2, y2, hx2, hy2);
+}
+
+/* -----------------------------------------------------------
+   Balance auto-unapply helpers
+----------------------------------------------------------- */
+function autoUnapplySingleBalance() {
+  if (singleParams.isBalanced) {
+    singleParams.isBalanced = false;
+    updateBalanceLabel('single-apply', false);
+    updateBalanceDisplay();
+  }
+}
+function autoUnapplyMultiBalance() {
+  if (multiParams.isBalanced) {
+    multiParams.isBalanced = false;
+    updateBalanceLabel('multi-apply', false);
+    updateBalanceDisplay();
+  }
+}
+
+/* -----------------------------------------------------------
+   Wire up controls (SINGLE + MULTI)
+----------------------------------------------------------- */
+function resetSingle() {
+  singleParams.omega = 0;
+  singleParams.isBalanced = SINGLE_DEFAULTS.isBalanced;
+  singleParams.mass_g = SINGLE_DEFAULTS.mass_g;
+  singleParams.radius_mm = SINGLE_DEFAULTS.radius_mm;
+  singleParams.balanceMass_g = 0;
+  singleParams.balanceRadius_mm = SINGLE_DEFAULTS.balanceRadius_mm;
+  singleParams.balanceAngle = SINGLE_DEFAULTS.balanceAngle;
+
+  const setVal = (id, v) => { const e = $(id); if (e) { e.value = String(v); e.dispatchEvent(new Event('input', {bubbles:true})); } };
+  setVal('single-rpm', 0);  setVal('single-rpm-value', 0);
+  setVal('single-mass', singleParams.mass_g); setVal('single-mass-value', singleParams.mass_g);
+  setVal('single-radius', singleParams.radius_mm); setVal('single-radius-value', singleParams.radius_mm);
+  setVal('single-balance-radius', singleParams.balanceRadius_mm); setVal('single-balance-radius-value', singleParams.balanceRadius_mm);
+  updateBalanceLabel('single-apply', singleParams.isBalanced);
+  updateSlowmoLabel('single-slowmo');
+}
+
+function wireSingleControls() {
+  bindRangeNumber('single-rpm', 'single-rpm-value', (rpm) => {
+    singleParams.omega = (rpm * 2 * Math.PI) / 60;
+    // RPM change does NOT auto-remove balance (as requested)
+  });
+  bindRangeNumber('single-mass', 'single-mass-value', (m) => { singleParams.mass_g = m; autoUnapplySingleBalance(); });
+  bindRangeNumber('single-radius', 'single-radius-value', (r) => { singleParams.radius_mm = r; autoUnapplySingleBalance(); });
+
+  const balanceBtn = $('single-apply');
+  if (balanceBtn && !balanceBtn._bound) {
+    balanceBtn._bound = true;
+    balanceBtn.addEventListener('click', () => {
+      singleParams.isBalanced = !singleParams.isBalanced;
+      if (singleParams.isBalanced) calculateSingleBalance();
+      updateBalanceLabel('single-apply', singleParams.isBalanced);
+      updateBalanceDisplay();
     });
-    
-    // Solve for two balance planes
-    let lA = (10 - 50) * 4; // Position A at 10%
-    let lB = (90 - 50) * 4; // Position B at 90%
-    let det = lB - lA;
-    
-    if (Math.abs(det) > 0.1) {
-        // Calculate MR for each balance plane
-        let mrAx = (-totalMRLx + totalMRx * lB) / det;
-        let mrAy = (-totalMRLy + totalMRy * lB) / det;
-        let mrBx = (totalMRLx - totalMRx * lA) / det;
-        let mrBy = (totalMRLy - totalMRy * lA) / det;
-        
-        // Balance A
-        let mrA = Math.sqrt(mrAx * mrAx + mrAy * mrAy);
-        let angleA = Math.atan2(mrAy, mrAx) * 180 / Math.PI;
-        multiSimulation.balances[0].mass = mrA / multiSimulation.balances[0].radius;
-        multiSimulation.balances[0].angle = (angleA + 360) % 360;
-        
-        // Balance B
-        let mrB = Math.sqrt(mrBx * mrBx + mrBy * mrBy);
-        let angleB = Math.atan2(mrBy, mrBx) * 180 / Math.PI;
-        multiSimulation.balances[1].mass = mrB / multiSimulation.balances[1].radius;
-        multiSimulation.balances[1].angle = (angleB + 360) % 360;
-        
-        // Update display
-        let balanceADisplay = document.getElementById('multi-balance-a');
-        let balanceBDisplay = document.getElementById('multi-balance-b');
-        if (balanceADisplay) {
-            balanceADisplay.textContent = 
-                `${multiSimulation.balances[0].mass.toFixed(1)} g @ ${multiSimulation.balances[0].angle.toFixed(0)}°`;
-        }
-        if (balanceBDisplay) {
-            balanceBDisplay.textContent = 
-                `${multiSimulation.balances[1].mass.toFixed(1)} g @ ${multiSimulation.balances[1].angle.toFixed(0)}°`;
-        }
-    }
+  }
+
+  const pauseBtn = $('single-pause');
+  if (pauseBtn && !pauseBtn._bound) {
+    pauseBtn._bound = true;
+    pauseBtn.addEventListener('click', () => {
+      singlePaused = !singlePaused;
+      pauseBtn.textContent = singlePaused ? 'Resume' : 'Pause';
+    });
+  }
+
+  const slowmoBtn = $('single-slowmo');
+  if (slowmoBtn && !slowmoBtn._bound) {
+    slowmoBtn._bound = true;
+    updateSlowmoLabel('single-slowmo');
+    slowmoBtn.addEventListener('click', () => {
+      timeScale = (timeScale === 1 ? SLOWMO_SCALE : 1);
+      updateSlowmoLabel('single-slowmo');
+    });
+  }
+
+  const resetBtn = $('single-reset');
+  if (resetBtn && !resetBtn._bound) {
+    resetBtn._bound = true;
+    resetBtn.addEventListener('click', resetSingle);
+  }
 }
 
-// ========== CONTROL SETUP ==========
+function resetMulti() {
+  multiParams.omega = 0;
+  multiParams.isBalanced = MULTI_DEFAULTS.isBalanced;
+  multiParams.rotorRadius_mm = MULTI_DEFAULTS.rotorRadius_mm;
+  multiParams.shaftHalfLen_mm = MULTI_DEFAULTS.shaftHalfLen_mm;
+  multiParams.masses = JSON.parse(JSON.stringify(MULTI_DEFAULTS.masses));
+  multiParams.balanceMasses = JSON.parse(JSON.stringify(MULTI_DEFAULTS.balanceMasses));
+  multiParams.angularVel = 0;
 
-function setupSingleControls() {
-    // RPM control
-    let rpmSlider = document.getElementById('single-rpm');
-    let rpmValue = document.getElementById('single-rpm-value');
-    if (rpmSlider && rpmValue) {
-        rpmSlider.addEventListener('input', () => {
-            singleSimulation.rpm = parseFloat(rpmSlider.value);
-            rpmValue.value = singleSimulation.rpm;
-        });
-        rpmValue.addEventListener('input', () => {
-            singleSimulation.rpm = parseFloat(rpmValue.value);
-            rpmSlider.value = singleSimulation.rpm;
-        });
-    }
-    
-    // Mass control
-    let massSlider = document.getElementById('single-mass');
-    let massValue = document.getElementById('single-mass-value');
-    if (massSlider && massValue) {
-        massSlider.addEventListener('input', () => {
-            singleSimulation.unbalance.mass = parseFloat(massSlider.value);
-            massValue.value = singleSimulation.unbalance.mass;
-        });
-        massValue.addEventListener('input', () => {
-            singleSimulation.unbalance.mass = parseFloat(massValue.value);
-            massSlider.value = singleSimulation.unbalance.mass;
-        });
-    }
-    
-    // Radius control
-    let radiusSlider = document.getElementById('single-radius');
-    let radiusValue = document.getElementById('single-radius-value');
-    if (radiusSlider && radiusValue) {
-        radiusSlider.addEventListener('input', () => {
-            singleSimulation.unbalance.radius = parseFloat(radiusSlider.value);
-            radiusValue.value = singleSimulation.unbalance.radius;
-        });
-        radiusValue.addEventListener('input', () => {
-            singleSimulation.unbalance.radius = parseFloat(radiusValue.value);
-            radiusSlider.value = singleSimulation.unbalance.radius;
-        });
-    }
-    
-    // Buttons
-    let pauseBtn = document.getElementById('single-pause');
-    if (pauseBtn) {
-        pauseBtn.addEventListener('click', () => {
-            singleSimulation.isPaused = !singleSimulation.isPaused;
-            pauseBtn.textContent = singleSimulation.isPaused ? 'Resume' : 'Pause';
-        });
-    }
-    
-    let calculateBtn = document.getElementById('single-calculate');
-    if (calculateBtn) {
-        calculateBtn.addEventListener('click', calculateSingleBalance);
-    }
-    
-    let applyBtn = document.getElementById('single-apply');
-    if (applyBtn) {
-        applyBtn.addEventListener('click', () => {
-            calculateSingleBalance();
-            singleSimulation.balance.enabled = true;
-        });
-    }
-    
-    let removeBtn = document.getElementById('single-remove');
-    if (removeBtn) {
-        removeBtn.addEventListener('click', () => {
-            singleSimulation.balance.enabled = false;
-            let massDisplay = document.getElementById('single-balance-mass');
-            let angleDisplay = document.getElementById('single-balance-angle');
-            if (massDisplay) massDisplay.textContent = '-- g';
-            if (angleDisplay) angleDisplay.textContent = '-- °';
-        });
-    }
-    
-    let resetBtn = document.getElementById('single-reset');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            singleSimulation.angle = 0;
-            singleSimulation.rpm = 0;
-            singleSimulation.unbalance = { mass: 50, radius: 60, angle: 0 };
-            singleSimulation.balance.enabled = false;
-            if (rpmSlider) rpmSlider.value = 0;
-            if (rpmValue) rpmValue.value = 0;
-            if (massSlider) massSlider.value = 50;
-            if (massValue) massValue.value = 50;
-            if (radiusSlider) radiusSlider.value = 60;
-            if (radiusValue) radiusValue.value = 60;
-        });
-    }
+  const setVal = (id, v) => { const e = $(id); if (e) { e.value = String(v); e.dispatchEvent(new Event('input', {bubbles:true})); } };
+  setVal('multi-rpm', 0); setVal('multi-rpm-value', 0);
+
+  // Mass 1
+  setVal('multi-mass1',     multiParams.masses[0].m_g);   setVal('multi-mass1-value',     multiParams.masses[0].m_g);
+  setVal('multi-radius1',   multiParams.masses[0].r_mm);  setVal('multi-radius1-value',   multiParams.masses[0].r_mm);
+  setVal('multi-position1', multiParams.masses[0].posPct);setVal('multi-position1-value', multiParams.masses[0].posPct);
+  setVal('multi-angle1',    Math.round((rad2deg(multiParams.masses[0].phase)+360)%360));
+  setVal('multi-angle1-value', Math.round((rad2deg(multiParams.masses[0].phase)+360)%360));
+
+  // Mass 2
+  setVal('multi-mass2',     multiParams.masses[1].m_g);   setVal('multi-mass2-value',     multiParams.masses[1].m_g);
+  setVal('multi-radius2',   multiParams.masses[1].r_mm);  setVal('multi-radius2-value',   multiParams.masses[1].r_mm);
+  setVal('multi-position2', multiParams.masses[1].posPct);setVal('multi-position2-value', multiParams.masses[1].posPct);
+  setVal('multi-angle2',    Math.round((rad2deg(multiParams.masses[1].phase)+360)%360));
+  setVal('multi-angle2-value', Math.round((rad2deg(multiParams.masses[1].phase)+360)%360));
+
+  // Mass 3
+  setVal('multi-mass3',     multiParams.masses[2].m_g);   setVal('multi-mass3-value',     multiParams.masses[2].m_g);
+  setVal('multi-radius3',   multiParams.masses[2].r_mm);  setVal('multi-radius3-value',   multiParams.masses[2].r_mm);
+  setVal('multi-position3', multiParams.masses[2].posPct);setVal('multi-position3-value', multiParams.masses[2].posPct);
+  setVal('multi-angle3',    Math.round((rad2deg(multiParams.masses[2].phase)+360)%360));
+  setVal('multi-angle3-value', Math.round((rad2deg(multiParams.masses[2].phase)+360)%360));
+
+  updateBalanceLabel('multi-apply', multiParams.isBalanced);
+  updateBalanceDisplay();
 }
 
-function setupMultiControls() {
-    // RPM control
-    let rpmSlider = document.getElementById('multi-rpm');
-    let rpmValue = document.getElementById('multi-rpm-value');
-    if (rpmSlider && rpmValue) {
-        rpmSlider.addEventListener('input', () => {
-            multiSimulation.rpm = parseFloat(rpmSlider.value);
-            rpmValue.value = multiSimulation.rpm;
-        });
-        rpmValue.addEventListener('input', () => {
-            multiSimulation.rpm = parseFloat(rpmValue.value);
-            rpmSlider.value = multiSimulation.rpm;
-        });
+function wireMultiControls() {
+  bindRangeNumber('multi-rpm', 'multi-rpm-value', (rpm) => {
+    multiParams.omega = (rpm * 2 * Math.PI) / 60;
+    // RPM change does NOT auto-remove balance (as requested)
+  });
+
+  // Mass 1
+  bindRangeNumber('multi-mass1',     'multi-mass1-value',     v => { multiParams.masses[0].m_g = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-radius1',   'multi-radius1-value',   v => { multiParams.masses[0].r_mm = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-position1', 'multi-position1-value', v => { multiParams.masses[0].posPct = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-angle1',    'multi-angle1-value',    v => { multiParams.masses[0].phase = normAngRad(deg2rad(v)); autoUnapplyMultiBalance(); });
+
+  // Mass 2
+  bindRangeNumber('multi-mass2',     'multi-mass2-value',     v => { multiParams.masses[1].m_g = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-radius2',   'multi-radius2-value',   v => { multiParams.masses[1].r_mm = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-position2', 'multi-position2-value', v => { multiParams.masses[1].posPct = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-angle2',    'multi-angle2-value',    v => { multiParams.masses[1].phase = normAngRad(deg2rad(v)); autoUnapplyMultiBalance(); });
+
+  // Mass 3
+  bindRangeNumber('multi-mass3',     'multi-mass3-value',     v => { multiParams.masses[2].m_g = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-radius3',   'multi-radius3-value',   v => { multiParams.masses[2].r_mm = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-position3', 'multi-position3-value', v => { multiParams.masses[2].posPct = v; autoUnapplyMultiBalance(); });
+  bindRangeNumber('multi-angle3',    'multi-angle3-value',    v => { multiParams.masses[2].phase = normAngRad(deg2rad(v)); autoUnapplyMultiBalance(); });
+
+  const balanceBtn = $('multi-apply');
+  if (balanceBtn && !balanceBtn._bound) {
+    balanceBtn._bound = true;
+    balanceBtn.addEventListener('click', () => {
+      multiParams.isBalanced = !multiParams.isBalanced;
+      if (multiParams.isBalanced) calculateMultiBalance();
+      updateBalanceLabel('multi-apply', multiParams.isBalanced);
+      updateBalanceDisplay();
+    });
+  }
+
+  const pauseBtn = $('multi-pause');
+  if (pauseBtn && !pauseBtn._bound) {
+    pauseBtn._bound = true;
+    pauseBtn.addEventListener('click', () => {
+      multiPaused = !multiPaused;
+      pauseBtn.textContent = multiPaused ? 'Resume' : 'Pause';
+    });
+  }
+
+  const slowmoBtn = $('multi-slowmo');
+  if (slowmoBtn && !slowmoBtn._bound) {
+    slowmoBtn._bound = true;
+    updateSlowmoLabel('multi-slowmo');
+    slowmoBtn.addEventListener('click', () => {
+      timeScale = (timeScale === 1 ? SLOWMO_SCALE : 1);
+      updateSlowmoLabel('multi-slowmo');
+    });
+  }
+
+  const resetBtn = $('multi-reset');
+  if (resetBtn && !resetBtn._bound) {
+    resetBtn._bound = true;
+    resetBtn.addEventListener('click', resetMulti);
+  }
+}
+
+/* -----------------------------------------------------------
+   SINGLE PLANE - Front View (uses global singlePaused/timeScale)
+----------------------------------------------------------- */
+const singleFrontSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    wireSingleControls();
+    parentEl = $('single-front-view');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.ellipseMode(p.CENTER);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
+
+    if (singleParams.omega < 0.1) {
+      const targetAngle = singleParams.isBalanced ? 0 : Math.PI/2;
+      const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
+      const settleRate = 2.0;
+      theta += diff * Math.min(1, dt * settleRate);
+    } else {
+      theta += singleParams.omega * dt;
     }
-    
-    // Setup controls for each mass
-    for (let i = 1; i <= 3; i++) {
-        let massSlider = document.getElementById(`multi-mass${i}`);
-        let massValue = document.getElementById(`multi-mass${i}-value`);
-        let radiusSlider = document.getElementById(`multi-radius${i}`);
-        let radiusValue = document.getElementById(`multi-radius${i}-value`);
-        let positionSlider = document.getElementById(`multi-position${i}`);
-        let positionValue = document.getElementById(`multi-position${i}-value`);
-        
-        if (massSlider && massValue) {
-            massSlider.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].mass = parseFloat(massSlider.value);
-                massValue.value = multiSimulation.unbalances[i-1].mass;
-            });
-            massValue.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].mass = parseFloat(massValue.value);
-                massSlider.value = multiSimulation.unbalances[i-1].mass;
-            });
-        }
-        
-        if (radiusSlider && radiusValue) {
-            radiusSlider.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].radius = parseFloat(radiusSlider.value);
-                radiusValue.value = multiSimulation.unbalances[i-1].radius;
-            });
-            radiusValue.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].radius = parseFloat(radiusValue.value);
-                radiusSlider.value = multiSimulation.unbalances[i-1].radius;
-            });
-        }
-        
-        if (positionSlider && positionValue) {
-            positionSlider.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].position = parseFloat(positionSlider.value);
-                positionValue.value = multiSimulation.unbalances[i-1].position;
-            });
-            positionValue.addEventListener('input', () => {
-                multiSimulation.unbalances[i-1].position = parseFloat(positionValue.value);
-                positionSlider.value = multiSimulation.unbalances[i-1].position;
-            });
-        }
+
+    let vibrationX = 0, vibrationY = 0;
+    if (!singleParams.isBalanced && singleParams.omega > 0.1) {
+      const vibrationMag = Math.min(10, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 10000);
+      vibrationX = vibrationMag * Math.cos(theta);
+      vibrationY = vibrationMag * Math.sin(theta);
     }
-    
-    // Buttons
-    let pauseBtn = document.getElementById('multi-pause');
-    if (pauseBtn) {
-        pauseBtn.addEventListener('click', () => {
-            multiSimulation.isPaused = !multiSimulation.isPaused;
-            pauseBtn.textContent = multiSimulation.isPaused ? 'Resume' : 'Pause';
-        });
+
+    p.push();
+    p.translate(p.width/2 + vibrationX, p.height/2 + vibrationY);
+
+    const margin = 24;
+    const maxR = Math.max(singleParams.rotorRadius_mm, singleParams.radius_mm);
+    const s = (Math.min(p.width, p.height) - 2*margin) / (2*maxR);
+
+    // dashed 0° reference (rotating)
+    const bodyLen = (Math.min(p.width, p.height) - 2*margin) / 2;
+    dashedZeroRay(p, bodyLen, theta);
+
+    p.noFill();
+    p.stroke(0, 60);
+    p.strokeWeight(2);
+    p.circle(0, 0, 2 * singleParams.rotorRadius_mm * s);
+
+    p.stroke(0, 20);
+    for (let i = 0; i < 8; i++) {
+      const a = theta + (i * Math.PI) / 4;
+      p.line(0, 0, Math.cos(a) * singleParams.rotorRadius_mm * s, Math.sin(a) * singleParams.rotorRadius_mm * s);
     }
-    
-    let calculateBtn = document.getElementById('multi-calculate');
-    if (calculateBtn) {
-        calculateBtn.addEventListener('click', calculateMultiBalance);
+
+    const r = singleParams.radius_mm * s;
+    const mx = Math.cos(theta) * r;
+    const my = Math.sin(theta) * r;
+    p.stroke(colours.red, 120);
+    drawArrow(p, 0, 0, mx, my, 10, Math.PI/7, 2);
+    p.noStroke();
+    p.fill(colours.red);
+    p.circle(mx, my, 12);
+
+    if (singleParams.isBalanced) {
+      const br = singleParams.balanceRadius_mm * s;
+      const bx = Math.cos(theta + singleParams.balanceAngle) * br;
+      const by = Math.sin(theta + singleParams.balanceAngle) * br;
+      p.stroke(colours.green, 120);
+      drawArrow(p, 0, 0, bx, by, 10, Math.PI/7, 2);
+      p.noStroke();
+      p.fill(colours.green);
+      p.circle(bx, by, 12);
     }
-    
-    let applyBtn = document.getElementById('multi-apply');
-    if (applyBtn) {
-        applyBtn.addEventListener('click', () => {
-            calculateMultiBalance();
-            multiSimulation.balances[0].enabled = true;
-            multiSimulation.balances[1].enabled = true;
-        });
+
+    p.fill(0);
+    p.circle(0, 0, 4);
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    const rpm = (singleParams.omega * 60) / (2 * Math.PI);
+    p.text(`Single * FRONT (x-y)\nRPM: ${rpm.toFixed(0)}  Balance: ${singleParams.isBalanced ? 'ON' : 'OFF'}`, 10, 10);
+
+    const statusEl = $('single-status');
+    if (statusEl) {
+      const statusValue = statusEl.querySelector('.status-value');
+      if (statusValue) {
+        statusValue.textContent = singleParams.isBalanced ? 'Balanced' : 'Unbalanced';
+        statusValue.className = 'status-value ' + (singleParams.isBalanced ? 'balanced' : 'unbalanced');
+      }
     }
-    
-    let removeBtn = document.getElementById('multi-remove');
-    if (removeBtn) {
-        removeBtn.addEventListener('click', () => {
-            multiSimulation.balances[0].enabled = false;
-            multiSimulation.balances[1].enabled = false;
-            let balanceA = document.getElementById('multi-balance-a');
-            let balanceB = document.getElementById('multi-balance-b');
-            if (balanceA) balanceA.textContent = '-- g @ -- °';
-            if (balanceB) balanceB.textContent = '-- g @ -- °';
-        });
+  };
+};
+
+/* -----------------------------------------------------------
+   SINGLE PLANE - Side View
+----------------------------------------------------------- */
+const singleSideSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('single-side-view');
+    const { w, h } = measureBox(parentEl, 0.62, 240);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 240);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
+
+    if (singleParams.omega < 0.1) {
+      const targetAngle = singleParams.isBalanced ? 0 : -Math.PI/2;
+      const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
+      const settleRate = 2.0;
+      theta += diff * Math.min(1, dt * settleRate);
+    } else {
+      theta += singleParams.omega * dt;
     }
-    
-    let resetBtn = document.getElementById('multi-reset');
-    if (resetBtn) {
-        resetBtn.addEventListener('click', () => {
-            multiSimulation.angle = 0;
-            multiSimulation.rpm = 0;
-            multiSimulation.unbalances[0] = { mass: 50, radius: 60, position: 25, angle: 0, color: [255, 0, 0] };
-            multiSimulation.unbalances[1] = { mass: 30, radius: 80, position: 50, angle: 120, color: [0, 100, 255] };
-            multiSimulation.unbalances[2] = { mass: 40, radius: 50, position: 75, angle: 240, color: [255, 150, 0] };
-            multiSimulation.balances[0].enabled = false;
-            multiSimulation.balances[1].enabled = false;
-            
-            // Reset all controls
-            if (rpmSlider) rpmSlider.value = 0;
-            if (rpmValue) rpmValue.value = 0;
-            for (let i = 1; i <= 3; i++) {
-                let mass = document.getElementById(`multi-mass${i}`);
-                let massVal = document.getElementById(`multi-mass${i}-value`);
-                let radius = document.getElementById(`multi-radius${i}`);
-                let radiusVal = document.getElementById(`multi-radius${i}-value`);
-                let position = document.getElementById(`multi-position${i}`);
-                let positionVal = document.getElementById(`multi-position${i}-value`);
-                
-                if (mass) mass.value = multiSimulation.unbalances[i-1].mass;
-                if (massVal) massVal.value = multiSimulation.unbalances[i-1].mass;
-                if (radius) radius.value = multiSimulation.unbalances[i-1].radius;
-                if (radiusVal) radiusVal.value = multiSimulation.unbalances[i-1].radius;
-                if (position) position.value = multiSimulation.unbalances[i-1].position;
-                if (positionVal) positionVal.value = multiSimulation.unbalances[i-1].position;
-            }
-        });
+
+    let vibrationY = 0;
+    if (!singleParams.isBalanced && singleParams.omega > 0.1) {
+      vibrationY = Math.min(15, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 10000) * Math.sin(theta);
     }
+
+    const leftX = 60;
+    const rightX = p.width - 60;
+    const centerX = (leftX + rightX) / 2;
+    const midY = p.height / 2;
+
+    p.stroke(0, 60);
+    p.strokeWeight(4);
+    p.line(leftX, midY + vibrationY, rightX, midY + vibrationY);
+
+    p.stroke(0, 120);
+    p.strokeWeight(3);
+    p.line(leftX, midY - 30, leftX, midY + 30);
+    p.line(rightX, midY - 30, rightX, midY + 30);
+
+    const s_side = (p.height - 60) / (2 * Math.max(1, singleParams.rotorRadius_mm));
+    const y = s_side * singleParams.radius_mm * Math.sin(theta);
+
+    p.stroke(colours.red[0], colours.red[1], colours.red[2]);
+    p.strokeWeight(3);
+    p.line(centerX, midY + vibrationY, centerX, midY + vibrationY - y);
+    p.noStroke();
+    p.fill(colours.red[0], colours.red[1], colours.red[2]);
+    p.circle(centerX, midY + vibrationY - y, 10);
+
+    if (singleParams.isBalanced) {
+      const by = s_side * singleParams.balanceRadius_mm * Math.sin(theta + singleParams.balanceAngle);
+      p.stroke(colours.green[0], colours.green[1], colours.green[2]);
+      p.strokeWeight(3);
+      p.line(centerX, midY, centerX, midY - by);
+      p.noStroke();
+      p.fill(colours.green[0], colours.green[1], colours.green[2]);
+      p.circle(centerX, midY - by, 8);
+    }
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(`Single * SIDE (z-y)`, 10, 10);
+  };
+};
+
+/* -----------------------------------------------------------
+   SINGLE PLANE - MR Diagram with reactions (fixed scale)
+----------------------------------------------------------- */
+const singleMRSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('single-mr-diagram');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
+
+    if (singleParams.omega < 0.1) {
+      const targetAngle = singleParams.isBalanced ? 0 : Math.PI/2;
+      const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
+      const settleRate = 2.0;
+      theta += diff * Math.min(1, dt * settleRate);
+    } else {
+      theta += singleParams.omega * dt;
+    }
+
+    const vectors = [];
+    const MR = singleParams.mass_g * singleParams.radius_mm;
+    vectors.push({ x: MR * Math.cos(theta), y: MR * Math.sin(theta), colour: colours.red, label: 'Unbalance' });
+
+    if (singleParams.isBalanced) {
+      const MR_bal = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
+      vectors.push({ x: MR_bal * Math.cos(theta + singleParams.balanceAngle), y: MR_bal * Math.sin(theta + singleParams.balanceAngle), colour: colours.green, label: 'Balance' });
+    }
+
+    let totalX = 0, totalY = 0;
+    for (const v of vectors) { totalX += v.x; totalY += v.y; }
+
+    const margin = 28;
+    const s = MR_FIXED_SCALE;
+
+    p.push();
+    p.translate(p.width/2, p.height/2);
+
+    p.noFill();
+    p.stroke(0, 25);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, p.width - 2*margin, p.height - 2*margin, 8);
+    // axes
+    p.stroke(0, 40);
+    p.line(-p.width, 0, p.width, 0);
+    p.line(0, -p.height, 0, p.height);
+    // rotating dashed 0° reference
+    const mrLen = (p.width / 2) - margin;
+    dashedZeroRay(p, mrLen, theta);
+
+    let cx = 0, cy = 0;
+    for (const v of vectors) {
+      p.stroke(v.colour[0], v.colour[1], v.colour[2]);
+      p.strokeWeight(3);
+      const nx = cx + v.x * s;
+      const ny = cy + v.y * s;
+      drawArrow(p, cx, cy, nx, ny, 12, Math.PI/7, 3);
+      cx = nx; cy = ny;
+    }
+
+    if (!singleParams.isBalanced && (Math.abs(totalX) > 0.1 || Math.abs(totalY) > 0.1)) {
+      p.stroke(0, 0, 0, 140);
+      p.strokeWeight(2);
+      drawArrow(p, 0, 0, totalX * s, totalY * s, 10, Math.PI/7, 2);
+    }
+
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    const resultantMag = Math.sqrt(totalX*totalX + totalY*totalY);
+    p.text(`Single * MR Diagram\n|MR| = ${resultantMag.toFixed(0)} gmm`, 10, 10);
+  };
+};
+
+/* -----------------------------------------------------------
+   SINGLE PLANE - Forces & Reactions (fixed scale, green only when applied)
+----------------------------------------------------------- */
+const singleForcesSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('single-force-diagram');
+    const { w, h } = measureBox(parentEl, 0.45, 240);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.45, 240);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
+
+    if (singleParams.omega < 0.1) {
+      const targetAngle = singleParams.isBalanced ? 0 : -Math.PI/2;
+      const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
+      const settleRate = 2.0;
+      theta += diff * Math.min(1, dt * settleRate);
+    } else {
+      theta += singleParams.omega * dt;
+    }
+
+    const leftX = 50, rightX = p.width - 50, midY = p.height/2;
+
+    let vibrationY = 0;
+    if (!singleParams.isBalanced && singleParams.omega > 0.1) {
+      vibrationY = Math.min(15, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 20000) * Math.sin(theta);
+    }
+
+    p.stroke(0, 60);
+    p.strokeWeight(3);
+    p.line(leftX, midY + vibrationY, rightX, midY + vibrationY);
+
+    p.strokeWeight(2);
+    p.line(leftX, midY + 25, leftX, midY - 25);
+    p.line(rightX, midY + 25, rightX, midY - 25);
+
+    const F = singleParams.mass_g * singleParams.radius_mm * (singleParams.omega ** 2);
+    const scaleF = FORCE_FIXED_SCALE;
+
+    const F1 = singleParams.mass_g * singleParams.radius_mm * (singleParams.omega ** 2);
+    const Fx1 = F1 * Math.cos(theta) * scaleF;
+    const Fy1 = F1 * Math.sin(theta) * scaleF;
+    p.stroke(colours.red[0], colours.red[1], colours.red[2]);
+    drawArrow(p, (leftX + rightX)/2, midY + vibrationY, (leftX + rightX)/2 + Fx1, midY + vibrationY - Fy1, 10, Math.PI/7, 3);
+
+    let Fx2 = 0, Fy2 = 0;
+    if (singleParams.isBalanced) {
+      const F2 = singleParams.balanceMass_g * singleParams.balanceRadius_mm * (singleParams.omega ** 2);
+      Fx2 = F2 * Math.cos(theta + singleParams.balanceAngle) * scaleF;
+      Fy2 = F2 * Math.sin(theta + singleParams.balanceAngle) * scaleF;
+      p.stroke(colours.green[0], colours.green[1], colours.green[2]);
+      drawArrow(p, (leftX + rightX)/2, midY + vibrationY, (leftX + rightX)/2 + Fx2, midY + vibrationY - Fy2, 10, Math.PI/7, 3);
+    }
+
+    const Rx = -(Fx1 + Fx2) / 2;
+    const Ry =  (Fy1 + Fy2) / 2;
+    p.stroke(colours.purple[0], colours.purple[1], colours.purple[2]);
+    drawArrow(p, leftX, midY, leftX + Rx, midY - Ry, 8, Math.PI/7, 2);
+    drawArrow(p, rightX, midY, rightX + Rx, midY - Ry, 8, Math.PI/7, 2);
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(`Single * Forces & Reactions\nStatus: ${singleParams.isBalanced ? 'Balanced' : 'Unbalanced'}`, 10, 10);
+
+    const forceEl = $('single-force');
+    if (forceEl) {
+      const forceN = F * 0.001 * 0.001 * (singleParams.omega ** 2);
+      forceEl.textContent = forceN.toFixed(1) + ' N';
+    }
+  };
+};
+
+/* -----------------------------------------------------------
+   MULTI-PLANE - Front View (global multiPaused/timeScale)
+----------------------------------------------------------- */
+const multiFrontSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    wireMultiControls();
+    parentEl = $('multi-front-view');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.ellipseMode(p.CENTER);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (multiPaused ? 0 : timeScale);
+
+    // Heavy side down: +/2 - COM angle
+    if (multiParams.omega < 0.1) {
+      const comAngle = calculateMultiCentreOfMass(theta);
+      const targetAngle = theta + (Math.PI/2 - comAngle);
+      const angleDiff = targetAngle - theta;
+      multiParams.angularVel += angleDiff * 0.05;
+      multiParams.angularVel *= GRAVITY_DAMPING;
+      theta += multiParams.angularVel * dt;
+    } else {
+      theta += multiParams.omega * dt;
+      multiParams.angularVel = 0;
+    }
+
+    let vibrationX = 0, vibrationY = 0;
+    if (!multiParams.isBalanced && multiParams.omega > 0.1) {
+      let totalFx = 0, totalFy = 0;
+      for (const m of multiParams.masses) {
+        const angle = theta + m.phase;
+        totalFx += m.m_g * m.r_mm * Math.cos(angle);
+        totalFy += m.m_g * m.r_mm * Math.sin(angle);
+      }
+      const vibrationMag = Math.min(10, Math.hypot(totalFx, totalFy) * multiParams.omega * multiParams.omega / 20000);
+      vibrationX = vibrationMag * Math.cos(theta);
+      vibrationY = vibrationMag * Math.sin(theta);
+    }
+
+    p.push();
+    p.translate(p.width/2 + vibrationX, p.height/2 + vibrationY);
+
+    const margin = 24;
+    const maxR = Math.max(multiParams.rotorRadius_mm, ...multiParams.masses.map(m => m.r_mm));
+    const s = (Math.min(p.width, p.height) - 2*margin) / (2*maxR);
+
+    // dashed 0° reference (rotating)
+    const bodyLen = (Math.min(p.width, p.height) - 2*margin) / 2;
+    dashedZeroRay(p, bodyLen, theta);
+
+    p.noFill();
+    p.stroke(0, 25);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, p.width - 2*margin, p.height - 2*margin, 8);
+    p.stroke(0, 70);
+    p.strokeWeight(2);
+    p.circle(0, 0, 2 * multiParams.rotorRadius_mm * s);
+
+    for (const m of multiParams.masses) {
+      const ang = theta + m.phase;
+      const x = Math.cos(ang) * m.r_mm * s;
+      const y = Math.sin(ang) * m.r_mm * s;
+      p.stroke(0, 100);
+      drawArrow(p, 0, 0, x, y, 10, Math.PI/7, 2);
+      p.noStroke();
+      p.fill(...m.colour);
+      p.circle(x, y, 12);
+    }
+
+    if (multiParams.isBalanced) {
+      // Draw M first, then L (MR diagram will thus end with L closing)
+      const bmM = multiParams.balanceMasses[1];
+      const bmL = multiParams.balanceMasses[0];
+      for (const bm of [bmM, bmL]) {
+        const x = Math.cos(theta + bm.angle) * bm.r_mm * s;
+        const y = Math.sin(theta + bm.angle) * bm.r_mm * s;
+        p.stroke(colours.green[0], colours.green[1], colours.green[2], 100);
+        drawArrow(p, 0, 0, x, y, 10, Math.PI/7, 2);
+        p.noStroke();
+        p.fill(...colours.green);
+        p.circle(x, y, 10);
+      }
+    }
+
+    p.fill(0);
+    p.circle(0, 0, 4);
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    const rpm = (multiParams.omega * 60) / (2 * Math.PI);
+    p.text(`Multi * FRONT (x-y)\nRPM: ${rpm.toFixed(0)}  Balance: ${multiParams.isBalanced ? 'ON' : 'OFF'}`, 10, 10);
+
+    const statusEl = $('multi-status');
+    if (statusEl) {
+      const statusValue = statusEl.querySelector('.status-value');
+      if (statusValue) {
+        statusValue.textContent = multiParams.isBalanced ? 'Balanced' : 'Unbalanced';
+        statusValue.className = 'status-value ' + (multiParams.isBalanced ? 'balanced' : 'unbalanced');
+      }
+    }
+  };
+};
+
+/* -----------------------------------------------------------
+   MULTI-PLANE - Side View
+----------------------------------------------------------- */
+const multiSideSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('multi-side-view');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (multiPaused ? 0 : timeScale);
+
+    // Heavy side down
+    if (multiParams.omega < 0.1) {
+      const comAngle = calculateMultiCentreOfMass(theta);
+      const targetAngle = theta + (Math.PI/2 - comAngle);
+      const angleDiff = targetAngle - theta;
+      multiParams.angularVel += angleDiff * 0.05;
+      multiParams.angularVel *= GRAVITY_DAMPING;
+      theta += multiParams.angularVel * dt;
+    } else {
+      theta += multiParams.omega * dt;
+    }
+
+    const margin = 24;
+    const panelW = p.width - 2*margin;
+    const panelH = p.height - 2*margin;
+
+    p.push();
+    p.translate(p.width/2, p.height/2);
+
+    const maxR = Math.max(multiParams.rotorRadius_mm, ...multiParams.masses.map(m => m.r_mm));
+    const zSpan = 2 * multiParams.shaftHalfLen_mm;
+    const ySpan = 2 * maxR;
+    const sx = panelW / zSpan;
+    const sy = panelH / ySpan;
+    const X = (zmm) => zmm * sx;
+    const Y = (ymm) => ymm * sy;
+
+    let vibrationY = 0;
+    if (!multiParams.isBalanced && multiParams.omega > 0.1) {
+      let totalFy = 0;
+      for (const m of multiParams.masses) {
+        const angle = theta + m.phase;
+        totalFy += m.m_g * m.r_mm * Math.sin(angle);
+      }
+      vibrationY = Math.min(10, Math.abs(totalFy) * multiParams.omega * multiParams.omega / 20000);
+    }
+
+    p.noFill();
+    p.stroke(0, 25);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, panelW, panelH, 8);
+
+    p.stroke(0, 50);
+    p.line(X(-multiParams.shaftHalfLen_mm), Y(0) + vibrationY * Math.sin(theta),
+           X(multiParams.shaftHalfLen_mm),  Y(0) + vibrationY * Math.sin(theta));
+
+    p.stroke(0, 120);
+    p.line(X(-multiParams.shaftHalfLen_mm), Y(-maxR), X(-multiParams.shaftHalfLen_mm), Y(maxR));
+    p.line(X(multiParams.shaftHalfLen_mm),  Y(-maxR), X(multiParams.shaftHalfLen_mm),  Y(maxR));
+
+    // Balance plane markers
+    const zL = posPctToZmm(10, multiParams.shaftHalfLen_mm);
+    const zM = posPctToZmm(90, multiParams.shaftHalfLen_mm);
+    p.stroke(colours.green[0], colours.green[1], colours.green[2], 60);
+    p.strokeWeight(1);
+    p.line(X(zL), Y(-maxR), X(zL), Y(maxR));
+    p.line(X(zM), Y(-maxR), X(zM), Y(maxR));
+    // Labels "L" and "M"
+    p.noStroke();
+    p.fill(30);
+    p.textSize(12);
+    p.textAlign(p.CENTER, p.TOP);
+    p.text('L', X(zL), Y(maxR) - 16);
+    p.text('M', X(zM), Y(maxR) - 16);
+
+    for (const m of multiParams.masses) {
+      const ang = theta + m.phase;
+      const zmm = posPctToZmm(m.posPct, multiParams.shaftHalfLen_mm);
+      const ymm = m.r_mm * Math.sin(ang);
+      p.stroke(...m.colour);
+      p.strokeWeight(3);
+      drawArrow(p, X(zmm), Y(0) + vibrationY * Math.sin(theta), X(zmm), Y(ymm) + vibrationY * Math.sin(theta), 10, Math.PI/7, 3);
+      p.noStroke();
+      p.fill(...m.colour);
+      p.circle(X(zmm), Y(ymm) + vibrationY * Math.sin(theta), 10);
+    }
+
+    if (multiParams.isBalanced) {
+      for (const bm of multiParams.balanceMasses) {
+        const zmm = posPctToZmm(bm.posPct, multiParams.shaftHalfLen_mm);
+        const ymm = bm.r_mm * Math.sin(theta + bm.angle);
+        p.stroke(...colours.green);
+        p.strokeWeight(2);
+        drawArrow(p, X(zmm), Y(0), X(zmm), Y(ymm), 8, Math.PI/7, 2);
+        p.noStroke();
+        p.fill(...colours.green);
+        p.circle(X(zmm), Y(ymm), 8);
+      }
+    }
+
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(`Multi * SIDE (z-y)`, 10, 10);
+  };
+};
+
+/* -----------------------------------------------------------
+   MULTI-PLANE - MR Diagram (fixed scale, show 5 arrows: 3 masses, green M, green L closing)
+----------------------------------------------------------- */
+const multiMRSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('multi-mr-diagram');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (multiPaused ? 0 : timeScale);
+
+    // Heavy side down
+    if (multiParams.omega < 0.1) {
+      const comAngle = calculateMultiCentreOfMass(theta);
+      const targetAngle = theta + (Math.PI/2 - comAngle);
+      const angleDiff = targetAngle - theta;
+      multiParams.angularVel += angleDiff * 0.05;
+      multiParams.angularVel *= GRAVITY_DAMPING;
+      theta += multiParams.angularVel * dt;
+    } else {
+      theta += multiParams.omega * dt;
+    }
+
+    // Build: red, blue, orange, green M, green L
+    const vectors = [];
+    for (const m of multiParams.masses) {
+      const MR = m.m_g * m.r_mm;
+      const ang = theta + m.phase;
+      vectors.push({ x: MR * Math.cos(ang), y: MR * Math.sin(ang), colour: m.colour, label: `Mass ${m.id}` });
+    }
+    if (multiParams.isBalanced) {
+      const bmM = multiParams.balanceMasses[1];
+      const bmL = multiParams.balanceMasses[0];
+      const MR_M = bmM.m_g * bmM.r_mm;
+      const MR_L = bmL.m_g * bmL.r_mm;
+      vectors.push({ x: MR_M * Math.cos(theta + bmM.angle), y: MR_M * Math.sin(theta + bmM.angle), colour: colours.green, label: 'M' });
+      vectors.push({ x: MR_L * Math.cos(theta + bmL.angle), y: MR_L * Math.sin(theta + bmL.angle), colour: colours.green, label: 'L' });
+    }
+
+    let totalX = 0, totalY = 0;
+    for (const v of vectors) { totalX += v.x; totalY += v.y; }
+
+    const margin = 28;
+    const s = MR_MULTI_FIXED_SCALE;
+
+    p.push();
+    p.translate(p.width/2, p.height/2);
+
+    p.noFill();
+    p.stroke(0, 25);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, p.width - 2*margin, p.height - 2*margin, 8);
+
+    // axes
+    p.stroke(0, 40);
+    p.line(-p.width, 0, p.width, 0);
+    p.line(0, -p.height, 0, p.height);
+    // rotating dashed 0° reference
+    const mrLen = (p.width / 2) - margin;
+    dashedZeroRay(p, mrLen, theta);
+
+    p.strokeWeight(3);
+    let cx = 0, cy = 0;
+    for (const v of vectors) {
+      p.stroke(...v.colour);
+      const nx = cx + v.x * s;
+      const ny = cy + v.y * s; // +y
+      drawArrow(p, cx, cy, nx, ny, 12, Math.PI/7, 3);
+      cx = nx; cy = ny;
+    }
+
+    // No black resultant when balanced; if unbalanced, show resultant
+    if (!multiParams.isBalanced && (Math.abs(totalX) > 0.1 || Math.abs(totalY) > 0.1)) {
+      p.stroke(0, 0, 0, 140);
+      p.strokeWeight(2);
+      drawArrow(p, 0, 0, totalX * s, totalY * s, 10, Math.PI/7, 2);
+    }
+
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    const resultantMag = Math.sqrt(totalX*totalX + totalY*totalY);
+    p.text(`Multi * MR Diagram\n|MR| = ${resultantMag.toFixed(0)} gmm`, 10, 10);
+  };
+};
+
+/* -----------------------------------------------------------
+   MULTI-PLANE - MRL Diagram (fixed scale, 4 arrows: red, blue, orange, green M closing; L is zero)
+----------------------------------------------------------- */
+const multiMRLSketch = (p) => {
+  let theta = 0;
+  let parentEl, canvas;
+
+  p.setup = function() {
+    parentEl = $('multi-mrl-diagram');
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    canvas = p.createCanvas(w, h);
+    canvas.parent(parentEl);
+    p.strokeCap(p.ROUND);
+  };
+
+  p.windowResized = function() {
+    const { w, h } = measureBox(parentEl, 0.62, 320);
+    p.resizeCanvas(w, h);
+  };
+
+  p.draw = function() {
+    p.background(255);
+    const dt = (p.deltaTime / 1000) * (multiPaused ? 0 : timeScale);
+
+    // Heavy side down
+    if (multiParams.omega < 0.1) {
+      const comAngle = calculateMultiCentreOfMass(theta);
+      const targetAngle = theta + (Math.PI/2 - comAngle);
+      const angleDiff = targetAngle - theta;
+      multiParams.angularVel += angleDiff * 0.05;
+      multiParams.angularVel *= GRAVITY_DAMPING;
+      theta += multiParams.angularVel * dt;
+    } else {
+      theta += multiParams.omega * dt;
+    }
+
+    // Reference at L
+    const zL = posPctToZmm(multiParams.balanceMasses[0].posPct, multiParams.shaftHalfLen_mm);
+
+    // Three MRL mass vectors
+    const vectors = [];
+    for (const m of multiParams.masses) {
+      const MR = m.m_g * m.r_mm;
+      const z  = posPctToZmm(m.posPct, multiParams.shaftHalfLen_mm);
+      const L  = z - zL;
+      const ang = theta + m.phase;
+      vectors.push({ x: MR * L * Math.cos(ang), y: MR * L * Math.sin(ang), colour: m.colour });
+    }
+
+    // M plane MRL
+    if (multiParams.isBalanced) {
+      const bmM = multiParams.balanceMasses[1];
+      const zM = posPctToZmm(bmM.posPct, multiParams.shaftHalfLen_mm);
+      const L_M = zM - zL; // non-zero
+      const MR_M = bmM.m_g * bmM.r_mm;
+      vectors.push({ x: MR_M * L_M * Math.cos(theta + bmM.angle), y: MR_M * L_M * Math.sin(theta + bmM.angle), colour: colours.green });
+    }
+
+    let totalX = 0, totalY = 0;
+    for (const v of vectors) { totalX += v.x; totalY += v.y; }
+
+    const margin = 28;
+    const s = MRL_MULTI_FIXED_SCALE;
+
+    p.push();
+    p.translate(p.width/2, p.height/2);
+
+    p.noFill();
+    p.stroke(0, 25);
+    p.rectMode(p.CENTER);
+    p.rect(0, 0, p.width - 2*margin, p.height - 2*margin, 8);
+
+    // axes
+    p.stroke(0, 40);
+    p.line(-p.width, 0, p.width, 0);
+    p.line(0, -p.height, 0, p.height);
+    // rotating dashed 0° reference
+    const mrlLen = (p.width / 2) - margin;
+    dashedZeroRay(p, mrlLen, theta);
+
+    p.strokeWeight(3);
+    let cx = 0, cy = 0;
+    for (const v of vectors) {
+      p.stroke(...v.colour);
+      const nx = cx + v.x * s;
+      const ny = cy + v.y * s;
+      drawArrow(p, cx, cy, nx, ny, 12, Math.PI/7, 3);
+      cx = nx; cy = ny;
+    }
+
+    // Resultant (black) - show only when NOT balanced
+    if (!multiParams.isBalanced && (Math.abs(totalX) > 0.1 || Math.abs(totalY) > 0.1)) {
+      p.stroke(0, 0, 0, 200);
+      drawArrow(p, 0, 0, totalX * s, totalY * s, 12, Math.PI/7, 2);
+    }
+    // When balanced, polygon closes via green M; no black resultant.
+
+    p.pop();
+
+    p.noStroke();
+    p.fill(30);
+    p.textSize(13);
+    p.textAlign(p.LEFT, p.TOP);
+    const resultantMag = Math.sqrt(totalX*totalX + totalY*totalY);
+    p.text(`Multi * MRL Diagram (ref: L)\n|MRL| = ${resultantMag.toFixed(0)} gmm`, 10, 10);
+  };
+};
+
+/* -----------------------------------------------------------
+   Boot all p5 instances
+----------------------------------------------------------- */
+let p5_instances = [];
+
+function boot() {
+  p5_instances.forEach(instance => { if (instance && instance.remove) instance.remove(); });
+  p5_instances = [];
+
+  // Single
+  p5_instances.push(new p5(singleFrontSketch));
+  p5_instances.push(new p5(singleSideSketch));
+  p5_instances.push(new p5(singleMRSketch));
+  p5_instances.push(new p5(singleForcesSketch));
+
+  // Multi
+  p5_instances.push(new p5(multiFrontSketch));
+  p5_instances.push(new p5(multiSideSketch));
+  p5_instances.push(new p5(multiMRSketch));
+  p5_instances.push(new p5(multiMRLSketch));
+
+  updateBalanceDisplay();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
 }

@@ -13,10 +13,170 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- Import Plotly for graphs -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- Import custom CSS -->
+    <!-- Import custom CSS - FIXED: Now properly importing main.css -->
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
     <!-- Custom script -->
     <script src="3d-stress-strain.js"></script>
+    
+    <!-- Additional styles for consistency -->
+    <style>
+        /* Ensure practice problem solutions are hidden by default */
+        .solution {
+            display: none;
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .solution-toggle {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+        
+        .solution-toggle:hover {
+            background-color: var(--primary-color);
+        }
+        
+        /* Feedback styles consistent with other files */
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        /* Slider styles */
+        .slider-container {
+            margin-bottom: 10px;
+        }
+        
+        .slider-container label {
+            display: inline-block;
+            width: 60px;
+            font-weight: bold;
+        }
+        
+        .slider {
+            width: 200px;
+            margin: 0 10px;
+        }
+        
+        .slider-container span {
+            display: inline-block;
+            width: 50px;
+            text-align: right;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        /* Control panel styling */
+        .control-panel {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group h3 {
+            margin-bottom: 10px;
+            color: #cc9900;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-container {
+            margin-top: 10px;
+        }
+        
+        .checkbox-container label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Results panels */
+        .results-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .result-panels {
+            display: grid;
+            grid-template-columns: 1fr;  /* always one column */
+            gap: 20px;
+        }
+        
+        .result-panel {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .result-panel h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #cc9900;
+        }
+        
+        .matrix {
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .plot-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        #mohr-circle-3d {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,13 +185,23 @@
         <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
 
-    <div class="container">
+    <div class="container" style="grid-template-columns:1fr">
         <div class="simulation-section">
             <h2>Interactive 3D Stress Visualisation</h2>
             <div id="sketch-holder">
                 <!-- Our p5.js sketch will go here -->
             </div>
-            <div id="controls">
+            <div id="axis-legend" style="margin-top:8px;font-size:14px;line-height:1.4;">
+            <strong>Stress colours:</strong>
+            <span style="margin-left:8px;color:#f00;">σ_x (red)</span>
+            <span style="margin-left:8px;color:#00f;">σ_y (blue)</span>
+            <span style="margin-left:8px;color:#0b0;">σ_z (green)</span>
+            <span style="margin-left:8px;color:#f0f;">τ_xy (purple)</span>
+            <span style="margin-left:8px;color:#0ff;">τ_yz (cyan)</span>
+            <span style="margin-left:8px;color:#ff0;">τ_xz (yellow)</span>
+            </div>
+            
+            <div class="control-panel">
                 <div class="control-group">
                     <h3>Stress Components (MPa)</h3>
                     <div class="slider-container">
@@ -71,13 +241,9 @@
                     <div class="button-container">
                         <button id="reset-view">Reset View</button>
                         <button id="toggle-principal">Show Principal Stresses</button>
-                        <button id="toggle-failure">Show Failure Criteria</button>
-                    </div>
-                    <div class="radio-container">
-                        <span>Material Model:</span>
-                        <label><input type="radio" name="material-model" value="isotropic" checked> Isotropic</label>
-                        <label><input type="radio" name="material-model" value="orthotropic"> Orthotropic</label>
-                        <label><input type="radio" name="material-model" value="transverse"> Transverse Isotropic</label>
+                        <div class="checkbox-container">
+                        <label><input type="checkbox" id="show-deformation" checked> Show deformation</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -85,7 +251,7 @@
 
         <div class="results-section">
             <h2>Calculation Results</h2>
-            <div class="result-panels">
+            <div class="result-panels" style="grid-template-columns:1fr">
                 <div class="result-panel">
                     <h3>Stress Tensor</h3>
                     <div id="stress-matrix" class="matrix"></div>
@@ -95,16 +261,13 @@
                     <div id="principal-stresses"></div>
                 </div>
                 <div class="result-panel">
-                    <h3>Failure Criteria</h3>
+                    <h3>Equivalent Failure Stress (σ_Y=110 MPa)</h3>
                     <div id="failure-criteria"></div>
                 </div>
             </div>
             <div class="visualisation-panels">
                 <div id="mohr-circle-3d" class="plot-container">
                     <!-- 3D Mohr's Circle plot will go here -->
-                </div>
-                <div id="failure-envelope" class="plot-container">
-                    <!-- Failure envelope plot will go here -->
                 </div>
             </div>
         </div>
@@ -116,18 +279,18 @@
                 <h3>Cauchy Stress Tensor</h3>
                 <p>The Cauchy stress tensor is a second-order tensor used to represent the state of stress at a point within a material. In three dimensions, it is represented as a 3×3 matrix:</p>
                 <div class="equation-box">
-                    $\boldsymbol{\sigma} = \begin{bmatrix} 
+                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
                     \sigma_{xx} & \tau_{xy} & \tau_{xz} \\
                     \tau_{yx} & \sigma_{yy} & \tau_{yz} \\
                     \tau_{zx} & \tau_{zy} & \sigma_{zz}
-                    \end{bmatrix}$
+                    \end{bmatrix}\]
                 </div>
                 <p>Where:</p>
                 <ul>
-                    <li>\(\sigma_{xx}\), \(\sigma_{yy}\), \(\sigma_{zz}\) are normal stresses</li>
-                    <li>\(\tau_{xy}\), \(\tau_{yz}\), \(\tau_{xz}\), \(\tau_{yx}\), \(\tau_{zy}\), \(\tau_{zx}\) are shear stresses</li>
+                    <li>σ<sub>xx</sub>, σ<sub>yy</sub>, σ<sub>zz</sub> are normal stresses</li>
+                    <li>τ<sub>xy</sub>, τ<sub>yz</sub>, τ<sub>xz</sub>, τ<sub>yx</sub>, τ<sub>zy</sub>, τ<sub>zx</sub> are shear stresses</li>
                 </ul>
-                <p>Due to moment equilibrium, the stress tensor is symmetric, meaning \(\tau_{ij} = \tau_{ji}\).</p>
+                <p>Due to moment equilibrium, the stress tensor is symmetric, meaning τ<sub>ij</sub> = τ<sub>ji</sub>.</p>
                 
                 <div class="key-point">
                     <p>The stress tensor completely defines the state of stress at a point. Each component represents the stress (force per unit area) acting on a plane perpendicular to one axis in the direction of another axis.</p>
@@ -136,169 +299,35 @@
             
             <section id="green-strain">
                 <h3>Green-Lagrange Strain Tensor</h3>
-                <p>The Green-Lagrange strain tensor describes the deformation of a material from an initial to a deformed state. It is defined as:</p>
+                <p>The Green-Lagrange strain tensor describes the deformation of a material from an initial to a deformed state. For small strains, it simplifies to the infinitesimal strain tensor:</p>
                 <div class="equation-box">
-                    $\mathbf{E} = \frac{1}{2}(\mathbf{F}^T\mathbf{F} - \mathbf{I})$
+                    \[\boldsymbol{\varepsilon} = \begin{bmatrix} 
+                    \varepsilon_{xx} & \gamma_{xy}/2 & \gamma_{xz}/2 \\
+                    \gamma_{xy}/2 & \varepsilon_{yy} & \gamma_{yz}/2 \\
+                    \gamma_{xz}/2 & \gamma_{yz}/2 & \varepsilon_{zz}
+                    \end{bmatrix}\]
                 </div>
-                <p>Where:</p>
-                <ul>
-                    <li>\(\mathbf{E}\) is the Green-Lagrange strain tensor</li>
-                    <li>\(\mathbf{F}\) is the deformation gradient tensor</li>
-                    <li>\(\mathbf{I}\) is the identity tensor</li>
-                </ul>
-                <p>For small deformations, the strain tensor can be approximated as:</p>
-                <div class="equation-box">
-                    $$\boldsymbol{\varepsilon} = \begin{bmatrix} 
-                    \varepsilon_{xx} & \frac{1}{2}\gamma_{xy} & \frac{1}{2}\gamma_{xz} \\
-                    \frac{1}{2}\gamma_{yx} & \varepsilon_{yy} & \frac{1}{2}\gamma_{yz} \\
-                    \frac{1}{2}\gamma_{zx} & \frac{1}{2}\gamma_{zy} & \varepsilon_{zz}
-                    \end{bmatrix}$$
-                </div>
-                <p>Where:</p>
-                <ul>
-                    <li>\(\varepsilon_{xx}\), \(\varepsilon_{yy}\), \(\varepsilon_{zz}\) are normal strains</li>
-                    <li>\(\gamma_{xy}\), \(\gamma_{yz}\), \(\gamma_{xz}\) are engineering shear strains</li>
-                </ul>
-            </section>
-            
-            <section id="constitutive-models">
-                <h3>Constitutive Models</h3>
-                <p>Constitutive models describe the relationship between stress and strain in a material. The general form follows Hooke's law:</p>
-                <div class="equation-box">
-                    $$\boldsymbol{\sigma} = \mathbf{C} : \boldsymbol{\varepsilon}$$
-                </div>
-                <p>Where \(\mathbf{C}\) is the fourth-order stiffness tensor.</p>
-                
-                <h4>Isotropic Materials</h4>
-                <p>For isotropic materials (properties are the same in all directions), the constitutive equation can be written as:</p>
-                <div class="equation-box">
-                    $$\boldsymbol{\sigma} = \lambda \text{tr}(\boldsymbol{\varepsilon}) \mathbf{I} + 2\mu \boldsymbol{\varepsilon}$$
-                </div>
-                <p>Where:</p>
-                <ul>
-                    <li>\(\lambda\) and \(\mu\) are Lamé parameters</li>
-                    <li>\(\text{tr}(\boldsymbol{\varepsilon})\) is the trace of the strain tensor</li>
-                </ul>
-                
-                <p>Alternatively, using engineering constants:</p>
-                <div class="equation-box">
-                    $$\begin{bmatrix} 
-                    \varepsilon_{xx} \\ \varepsilon_{yy} \\ \varepsilon_{zz} \\ \gamma_{xy} \\ \gamma_{yz} \\ \gamma_{xz}
-                    \end{bmatrix} = 
-                    \begin{bmatrix} 
-                    \frac{1}{E} & -\frac{\nu}{E} & -\frac{\nu}{E} & 0 & 0 & 0 \\
-                    -\frac{\nu}{E} & \frac{1}{E} & -\frac{\nu}{E} & 0 & 0 & 0 \\
-                    -\frac{\nu}{E} & -\frac{\nu}{E} & \frac{1}{E} & 0 & 0 & 0 \\
-                    0 & 0 & 0 & \frac{1}{G} & 0 & 0 \\
-                    0 & 0 & 0 & 0 & \frac{1}{G} & 0 \\
-                    0 & 0 & 0 & 0 & 0 & \frac{1}{G}
-                    \end{bmatrix}
-                    \begin{bmatrix} 
-                    \sigma_{xx} \\ \sigma_{yy} \\ \sigma_{zz} \\ \tau_{xy} \\ \tau_{yz} \\ \tau_{xz}
-                    \end{bmatrix}$$
-                </div>
-                
-                <h4>Orthotropic Materials</h4>
-                <p>For orthotropic materials (different properties in three perpendicular directions), the compliance matrix becomes:</p>
-                <div class="equation-box">
-                    $$\begin{bmatrix} 
-                    \varepsilon_{xx} \\ \varepsilon_{yy} \\ \varepsilon_{zz} \\ \gamma_{xy} \\ \gamma_{yz} \\ \gamma_{xz}
-                    \end{bmatrix} = 
-                    \begin{bmatrix} 
-                    \frac{1}{E_x} & -\frac{\nu_{xy}}{E_x} & -\frac{\nu_{xz}}{E_x} & 0 & 0 & 0 \\
-                    -\frac{\nu_{yx}}{E_y} & \frac{1}{E_y} & -\frac{\nu_{yz}}{E_y} & 0 & 0 & 0 \\
-                    -\frac{\nu_{zx}}{E_z} & -\frac{\nu_{zy}}{E_z} & \frac{1}{E_z} & 0 & 0 & 0 \\
-                    0 & 0 & 0 & \frac{1}{G_{xy}} & 0 & 0 \\
-                    0 & 0 & 0 & 0 & \frac{1}{G_{yz}} & 0 \\
-                    0 & 0 & 0 & 0 & 0 & \frac{1}{G_{xz}}
-                    \end{bmatrix}
-                    \begin{bmatrix} 
-                    \sigma_{xx} \\ \sigma_{yy} \\ \sigma_{zz} \\ \tau_{xy} \\ \tau_{yz} \\ \tau_{xz}
-                    \end{bmatrix}$$
-                </div>
-                
-                <h4>Transversely Isotropic Materials</h4>
-                <p>For transversely isotropic materials (isotropic in one plane), the compliance matrix simplifies. Assuming the plane of isotropy is the x-y plane:</p>
-                <div class="equation-box">
-                    $$\begin{bmatrix} 
-                    \varepsilon_{xx} \\ \varepsilon_{yy} \\ \varepsilon_{zz} \\ \gamma_{xy} \\ \gamma_{yz} \\ \gamma_{xz}
-                    \end{bmatrix} = 
-                    \begin{bmatrix} 
-                    \frac{1}{E_T} & -\frac{\nu_T}{E_T} & -\frac{\nu_{TL}}{E_T} & 0 & 0 & 0 \\
-                    -\frac{\nu_T}{E_T} & \frac{1}{E_T} & -\frac{\nu_{TL}}{E_T} & 0 & 0 & 0 \\
-                    -\frac{\nu_{LT}}{E_L} & -\frac{\nu_{LT}}{E_L} & \frac{1}{E_L} & 0 & 0 & 0 \\
-                    0 & 0 & 0 & \frac{2(1+\nu_T)}{E_T} & 0 & 0 \\
-                    0 & 0 & 0 & 0 & \frac{1}{G_{LT}} & 0 \\
-                    0 & 0 & 0 & 0 & 0 & \frac{1}{G_{LT}}
-                    \end{bmatrix}
-                    \begin{bmatrix} 
-                    \sigma_{xx} \\ \sigma_{yy} \\ \sigma_{zz} \\ \tau_{xy} \\ \tau_{yz} \\ \tau_{xz}
-                    \end{bmatrix}$$
-                </div>
-                <p>Where:</p>
-                <ul>
-                    <li>\(E_T\) is the Young's modulus in the transverse direction (x-y plane)</li>
-                    <li>\(E_L\) is the Young's modulus in the longitudinal direction (z-axis)</li>
-                    <li>\(\nu_T\) is Poisson's ratio in the transverse plane</li>
-                    <li>\(\nu_{LT}\) and \(\nu_{TL}\) are the Poisson's ratios for the longitudinal-transverse interactions</li>
-                    <li>\(G_{LT}\) is the longitudinal-transverse shear modulus</li>
-                </ul>
-            </section>
-            
-            <section id="stress-transformation">
-                <h3>3D Stress Transformation</h3>
-                <p>Stress transformation allows us to determine the stress components on a plane with any orientation. For 3D transformation, we use direction cosines to define the orientation of the new coordinate system.</p>
-                <div class="equation-box">
-                    $$\boldsymbol{\sigma}' = \mathbf{Q}^T \boldsymbol{\sigma} \mathbf{Q}$$
-                </div>
-                <p>Where:</p>
-                <ul>
-                    <li>\(\boldsymbol{\sigma}'\) is the transformed stress tensor</li>
-                    <li>\(\mathbf{Q}\) is the transformation matrix (composed of direction cosines)</li>
-                </ul>
-                
-                <div class="key-point">
-                    <p>Principal stresses are the eigenvalues of the stress tensor, representing the normal stresses on planes where shear stresses vanish. The principal directions are the eigenvectors of the stress tensor.</p>
-                </div>
-                
-                <p>The characteristic equation for finding principal stresses is:</p>
-                <div class="equation-box">
-                    $$\det(\boldsymbol{\sigma} - \sigma_I \mathbf{I}) = 0$$
-                </div>
-                <p>Which expands to:</p>
-                <div class="equation-box">
-                    $$\sigma^3 - I_1\sigma^2 + I_2\sigma - I_3 = 0$$
-                </div>
-                <p>Where \(I_1\), \(I_2\), and \(I_3\) are the first, second, and third invariants of the stress tensor.</p>
+                <p>Where ε represents normal strains and γ represents engineering shear strains.</p>
             </section>
             
             <section id="failure-criteria">
                 <h3>Failure Criteria</h3>
-                
-                <h4>Maximum Principal Stress Theory (Rankine)</h4>
-                <p>Failure occurs when the maximum principal stress reaches the yield strength of the material:</p>
-                <div class="equation-box">
-                    $$\max(|\sigma_1|, |\sigma_2|, |\sigma_3|) \geq \sigma_y$$
-                </div>
-                
-                <h4>Maximum Shear Stress Theory (Tresca)</h4>
-                <p>Failure occurs when the maximum shear stress reaches a critical value:</p>
-                <div class="equation-box">
-                    $$\max(|\sigma_1 - \sigma_2|, |\sigma_2 - \sigma_3|, |\sigma_3 - \sigma_1|) \geq 2\tau_y = \sigma_y$$
-                </div>
+                <p>Several criteria predict material failure under complex stress states:</p>
                 
                 <h4>Von Mises Criterion</h4>
-                <p>Failure occurs when the distortion energy reaches a critical value:</p>
                 <div class="equation-box">
-                    $$\sqrt{\frac{1}{2}[(\sigma_1 - \sigma_2)^2 + (\sigma_2 - \sigma_3)^2 + (\sigma_3 - \sigma_1)^2]} \geq \sigma_y$$
+                    \[\sigma_{VM} = \sqrt{\frac{1}{2}[(σ_1-σ_2)^2 + (σ_2-σ_3)^2 + (σ_3-σ_1)^2]}\]
                 </div>
-                <p>Or, equivalently:</p>
+                <p>Failure occurs when σ<sub>VM</sub> ≥ σ<sub>y</sub> (yield strength)</p>
+                
+                <h4>Tresca Criterion</h4>
                 <div class="equation-box">
-                    $$\sqrt{(\sigma_x - \sigma_y)^2 + (\sigma_y - \sigma_z)^2 + (\sigma_z - \sigma_x)^2 + 6(\tau_{xy}^2 + \tau_{yz}^2 + \tau_{xz}^2)} \geq \sqrt{2}\sigma_y$$
+                    \[\tau_{max} = \frac{σ_{max} - σ_{min}}{2}\]
                 </div>
+                <p>Failure occurs when τ<sub>max</sub> ≥ σ<sub>y</sub>/2</p>
                 
                 <div class="key-point">
-                    <p>The von Mises criterion is commonly used for ductile materials, while the Rankine criterion is often applied to brittle materials. The Tresca criterion is more conservative than von Mises but simpler to calculate.</p>
+                    <p>The von Mises criterion is based on distortion energy theory and is widely used for ductile materials. The Tresca criterion is more conservative than von Mises but simpler to calculate.</p>
                 </div>
             </section>
         </div>
@@ -310,38 +339,39 @@
                 <h3>Problem 1: Principal Stresses</h3>
                 <p>For the stress tensor below, calculate the principal stresses and their directions:</p>
                 <div class="equation-box">
-                    $$\boldsymbol{\sigma} = \begin{bmatrix} 
+                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
                     80 & 25 & 0 \\
                     25 & 40 & 0 \\
                     0 & 0 & 20
-                    \end{bmatrix} \text{ MPa}$$
+                    \end{bmatrix} \text{ MPa}\]
                 </div>
                 <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
                 <div class="solution" id="solution1">
                     <p>To find the principal stresses, we need to solve the characteristic equation:</p>
-                    <p>\(\det(\boldsymbol{\sigma} - \sigma_I \mathbf{I}) = 0\)</p>
+                    <p>\(\det(\boldsymbol{\lambda} - \lambda \mathbf{I}) = 0\)</p>
                     <p>This gives us:</p>
-                    <p>\((\sigma - 20)[(\sigma - 80)(\sigma - 40) - 25^2] = 0\)</p>
-                    <p>\((\sigma - 20)[\sigma^2 - 120\sigma + 3200 - 625] = 0\)</p>
-                    <p>\((\sigma - 20)(\sigma^2 - 120\sigma + 2575) = 0\)</p>
+                    <p>\((\lambda - 20)[(\lambda - 80)(\lambda - 40) - 25^2] = 0\)</p>
+                    <p>\((\lambda - 20)[\lambda^2 - 120\lambda + 3200 - 625] = 0\)</p>
+                    <p>\((\lambda - 20)(\lambda^2 - 120\lambda + 2575) = 0\)</p>
                     <p>Solving this equation:</p>
-                    <p>\(\sigma_1 = 20 \text{ MPa}\)</p>
-                    <p>\(\sigma_{2,3} = \frac{120 \pm \sqrt{120^2 - 4 \times 2575}}{2} = \frac{120 \pm \sqrt{14400 - 10300}}{2} = \frac{120 \pm \sqrt{4100}}{2} = \frac{120 \pm 64}{2}\)</p>
-                    <p>\(\sigma_2 = 92 \text{ MPa}\)</p>
-                    <p>\(\sigma_3 = 28 \text{ MPa}\)</p>
-                    <p>The principal directions can be found by substituting each principal stress back into \((\boldsymbol{\sigma} - \sigma_I \mathbf{I})\mathbf{v} = \mathbf{0}\) and solving for the eigenvector \(\mathbf{v}\).</p>
+                    <p>\(\lambda_1 = 20 \text{ MPa}\)</p>
+                    <p>\(\lambda_{2,3} = \frac{120 \pm \sqrt{120^2 - 4 \times 2575}}{2} = \frac{120 \pm \sqrt{14400 - 10300}}{2} = \frac{120 \pm \sqrt{4100}}{2} = \frac{120 \pm 64}{2}\)</p>
+                    <p>\(\lambda_2 = 92 \text{ MPa}\)</p>
+                    <p>\(\lambda_3 = 28 \text{ MPa}\)</p>
+                    <p>Thus giving \(\sigma_1 = 92 \text{ MPa}, \quad \sigma_2 = 28 \text{ MPa}, \quad \sigma_3 = 20 \text{ MPa}\)</p>
+                    <p>The principal directions can be found by substituting each principal stress back into \((\boldsymbol{\sigma} - \sigma_i \mathbf{I})\mathbf{v_i} = \mathbf{0}\) and solving for the eigenvector \(\mathbf{v_i}\), where \(i=1,2,3\).</p>
                 </div>
             </div>
             
             <div class="problem">
                 <h3>Problem 2: Failure Analysis</h3>
-                <p>A component made of steel (yield strength \(\sigma_y = 250 \text{ MPa}\)) is subjected to the following stress state:</p>
+                <p>A component made of steel (yield strength σ<sub>y</sub> = 250 MPa) is subjected to the following stress state:</p>
                 <div class="equation-box">
-                    $$\boldsymbol{\sigma} = \begin{bmatrix} 
+                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
                     150 & 50 & 30 \\
                     50 & 100 & 20 \\
                     30 & 20 & 50
-                    \end{bmatrix} \text{ MPa}$$
+                    \end{bmatrix} \text{ MPa}\]
                 </div>
                 <p>Determine whether the component will fail according to:</p>
                 <ol type="a">
@@ -351,76 +381,23 @@
                 </ol>
                 <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
                 <div class="solution" id="solution2">
-                    <p>First, let's calculate the principal stresses by finding the eigenvalues of the stress tensor. Using numerical methods:</p>
-                    <p>\(\sigma_1 = 175.7 \text{ MPa}\)</p>
-                    <p>\(\sigma_2 = 89.5 \text{ MPa}\)</p>
-                    <p>\(\sigma_3 = 34.8 \text{ MPa}\)</p>
+                    <p>First, let's calculate the principal stresses by finding the eigenvalues of the stress tensor.</p>
+                    <p>After solving the characteristic equation, we get:</p>
+                    <p>σ₁ = 185.2 MPa, σ₂ = 85.5 MPa, σ₃ = 29.3 MPa</p>
                     
-                    <p>a) Maximum Principal Stress Theory (Rankine):</p>
-                    <p>\(\max(|\sigma_1|, |\sigma_2|, |\sigma_3|) = 175.7 \text{ MPa} < \sigma_y = 250 \text{ MPa}\)</p>
-                    <p>The component will not fail according to this criterion.</p>
+                    <p><strong>a) Rankine Criterion:</strong></p>
+                    <p>Failure if σ₁ ≥ σ<sub>y</sub></p>
+                    <p>185.2 MPa < 250 MPa → <strong>Safe</strong></p>
                     
-                    <p>b) Maximum Shear Stress Theory (Tresca):</p>
-                    <p>\(\max(|\sigma_1 - \sigma_2|, |\sigma_2 - \sigma_3|, |\sigma_3 - \sigma_1|) = |\sigma_1 - \sigma_3| = |175.7 - 34.8| = 140.9 \text{ MPa}\)</p>
-                    <p>\(\tau_{max} = \frac{140.9}{2} = 70.45 \text{ MPa} < \tau_y = \frac{\sigma_y}{2} = 125 \text{ MPa}\)</p>
-                    <p>The component will not fail according to this criterion.</p>
+                    <p><strong>b) Tresca Criterion:</strong></p>
+                    <p>τ<sub>max</sub> = (σ₁ - σ₃)/2 = (185.2 - 29.3)/2 = 78 MPa</p>
+                    <p>Failure if τ<sub>max</sub> ≥ σ<sub>y</sub>/2 = 125 MPa</p>
+                    <p>78 MPa < 125 MPa → <strong>Safe</strong></p>
                     
-                    <p>c) Von Mises Criterion:</p>
-                    <p>\(\sigma_{vm} = \sqrt{\frac{1}{2}[(\sigma_1 - \sigma_2)^2 + (\sigma_2 - \sigma_3)^2 + (\sigma_3 - \sigma_1)^2]}\)</p>
-                    <p>\(\sigma_{vm} = \sqrt{\frac{1}{2}[(175.7 - 89.5)^2 + (89.5 - 34.8)^2 + (34.8 - 175.7)^2]}\)</p>
-                    <p>\(\sigma_{vm} = \sqrt{\frac{1}{2}[7442.4 + 2990.2 + 19846.8]} = \sqrt{\frac{30279.4}{2}} = 123.0 \text{ MPa} < \sigma_y = 250 \text{ MPa}\)</p>
-                    <p>The component will not fail according to this criterion either.</p>
-                </div>
-            </div>
-            
-            <div class="problem">
-                <h3>Problem 3: Stress Transformation</h3>
-                <p>Given the stress tensor:</p>
-                <div class="equation-box">
-                    $$\boldsymbol{\sigma} = \begin{bmatrix} 
-                    60 & 15 & 25 \\
-                    15 & 40 & 10 \\
-                    25 & 10 & 20
-                    \end{bmatrix} \text{ MPa}$$
-                </div>
-                <p>Calculate the stress components in a coordinate system rotated 30° about the z-axis.</p>
-                <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
-                <div class="solution" id="solution3">
-                    <p>For rotation about the z-axis by 30°, the transformation matrix is:</p>
-                    <p>\(\mathbf{Q} = \begin{bmatrix} 
-                    \cos(30°) & \sin(30°) & 0 \\
-                    -\sin(30°) & \cos(30°) & 0 \\
-                    0 & 0 & 1
-                    \end{bmatrix} = \begin{bmatrix} 
-                    0.866 & 0.5 & 0 \\
-                    -0.5 & 0.866 & 0 \\
-                    0 & 0 & 1
-                    \end{bmatrix}\)</p>
-                    
-                    <p>The transformed stress tensor is:</p>
-                    <p>\(\boldsymbol{\sigma}' = \mathbf{Q}^T \boldsymbol{\sigma} \mathbf{Q}\)</p>
-                    
-                    <p>Computing this matrix multiplication:</p>
-                    <p>\(\boldsymbol{\sigma}' = \begin{bmatrix} 
-                    0.866 & -0.5 & 0 \\
-                    0.5 & 0.866 & 0 \\
-                    0 & 0 & 1
-                    \end{bmatrix} \begin{bmatrix} 
-                    60 & 15 & 25 \\
-                    15 & 40 & 10 \\
-                    25 & 10 & 20
-                    \end{bmatrix} \begin{bmatrix} 
-                    0.866 & 0.5 & 0 \\
-                    -0.5 & 0.866 & 0 \\
-                    0 & 0 & 1
-                    \end{bmatrix}\)</p>
-                    
-                    <p>After performing the matrix multiplication:</p>
-                    <p>\(\boldsymbol{\sigma}' = \begin{bmatrix} 
-                    47.7 & 32.5 & 25.8 \\
-                    32.5 & 52.3 & 5.7 \\
-                    25.8 & 5.7 & 20
-                    \end{bmatrix} \text{ MPa}\)</p>
+                    <p><strong>c) Von Mises Criterion:</strong></p>
+                    <p>σ<sub>VM</sub> = √{½[(185.2-85.5)² + (85.5-29.3)² + (29.3-185.2)²]}</p>
+                    <p>σ<sub>VM</sub> = √{½[9940 + 3158 + 24336]} = √18717 = 136.8 MPa</p>
+                    <p>136.8 MPa < 250 MPa → <strong>Safe</strong></p>
                 </div>
             </div>
         </div>
@@ -430,84 +407,57 @@
             
             <div class="quiz-container">
                 <div class="quiz-question">
-                    <p><strong>Question 1:</strong> Which of the following statements about the Cauchy stress tensor is FALSE?</p>
-                    <form id="q1">
-                        <input type="radio" id="q1a" name="q1" value="a">
-                        <label for="q1a">a) It is a second-order tensor represented as a 3×3 matrix</label><br>
-                        <input type="radio" id="q1b" name="q1" value="b">
-                        <label for="q1b">b) It must be symmetric due to moment equilibrium</label><br>
-                        <input type="radio" id="q1c" name="q1" value="c">
-                        <label for="q1c">c) The diagonal elements represent shear stresses</label><br>
-                        <input type="radio" id="q1d" name="q1" value="d">
-                        <label for="q1d">d) It completely defines the state of stress at a point</label><br>
-                        <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
-                    </form>
-                    <div id="q1-feedback" class="feedback"></div>
+                    <h3>Question 1: Which of the following statements about the Cauchy stress tensor is FALSE?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1" value="a"> a) It is a second-order tensor represented as a 3×3 matrix</label>
+                        <label><input type="radio" name="q1" value="b"> b) It must be symmetric due to moment equilibrium</label>
+                        <label><input type="radio" name="q1" value="c"> c) The diagonal elements represent shear stresses</label>
+                        <label><input type="radio" name="q1" value="d"> d) It completely defines the state of stress at a point</label>
+                    </div>
                 </div>
                 
                 <div class="quiz-question">
-                    <p><strong>Question 2:</strong> According to the von Mises failure criterion, failure occurs when:</p>
-                    <form id="q2">
-                        <input type="radio" id="q2a" name="q2" value="a">
-                        <label for="q2a">a) The maximum principal stress reaches the yield strength</label><br>
-                        <input type="radio" id="q2b" name="q2" value="b">
-                        <label for="q2b">b) The maximum shear stress reaches half the yield strength</label><br>
-                        <input type="radio" id="q2c" name="q2" value="c">
-                        <label for="q2c">c) The distortion energy reaches a critical value</label><br>
-                        <input type="radio" id="q2d" name="q2" value="d">
-                        <label for="q2d">d) The normal stress equals the shear stress</label><br>
-                        <button type="button" onclick="checkAnswer('q2', 'c')">Check Answer</button>
-                    </form>
-                    <div id="q2-feedback" class="feedback"></div>
+                    <h3>Question 2: According to the von Mises failure criterion, failure occurs when:</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q2" value="a"> a) The maximum principal stress reaches the yield strength</label>
+                        <label><input type="radio" name="q2" value="b"> b) The maximum shear stress reaches half the yield strength</label>
+                        <label><input type="radio" name="q2" value="c"> c) The distortion energy reaches a critical value</label>
+                        <label><input type="radio" name="q2" value="d"> d) The normal stress equals the shear stress</label>
+                    </div>
                 </div>
                 
                 <div class="quiz-question">
-                    <p><strong>Question 3:</strong> Which of the following material models requires the fewest independent elastic constants to fully characterize its behavior?</p>
-                    <form id="q3">
-                        <input type="radio" id="q3a" name="q3" value="a">
-                        <label for="q3a">a) Anisotropic</label><br>
-                        <input type="radio" id="q3b" name="q3" value="b">
-                        <label for="q3b">b) Orthotropic</label><br>
-                        <input type="radio" id="q3c" name="q3" value="c">
-                        <label for="q3c">c) Transversely isotropic</label><br>
-                        <input type="radio" id="q3d" name="q3" value="d">
-                        <label for="q3d">d) Isotropic</label><br>
-                        <button type="button" onclick="checkAnswer('q3', 'd')">Check Answer</button>
-                    </form>
-                    <div id="q3-feedback" class="feedback"></div>
+                    <h3>Question 3: Which of the following material models requires the fewest independent elastic constants to fully characterise its behaviour?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q3" value="a"> a) Anisotropic</label>
+                        <label><input type="radio" name="q3" value="b"> b) Orthotropic</label>
+                        <label><input type="radio" name="q3" value="c"> c) Transversely isotropic</label>
+                        <label><input type="radio" name="q3" value="d"> d) Isotropic</label>
+                    </div>
                 </div>
                 
                 <div class="quiz-question">
-                    <p><strong>Question 4:</strong> Principal stresses are:</p>
-                    <form id="q4">
-                        <input type="radio" id="q4a" name="q4" value="a">
-                        <label for="q4a">a) Always equal to the normal stresses in the original coordinate system</label><br>
-                        <input type="radio" id="q4b" name="q4" value="b">
-                        <label for="q4b">b) The eigenvalues of the stress tensor</label><br>
-                        <input type="radio" id="q4c" name="q4" value="c">
-                        <label for="q4c">c) Always positive values regardless of the stress state</label><br>
-                        <input type="radio" id="q4d" name="q4" value="d">
-                        <label for="q4d">d) The maximum shear stresses in the material</label><br>
-                        <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-                    </form>
-                    <div id="q4-feedback" class="feedback"></div>
+                    <h3>Question 4: Principal stresses are:</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q4" value="a"> a) Always equal to the normal stresses in the original coordinate system</label>
+                        <label><input type="radio" name="q4" value="b"> b) The eigenvalues of the stress tensor</label>
+                        <label><input type="radio" name="q4" value="c"> c) Always positive values regardless of the stress state</label>
+                        <label><input type="radio" name="q4" value="d"> d) The maximum shear stresses in the material</label>
+                    </div>
                 </div>
                 
                 <div class="quiz-question">
-                    <p><strong>Question 5:</strong> For a state of stress with principal stresses σ₁ = 200 MPa, σ₂ = 100 MPa, and σ₃ = 50 MPa, the maximum shear stress is:</p>
-                    <form id="q5">
-                        <input type="radio" id="q5a" name="q5" value="a">
-                        <label for="q5a">a) 75 MPa</label><br>
-                        <input type="radio" id="q5b" name="q5" value="b">
-                        <label for="q5b">b) 150 MPa</label><br>
-                        <input type="radio" id="q5c" name="q5" value="c">
-                        <label for="q5c">c) 50 MPa</label><br>
-                        <input type="radio" id="q5d" name="q5" value="d">
-                        <label for="q5d">d) 200 MPa</label><br>
-                        <button type="button" onclick="checkAnswer('q5', 'a')">Check Answer</button>
-                    </form>
-                    <div id="q5-feedback" class="feedback"></div>
+                    <h3>Question 5: For a state of stress with principal stresses σ₁ = 200 MPa, σ₂ = 100 MPa, and σ₃ = 50 MPa, the maximum shear stress is:</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q5" value="a"> a) 75 MPa</label>
+                        <label><input type="radio" name="q5" value="b"> b) 150 MPa</label>
+                        <label><input type="radio" name="q5" value="c"> c) 50 MPa</label>
+                        <label><input type="radio" name="q5" value="d"> d) 200 MPa</label>
+                    </div>
                 </div>
+                
+                <button id="submit-quiz">Submit Quiz</button>
+                <div id="quiz-results" class="hidden"></div>
             </div>
         </div>
     </div> 

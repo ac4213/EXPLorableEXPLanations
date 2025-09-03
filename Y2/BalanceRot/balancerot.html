@@ -78,7 +78,7 @@
         .view-title {
             position: absolute;
             top: 10px;
-            left: 10px;
+            right: 10px;
             background-color: rgba(255,255,255,0.9);
             padding: 3px 8px;
             border-radius: 3px;
@@ -303,8 +303,8 @@
         <h2>Interactive Simulations</h2>
         
         <div class="tab-navigation">
-            <button class="tab-button active" onclick="switchTab('single')">Single Plane Balancing</button>
-            <button class="tab-button" onclick="switchTab('multi')">Multi-Plane Balancing</button>
+            <button class="tab-button active" onclick="switchTab(event,'single')">Single Plane Balancing</button>
+            <button class="tab-button" onclick="switchTab(event,'multi')">Multi-Plane Balancing</button>
         </div>
         
         <!-- Single Plane Simulation -->
@@ -336,8 +336,8 @@
                         <h4>Shaft Speed</h4>
                         <div class="slider-row">
                             <span class="slider-label">RPM:</span>
-                            <input type="range" id="single-rpm" min="0" max="1800" value="0" step="30">
-                            <input type="number" id="single-rpm-value" value="0" min="0" max="1800">
+                            <input type="range" id="single-rpm" min="0" max="180" value="0" step="10">
+                            <input type="number" id="single-rpm-value" min="0" max="180" value="0" step="10">
                         </div>
                     </div>
                     
@@ -345,22 +345,21 @@
                         <h4>Unbalance Mass</h4>
                         <div class="slider-row">
                             <span class="slider-label">Mass (g):</span>
-                            <input type="range" id="single-mass" min="10" max="200" value="50" step="5">
-                            <input type="number" id="single-mass-value" value="50" min="10" max="200">
+                            <input type="range" id="single-mass" min="10" max="50" value="10" step="2">
+                            <input type="number" id="single-mass-value" min="10" max="50" value="10" step="2">
                         </div>
                         <div class="slider-row">
                             <span class="slider-label">Radius (mm):</span>
-                            <input type="range" id="single-radius" min="20" max="100" value="60" step="5">
-                            <input type="number" id="single-radius-value" value="60" min="20" max="100">
+                            <input type="range" id="single-radius" min="10" max="50" value="20" step="2">
+                            <input type="number" id="single-radius-value" min="10" max="50" value="20" step="2">
                         </div>
                     </div>
                 </div>
                 
                 <div class="button-row">
                     <button class="control-button" id="single-pause">Pause</button>
-                    <button class="control-button" id="single-calculate">Calculate Balance</button>
+                    <button class="control-button" id="single-slowmo">Slow-mo</button>
                     <button class="control-button" id="single-apply">Apply Balance</button>
-                    <button class="control-button" id="single-remove">Remove Balance</button>
                     <button class="control-button" id="single-reset">Reset</button>
                 </div>
             </div>
@@ -416,8 +415,8 @@
                         <h4>Shaft Speed</h4>
                         <div class="slider-row">
                             <span class="slider-label">RPM:</span>
-                            <input type="range" id="multi-rpm" min="0" max="1800" value="0" step="30">
-                            <input type="number" id="multi-rpm-value" value="0" min="0" max="1800">
+                            <input type="range" id="multi-rpm" min="0" max="180" value="0" step="10">
+                            <input type="number" id="multi-rpm-value" min="0" max="180" value="0" step="10">
                         </div>
                     </div>
                 </div>
@@ -434,6 +433,11 @@
                             <span class="slider-label">Radius (mm):</span>
                             <input type="range" id="multi-radius1" min="20" max="100" value="60" step="5">
                             <input type="number" id="multi-radius1-value" value="60" min="20" max="100">
+                        </div>
+                        <div class="slider-row">
+                            <span class="slider-label">Angle (°):</span>
+                            <input type="range" id="multi-angle1" min="0" max="360" value="0" step="1">
+                            <input type="number" id="multi-angle1-value" value="0" min="0" max="360" step="1">
                         </div>
                         <div class="slider-row">
                             <span class="slider-label">Position (%):</span>
@@ -455,6 +459,11 @@
                             <input type="number" id="multi-radius2-value" value="80" min="20" max="100">
                         </div>
                         <div class="slider-row">
+                            <span class="slider-label">Angle (°):</span>
+                            <input type="range" id="multi-angle2" min="0" max="360" value="60" step="1">
+                            <input type="number" id="multi-angle2-value" value="60" min="0" max="360" step="1">
+                        </div>
+                        <div class="slider-row">
                             <span class="slider-label">Position (%):</span>
                             <input type="range" id="multi-position2" min="15" max="85" value="50" step="5">
                             <input type="number" id="multi-position2-value" value="50" min="15" max="85">
@@ -474,6 +483,11 @@
                             <input type="number" id="multi-radius3-value" value="50" min="20" max="100">
                         </div>
                         <div class="slider-row">
+                            <span class="slider-label">Angle (°):</span>
+                            <input type="range" id="multi-angle3" min="0" max="360" value="120" step="1">
+                            <input type="number" id="multi-angle3-value" value="120" min="0" max="360" step="1">
+                        </div>
+                        <div class="slider-row">
                             <span class="slider-label">Position (%):</span>
                             <input type="range" id="multi-position3" min="15" max="85" value="75" step="5">
                             <input type="number" id="multi-position3-value" value="75" min="15" max="85">
@@ -483,9 +497,8 @@
                 
                 <div class="button-row">
                     <button class="control-button" id="multi-pause">Pause</button>
-                    <button class="control-button" id="multi-calculate">Calculate Balance</button>
+                    <button class="control-button" id="multi-slowmo">Slow-mo</button>
                     <button class="control-button" id="multi-apply">Apply Balance</button>
-                    <button class="control-button" id="multi-remove">Remove Balance</button>
                     <button class="control-button" id="multi-reset">Reset</button>
                 </div>
             </div>
@@ -700,19 +713,19 @@
 
     <script>
         // Tab switching function
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
-        }
+        function switchTab(ev, tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+
+  // Show selected tab + highlight the clicked button
+  const panel = document.getElementById(`${tabName}-tab`);
+  if (panel) panel.classList.add('active');
+  ev?.currentTarget?.classList.add('active');
+
+  // Make p5 canvases re-measure their parents now that visibility changed
+  window.dispatchEvent(new Event('resize'));
+}
         
         // Function to toggle solution visibility
         function toggleSolution(id) {

@@ -1,1107 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Macaulay's Method - Interactive Beam Analysis</title>
-    
-    <!-- Import p5.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    
-    <!-- Import MathJax for LaTeX rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
-    
-    <!-- External CSS -->
-    <style>
-        :root {
-            --primary-color: #ffd700;
-            --secondary-color: #ffb300;
-            --text-color: #333;
-            --background-color: #fffbeb;
-            --link-color: #cc9900;
-            --link-hover-color: #1c01b8;
-            --section-bg: white;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background-color);
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            text-align: center;
-            padding: 1.5rem;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            font-variant: small-caps;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-style: italic;
-            font-size: 1.2em;
-        }
-
-        .content-section, .simulation-section {
-            background-color: var(--section-bg);
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            color: #b38600;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        h3 {
-            color: #cc9900;
-            margin: 15px 0 10px 0;
-        }
-
-        p, ul, ol {
-            margin-bottom: 15px;
-        }
-
-        ul, ol {
-            padding-left: 25px;
-        }
-
-        .equation-box {
-            background-color: #f9f9f9;
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .key-point {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        #sketch-holder {
-            width: 100%;
-            position: relative;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            margin: 15px 0;
-        }
-
-        #controls-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 15px 0;
-            padding: 15px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            border: none;
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        button.active {
-            background-color: var(--link-color);
-            color: white;
-        }
-
-        select, input[type="range"] {
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-
-        .practice-problems {
-            background-color: #e6f7ff;
-            border-left: 4px solid #1890ff;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .toggle-section {
-            cursor: pointer;
-            color: var(--link-color);
-            font-weight: bold;
-        }
-
-        .toggle-section:hover {
-            text-decoration: underline;
-            color: var(--link-hover-color);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .singularity-table {
-            overflow-x: auto;
-            margin: 20px 0;
-        }
-
-        .singularity-table table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
-        }
-
-        .singularity-table th, .singularity-table td {
-            text-align: center;
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-
-        .singularity-table th {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            font-weight: bold;
-        }
-
-        .singularity-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 15px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--link-color);
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            color: var(--link-hover-color);
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.8em; }
-            h2 { font-size: 1.5em; }
-            #controls-container { flex-direction: column; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Macaulay's Method</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    :root { --primary: #ffd700; --secondary:#ffb300; --bg:#fffbeb; --text:#222; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
+    header{background:var(--primary);padding:16px 20px}
+    header h1{margin:0;font-variant:small-caps}
+    .wrap{max-width:1120px;margin:0 auto;padding:16px}
+    .panel{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px}
+    #controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:12px}
+    .control{display:grid;gap:6px}
+    select,input[type=range]{width:100%}
+    button{background:var(--primary);border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer}
+    button.toggled{background:#b8860b;color:#fff}
+    .muted{opacity:.45;pointer-events:none}
+    #sketch-holder{border:1px solid #ddd;border-radius:10px;background:#f9f9f9;overflow:hidden}
+    .note{font-size:12px;color:#555}
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Macaulay's Method</h1>
-        <p class="subtitle">Beam Deflection Analysis Using Singularity Functions</p>
-    </header>
-
-    <div class="content-section">
-        <h2>Introduction to Beam Deflection Analysis</h2>
-        <p>Macaulay's Method is a powerful technique for determining the deflection and slope of beams under various loading conditions. Named after William Herrick Macaulay who introduced it in 1919, this method uses singularity functions to elegantly handle discontinuous loading conditions.</p>
-        
-        <div class="key-point">
-            <p><strong>Key Advantage:</strong> Macaulay's Method allows us to write a single equation for the entire beam, even when the loading is discontinuous, making it particularly useful for beams with multiple point loads, distributed loads, and moments.</p>
-        </div>
-
-        <h3>Euler-Bernoulli Beam Theory</h3>
-        <p>The foundation of Macaulay's Method lies in the Euler-Bernoulli beam theory, which makes several key assumptions:</p>
-        <ul>
-            <li>Plane sections remain plane after deformation</li>
-            <li>The beam material is linear elastic (follows Hooke's Law)</li>
-            <li>Small deflections and slopes (allowing linear analysis)</li>
-            <li>Shear deformation is negligible compared to bending deformation</li>
-            <li>The neutral axis passes through the centroid of the cross-section</li>
-        </ul>
-
-        <div class="equation-box">
-            <p>The fundamental beam equation relating deflection to loading:</p>
-            <p>\(EI \frac{d^4v}{dx^4} = w(x)\)</p>
-            <p>Where:</p>
-            <ul>
-                <li>\(E\) = Young's modulus (material property)</li>
-                <li>\(I\) = Second moment of area (geometric property)</li>
-                <li>\(v\) = Deflection</li>
-                <li>\(w(x)\) = Distributed load intensity</li>
-            </ul>
-        </div>
-
-        <h3>Relationships Between Load, Shear, Moment, Slope and Deflection</h3>
-        <div class="equation-box">
-            <p>Starting from the distributed load, successive integrations give us:</p>
-            <p>Distributed load: \(w(x)\)</p>
-            <p>Shear force: \(V(x) = -\int w(x) \, dx\)</p>
-            <p>Bending moment: \(M(x) = \int V(x) \, dx\)</p>
-            <p>Slope: \(\varphi(x) = \frac{1}{EI} \int M(x) \, dx\)</p>
-            <p>Deflection: \(v(x) = \int \varphi(x) \, dx\)</p>
-        </div>
+  <header>
+    <div class="wrap">
+      <h1>Macaulay's Method – Interactive Beam</h1>
+      <div class="note">Determinate diagrams use Macaulay. Indeterminate cases solved by compatibility (stiffness), not the force method.</div>
     </div>
+  </header>
 
-    <div class="content-section">
-        <h2>Singularity Functions</h2>
-        <p>Singularity functions, also known as Macaulay brackets, are the key mathematical tool that makes Macaulay's Method so powerful. They allow us to "turn on" loads at specific points along the beam.</p>
-
-        <div class="equation-box">
-            <p>The singularity function is defined as:</p>
-            <p>\(\langle x - a \rangle^n = \begin{cases} 0 & \text{if } x < a \\ (x - a)^n & \text{if } x \geq a \end{cases}\)</p>
-            <p>Where \(a\) is the location where the function "activates"</p>
+  <div class="wrap">
+    <div class="panel">
+      <div id="controls">
+        <div class="control">
+          <label for="beam-type">Beam & Loading</label>
+          <select id="beam-type">
+            <option value="ss-point">Simply Supported – Point at a</option>
+            <option value="ss-udl">Simply Supported – UDL (0→L)</option>
+            <option value="ss-combined">Simply Supported – UDL + Point at a</option>
+            <option value="cantilever-point">Cantilever – Point at a</option>
+            <option value="overhang-right">Overhang (right) – supports at x=0 and x=s, free overhang to L</option>
+            <option value="fixed-fixed">Fixed–Fixed – UDL/Point/Combined</option>
+            <option value="continuous-3">Continuous (3 supports) – UDL/Point/Combined</option>
+          </select>
         </div>
-
-        <h3>Types of Singularity Functions</h3>
-        <div class="singularity-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Load Type</th>
-                        <th>Singularity Function</th>
-                        <th>Power (n)</th>
-                        <th>Physical Meaning</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Concentrated Moment</td>
-                        <td>\(M_0\langle x - a \rangle^{-2}\)</td>
-                        <td>-2</td>
-                        <td>Applied couple/moment</td>
-                    </tr>
-                    <tr>
-                        <td>Concentrated Force</td>
-                        <td>\(P\langle x - a \rangle^{-1}\)</td>
-                        <td>-1</td>
-                        <td>Point load</td>
-                    </tr>
-                    <tr>
-                        <td>Uniform Distributed Load</td>
-                        <td>\(w\langle x - a \rangle^0\)</td>
-                        <td>0</td>
-                        <td>Constant distributed load</td>
-                    </tr>
-                    <tr>
-                        <td>Linearly Varying Load</td>
-                        <td>\(w\langle x - a \rangle^1\)</td>
-                        <td>1</td>
-                        <td>Triangular distributed load</td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="control">
+          <label for="load-mag">Point Load P (kN)</label>
+          <input type="range" id="load-mag" min="0" max="120" step="1" value="20" />
+          <div><span id="load-mag-val">20</span> kN</div>
         </div>
-
-        <div class="key-point">
-            <p><strong>Integration Rules for Singularity Functions:</strong></p>
-            <p>\(\int \langle x - a \rangle^n \, dx = \frac{\langle x - a \rangle^{n+1}}{n+1} + C\quad \) for \(n \geq 0\)</p>
-            <p>\(\int \langle x - a \rangle^{-1} \, dx = \langle x - a \rangle^0 + C\)</p>
-            <p>\(\int \langle x - a \rangle^{-2} \, dx = \langle x - a \rangle^{-1} + C\)</p>
+        <div class="control" id="pos-ctl">
+          <label for="load-pos">Load Position a/L</label>
+          <input type="range" id="load-pos" min="0" max="100" step="1" value="50" />
+          <div><span id="load-pos-val">0.50</span> L</div>
         </div>
+        <div class="control" id="overhang-ctl">
+          <label for="support-b">Overhang support position s/L (right support)</label>
+          <input type="range" id="support-b" min="40" max="95" step="1" value="80" />
+          <div>s = <span id="support-b-val">0.80</span> L</div>
+        </div>
+        <div class="control">
+          <label for="udl-mag">UDL w (kN/m)</label>
+          <input type="range" id="udl-mag" min="0" max="60" step="1" value="10" />
+          <div><span id="udl-mag-val">10</span> kN/m</div>
+          <div class="note">Applies across entire span.</div>
+        </div>
+        <div class="control">
+          <label>Display</label>
+          <div>
+            <button id="btn-defl" class="toggled">Deflection</button>
+            <button id="btn-shear" class="toggled">Shear</button>
+            <button id="btn-moment" class="toggled">Moment</button>
+          </div>
+        </div>
+        <div class="control">
+          <label for="scale">Deflection Scale (×)</label>
+          <input type="range" id="scale" min="10" max="250" step="5" value="70" />
+          <div><span id="scale-val">70</span>×</div>
+        </div>
+      </div>
+
+      <div id="sketch-holder"></div>
+      <p class="note" id="msg"></p>
     </div>
+  </div>
 
-    <div class="simulation-section">
-        <h2>Interactive Beam Analysis</h2>
-        <p>Explore different beam configurations and loading conditions. Select a beam type and adjust the loads to see real-time deflection, slope, shear force, and bending moment diagrams.</p>
-        
-        <div id="controls-container">
-            <div class="control-group">
-                <label for="beam-type">Beam Configuration:</label>
-                <select id="beam-type">
-                    <option value="cantilever">Cantilever - Point Load</option>
-                    <option value="simply-supported">Simply Supported - Point Load</option>
-                    <option value="simply-distributed">Simply Supported - UDL</option>
-                    <option value="fixed-fixed">Fixed-Fixed Beam (Indeterminate)</option>
-                    <option value="continuous">Continuous Beam (Indeterminate)</option>
-                    <option value="combined">Combined Loading</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="load-magnitude">Load Magnitude:</label>
-                <input type="range" id="load-magnitude" min="5" max="50" value="20">
-                <span id="load-value">20 kN</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="load-position">Load Position:</label>
-                <input type="range" id="load-position" min="0" max="100" value="50">
-                <span id="position-value">50%</span>
-            </div>
-            
-            <div class="control-group">
-                <label>Display Options:</label>
-                <button id="toggle-deflection" class="active">Deflection</button>
-                <button id="toggle-slope">Slope</button>
-                <button id="toggle-shear">Shear Force</button>
-                <button id="toggle-moment">Bending Moment</button>
-            </div>
-            
-            <div class="control-group">
-                <label for="scale-factor">Deflection Scale:</label>
-                <input type="range" id="scale-factor" min="1" max="100" value="50">
-                <span id="scale-value">50x</span>
-            </div>
-        </div>
-        
-        <div id="sketch-holder">
-            <!-- p5.js sketch will go here -->
-        </div>
-    </div>
+<script>
+// ===================== State =====================
+const cfg = {
+  beamType:'ss-point', P:20, w:10, a:0.5, s:0.8, L:1.0,
+  showDefl:true, showShear:true, showMoment:true, scale:70,
+};
 
-    <div class="content-section">
-        <h2>Macaulay's Method Procedure</h2>
-        
-        <h3>Step-by-Step Approach</h3>
-        <ol>
-            <li><strong>Express all loads using singularity functions</strong>
-                <ul>
-                    <li>Write each load in terms of Macaulay brackets</li>
-                    <li>Include reaction forces as unknowns</li>
-                </ul>
-            </li>
-            <li><strong>Write the load equation</strong>
-                <p>\(w(x) = \sum \text{[all loads in singularity form]}\)</p>
-            </li>
-            <li><strong>Integrate successively to find V, M, θ, and v</strong>
-                <ul>
-                    <li>First integration: Shear force \(V(x)\)</li>
-                    <li>Second integration: Bending moment \(M(x)\)</li>
-                    <li>Third integration: Slope \(EI\varphi(x)\)</li>
-                    <li>Fourth integration: Deflection \(EIv(x)\)</li>
-                </ul>
-            </li>
-            <li><strong>Apply boundary conditions</strong>
-                <ul>
-                    <li>For supports: \(v = 0\)</li>
-                    <li>For fixed ends: \(v = 0\) and \(\varphi = 0\)</li>
-                    <li>For free ends: \(M = 0\) and \(V = 0\)</li>
-                </ul>
-            </li>
-            <li><strong>Solve for unknowns</strong>
-                <ul>
-                    <li>Determine reaction forces</li>
-                    <li>Find integration constants</li>
-                </ul>
-            </li>
-        </ol>
+// UI
+const beamSel = document.getElementById('beam-type');
+const pSlider = document.getElementById('load-mag'); const pVal=document.getElementById('load-mag-val');
+const aSlider = document.getElementById('load-pos'); const aVal=document.getElementById('load-pos-val');
+const sSlider = document.getElementById('support-b'); const sVal=document.getElementById('support-b-val');
+const posCtl = document.getElementById('pos-ctl'); const overCtl=document.getElementById('overhang-ctl');
+const wSlider = document.getElementById('udl-mag'); const wVal=document.getElementById('udl-mag-val');
+const btnDefl=document.getElementById('btn-defl'); const btnShear=document.getElementById('btn-shear'); const btnMoment=document.getElementById('btn-moment');
+const sScale=document.getElementById('scale'); const sScaleVal=document.getElementById('scale-val');
+const msgEl=document.getElementById('msg');
 
-        <div class="key-point">
-            <p><strong>Important:</strong> For statically indeterminate beams, you'll need additional compatibility equations beyond the equilibrium equations. The number of redundants equals the degree of indeterminacy.</p>
-        </div>
-    </div>
+beamSel.onchange = e=>{ cfg.beamType=e.target.value; updateCtl(); };
+pSlider.oninput = e=>{ cfg.P=+e.target.value; pVal.textContent=cfg.P; };
+aSlider.oninput = e=>{ cfg.a=(+e.target.value)/100; aVal.textContent=cfg.a.toFixed(2);} ;
+sSlider.oninput = e=>{ cfg.s=(+e.target.value)/100; if(cfg.s<0.4) cfg.s=0.4; sSlider.value=Math.round(cfg.s*100); sVal.textContent=cfg.s.toFixed(2);} ;
+wSlider.oninput = e=>{ cfg.w=+e.target.value; wVal.textContent=cfg.w; };
+btnDefl.onclick=()=>{ cfg.showDefl=!cfg.showDefl; btnDefl.classList.toggle('toggled',cfg.showDefl); };
+btnShear.onclick=()=>{ cfg.showShear=!cfg.showShear; btnShear.classList.toggle('toggled',cfg.showShear); };
+btnMoment.onclick=()=>{ cfg.showMoment=!cfg.showMoment; btnMoment.classList.toggle('toggled',cfg.showMoment); };
+sScale.oninput = e=>{ cfg.scale=+e.target.value; sScaleVal.textContent=cfg.scale; };
 
-    <div class="content-section">
-        <h2>Boundary Conditions</h2>
-        
-        <h3>Common Support Conditions</h3>
-        <div class="singularity-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Support Type</th>
-                        <th>Deflection (v)</th>
-                        <th>Slope (θ)</th>
-                        <th>Moment (M)</th>
-                        <th>Shear (V)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Free End</td>
-                        <td>Free</td>
-                        <td>Free</td>
-                        <td>0</td>
-                        <td>0</td>
-                    </tr>
-                    <tr>
-                        <td>Simply Supported</td>
-                        <td>0</td>
-                        <td>Free</td>
-                        <td>0</td>
-                        <td>Free</td>
-                    </tr>
-                    <tr>
-                        <td>Fixed Support</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>Free</td>
-                        <td>Free</td>
-                    </tr>
-                    <tr>
-                        <td>Guided Support</td>
-                        <td>Free</td>
-                        <td>0</td>
-                        <td>Free</td>
-                        <td>Free</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+function updateCtl(){
+  // Position slider relevant when point load exists
+  const usesPoint = ['ss-point','cantilever-point','ss-combined','overhang-right','fixed-fixed','continuous-3'].includes(cfg.beamType);
+  posCtl.classList.toggle('muted', !usesPoint);
+  aSlider.disabled=!usesPoint;
+  // Overhang slider only for overhang
+  overCtl.classList.toggle('muted', cfg.beamType!=='overhang-right');
+  sSlider.disabled = cfg.beamType!=='overhang-right';
+  // Message
+  if(['fixed-fixed','continuous-3'].includes(cfg.beamType)){
+    msgEl.textContent = 'Indeterminate: solved via compatibility (stiffness method).';
+  } else { msgEl.textContent=''; }
+}
 
-        <h3>Statically Determinate vs Indeterminate Beams</h3>
-        <div class="equation-box">
-            <p>Degree of indeterminacy = Number of unknowns - Number of equilibrium equations</p>
-            <p>For a 2D beam:</p>
-            <ul>
-                <li>Equilibrium equations available: 3 (ΣFx = 0, ΣFy = 0, ΣM = 0)</li>
-                <li>If unknowns > 3: Statically indeterminate</li>
-                <li>If unknowns = 3: Statically determinate</li>
-                <li>If unknowns < 3: Unstable structure</li>
-            </ul>
-        </div>
-    </div>
+// ===================== FE utilities =====================
+// Macaulay helpers
+function bracket(x,a,p){ if(x<a) return 0; const d=x-a; return p===0?1:Math.pow(d,p); }
 
-    <div class="content-section">
-        <h2>Worked Examples</h2>
-        
-        <div class="practice-problems">
-            <h3>Example 1: Cantilever Beam with Point Load</h3>
-            <p>A cantilever beam of length L = 4m carries a point load P = 10kN at its free end. Find the maximum deflection. Given: E = 200 GPa, I = 8.33×10⁻⁶ m⁴</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p><strong>Step 1:</strong> Write load equation using singularity functions</p>
-                <p>\(w(x) = R_A\langle x - 0 \rangle^{-1} + M_A\langle x - 0 \rangle^{-2} - P\langle x - L \rangle^{-1}\)</p>
-                
-                <p><strong>Step 2:</strong> Apply equilibrium</p>
-                <p>\(R_A = P = 10 \text{ kN}\)</p>
-                <p>\(M_A = PL = 10 \times 4 = 40 \text{ kNm}\)</p>
-                
-                <p><strong>Step 3:</strong> Integrate to find deflection</p>
-                <p>\(EIv(x) = \frac{R_A\langle x - 0 \rangle^3}{6} + \frac{M_A\langle x - 0 \rangle^2}{2} - \frac{P\langle x - L \rangle^3}{6}\)</p>
-                
-                <p><strong>Step 4:</strong> Apply boundary conditions</p>
-                <p>At x = 0: v = 0 and θ = 0 (fixed end)</p>
-                <p>This gives C₁ = C₂ = 0</p>
-                
-                <p><strong>Step 5:</strong> Maximum deflection at x = L</p>
-                <p>\(v_{max} = -\frac{PL^3}{3EI} = -\frac{10000 \times 4^3}{3 \times 200 \times 10^9 \times 8.33 \times 10^{-6}} = -12.8 \text{ mm}\)</p>
-            </div>
-        </div>
+// DOF per node: v (vertical), theta (rotation)
+function assemble(nodes, supports, loads, wUDL){
+  const nN = nodes.length; const ndof=2*nN; const K = Array.from({length:ndof},()=>Array(ndof).fill(0));
+  const F = Array(ndof).fill(0);
+  // Element assembly with EI=1
+  for(let e=0;e<nN-1;e++){
+    const x1=nodes[e], x2=nodes[e+1]; const Le=x2-x1; const L3=Math.pow(Le,3);
+    const k = [
+      [ 12/L3,  6/Math.pow(Le,2), -12/L3,  6/Math.pow(Le,2)],
+      [  6/Math.pow(Le,2), 4/Le,   -6/Math.pow(Le,2), 2/Le   ],
+      [ -12/L3, -6/Math.pow(Le,2), 12/L3, -6/Math.pow(Le,2)],
+      [  6/Math.pow(Le,2), 2/Le,   -6/Math.pow(Le,2), 4/Le   ],
+    ];
+    const dofs=[2*e,2*e+1,2*(e+1),2*(e+1)+1];
+    for(let i=0;i<4;i++) for(let j=0;j<4;j++) K[dofs[i]][dofs[j]] += k[i][j];
+    // Equivalent nodal loads for uniform downward wUDL over this element (if any)
+    if (wUDL>0){
+      const fe = [ wUDL*Le/2,  wUDL*Le*Le/12,  wUDL*Le/2, -wUDL*Le*Le/12 ];
+      F[dofs[0]] += -fe[0]; F[dofs[1]] += -fe[1]; F[dofs[2]] += -fe[2]; F[dofs[3]] += -fe[3]; // convert to upward-positive
+    }
+  }
+  // Node point loads (downward)
+  for(const pl of loads){ F[2*pl.node] += -pl.P; }
 
-        <div class="practice-problems">
-            <h3>Example 2: Simply Supported Beam with UDL</h3>
-            <p>A simply supported beam of length L = 6m carries a uniformly distributed load w = 5 kN/m. Determine the maximum deflection.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p><strong>Step 1:</strong> Calculate reactions (by symmetry)</p>
-                <p>\(R_A = R_B = \frac{wL}{2} = \frac{5 \times 6}{2} = 15 \text{ kN}\)</p>
-                
-                <p><strong>Step 2:</strong> Write load equation</p>
-                <p>\(w(x) = R_A\langle x - 0 \rangle^{-1} - w\langle x - 0 \rangle^0 + w\langle x - L \rangle^0 + R_B\langle x - L \rangle^{-1}\)</p>
-                
-                <p><strong>Step 3:</strong> Integrate four times</p>
-                <p>\(EIv(x) = \frac{R_A\langle x - 0 \rangle^3}{6} - \frac{w\langle x - 0 \rangle^4}{24} + \frac{w\langle x - L \rangle^4}{24} + C_1x + C_2\)</p>
-                
-                <p><strong>Step 4:</strong> Apply boundary conditions</p>
-                <p>At x = 0: v = 0 → C₂ = 0</p>
-                <p>At x = L: v = 0 → C₁ = -wL³/24</p>
-                
-                <p><strong>Step 5:</strong> Maximum deflection at x = L/2</p>
-                <p>\(v_{max} = -\frac{5wL^4}{384EI} = -\frac{5 \times 5000 \times 6^4}{384 \times 200 \times 10^9 \times I}\)</p>
-            </div>
-        </div>
+  // Apply supports
+  const fixed = new Set();
+  supports.forEach(s=>{
+    const i = nodes.indexOf(s.x);
+    if (i<0) return;
+    if (s.v===0){ fixed.add(2*i); }
+    if (s.theta===0){ fixed.add(2*i+1); }
+  });
 
-        <div class="practice-problems">
-            <h3>Example 3: Fixed-Fixed Beam (Indeterminate)</h3>
-            <p>A beam with both ends fixed, length L = 5m, carries a central point load P = 20kN. This is a statically indeterminate problem with degree of indeterminacy = 2.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p><strong>Step 1:</strong> Identify unknowns</p>
-                <p>Unknowns: R_A, R_B (reactions), M_A, M_B (moments at supports)</p>
-                <p>Equilibrium equations: 2 (ΣFy = 0, ΣM = 0)</p>
-                <p>Degree of indeterminacy = 4 - 2 = 2</p>
-                
-                <p><strong>Step 2:</strong> Write general equation</p>
-                <p>\(w(x) = R_A\langle x - 0 \rangle^{-1} + M_A\langle x - 0 \rangle^{-2} - P\langle x - L/2 \rangle^{-1} + R_B\langle x - L \rangle^{-1} + M_B\langle x - L \rangle^{-2}\)</p>
-                
-                <p><strong>Step 3:</strong> Apply all boundary conditions</p>
-                <p>At x = 0: v = 0, θ = 0</p>
-                <p>At x = L: v = 0, θ = 0</p>
-                
-                <p><strong>Step 4:</strong> Solve system of equations</p>
-                <p>By symmetry: R_A = R_B = P/2 = 10 kN</p>
-                <p>M_A = M_B = PL/8 = 12.5 kNm</p>
-                
-                <p><strong>Step 5:</strong> Maximum deflection at centre</p>
-                <p>\(v_{max} = -\frac{PL^3}{192EI}\) (1/4 of simply supported case)</p>
-            </div>
-        </div>
-    </div>
+  // Reduce and solve
+  const free = []; for(let i=0;i<ndof;i++) if(!fixed.has(i)) free.push(i);
+  const Kff = free.map(i=>free.map(j=>K[i][j]));
+  const Ff = free.map(i=>F[i]);
+  const df = solveLinear(Kff, Ff);
+  const d = Array(ndof).fill(0); free.forEach((dof,idx)=>{ d[dof]=df[idx]; });
 
-    <div class="content-section">
-        <h2>Applications in Engineering</h2>
-        
-        <h3>Structural Engineering</h3>
-        <ul>
-            <li><strong>Building Design:</strong> Floor beams, roof trusses, and bridge girders</li>
-            <li><strong>Foundation Analysis:</strong> Pile foundations modelled as beams on elastic foundations</li>
-            <li><strong>Serviceability Checks:</strong> Ensuring deflections remain within acceptable limits</li>
-        </ul>
+  // Reactions R = K d − F (signs consistent with assembly)
+  const R = Array(ndof).fill(0);
+  for(let i=0;i<ndof;i++){ let s=0; for(let j=0;j<ndof;j++) s += K[i][j]*d[j]; R[i]=s - F[i]; }
+  return {d,R,K,F};
+}
 
-        <h3>Mechanical Engineering</h3>
-        <ul>
-            <li><strong>Machine Shafts:</strong> Calculating critical speeds and avoiding resonance</li>
-            <li><strong>Robot Arms:</strong> Predicting end-effector positioning accuracy</li>
-            <li><strong>Aircraft Wings:</strong> Aeroelastic analysis and flutter prevention</li>
-        </ul>
+function solveLinear(A,b){
+  const n=A.length; const M=A.map(r=>r.slice()); const x=b.slice();
+  for(let k=0;k<n;k++){
+    let piv=k; for(let i=k+1;i<n;i++) if (Math.abs(M[i][k])>Math.abs(M[piv][k])) piv=i;
+    if (Math.abs(M[piv][k])<1e-12) continue;
+    if (piv!==k){ [M[k],M[piv]]=[M[piv],M[k]]; [x[k],x[piv]]=[x[piv],x[k]]; }
+    const akk=M[k][k];
+    for(let j=k;j<n;j++) M[k][j]/=akk; x[k]/=akk;
+    for(let i=0;i<n;i++) if(i!==k){ const f=M[i][k]; if(Math.abs(f)>0){ for(let j=k;j<n;j++) M[i][j]-=f*M[k][j]; x[i]-=f*x[k]; } }
+  }
+  return x;
+}
 
-        <h3>Civil Engineering</h3>
-        <ul>
-            <li><strong>Bridge Design:</strong> Multi-span continuous bridges</li>
-            <li><strong>Railway Tracks:</strong> Rail deflection under moving loads</li>
-            <li><strong>Retaining Walls:</strong> Lateral earth pressure analysis</li>
-        </ul>
+// Build model per case
+function buildModel(){
+  // nodes in [0,1]; include point load location as a node if used
+  let nodes=[0,1];
+  const usePoint = cfg.P>0 && ['ss-point','cantilever-point','ss-combined','overhang-right','fixed-fixed','continuous-3'].includes(cfg.beamType);
+  if (usePoint && cfg.a>0 && cfg.a<1) nodes.push(cfg.a);
+  if (cfg.beamType==='overhang-right'){ if (cfg.s>0 && cfg.s<1) nodes.push(cfg.s); }
+  if (cfg.beamType==='continuous-3'){ nodes=[0,0.5,1]; if (usePoint && cfg.a!==0 && cfg.a!==0.5 && cfg.a!==1) nodes.push(cfg.a); }
+  nodes = Array.from(new Set(nodes)).sort((a,b)=>a-b);
 
-        <div class="key-point">
-            <p><strong>Design Consideration:</strong> Most design codes limit the maximum deflection to L/250 to L/500 of the span length to prevent serviceability issues and maintain user comfort.</p>
-        </div>
-    </div>
+  // supports
+  const supports=[];
+  if (cfg.beamType==='ss-point' || cfg.beamType==='ss-udl' || cfg.beamType==='ss-combined'){
+    supports.push({x:0, v:0}); supports.push({x:1, v:0});
+  } else if (cfg.beamType==='cantilever-point'){
+    supports.push({x:0, v:0, theta:0});
+  } else if (cfg.beamType==='overhang-right'){
+    supports.push({x:0, v:0}); supports.push({x:cfg.s, v:0});
+  } else if (cfg.beamType==='fixed-fixed'){
+    supports.push({x:0, v:0, theta:0}); supports.push({x:1, v:0, theta:0});
+  } else if (cfg.beamType==='continuous-3'){
+    supports.push({x:0, v:0}); supports.push({x:0.5, v:0}); supports.push({x:1, v:0});
+  }
 
-    <div class="content-section">
-        <h2>Advanced Topics</h2>
-        
-        <h3>Variable Cross-Sections</h3>
-        <p>For beams with varying second moment of area I(x):</p>
-        <div class="equation-box">
-            <p>\(\frac{d^2v}{dx^2} = -\frac{M(x)}{E \cdot I(x)}\)</p>
-            <p>This requires numerical integration or specialised methods like the moment-area method.</p>
-        </div>
+  // loads
+  const loads=[];
+  if (usePoint){
+    const idx = nodes.indexOf(cfg.a);
+    if (idx>=0) loads.push({node:idx, P:cfg.P});
+  }
+  const wUDL = cfg.w>0 ? cfg.w : 0; // kN/m (over full span)
+  return {nodes,supports,loads,wUDL};
+}
 
-        <h3>Temperature Effects</h3>
-        <p>Thermal loading can cause additional deflections:</p>
-        <div class="equation-box">
-            <p>Thermal curvature: \(\kappa_T = \frac{\alpha \Delta T}{h}\)</p>
-            <p>Where α is the coefficient of thermal expansion and h is the beam height</p>
-        </div>
+// Build global V(x), M(x) using Macaulay sums and reactions from compatibility solve
+function buildVM_Macaulay(model, sol){
+  const {nodes} = model;
 
-        <h3>Dynamic Loading</h3>
-        <p>For time-varying loads, the equation becomes:</p>
-        <div class="equation-box">
-            <p>\(EI \frac{\partial^4 v}{\partial x^4} + \rho A \frac{\partial^2 v}{\partial t^2} = w(x,t)\)</p>
-            <p>This leads to natural frequencies and mode shapes analysis</p>
-        </div>
-    </div>
+  // ===== Special case: cantilever (free end at x = 1) =====
+  // Compute internal forces from the RIGHT so M(1)=0 and M(x>=a)=0 for point-load-only cases.
+  if (cfg.beamType === 'cantilever-point') {
+    const P = cfg.P > 0 ? cfg.P : 0;
+    const a = cfg.a; // load position from fixed end (0..1)
+    const w = model.wUDL > 0 ? model.wUDL : 0; // UDL over 0→1 if toggled
 
-    <div class="content-section">
-        <h2>Common Deflection Formulae</h2>
-        <div class="singularity-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Beam Type</th>
-                        <th>Loading</th>
-                        <th>Maximum Deflection</th>
-                        <th>Location</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Cantilever</td>
-                        <td>Point load at end</td>
-                        <td>\(\delta_{max} = \frac{PL^3}{3EI}\)</td>
-                        <td>At free end</td>
-                    </tr>
-                    <tr>
-                        <td>Cantilever</td>
-                        <td>UDL</td>
-                        <td>\(\delta_{max} = \frac{wL^4}{8EI}\)</td>
-                        <td>At free end</td>
-                    </tr>
-                    <tr>
-                        <td>Simply Supported</td>
-                        <td>Central point load</td>
-                        <td>\(\delta_{max} = \frac{PL^3}{48EI}\)</td>
-                        <td>At centre</td>
-                    </tr>
-                    <tr>
-                        <td>Simply Supported</td>
-                        <td>UDL</td>
-                        <td>\(\delta_{max} = \frac{5wL^4}{384EI}\)</td>
-                        <td>At centre</td>
-                    </tr>
-                    <tr>
-                        <td>Fixed-Fixed</td>
-                        <td>Central point load</td>
-                        <td>\(\delta_{max} = \frac{PL^3}{192EI}\)</td>
-                        <td>At centre</td>
-                    </tr>
-                    <tr>
-                        <td>Fixed-Fixed</td>
-                        <td>UDL</td>
-                        <td>\(\delta_{max} = \frac{wL^4}{384EI}\)</td>
-                        <td>At centre</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    return {
+      // Shear from the right: contributions of loads on the segment (x→1)
+      V: function(x){
+        let v = 0;
+        if (P > 0 && x < a) v -= P;          // point load lies to the right of the cut
+        if (w > 0) v -= w * (1 - x);         // UDL on (x→1)
+        return v;
+      },
+      // Moment from the right: zero at the free end by definition
+      M: function(x){
+        let m = 0;
+        if (P > 0 && x < a) m -= P * (a - x);                // linear up to the load
+        if (w > 0) m -= 0.5 * w * (1 - x) * (1 - x);         // parabolic from UDL
+        return m;
+      }
+    };
+  }
 
-    <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-        <p>Coventry University, United Kingdom</p>
-        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
-        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
-    </footer>
+  // ===== Generic Macaulay (existing) for other beam types =====
+  const forces=[]; const couples=[];
+  for(let i=0;i<nodes.length;i++){
+    const atX = nodes[i];
+    const hasVfixed = (model.supports||[]).some(s=>s.x===atX && s.v===0);
+    if (hasVfixed){ forces.push({x:atX, Q: sol.R[2*i]}); }
+    const hasThFixed = (model.supports||[]).some(s=>s.x===atX && s.theta===0);
+    if (hasThFixed){ couples.push({x:atX, M: sol.R[2*i+1]}); }
+  }
+  if (cfg.P>0 && ['ss-point','cantilever-point','ss-combined','overhang-right','fixed-fixed','continuous-3'].includes(cfg.beamType)){
+    forces.push({x:cfg.a, Q: -cfg.P}); // downward point load
+  }
+  const w = model.wUDL>0 ? model.wUDL : 0;
 
-    <script>
-        // Beam analysis using p5.js
-        let beamType = 'cantilever';
-        let loadMagnitude = 20;
-        let loadPosition = 0.5;
-        let scaleFactor = 50;
-        let showDeflection = true;
-        let showSlope = false;
-        let showShear = false;
-        let showMoment = false;
-        
-        function setup() {
-            let canvas = createCanvas(800, 600);
-            canvas.parent('sketch-holder');
-            
-            // Setup event listeners
-            document.getElementById('beam-type').addEventListener('change', function(e) {
-                beamType = e.target.value;
-            });
-            
-            document.getElementById('load-magnitude').addEventListener('input', function(e) {
-                loadMagnitude = parseInt(e.target.value);
-                document.getElementById('load-value').textContent = loadMagnitude + ' kN';
-            });
-            
-            document.getElementById('load-position').addEventListener('input', function(e) {
-                loadPosition = parseInt(e.target.value) / 100;
-                document.getElementById('position-value').textContent = (loadPosition * 100).toFixed(0) + '%';
-            });
-            
-            document.getElementById('scale-factor').addEventListener('input', function(e) {
-                scaleFactor = parseInt(e.target.value);
-                document.getElementById('scale-value').textContent = scaleFactor + 'x';
-            });
-            
-            // Toggle buttons
-            document.getElementById('toggle-deflection').addEventListener('click', function() {
-                showDeflection = !showDeflection;
-                this.classList.toggle('active');
-            });
-            
-            document.getElementById('toggle-slope').addEventListener('click', function() {
-                showSlope = !showSlope;
-                this.classList.toggle('active');
-            });
-            
-            document.getElementById('toggle-shear').addEventListener('click', function() {
-                showShear = !showShear;
-                this.classList.toggle('active');
-            });
-            
-            document.getElementById('toggle-moment').addEventListener('click', function() {
-                showMoment = !showMoment;
-                this.classList.toggle('active');
-            });
-        }
-        
-        function draw() {
-            background(249, 249, 249);
-            
-            // Drawing area boundaries
-            let beamY = height * 0.3;
-            let beamLength = width * 0.8;
-            let beamStartX = width * 0.1;
-            let beamEndX = beamStartX + beamLength;
-            
-            // Draw coordinate system
-            stroke(200);
-            strokeWeight(1);
-            // Grid
-            for (let x = beamStartX; x <= beamEndX; x += beamLength/10) {
-                line(x, 50, x, height - 50);
-            }
-            
-            // Draw beam (undeformed)
-            stroke(150);
-            strokeWeight(2);
-            line(beamStartX, beamY, beamEndX, beamY);
-            
-            // Draw supports based on beam type
-            drawSupports(beamStartX, beamEndX, beamY);
-            
-            // Draw loads
-            drawLoads(beamStartX, beamLength, beamY);
-            
-            // Calculate and draw deflected shape
-            if (showDeflection) {
-                drawDeflectedShape(beamStartX, beamLength, beamY);
-            }
-            
-            // Draw diagrams
-            let diagramY = height * 0.6;
-            if (showShear) {
-                drawShearDiagram(beamStartX, beamLength, diagramY);
-            }
-            if (showMoment) {
-                drawMomentDiagram(beamStartX, beamLength, diagramY + 100);
-            }
-            
-            // Labels
-            fill(0);
-            noStroke();
-            textAlign(CENTER);
-            textSize(14);
-            text(getBeamTitle(), width/2, 30);
-            
-            // Axes labels
-            textAlign(LEFT);
-            textSize(12);
-            text('x', beamEndX + 10, beamY);
-            text('v', beamStartX - 20, beamY - 60);
-        }
-        
-        function drawSupports(startX, endX, y) {
-            stroke(0);
-            strokeWeight(2);
-            fill(100);
-            
-            switch(beamType) {
-                case 'cantilever':
-                    // Fixed support at left
-                    rect(startX - 10, y - 20, 10, 40);
-                    // Ground hatching
-                    for (let i = 0; i < 5; i++) {
-                        line(startX - 10 - i*3, y - 20 - i*3, startX - 10 - i*3, y + 20 + i*3);
-                    }
-                    break;
-                    
-                case 'simply-supported':
-                case 'simply-distributed':
-                case 'combined':
-                    // Pin support at left
-                    triangle(startX - 10, y + 15, startX + 10, y + 15, startX, y);
-                    // Roller support at right
-                    triangle(endX - 10, y + 15, endX + 10, y + 15, endX, y);
-                    ellipse(endX - 5, y + 20, 8, 8);
-                    ellipse(endX + 5, y + 20, 8, 8);
-                    break;
-                    
-                case 'fixed-fixed':
-                    // Fixed supports at both ends
-                    rect(startX - 10, y - 20, 10, 40);
-                    rect(endX, y - 20, 10, 40);
-                    // Ground hatching
-                    for (let i = 0; i < 5; i++) {
-                        line(startX - 10 - i*3, y - 20 - i*3, startX - 10 - i*3, y + 20 + i*3);
-                        line(endX + 10 + i*3, y - 20 - i*3, endX + 10 + i*3, y + 20 + i*3);
-                    }
-                    break;
-                    
-                case 'continuous':
-                    // Three supports for continuous beam
-                    triangle(startX - 10, y + 15, startX + 10, y + 15, startX, y);
-                    triangle(startX + (endX-startX)/2 - 10, y + 15, startX + (endX-startX)/2 + 10, y + 15, startX + (endX-startX)/2, y);
-                    triangle(endX - 10, y + 15, endX + 10, y + 15, endX, y);
-                    break;
-            }
-        }
-        
-        function drawLoads(startX, length, y) {
-            stroke(255, 0, 0);
-            strokeWeight(3);
-            fill(255, 0, 0);
-            
-            let loadX = startX + length * loadPosition;
-            
-            switch(beamType) {
-                case 'cantilever':
-                    // Point load at free end
-                    drawArrow(startX + length, y - 60, startX + length, y);
-                    text(loadMagnitude + ' kN', startX + length + 10, y - 30);
-                    break;
-                    
-                case 'simply-supported':
-                case 'fixed-fixed':
-                    // Point load at position
-                    drawArrow(loadX, y - 60, loadX, y);
-                    text(loadMagnitude + ' kN', loadX + 10, y - 30);
-                    break;
-                    
-                case 'simply-distributed':
-                    // Distributed load
-                    for (let x = startX; x <= startX + length; x += 20) {
-                        drawArrow(x, y - 40, x, y);
-                    }
-                    text('w = ' + (loadMagnitude/5) + ' kN/m', startX + length/2, y - 50);
-                    break;
-                    
-                case 'continuous':
-                    // Two point loads
-                    drawArrow(startX + length * 0.25, y - 60, startX + length * 0.25, y);
-                    drawArrow(startX + length * 0.75, y - 60, startX + length * 0.75, y);
-                    text(loadMagnitude + ' kN', startX + length * 0.25 + 10, y - 30);
-                    text(loadMagnitude + ' kN', startX + length * 0.75 + 10, y - 30);
-                    break;
-                    
-                case 'combined':
-                    // Point load and distributed load
-                    drawArrow(loadX, y - 60, loadX, y);
-                    text(loadMagnitude + ' kN', loadX + 10, y - 30);
-                    for (let x = startX; x <= startX + length/2; x += 20) {
-                        drawArrow(x, y - 40, x, y);
-                    }
-                    break;
-            }
-        }
-        
-        function drawArrow(x1, y1, x2, y2) {
-            line(x1, y1, x2, y2);
-            let angle = atan2(y2 - y1, x2 - x1);
-            push();
-            translate(x2, y2);
-            rotate(angle);
-            line(0, 0, -8, -5);
-            line(0, 0, -8, 5);
-            pop();
-        }
-        
-        function drawDeflectedShape(startX, length, baseY) {
-            stroke(0, 0, 255);
-            strokeWeight(2);
-            noFill();
-            
-            beginShape();
-            for (let i = 0; i <= 100; i++) {
-                let x = i / 100;
-                let pixelX = startX + x * length;
-                let deflection = calculateDeflection(x) * scaleFactor;
-                vertex(pixelX, baseY + deflection);
-            }
-            endShape();
-            
-            // Show maximum deflection value
-            let maxDefl = calculateMaxDeflection();
-            fill(0, 0, 255);
-            noStroke();
-            textAlign(CENTER);
-            text('Max deflection: ' + maxDefl.toFixed(2) + ' mm', width/2, height - 30);
-        }
-        
-        function calculateDeflection(x) {
-            // Simplified deflection calculations for demonstration
-            // In reality, these would use the full Macaulay's method equations
-            let v = 0;
-            let L = 1; // Normalised length
-            
-            switch(beamType) {
-                case 'cantilever':
-                    // v = PL³/3EI * (3x/L - (x/L)³)
-                    if (x <= 1) {
-                        v = loadMagnitude * (3*x - x*x*x);
-                    }
-                    break;
-                    
-                case 'simply-supported':
-                    // Point load at centre
-                    let a = loadPosition;
-                    if (x <= a) {
-                        v = loadMagnitude * x * (1 - a) * (2 - x - a) / 6;
-                    } else {
-                        v = loadMagnitude * a * (1 - x) * (2 - a - x) / 6;
-                    }
-                    break;
-                    
-                case 'simply-distributed':
-                    // Uniformly distributed load
-                    v = (loadMagnitude/5) * x * (1 - x) * (1 + x - x*x) / 24;
-                    break;
-                    
-                case 'fixed-fixed':
-                    // Fixed-fixed with central load
-                    if (x <= 0.5) {
-                        v = loadMagnitude * x * x * (3 - 4*x) / 48;
-                    } else {
-                        v = loadMagnitude * (1-x) * (1-x) * (3 - 4*(1-x)) / 48;
-                    }
-                    break;
-                    
-                case 'continuous':
-                    // Approximate continuous beam deflection
-                    v = loadMagnitude * sin(PI * x) * 0.05;
-                    break;
-                    
-                case 'combined':
-                    // Combined loading
-                    v = loadMagnitude * x * (1 - x) * (1 + x - x*x) / 24;
-                    if (x > loadPosition - 0.1 && x < loadPosition + 0.1) {
-                        v += loadMagnitude * 0.02;
-                    }
-                    break;
-            }
-            
-            return v;
-        }
-        
-        function calculateMaxDeflection() {
-            // Return approximate maximum deflections in mm
-            // These are simplified values for demonstration
-            switch(beamType) {
-                case 'cantilever':
-                    return loadMagnitude * 3.2;
-                case 'simply-supported':
-                    return loadMagnitude * 1.04;
-                case 'simply-distributed':
-                    return loadMagnitude * 0.65;
-                case 'fixed-fixed':
-                    return loadMagnitude * 0.26;
-                case 'continuous':
-                    return loadMagnitude * 0.4;
-                case 'combined':
-                    return loadMagnitude * 0.8;
-                default:
-                    return 0;
-            }
-        }
-        
-        function drawShearDiagram(startX, length, y) {
-            stroke(0, 150, 0);
-            strokeWeight(2);
-            fill(0, 150, 0, 50);
-            
-            beginShape();
-            vertex(startX, y);
-            
-            for (let i = 0; i <= 100; i++) {
-                let x = i / 100;
-                let pixelX = startX + x * length;
-                let shear = calculateShear(x) * 2; // Scale for visibility
-                vertex(pixelX, y - shear);
-            }
-            
-            vertex(startX + length, y);
-            endShape(CLOSE);
-            
-            // Label
-            fill(0, 150, 0);
-            noStroke();
-            text('Shear Force Diagram', startX, y + 20);
-        }
-        
-        function calculateShear(x) {
-            // Simplified shear calculations
-            switch(beamType) {
-                case 'cantilever':
-                    return x < 1 ? loadMagnitude : 0;
-                case 'simply-supported':
-                    return x < loadPosition ? loadMagnitude * (1 - loadPosition) : -loadMagnitude * loadPosition;
-                case 'simply-distributed':
-                    return (loadMagnitude/5) * (0.5 - x);
-                default:
-                    return 0;
-            }
-        }
-        
-        function drawMomentDiagram(startX, length, y) {
-            stroke(150, 0, 150);
-            strokeWeight(2);
-            fill(150, 0, 150, 50);
-            
-            beginShape();
-            vertex(startX, y);
-            
-            for (let i = 0; i <= 100; i++) {
-                let x = i / 100;
-                let pixelX = startX + x * length;
-                let moment = calculateMoment(x) * 2; // Scale for visibility
-                vertex(pixelX, y - moment);
-            }
-            
-            vertex(startX + length, y);
-            endShape(CLOSE);
-            
-            // Label
-            fill(150, 0, 150);
-            noStroke();
-            text('Bending Moment Diagram', startX, y + 20);
-        }
-        
-        function calculateMoment(x) {
-            // Simplified moment calculations
-            switch(beamType) {
-                case 'cantilever':
-                    return x < 1 ? -loadMagnitude * (1 - x) : 0;
-                case 'simply-supported':
-                    return x < loadPosition ? 
-                        loadMagnitude * x * (1 - loadPosition) : 
-                        loadMagnitude * loadPosition * (1 - x);
-                case 'simply-distributed':
-                    return (loadMagnitude/5) * x * (1 - x) / 2;
-                default:
-                    return 0;
-            }
-        }
-        
-        function getBeamTitle() {
-            switch(beamType) {
-                case 'cantilever': return 'Cantilever Beam with Point Load';
-                case 'simply-supported': return 'Simply Supported Beam with Point Load';
-                case 'simply-distributed': return 'Simply Supported Beam with Distributed Load';
-                case 'fixed-fixed': return 'Fixed-Fixed Beam (Statically Indeterminate)';
-                case 'continuous': return 'Continuous Beam (Statically Indeterminate)';
-                case 'combined': return 'Combined Loading';
-                default: return 'Beam Analysis';
-            }
-        }
-        
-        // Toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                event.target.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                event.target.textContent = "Show Solution";
-            }
-        }
-    </script>
+  return {
+    V: function(x){
+      let V=0; for(const f of forces){ if (x>=f.x) V += f.Q; }
+      V += - w * bracket(x,0,1) + w * bracket(x,1,1); // uniform w over [0,1]
+      return V;
+    },
+    M: function(x){
+      let M=0; for(const f of forces){ if (x>=f.x) M += f.Q * (x - f.x); }
+      for(const c of couples){ if (x>=c.x) M += c.M; }
+      M += - (w/2) * bracket(x,0,2) + (w/2) * bracket(x,1,2); // UDL contribution
+      return M;
+    }
+  };
+}
+
+// Sampling
+function sampler(model, sol){
+  const {nodes}=model; const nEl=nodes.length-1; const samples=[];
+  const VM = buildVM_Macaulay(model, sol);
+  for(let e=0;e<nEl;e++){
+    const x1=nodes[e], x2=nodes[e+1]; const Le=x2-x1; const dofs=[2*e,2*e+1,2*(e+1),2*(e+1)+1];
+    const d_e=[ sol.d[dofs[0]], sol.d[dofs[1]], sol.d[dofs[2]], sol.d[dofs[3]] ];
+    const N=500; for(let i=0;i<=N;i++){
+      const s=i/N*Le; const gx=x1 + s;
+      const V = VM.V(gx), M = VM.M(gx);
+      const v = shapeDisp(Le, d_e, s);
+      samples.push({x:gx, V, M, v});
+    }
+  }
+  return samples.sort((a,b)=>a.x-b.x);
+}
+
+// Cubic shape function deflection within an element
+function shapeDisp(Le, d_e, s){
+  const xi = s/Le;
+  const N1 = 1 - 3*xi*xi + 2*xi*xi*xi;
+  const N2 = Le*(xi - 2*xi*xi + xi*xi*xi);
+  const N3 = 3*xi*xi - 2*xi*xi*xi;
+  const N4 = Le*(-xi*xi + xi*xi*xi);
+  return N1*d_e[0] + N2*d_e[1] + N3*d_e[2] + N4*d_e[3];
+}
+
+// ===================== Drawing =====================
+let beamY, beamStartX, beamEndX, beamLenPx;
+
+function setup(){ const c=createCanvas(940,650); c.parent('sketch-holder'); updateCtl(); }
+
+function drawSupports(y){
+  stroke(0); strokeWeight(2); fill(120); const s=12;
+  if (cfg.beamType==='cantilever-point' || cfg.beamType==='fixed-fixed'){
+    // left fixed
+    rect(beamStartX-12, y-24, 12, 48);
+  } else { // left pin
+    triangle(beamStartX-s, y+s, beamStartX+s, y+s, beamStartX, y);
+  }
+  // middle support for continuous-3 at 0.5L
+  if (cfg.beamType==='continuous-3'){
+    const xm = beamStartX + 0.5*beamLenPx; triangle(xm- s, y+s, xm+ s, y+s, xm, y);
+  }
+  // right support
+  if (cfg.beamType==='fixed-fixed'){
+    rect(beamEndX, y-24, 12, 48);
+  } else if (cfg.beamType==='cantilever-point'){
+    // free end → draw nothing
+  } else if (cfg.beamType==='overhang-right'){
+    const xr = beamStartX + cfg.s*beamLenPx;
+    triangle(xr- s, y+s, xr+ s, y+s, xr, y);
+    ellipse(xr-6,y+s+6,8,8); ellipse(xr+6,y+s+6,8,8);
+  } else { // simply supported & continuous right
+    triangle(beamEndX- s, y+s, beamEndX+ s, y+s, beamEndX, y);
+    ellipse(beamEndX-6,y+s+6,8,8); ellipse(beamEndX+6,y+s+6,8,8);
+  }
+}
+
+function drawArrow(x1,y1,x2,y2){
+  stroke(220,0,0); strokeWeight(3); line(x1,y1,x2,y2);
+  const ang=Math.atan2(y2-y1,x2-x1);
+  push(); translate(x2,y2); rotate(ang); line(0,0,-8,-5); line(0,0,-8,5); pop();
+}
+
+function drawLoads(y){
+  const aPx = beamStartX + cfg.a*beamLenPx;
+  if (cfg.P>0) { drawArrow(aPx,y-60,aPx,y); noStroke(); fill(180,0,0); text(`${cfg.P} kN`, aPx+10, y-40); }
+  if (cfg.w>0){ for(let x=beamStartX; x<=beamEndX; x+=18) drawArrow(x,y-40,x,y); noStroke(); fill(180,0,0); text(`w=${cfg.w} kN/m`, (beamStartX+beamEndX)/2, y-50); }
+}
+
+// DEFLECTION
+function drawDeflection(samples, yBase){
+  stroke(0,0,255); strokeWeight(2); noFill();
+  beginShape();
+  for(let i=0;i<samples.length;i++){
+    const px = beamStartX + samples[i].x*beamLenPx;
+    const py = yBase - cfg.scale*samples[i].v; // flipped convention
+    vertex(px, py);
+  }
+  endShape();
+  noStroke(); fill(0,0,255);
+  const vmax = samples.reduce((m,s)=>Math.max(m,Math.abs(s.v)),0);
+  textAlign(CENTER); text(`Max |EIv| (scaled): ${(cfg.scale*vmax).toFixed(2)}`, (beamStartX+beamEndX)/2, height-26);
+}
+
+// GENERIC DIAGRAM DRAWER
+function drawDiagram(samples, yBase, what){
+  const n=samples.length; noFill(); strokeWeight(2);
+  if (what==='V'){ stroke(0,120,0); fill(0,120,0,40);} else { stroke(220,0,0); fill(220,0,0,40);}
+  beginShape(); vertex(beamStartX, yBase);
+  for(let i=0;i<n;i++){
+    const px = beamStartX + samples[i].x*beamLenPx;
+    const val = (what==='V') ? samples[i].V : samples[i].M;
+    vertex(px, yBase - val*2);
+  }
+  vertex(beamEndX, yBase); endShape(CLOSE);
+  noStroke(); fill(what==='V'?color(0,120,0):color(220,0,0));
+  textAlign(LEFT); text(what==='V'?'Shear V(x)':'Moment M(x)', beamStartX+8, yBase+18);
+}
+
+function draw(){
+  background(249);
+  beamY = height*0.32; beamStartX = width*0.08; beamEndX = width*0.92; beamLenPx = beamEndX - beamStartX;
+
+  // grid
+  stroke(230); for(let i=0;i<=50;i++){ const x=beamStartX + i*beamLenPx/50; line(x, 40, x, height-40); }
+
+  // beam axis
+  stroke(150); strokeWeight(3); line(beamStartX, beamY, beamEndX, beamY);
+  drawSupports(beamY); drawLoads(beamY);
+
+  // Solve & sample
+  const model = buildModel();
+  const sol = assemble(model.nodes, model.supports, model.loads, model.wUDL);
+  const samples = sampler(model, sol);
+
+  if (cfg.showDefl) drawDeflection(samples, beamY);
+
+  // Shear panel then moment panel below
+  const y1 = height * 0.60, y2 = height * 0.82;
+  if (cfg.showShear)  drawDiagram(samples, y1, 'V');
+  if (cfg.showMoment) drawDiagram(samples, y2, 'M');
+
+  // title
+  noStroke(); fill(0); textAlign(CENTER); textSize(14); text(titleText(), width/2, 24);
+}
+
+function titleText(){
+  switch(cfg.beamType){
+    case 'ss-point': return 'Simply Supported – Point at a (Macaulay-compatible)';
+    case 'ss-udl': return 'Simply Supported – UDL (Macaulay-compatible)';
+    case 'ss-combined': return 'Simply Supported – UDL + Point (Macaulay-compatible)';
+    case 'cantilever-point': return 'Cantilever – Point at a';
+    case 'overhang-right': return 'Overhang Right – Supports at x=0 & x=s, free end at L';
+    case 'fixed-fixed': return 'Fixed–Fixed – Compatibility (stiffness)';
+    case 'continuous-3': return 'Continuous (3 supports) – Compatibility (stiffness)';
+    default: return 'Beam';
+  }
+}
+</script>
 </body>
 </html>

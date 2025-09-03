@@ -135,7 +135,6 @@
         <div class="buttons">
             <button id="animate-btn">Start Animation</button>
             <button id="reset-btn">Reset</button>
-            <button id="recalculate-btn">Recalculate</button>
         </div>
         
         <div id="sketch-container"></div>
@@ -218,9 +217,14 @@
                     drawPhysicalPlot(500, yPosition, timeArray, physicalData, t);
                     
                     // Animation (bottom)
-                    drawAnimation(50, 350, sf * physicalData[0][timeIndex], 
-                                     sf * physicalData[1][timeIndex], 
-                                     sf * physicalData[2][timeIndex]);
+                    drawAnimation(
+                        50,
+                        350,
+                        sf * physicalData[0][timeIndex], 
+                        sf * physicalData[1][timeIndex], 
+                        sf * physicalData[2][timeIndex],
+                        x0 // keep your existing IC readout unchanged
+                    );
                 } catch (error) {
                     console.error("Error in draw:", error);
                     p.fill(255, 0, 0);
@@ -236,12 +240,9 @@
                 });
                 
                 document.getElementById("reset-btn").addEventListener("click", function() {
-                    t = 0;
+                    animating= false; document.getElementById("animate-btn").textContent = "Start Animation"; t=0;
                 });
-                
-                document.getElementById("recalculate-btn").addEventListener("click", function() {
-                    needsRecalculation = true;
-                });
+
             }
             
             function setupSliders() {
@@ -321,7 +322,7 @@
                 timeArray = [];
                 modalData = [[], [], []];
                 physicalData = [[], [], []];
-                t = 0;
+                t = 0; // ensure we start from initial frame
                 
                 try {
                     // Mass matrix
@@ -348,7 +349,7 @@
                     const A1 = numeric.dot(Msqrt_inv, K);
                     const A = numeric.dot(A1, Msqrt_inv);
                     
-                    // Get eigenvalues and eigenvectors
+                    // Get eigenvalues and eigenvectors (A is symmetric -> eig.E is orthonormal)
                     const eig = numeric.eig(A);
                     
                     // Sort eigenvalues and eigenvectors
@@ -363,9 +364,10 @@
                     zeta = Omegan.map(omega => beta * omega / 2);
                     
                     // Calculate damped natural frequencies
-                    Omegad = Omegan.map((omega, i) => omega * Math.sqrt(1 - zeta[i] * zeta[i]));
+                    Omegad = Omegan.map((omega, i) => omega * Math.sqrt(Math.max(0, 1 - zeta[i] * zeta[i])));
                     
-                    // Extract eigenvectors and transform them back to physical coordinates
+                    // Extract eigenvectors and transform them back to physical coordinates:
+                    // X = M^{-1/2} * Y  (mass-orthonormal: X^T M X = I)
                     X = [[], [], []];
                     for (let i = 0; i < 3; i++) {
                         X[i] = [];
@@ -375,17 +377,9 @@
                         }
                     }
                     
-                    // Normalize eigenvectors
+                    // IMPORTANT: keep mass-orthonormal scaling (do NOT re-normalize Euclidean).
+                    // Only flip sign for consistency if desired.
                     for (let j = 0; j < 3; j++) {
-                        // Calculate norm
-                        let norm = Math.sqrt(X[0][j]*X[0][j] + X[1][j]*X[1][j] + X[2][j]*X[2][j]);
-                        
-                        // Normalize
-                        X[0][j] /= norm;
-                        X[1][j] /= norm;
-                        X[2][j] /= norm;
-                        
-                        // Ensure first mass entry is negative (convention)
                         if (X[0][j] > 0) {
                             X[0][j] *= -1;
                             X[1][j] *= -1;
@@ -393,13 +387,13 @@
                         }
                     }
                     
-                    // Compute inverse of X for modal initial conditions
-                    const X_array = numeric.transpose(X);
-                    const X_inv = numeric.inv(X_array);
-                    
-                    // Transform initial conditions to modal coordinates
-                    const q0 = numeric.dot(X_inv, x0);
-                    const p0 = numeric.dot(X_inv, v0);
+                    // ----- Correct mass-weighted projection for initial conditions -----
+                    const XT = numeric.transpose(X);
+                    const Mx0 = numeric.dot(M, x0);
+                    const Mv0 = numeric.dot(M, v0);
+                    const q0 = numeric.dot(XT, Mx0);
+                    const p0 = numeric.dot(XT, Mv0);
+                    // -------------------------------------------------------------------
                     
                     // Modal parameters for damped free oscillation
                     modalA = [];
@@ -416,16 +410,15 @@
                         // Modal solutions
                         const q_t = [0, 0, 0];
                         for (let i = 0; i < 3; i++) {
-                            // For underdamped case (zeta < 1)
-                            q_t[i] = modalB[i] * Math.exp(-zeta[i] * Omegan[i] * time) * Math.cos(Omegad[i] * time) + 
-                                    modalA[i] * Math.exp(-zeta[i] * Omegan[i] * time) * Math.sin(Omegad[i] * time);
+                            const decay = Math.exp(-zeta[i] * Omegan[i] * time);
+                            q_t[i] = modalB[i] * decay * Math.cos(Omegad[i] * time) + 
+                                     modalA[i] * decay * Math.sin(Omegad[i] * time);
                             
                             modalData[i].push(q_t[i]);
                         }
                         
                         // Physical solutions - x(t) = X * q(t)
                         const x_t = numeric.dot(X, q_t);
-                        
                         for (let i = 0; i < 3; i++) {
                             physicalData[i].push(x_t[i]);
                         }
@@ -633,15 +626,9 @@
                 p.pop();
             }
             
-            function drawAnimation(x, y, disp1, disp2, disp3) {
+            function drawAnimation(x, y, disp1, disp2, disp3, x0_now) {
                 p.push();
                 p.translate(x, y);
-                
-                // Title
-                p.fill(0);
-                p.textAlign(p.CENTER);
-                p.textSize(16);
-                p.text("Animation with Current I.C.", 400, -30);
                 
                 // Draw coordinate system
                 p.stroke(200);
@@ -692,10 +679,10 @@
                 p.text("m₂=" + m2.toFixed(1) + " kg", baseX2 + boxSize/2, baseY - 20);
                 p.text("m₃=" + m3.toFixed(1) + " kg", baseX3 + boxSize/2, baseY - 20);
                 
-                p.text("k₁=" + (k1/1000).toFixed(0) + " kN/m", baseX1/2, baseY + 20);
-                p.text("k₂=" + (k2/1000).toFixed(0) + " kN/m", (baseX1 + boxSize + baseX2)/2, baseY + 20);
-                p.text("k₃=" + (k3/1000).toFixed(0) + " kN/m", (baseX2 + boxSize + baseX3)/2, baseY + 20);
-                p.text("k₄=" + (k4/1000).toFixed(0) + " kN/m", baseX3 + boxSize + 60, baseY + 20);
+                p.text("k₁=" + (k1/1000).toFixed(0) + " kN/m", baseX1/2, baseY + 80);
+                p.text("k₂=" + (k2/1000).toFixed(0) + " kN/m", (baseX1 + boxSize + baseX2)/2, baseY + 80);
+                p.text("k₃=" + (k3/1000).toFixed(0) + " kN/m", (baseX2 + boxSize + baseX3)/2, baseY + 80);
+                p.text("k₄=" + (k4/1000).toFixed(0) + " kN/m", baseX3 + boxSize + 60, baseY + 80);
                 
                 // Draw static boxes (dashed)
                 drawDashedRect(baseX1, baseY, boxSize, boxSize);
@@ -710,6 +697,7 @@
                 
                 // Draw dynamic boxes
                 // First mass (red)
+                p.push();
                 p.stroke(p.color(212, 35, 35));
                 p.strokeWeight(2);
                 p.noFill();
@@ -722,6 +710,7 @@
                 // Third mass (purple)
                 p.stroke(p.color(120, 64, 204));
                 p.rect(baseX3 + disp3, baseY, boxSize, boxSize);
+                p.pop();
                 
                 // Add small labels
                 p.textSize(10);
@@ -734,12 +723,28 @@
                 // Display natural frequencies and damping ratios
                 p.textAlign(p.LEFT);
                 p.textSize(12);
-                let infoX = 650;
-                let infoY = -120;
+                let infoX = 640;
+                let infoY = -110;
                 p.text("Natural Frequencies:", infoX, infoY);
                 p.text("ω₁ = " + Omegan[0].toFixed(2) + " rad/s, ζ₁ = " + zeta[0].toFixed(4), infoX, infoY + 20);
                 p.text("ω₂ = " + Omegan[1].toFixed(2) + " rad/s, ζ₂ = " + zeta[1].toFixed(4), infoX, infoY + 40);
                 p.text("ω₃ = " + Omegan[2].toFixed(2) + " rad/s, ζ₃ = " + zeta[2].toFixed(4), infoX, infoY + 60);
+
+                                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Animation with Current I.C.", 400, 105);
+
+                // Initial condition readout (as in your provided file)
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                p.text(
+                    `x₁(0) = ${x0_now[0].toFixed(2)},  x₂(0) = ${x0_now[1].toFixed(2)},  x₃(0) = ${x0_now[2].toFixed(2)}`,
+                    300, 130
+                );
+                
                 
                 p.pop();
             }
@@ -783,5 +788,5 @@
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>
-  </footer>
+</footer>
 </html>

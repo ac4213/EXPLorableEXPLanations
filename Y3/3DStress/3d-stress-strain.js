@@ -1,1058 +1,699 @@
-// Calculate failure criteria
-function calculateFailureCriteria() {
-    const yieldStrength = materialProperties[materialModel].yieldStrength;
-    
-    // Rankine criterion (Maximum Principal Stress)
-    failureCriteria.rankine.value = Math.max(
-        Math.abs(principalStresses.s1),
-        Math.abs(principalStresses.s2),
-        Math.abs(principalStresses.s3)
-    );
-    failureCriteria.rankine.status = failureCriteria.rankine.value >= yieldStrength ? 'Fail' : 'Safe';
-    
-    // Tresca criterion (Maximum Shear Stress)
-    failureCriteria.tresca.value = Math.max(
-        Math.abs(principalStresses.s1 - principalStresses.s2),
-        Math.abs(principalStresses.s2 - principalStresses.s3),
-        Math.abs(principalStresses.s3 - principalStresses.s1)
-    ) / 2;
-    failureCriteria.tresca.status = failureCriteria.tresca.value >= yieldStrength / 2 ? 'Fail' : 'Safe';
-    
-    // von Mises criterion
-    failureCriteria.vonMises.value = Math.sqrt(
-        0.5 * (
-            Math.pow(principalStresses.s1 - principalStresses.s2, 2) +
-            Math.pow(principalStresses.s2 - principalStresses.s3, 2) +
-            Math.pow(principalStresses.s3 - principalStresses.s1, 2)
-        )
-    );
-    failureCriteria.vonMises.status = failureCriteria.vonMises.value >= yieldStrength / Math.sqrt(2) ? 'Fail' : 'Safe';
-}
+// ============================================================
+/* 3D Stress–Strain Interactive (p5 + Plotly)
+   Latest adjustments:
+   - Flat colours (no lighting) so arrows render the same from any view
+   - Global arrow scale knob (STRESS_ARROW_SCALE) for all stress arrows
+   - Reference frame axes from cube centre with live "x/y/z" labels
+   - NORMAL stresses: tension starts on face and points outward;
+                      compression tip sits on face and points inward
+                      (axis-coloured: x red, y blue, z green)
+   - SHEAR stresses: centred on face (midpoint at face centre) always;
+                     colours are plane mixes:
+                        τ_xy -> purple, τ_yz -> cyan, τ_xz -> yellow
+   - Isotropic only (no material radios)
+   - Mohr's circle preserved as perfect circles (equal axis scaling)
+   - Accurate symmetric 3×3 eigensolver (Jacobi)
+*/
+// ============================================================
 
-// Update display with calculated values
-function updateDisplay() {
-    // Update stress matrix display
-    const stressMatrixElement = document.getElementById('stress-matrix');
-    stressMatrixElement.innerHTML = `
-        <pre>σ = [
-    ${stressComponents.xx.toFixed(1)}  ${stressComponents.xy.toFixed(1)}  ${stressComponents.xz.toFixed(1)}
-    ${stressComponents.xy.toFixed(1)}  ${stressComponents.yy.toFixed(1)}  ${stressComponents.yz.toFixed(1)}
-    ${stressComponents.xz.toFixed(1)}  ${stressComponents.yz.toFixed(1)}  ${stressComponents.zz.toFixed(1)}
-] MPa</pre>
-    `;
-    
-    // Update principal stresses display
-    const principalStressesElement = document.getElementById('principal-stresses');
-    principalStressesElement.innerHTML = `
-        <p>σ₁ = ${principalStresses.s1.toFixed(1)} MPa</p>
-        <p>σ₂ = ${principalStresses.s2.toFixed(1)} MPa</p>
-        <p>σ₃ = ${principalStresses.s3.toFixed(1)} MPa</p>
-    `;
-    
-    // Update failure criteria display
-    const failureCriteriaElement = document.getElementById('failure-criteria');
-    failureCriteriaElement.innerHTML = `
-        <p><strong>Rankine:</strong> ${failureCriteria.rankine.value.toFixed(1)} MPa - <span class="${failureCriteria.rankine.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.rankine.status}</span></p>
-        <p><strong>Tresca:</strong> ${failureCriteria.tresca.value.toFixed(1)} MPa - <span class="${failureCriteria.tresca.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.tresca.status}</span></p>
-        <p><strong>Von Mises:</strong> ${failureCriteria.vonMises.value.toFixed(1)} MPa - <span class="${failureCriteria.vonMises.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.vonMises.status}</span></p>
-    `;
-    
-    // Create or update Mohr's Circle plot
-    createMohrCirclePlot();
-    
-    // Create or update failure envelope plot
-    createFailureEnvelopePlot();
-}
+// ------------------------------
+// Tunables
+// ------------------------------
+const STRESS_ARROW_SCALE = 6.0; // ← master scale for ALL stress arrows (normal + shear). Tweak this.
 
-// Create Mohr's Circle plot
-function createMohrCirclePlot() {
-    const mohrCircleElement = document.getElementById('mohr-circle-3d');
-    
-    // Calculate Mohr's circles
-    const centers = [
-        (principalStresses.s1 + principalStresses.s2) / 2,
-        (principalStresses.s2 + principalStresses.s3) / 2,
-        (principalStresses.s3 + principalStresses.s1) / 2
-    ];
-    
-    const radii = [
-        Math.abs(principalStresses.s1 - principalStresses.s2) / 2,
-        Math.abs(principalStresses.s2 - principalStresses.s3) / 2,
-        Math.abs(principalStresses.s3 - principalStresses.s1) / 2
-    ];
-    
-    // Generate points for Mohr's circles
-    const circle1Points = generateCirclePoints(centers[0], radii[0], 50);
-    const circle2Points = generateCirclePoints(centers[1], radii[1], 50);
-    const circle3Points = generateCirclePoints(centers[2], radii[2], 50);
-    
-    const trace1 = {
-        x: circle1Points.x,
-        y: circle1Points.y,
-        mode: 'lines',
-        name: 'σ₁-σ₂',
-        line: {
-            color: 'rgba(255, 0, 0, 0.7)',
-            width: 2
-        }
-    };
-    
-    const trace2 = {
-        x: circle2Points.x,
-        y: circle2Points.y,
-        mode: 'lines',
-        name: 'σ₂-σ₃',
-        line: {
-            color: 'rgba(0, 255, 0, 0.7)',
-            width: 2
-        }
-    };
-    
-    const trace3 = {
-        x: circle3Points.x,
-        y: circle3Points.y,
-        mode: 'lines',
-        name: 'σ₃-σ₁',
-        line: {
-            color: 'rgba(0, 0, 255, 0.7)',
-            width: 2
-        }
-    };
-    
-    const layout = {
-        title: "3D Mohr's Circles",
-        xaxis: {
-            title: 'Normal Stress (MPa)',
-            zeroline: true
-        },
-        yaxis: {
-            title: 'Shear Stress (MPa)',
-            zeroline: true
-        },
-        showlegend: true,
-        margin: {
-            l: 50,
-            r: 50,
-            b: 50,
-            t: 50,
-            pad: 4
-        }
-    };
-    
-    Plotly.newPlot(mohrCircleElement, [trace1, trace2, trace3], layout, {displayModeBar: false});
-}
-
-// Create failure envelope plot
-function createFailureEnvelopePlot() {
-    const failureEnvelopeElement = document.getElementById('failure-envelope');
-    
-    // Get yield strength from current material model
-    const yieldStrength = materialProperties[materialModel].yieldStrength;
-    
-    // Generate points for failure envelopes
-    const sigmaValues = [];
-    for (let i = -yieldStrength * 1.5; i <= yieldStrength * 1.5; i += yieldStrength / 15) {
-        sigmaValues.push(i);
-    }
-    
-    // Rankine envelope (square)
-    const rankineX = [];
-    const rankineY = [];
-    
-    // Top line
-    for (let sigma = -yieldStrength; sigma <= yieldStrength; sigma += yieldStrength / 15) {
-        rankineX.push(sigma);
-        rankineY.push(yieldStrength);
-    }
-    // Right line
-    for (let sigma = yieldStrength; sigma >= -yieldStrength; sigma -= yieldStrength / 15) {
-        rankineX.push(yieldStrength);
-        rankineY.push(sigma);
-    }
-    // Bottom line
-    for (let sigma = yieldStrength; sigma >= -yieldStrength; sigma -= yieldStrength / 15) {
-        rankineX.push(sigma);
-        rankineY.push(-yieldStrength);
-    }
-    // Left line
-    for (let sigma = -yieldStrength; sigma <= yieldStrength; sigma += yieldStrength / 15) {
-        rankineX.push(-yieldStrength);
-        rankineY.push(sigma);
-    }
-    // Close the envelope
-    rankineX.push(rankineX[0]);
-    rankineY.push(rankineY[0]);
-    
-    // Tresca envelope (hexagon)
-    const trescaX = [];
-    const trescaY = [];
-    
-    // Generate hexagon points
-    for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 3) {
-        trescaX.push(yieldStrength * Math.cos(angle));
-        trescaY.push(yieldStrength * Math.sin(angle));
-    }
-    // Close the envelope
-    trescaX.push(trescaX[0]);
-    trescaY.push(trescaY[0]);
-    
-    // Von Mises envelope (circle)
-    const vonMisesX = [];
-    const vonMisesY = [];
-    
-    for (let angle = 0; angle <= 2 * Math.PI; angle += Math.PI / 30) {
-        vonMisesX.push(yieldStrength * Math.cos(angle));
-        vonMisesY.push(yieldStrength * Math.sin(angle));
-    }
-    
-    // Current stress state
-    const currentX = principalStresses.s1;
-    const currentY = principalStresses.s2;
-    
-    const trace1 = {
-        x: rankineX,
-        y: rankineY,
-        mode: 'lines',
-        name: 'Rankine',
-        line: {
-            color: 'blue',
-            width: 2,
-            dash: 'dot'
-        }
-    };
-    
-    const trace2 = {
-        x: trescaX,
-        y: trescaY,
-        mode: 'lines',
-        name: 'Tresca',
-        line: {
-            color: 'green',
-            width: 2,
-            dash: 'dashdot'
-        }
-    };
-    
-    const trace3 = {
-        x: vonMisesX,
-        y: vonMisesY,
-        mode: 'lines',
-        name: 'Von Mises',
-        line: {
-            color: 'red',
-            width: 2
-        }
-    };
-    
-    const trace4 = {
-        x: [currentX],
-        y: [currentY],
-        mode: 'markers',
-        name: 'Current State',
-        marker: {
-            color: 'black',
-            size: 10,
-            symbol: 'circle'
-        }
-    };
-    
-    const layout = {
-        title: 'Failure Envelopes',
-        xaxis: {
-            title: 'σ₁ (MPa)',
-            zeroline: true
-        },
-        yaxis: {
-            title: 'σ₂ (MPa)',
-            zeroline: true,
-            scaleanchor: 'x',
-            scaleratio: 1
-        },
-        showlegend: true,
-        margin: {
-            l: 50,
-            r: 50,
-            b: 50,
-            t: 50,
-            pad: 4
-        }
-    };
-    
-    Plotly.newPlot(failureEnvelopeElement, [trace1, trace2, trace3, trace4], layout, {displayModeBar: false});
-}
-
-// Helper function to generate circle points
-function generateCirclePoints(center, radius, numPoints) {
-    const x = [];
-    const y = [];
-    
-    for (let i = 0; i <= numPoints; i++) {
-        const angle = (i / numPoints) * 2 * Math.PI;
-        x.push(center + radius * Math.cos(angle));
-        y.push(radius * Math.sin(angle));
-    }
-    
-    return { x, y };
-}
-
-// Initialize the application when the window loads
-window.onload = function() {
-    // Set initial values for sliders
-    document.getElementById('sigma-xx-value').textContent = stressComponents.xx;
-    document.getElementById('sigma-yy-value').textContent = stressComponents.yy;
-    document.getElementById('sigma-zz-value').textContent = stressComponents.zz;
-    document.getElementById('tau-xy-value').textContent = stressComponents.xy;
-    document.getElementById('tau-yz-value').textContent = stressComponents.yz;
-    document.getElementById('tau-xz-value').textContent = stressComponents.xz;
-    
-    // Add CSS for failure criteria indicators
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .safe {
-            color: green;
-            font-weight: bold;
-        }
-        
-        .fail {
-            color: red;
-            font-weight: bold;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Initial calculation and display update
-    recalculateAndUpdate();
-};// Global variables for the simulation
+// ------------------------------
+// Global state
+// ------------------------------
 let cube;
 let angle = 0;
 let showPrincipal = false;
-let showFailure = false;
-let materialModel = 'isotropic';
+let showFailure   = false;
+let showDeformation = true; // controlled by #show-deformation if present
+const materialModel = 'isotropic'; // fixed
 
-// Stress components with default values
+// Stress components with default values (MPa)
 let stressComponents = {
-    xx: 50,
-    yy: 30,
-    zz: 10,
-    xy: 15,
-    yz: 5,
-    xz: 10
+  xx: 50,
+  yy: 30,
+  zz: 10,
+  xy: 15,
+  yz: 5,
+  xz: 10
 };
 
-// Calculated values for display
+// Principal stresses (values in MPa; directions unit vectors)
 let principalStresses = {
-    s1: 0,
-    s2: 0,
-    s3: 0,
-    v1: null,
-    v2: null,
-    v3: null
+  s1: 0, s2: 0, s3: 0,
+  v1: null, v2: null, v3: null
 };
 
+// Failure criteria results
 let failureCriteria = {
-    rankine: { value: 0, status: 'Safe' },
-    tresca: { value: 0, status: 'Safe' },
-    vonMises: { value: 0, status: 'Safe' }
+  tresca:  { value: 0, status: 'Safe' },
+  vonMises:{ value: 0, status: 'Safe' }
 };
 
-// Material properties for different models
+// Yield strength for isotropic example (MPa)
 const materialProperties = {
-    isotropic: {
-        E: 210000, // Young's modulus in MPa
-        v: 0.3,    // Poisson's ratio
-        G: 80769,  // Shear modulus in MPa
-        yieldStrength: 250 // Yield strength in MPa
-    },
-    orthotropic: {
-        Ex: 210000, // Young's modulus in x direction
-        Ey: 150000, // Young's modulus in y direction
-        Ez: 100000, // Young's modulus in z direction
-        vxy: 0.3,   // Poisson's ratio xy
-        vyz: 0.25,  // Poisson's ratio yz
-        vxz: 0.2,   // Poisson's ratio xz
-        Gxy: 50000, // Shear modulus xy
-        Gyz: 40000, // Shear modulus yz
-        Gxz: 45000, // Shear modulus xz
-        yieldStrength: 250 // Yield strength in MPa
-    },
-    transverse: {
-        ET: 210000, // Transverse Young's modulus
-        EL: 150000, // Longitudinal Young's modulus
-        vT: 0.3,    // Transverse Poisson's ratio
-        vLT: 0.25,  // Longitudinal-transverse Poisson's ratio
-        GLT: 50000, // Longitudinal-transverse shear modulus
-        yieldStrength: 250 // Yield strength in MPa
-    }
+  isotropic: { yieldStrength: 110 }
 };
 
-// p5.js setup function
+// ------------------------------
+// p5: setup & draw
+// ------------------------------
 function setup() {
-    // Create canvas and attach it to the sketch-holder div
-    const canvas = createCanvas(800, 400, WEBGL);
-    canvas.parent('sketch-holder');
-    
-    // Initialize stress cube
-    cube = new StressCube();
-    
-    // Setup control event listeners
-    setupControls();
-    
-    // Initial calculation
-    calculatePrincipalStresses();
-    calculateFailureCriteria();
-    updateDisplay();
+  const canvas = createCanvas(800, 400, WEBGL);
+  canvas.parent('sketch-holder');
+
+  cube = new StressCube();
+  setupControls();
+
+  calculatePrincipalStresses();
+  calculateFailureCriteria();
+  updateDisplay();
 }
 
-// p5.js draw function
 function draw() {
-    background(240);
-    
-    // Set up lighting
-    ambientLight(100);
-    directionalLight(255, 255, 255, -1, 1, -1);
-    
-    // Rotate based on mouse position or auto-rotation
-    if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-        rotateY(map(mouseX, 0, width, -PI, PI));
-        rotateX(map(mouseY, 0, height, PI, -PI));
-    } else {
-        // Auto-rotation when mouse isn't pressed
-        angle += 0.01;
-        rotateY(angle);
-        rotateX(sin(angle * 0.5) * 0.5);
-    }
-    
-    // Draw the stress cube
-    cube.display();
+  background(240);
+
+  // FLAT look: disable lighting entirely so fills/lines are constant
+  noLights();
+
+  // Orbit-like rotation
+  if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+    rotateY(map(mouseX, 0, width, -PI, PI));
+    rotateX(map(mouseY, 0, height, PI, -PI));
+  } else {
+    angle += 0.01;
+    rotateY(angle);
+    rotateX(sin(angle * 0.5) * 0.5);
+  }
+
+  cube.display();
 }
 
-// StressCube class
+// ------------------------------
+// Stress cube class
+// ------------------------------
 class StressCube {
-    constructor() {
-        this.size = 100;
-        this.deformationScale = 0.002; // Scale factor for deformation visualization
-    }
-    
-    display() {
-        push();
-        
-        // Apply deformation based on stress components
-        const deformation = this.calculateDeformation();
-        
-        // Draw the deformed cube
-        stroke(0);
-        strokeWeight(1);
-        noFill();
-        
-        // Original cube outline
-        stroke(200);
-        box(this.size);
-        
-        // Deformed cube
-        stroke(0);
-        beginShape(LINES);
-        
-        // Draw the 12 edges of the deformed cube
-        for (let i = 0; i < 8; i++) {
-            for (let j = i + 1; j < 8; j++) {
-                if (this.isEdge(i, j)) {
-                    const v1 = deformation[i];
-                    const v2 = deformation[j];
-                    vertex(v1.x, v1.y, v1.z);
-                    vertex(v2.x, v2.y, v2.z);
-                }
-            }
-        }
-        endShape();
-        
-        // Draw stress arrows
-        this.drawStressArrows();
-        
-        // If showing principal stresses, draw them
-        if (showPrincipal) {
-            this.drawPrincipalStresses();
-        }
-        
-        // If showing failure criteria, draw them
-        if (showFailure) {
-            this.drawFailureCriteria();
-        }
-        
-        pop();
-    }
-    
-    calculateDeformation() {
-        // Calculate the vertices of the deformed cube based on stress
-        const halfSize = this.size / 2;
-        const vertices = [];
-        
-        // Original cube vertices
-        const baseVertices = [
-            createVector(-halfSize, -halfSize, -halfSize), // 0: left-bottom-back
-            createVector(halfSize, -halfSize, -halfSize),  // 1: right-bottom-back
-            createVector(halfSize, halfSize, -halfSize),   // 2: right-top-back
-            createVector(-halfSize, halfSize, -halfSize),  // 3: left-top-back
-            createVector(-halfSize, -halfSize, halfSize),  // 4: left-bottom-front
-            createVector(halfSize, -halfSize, halfSize),   // 5: right-bottom-front
-            createVector(halfSize, halfSize, halfSize),    // 6: right-top-front
-            createVector(-halfSize, halfSize, halfSize)    // 7: left-top-front
-        ];
-        
-        // Apply deformation based on stress components
-        for (let i = 0; i < baseVertices.length; i++) {
-            const v = baseVertices[i];
-            
-            // Apply normal stress deformation
-            const xDeform = v.x * (1 + stressComponents.xx * this.deformationScale);
-            const yDeform = v.y * (1 + stressComponents.yy * this.deformationScale);
-            const zDeform = v.z * (1 + stressComponents.zz * this.deformationScale);
-            
-            // Apply shear stress deformation (simplified approximation)
-            const xyShear = v.y * stressComponents.xy * this.deformationScale;
-            const yzShear = v.z * stressComponents.yz * this.deformationScale;
-            const xzShear = v.z * stressComponents.xz * this.deformationScale;
-            
-            vertices.push(createVector(
-                xDeform + xyShear + xzShear,
-                yDeform + xyShear + yzShear,
-                zDeform + xzShear + yzShear
-            ));
-        }
-        
-        return vertices;
-    }
-    
-    isEdge(i, j) {
-        // Check if two vertices form an edge in a cube
-        const edges = [
-            [0, 1], [1, 2], [2, 3], [3, 0], // back face
-            [4, 5], [5, 6], [6, 7], [7, 4], // front face
-            [0, 4], [1, 5], [2, 6], [3, 7]  // connecting edges
-        ];
-        
-        for (const edge of edges) {
-            if ((edge[0] === i && edge[1] === j) || (edge[0] === j && edge[1] === i)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    drawStressArrows() {
-        const halfSize = this.size / 2;
-        const arrowSize = 15;
-        const arrowScale = 0.5;
-        
-        // Draw normal stress arrows
-        push();
-        
-        // X-direction arrows (red)
-        stroke(255, 0, 0);
-        strokeWeight(2);
-        
-        // Right face
-        if (stressComponents.xx > 0) {
-            push();
-            translate(halfSize, 0, 0);
-            rotateZ(HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.xx / 100, 10, 5);
-            pop();
-        } else if (stressComponents.xx < 0) {
-            push();
-            translate(halfSize, 0, 0);
-            rotateZ(-HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.xx / 100, 10, 5);
-            pop();
-        }
-        
-        // Left face
-        if (stressComponents.xx > 0) {
-            push();
-            translate(-halfSize, 0, 0);
-            rotateZ(-HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.xx / 100, 10, 5);
-            pop();
-        } else if (stressComponents.xx < 0) {
-            push();
-            translate(-halfSize, 0, 0);
-            rotateZ(HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.xx / 100, 10, 5);
-            pop();
-        }
-        
-        // Y-direction arrows (green)
-        stroke(0, 255, 0);
-        
-        // Top face
-        if (stressComponents.yy > 0) {
-            push();
-            translate(0, halfSize, 0);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.yy / 100, 10, 5);
-            pop();
-        } else if (stressComponents.yy < 0) {
-            push();
-            translate(0, halfSize, 0);
-            rotateZ(PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.yy / 100, 10, 5);
-            pop();
-        }
-        
-        // Bottom face
-        if (stressComponents.yy > 0) {
-            push();
-            translate(0, -halfSize, 0);
-            rotateZ(PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.yy / 100, 10, 5);
-            pop();
-        } else if (stressComponents.yy < 0) {
-            push();
-            translate(0, -halfSize, 0);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.yy / 100, 10, 5);
-            pop();
-        }
-        
-        // Z-direction arrows (blue)
-        stroke(0, 0, 255);
-        
-        // Front face
-        if (stressComponents.zz > 0) {
-            push();
-            translate(0, 0, halfSize);
-            rotateX(-HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.zz / 100, 10, 5);
-            pop();
-        } else if (stressComponents.zz < 0) {
-            push();
-            translate(0, 0, halfSize);
-            rotateX(HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.zz / 100, 10, 5);
-            pop();
-        }
-        
-        // Back face
-        if (stressComponents.zz > 0) {
-            push();
-            translate(0, 0, -halfSize);
-            rotateX(HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * stressComponents.zz / 100, 10, 5);
-            pop();
-        } else if (stressComponents.zz < 0) {
-            push();
-            translate(0, 0, -halfSize);
-            rotateX(-HALF_PI);
-            this.drawArrow(0, 0, 0, arrowSize * arrowScale * -stressComponents.zz / 100, 10, 5);
-            pop();
-        }
-        
-        // Draw shear stress arrows (purple)
-        stroke(200, 0, 200);
-        
-        // XY shear
-        if (stressComponents.xy !== 0) {
-            const xyScale = arrowScale * stressComponents.xy / 30;
-            
-            // Top face (x-direction)
-            push();
-            translate(0, halfSize, 0);
-            rotateZ(HALF_PI);
-            this.drawArrow(-halfSize/2, 0, 0, arrowSize * xyScale, 8, 4);
-            this.drawArrow(halfSize/2, 0, 0, -arrowSize * xyScale, 8, 4);
-            pop();
-            
-            // Right face (y-direction)
-            push();
-            translate(halfSize, 0, 0);
-            this.drawArrow(0, -halfSize/2, 0, arrowSize * xyScale, 8, 4);
-            this.drawArrow(0, halfSize/2, 0, -arrowSize * xyScale, 8, 4);
-            pop();
-        }
-        
-        // YZ shear
-        if (stressComponents.yz !== 0) {
-            const yzScale = arrowScale * stressComponents.yz / 30;
-            
-            // Front face (y-direction)
-            push();
-            translate(0, 0, halfSize);
-            this.drawArrow(0, -halfSize/2, 0, arrowSize * yzScale, 8, 4);
-            this.drawArrow(0, halfSize/2, 0, -arrowSize * yzScale, 8, 4);
-            pop();
-            
-            // Top face (z-direction)
-            push();
-            translate(0, halfSize, 0);
-            rotateX(-HALF_PI);
-            this.drawArrow(0, -halfSize/2, 0, arrowSize * yzScale, 8, 4);
-            this.drawArrow(0, halfSize/2, 0, -arrowSize * yzScale, 8, 4);
-            pop();
-        }
-        
-        // XZ shear
-        if (stressComponents.xz !== 0) {
-            const xzScale = arrowScale * stressComponents.xz / 30;
-            
-            // Front face (x-direction)
-            push();
-            translate(0, 0, halfSize);
-            rotateZ(HALF_PI);
-            this.drawArrow(-halfSize/2, 0, 0, arrowSize * xzScale, 8, 4);
-            this.drawArrow(halfSize/2, 0, 0, -arrowSize * xzScale, 8, 4);
-            pop();
-            
-            // Right face (z-direction)
-            push();
-            translate(halfSize, 0, 0);
-            rotateX(-HALF_PI);
-            this.drawArrow(0, -halfSize/2, 0, arrowSize * xzScale, 8, 4);
-            this.drawArrow(0, halfSize/2, 0, -arrowSize * xzScale, 8, 4);
-            pop();
-        }
-        
-        pop();
-    }
-    
-    drawPrincipalStresses() {
-        const halfSize = this.size / 2;
-        const arrowSize = 25;
-        
-        push();
-        strokeWeight(3);
-        
-        // Scale factors for arrows based on principal stress magnitude
-        const maxPrincipal = max(abs(principalStresses.s1), abs(principalStresses.s2), abs(principalStresses.s3));
-        const arrowScale = 0.8;
-        
-        // Draw principal stress arrows in their respective directions
-        // Principal stress 1 (red)
-        if (principalStresses.v1) {
-            stroke(255, 0, 0);
-            const s1Scale = arrowScale * principalStresses.s1 / maxPrincipal;
-            const v1 = createVector(principalStresses.v1[0], principalStresses.v1[1], principalStresses.v1[2]);
-            v1.normalize().mult(halfSize);
-            
-            push();
-            if (principalStresses.s1 >= 0) {
-                // Draw from origin to principal direction
-                line(0, 0, 0, v1.x, v1.y, v1.z);
-                translate(v1.x, v1.y, v1.z);
-                // Rotate to align with principal direction
-                const rotAxis = createVector(0, 0, 1).cross(v1);
-                const rotAngle = createVector(0, 0, 1).angleBetween(v1);
-                if (rotAxis.mag() > 0.01) { // Avoid rotation if parallel to z-axis
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * s1Scale, 12, 6);
-            } else {
-                // Draw from origin to negative principal direction
-                line(0, 0, 0, -v1.x, -v1.y, -v1.z);
-                translate(-v1.x, -v1.y, -v1.z);
-                // Rotate to align with negative principal direction
-                const rotAxis = createVector(0, 0, 1).cross(createVector(-v1.x, -v1.y, -v1.z));
-                const rotAngle = createVector(0, 0, 1).angleBetween(createVector(-v1.x, -v1.y, -v1.z));
-                if (rotAxis.mag() > 0.01) { // Avoid rotation if parallel to z-axis
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * -s1Scale, 12, 6);
-            }
-            pop();
-            
-            // Draw text for principal stress values
-            push();
-            translate(v1.x * 1.2, v1.y * 1.2, v1.z * 1.2);
-            fill(255, 0, 0);
-            textSize(12);
-            text('σ₁=' + principalStresses.s1.toFixed(1), 0, 0);
-            pop();
-        }
-        
-        // Principal stress 2 (green)
-        if (principalStresses.v2) {
-            stroke(0, 255, 0);
-            const s2Scale = arrowScale * principalStresses.s2 / maxPrincipal;
-            const v2 = createVector(principalStresses.v2[0], principalStresses.v2[1], principalStresses.v2[2]);
-            v2.normalize().mult(halfSize);
-            
-            push();
-            if (principalStresses.s2 >= 0) {
-                line(0, 0, 0, v2.x, v2.y, v2.z);
-                translate(v2.x, v2.y, v2.z);
-                const rotAxis = createVector(0, 0, 1).cross(v2);
-                const rotAngle = createVector(0, 0, 1).angleBetween(v2);
-                if (rotAxis.mag() > 0.01) {
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * s2Scale, 12, 6);
-            } else {
-                line(0, 0, 0, -v2.x, -v2.y, -v2.z);
-                translate(-v2.x, -v2.y, -v2.z);
-                const rotAxis = createVector(0, 0, 1).cross(createVector(-v2.x, -v2.y, -v2.z));
-                const rotAngle = createVector(0, 0, 1).angleBetween(createVector(-v2.x, -v2.y, -v2.z));
-                if (rotAxis.mag() > 0.01) {
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * -s2Scale, 12, 6);
-            }
-            pop();
-            
-            // Draw text for principal stress value
-            push();
-            translate(v2.x * 1.2, v2.y * 1.2, v2.z * 1.2);
-            fill(0, 255, 0);
-            textSize(12);
-            text('σ₂=' + principalStresses.s2.toFixed(1), 0, 0);
-            pop();
-        }
-        
-        // Principal stress 3 (blue)
-        if (principalStresses.v3) {
-            stroke(0, 0, 255);
-            const s3Scale = arrowScale * principalStresses.s3 / maxPrincipal;
-            const v3 = createVector(principalStresses.v3[0], principalStresses.v3[1], principalStresses.v3[2]);
-            v3.normalize().mult(halfSize);
-            
-            push();
-            if (principalStresses.s3 >= 0) {
-                line(0, 0, 0, v3.x, v3.y, v3.z);
-                translate(v3.x, v3.y, v3.z);
-                const rotAxis = createVector(0, 0, 1).cross(v3);
-                const rotAngle = createVector(0, 0, 1).angleBetween(v3);
-                if (rotAxis.mag() > 0.01) {
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * s3Scale, 12, 6);
-            } else {
-                line(0, 0, 0, -v3.x, -v3.y, -v3.z);
-                translate(-v3.x, -v3.y, -v3.z);
-                const rotAxis = createVector(0, 0, 1).cross(createVector(-v3.x, -v3.y, -v3.z));
-                const rotAngle = createVector(0, 0, 1).angleBetween(createVector(-v3.x, -v3.y, -v3.z));
-                if (rotAxis.mag() > 0.01) {
-                    rotate(rotAngle, rotAxis);
-                }
-                this.drawArrowHead(0, 0, 0, arrowSize * -s3Scale, 12, 6);
-            }
-            pop();
-            
-            // Draw text for principal stress value
-            push();
-            translate(v3.x * 1.2, v3.y * 1.2, v3.z * 1.2);
-            fill(0, 0, 255);
-            textSize(12);
-            text('σ₃=' + principalStresses.s3.toFixed(1), 0, 0);
-            pop();
-        }
-        
-        pop();
-    }
-    
-    drawFailureCriteria() {
-        // Display a simple visual indicator for failure criteria status
-        
-        push();
-        translate(0, 0, this.size * 0.6);
-        
-        textSize(14);
-        fill(0);
-        textAlign(CENTER);
-        text("Failure Criteria Status", 0, -40);
-        
-        // Rankine
-        if (failureCriteria.rankine.status === 'Fail') {
-            fill(255, 0, 0);
-        } else {
-            fill(0, 255, 0);
-        }
-        ellipse(-50, -15, 15, 15);
-        fill(0);
-        text("Rankine", -50, 5);
-        
-        // Tresca
-        if (failureCriteria.tresca.status === 'Fail') {
-            fill(255, 0, 0);
-        } else {
-            fill(0, 255, 0);
-        }
-        ellipse(0, -15, 15, 15);
-        fill(0);
-        text("Tresca", 0, 5);
-        
-        // Von Mises
-        if (failureCriteria.vonMises.status === 'Fail') {
-            fill(255, 0, 0);
-        } else {
-            fill(0, 255, 0);
-        }
-        ellipse(50, -15, 15, 15);
-        fill(0);
-        text("Von Mises", 50, 5);
-        
-        pop();
-    }
-    
-    drawArrow(x, y, z, len, headSize, headWidth) {
-        // Draw arrow shaft
-        line(x, y, z, x + len, y, z);
-        
-        // Draw arrowhead
-        this.drawArrowHead(x + len, y, z, headSize, headWidth);
-    }
-    
-    drawArrowHead(x, y, z, size, width) {
-        // Draw arrowhead triangles
-        beginShape();
-        vertex(x, y, z);
-        vertex(x - size, y - width/2, z);
-        vertex(x - size, y + width/2, z);
-        endShape(CLOSE);
-    }
-}
+  constructor() {
+    this.size = 100;
+    this.deformationScale = 0.002; // visualisation-only scale
+  }
 
-// Setup event listeners for controls
-function setupControls() {
-    // Stress sliders
-    document.getElementById('sigma-xx').addEventListener('input', function() {
-        stressComponents.xx = parseInt(this.value);
-        document.getElementById('sigma-xx-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    document.getElementById('sigma-yy').addEventListener('input', function() {
-        stressComponents.yy = parseInt(this.value);
-        document.getElementById('sigma-yy-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    document.getElementById('sigma-zz').addEventListener('input', function() {
-        stressComponents.zz = parseInt(this.value);
-        document.getElementById('sigma-zz-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    document.getElementById('tau-xy').addEventListener('input', function() {
-        stressComponents.xy = parseInt(this.value);
-        document.getElementById('tau-xy-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    document.getElementById('tau-yz').addEventListener('input', function() {
-        stressComponents.yz = parseInt(this.value);
-        document.getElementById('tau-yz-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    document.getElementById('tau-xz').addEventListener('input', function() {
-        stressComponents.xz = parseInt(this.value);
-        document.getElementById('tau-xz-value').textContent = this.value;
-        recalculateAndUpdate();
-    });
-    
-    // View control buttons
-    document.getElementById('reset-view').addEventListener('click', function() {
-        angle = 0;
-    });
-    
-    document.getElementById('toggle-principal').addEventListener('click', function() {
-        showPrincipal = !showPrincipal;
-        if (showPrincipal) {
-            this.textContent = 'Hide Principal Stresses';
-        } else {
-            this.textContent = 'Show Principal Stresses';
-        }
-    });
-    
-    document.getElementById('toggle-failure').addEventListener('click', function() {
-        showFailure = !showFailure;
-        if (showFailure) {
-            this.textContent = 'Hide Failure Criteria';
-        } else {
-            this.textContent = 'Show Failure Criteria';
-        }
-    });
-    
-    // Material model radio buttons
-    const materialModelRadios = document.querySelectorAll('input[name="material-model"]');
-    materialModelRadios.forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            materialModel = this.value;
-            recalculateAndUpdate();
-        });
-    });
-}
+  display() {
+    push();
 
-// Recalculate and update display
-function recalculateAndUpdate() {
-    calculatePrincipalStresses();
-    calculateFailureCriteria();
-    updateDisplay();
-}
+    // 0) Reference axes (draw first so cube lines sit on top)
+    //this.drawReferenceAxes();
 
-// Calculate principal stresses and directions
-function calculatePrincipalStresses() {
-    // Create the stress tensor matrix
-    const stressTensor = [
-        [stressComponents.xx, stressComponents.xy, stressComponents.xz],
-        [stressComponents.xy, stressComponents.yy, stressComponents.yz],
-        [stressComponents.xz, stressComponents.yz, stressComponents.zz]
+    // 1) Base cube (wireframe)
+    stroke(200);
+    noFill();
+    box(this.size);
+
+    // 2) Deformed edges (toggle)
+    if (showDeformation) {
+      const deformation = this.calculateDeformation();
+      stroke(0);
+      noFill();
+      beginShape(LINES);
+      for (let i = 0; i < 8; i++) {
+        for (let j = i + 1; j < 8; j++) {
+          if (this.isEdge(i, j)) {
+            const v1 = deformation[i];
+            const v2 = deformation[j];
+            vertex(v1.x, v1.y, v1.z);
+            vertex(v2.x, v2.y, v2.z);
+          }
+        }
+      }
+      endShape();
+    }
+
+    // 3) Stress arrows + overlays
+    this.drawStressArrows();
+
+    if (showPrincipal) this.drawPrincipalStresses();
+    if (showFailure)   this.drawFailureCriteria();
+
+    pop();
+  }
+
+  drawReferenceAxes() {
+    // Draw x (red), y (blue), z (green) axes from the centre with labels
+    const h = this.size / 2;
+    const L = h * 0.75; // axis length inside cube
+
+    const drawAxis = (dirVec, col, label) => {
+      const p = createVector(0,0,0);
+      const q = p5.Vector.mult(dirVec.copy().normalize(), L);
+
+      // axis line + small head
+      this._drawArrowFromTo(p, q, 10, 4, col, 2);
+
+      // label at a tad beyond the tip so it doesn't overlap
+      push();
+      const labelOffset = p5.Vector.mult(dirVec.copy().normalize(), 12);
+      const pos = p5.Vector.add(q, labelOffset);
+      translate(pos.x, pos.y, pos.z);
+      noStroke();
+      fill(col[0], col[1], col[2]);
+      textSize(14);
+      textAlign(LEFT, CENTER);
+      text(label, 0, 0);
+      pop();
+    };
+
+    // x: red, y: blue, z: green
+    drawAxis(createVector( 1, 0, 0), [255, 0, 0],  'x');
+    drawAxis(createVector( 0, 1, 0), [  0, 96,255], 'y');
+    drawAxis(createVector( 0, 0, 1), [  0,176,  0], 'z');
+  }
+
+  calculateDeformation() {
+    const h = this.size / 2;
+    const base = [
+      createVector(-h, -h, -h), // 0
+      createVector( h, -h, -h), // 1
+      createVector( h,  h, -h), // 2
+      createVector(-h,  h, -h), // 3
+      createVector(-h, -h,  h), // 4
+      createVector( h, -h,  h), // 5
+      createVector( h,  h,  h), // 6
+      createVector(-h,  h,  h)  // 7
     ];
-    
-    // For this demo, we'll use these calculations as an approximation
-    const I1 = stressComponents.xx + stressComponents.yy + stressComponents.zz;
-    const I2 = stressComponents.xx * stressComponents.yy + stressComponents.yy * stressComponents.zz + 
-               stressComponents.zz * stressComponents.xx - 
-               stressComponents.xy * stressComponents.xy - 
-               stressComponents.yz * stressComponents.yz - 
-               stressComponents.xz * stressComponents.xz;
-    const I3 = stressComponents.xx * stressComponents.yy * stressComponents.zz + 
-               2 * stressComponents.xy * stressComponents.yz * stressComponents.xz -
-               stressComponents.xx * stressComponents.yz * stressComponents.yz -
-               stressComponents.yy * stressComponents.xz * stressComponents.xz -
-               stressComponents.zz * stressComponents.xy * stressComponents.xy;
-    
-    // Simplified principal stress calculation for demonstration
-    // In a real application, use a proper numerical eigenvalue solver
-    principalStresses.s1 = Math.max(stressComponents.xx, stressComponents.yy, stressComponents.zz) + 10;
-    principalStresses.s3 = Math.min(stressComponents.xx, stressComponents.yy, stressComponents.zz) - 10;
-    principalStresses.s2 = I1 - principalStresses.s1 - principalStresses.s3;
-    
-    // Simplified principal directions for demonstration
-    principalStresses.v1 = [0.8, 0.5, 0.3];
-    principalStresses.v2 = [-0.5, 0.8, 0.3];
-    principalStresses.v3 = [0.3, -0.3, 0.9];
-}
 
-// Function to check quiz answers
-function checkAnswer(questionId, correctAnswer) {
-    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-    const feedbackElement = document.getElementById(`${questionId}-feedback`);
-    
-    if (!selectedOption) {
-        feedbackElement.innerHTML = "Please select an answer.";
-        feedbackElement.className = "feedback";
-        return;
+    const v = [];
+    for (let i = 0; i < base.length; i++) {
+      const p = base[i];
+      // normal strain (very simplified visualisation)
+      const xDe = p.x * (1 + stressComponents.xx * this.deformationScale);
+      const yDe = p.y * (1 + stressComponents.yy * this.deformationScale);
+      const zDe = p.z * (1 + stressComponents.zz * this.deformationScale);
+
+      // shear "sliding" visualisation (not physical)
+      const xy = p.y * stressComponents.xy * this.deformationScale;
+      const yz = p.z * stressComponents.yz * this.deformationScale;
+      const xz = p.z * stressComponents.xz * this.deformationScale;
+
+      v.push(createVector(
+        xDe + xy + xz,
+        yDe + xy + yz,
+        zDe + xz + yz
+      ));
     }
-    
-    if (selectedOption.value === correctAnswer) {
-        feedbackElement.innerHTML = "Correct! Well done.";
-        feedbackElement.className = "feedback correct";
+    return v;
+  }
+
+  isEdge(i, j) {
+    const edges = [
+      [0,1],[1,2],[2,3],[3,0], // back
+      [4,5],[5,6],[6,7],[7,4], // front
+      [0,4],[1,5],[2,6],[3,7]  // connect
+    ];
+    for (const e of edges) {
+      if ((e[0] === i && e[1] === j) || (e[0] === j && e[1] === i)) return true;
+    }
+    return false;
+  }
+
+  // ------------- Arrow helpers ----------------
+  _drawArrowFromTo(p, q, headLen = 12, headRad = 5, col = [0,0,0], weight = 2) {
+    // Draws a 3D arrow from point p to point q
+    const dir = p5.Vector.sub(q, p);
+    const L = dir.mag();
+    if (L < 1e-6) return;
+
+    const d = dir.copy().normalize();
+    const tip = q.copy();
+
+    // shaft
+    push();
+    stroke(col[0], col[1], col[2]);
+    strokeWeight(weight);
+    line(p.x, p.y, p.z, tip.x, tip.y, tip.z);
+
+    // head as a cone-like fan
+    const baseCenter = p5.Vector.add(tip, p5.Vector.mult(d, -headLen));
+    const arbitrary = (Math.abs(d.x) < 0.9) ? createVector(1,0,0) : createVector(0,1,0);
+    let u = d.copy().cross(arbitrary).normalize();
+    let v = d.copy().cross(u).normalize();
+
+    noStroke();
+    fill(col[0], col[1], col[2]);
+    beginShape(TRIANGLES);
+    const segs = 12;
+    for (let i = 0; i < segs; i++) {
+      const a0 = (i / segs) * TWO_PI;
+      const a1 = ((i + 1) / segs) * TWO_PI;
+      const b0 = p5.Vector.add(baseCenter,
+        p5.Vector.add(p5.Vector.mult(u, headRad * Math.cos(a0)), p5.Vector.mult(v, headRad * Math.sin(a0))));
+      const b1 = p5.Vector.add(baseCenter,
+        p5.Vector.add(p5.Vector.mult(u, headRad * Math.cos(a1)), p5.Vector.mult(v, headRad * Math.sin(a1))));
+      vertex(tip.x, tip.y, tip.z);
+      vertex(b0.x, b0.y, b0.z);
+      vertex(b1.x, b1.y, b1.z);
+    }
+    endShape();
+    pop();
+  }
+
+  _lenFrom(val, max = 100, base = 20, cap = 1.5) {
+    return STRESS_ARROW_SCALE * base * constrain(Math.abs(val) / max, 0, cap);
+  }
+
+  // ------------- Stress arrows ----------------
+  drawStressArrows() {
+    const h = this.size / 2;
+
+    // --- NORMAL STRESSES ---
+    const drawNormalFace = (faceCenter, outwardDir, val, colorArr) => {
+      const L = this._lenFrom(val, 100, 22, 1.5);
+      const d = outwardDir.copy().normalize();
+
+      if (val >= 0) {
+        // Tension: start = surface, tip = start + L * outward
+        const start = faceCenter.copy();
+        const tip   = p5.Vector.add(start, p5.Vector.mult(d, L));
+        this._drawArrowFromTo(start, tip, 12, 5, colorArr, 2);
+      } else if (val < 0) {
+        // Compression: tip = surface, start = tip + L * outward
+        const tip   = faceCenter.copy();
+        const start = p5.Vector.add(tip, p5.Vector.mult(d, L));
+        this._drawArrowFromTo(start, tip, 12, 5, colorArr, 2);
+      }
+    };
+
+    // σ_xx on x-faces (red)
+    drawNormalFace(createVector( h, 0, 0), createVector( 1, 0, 0), stressComponents.xx, [255, 0, 0]);
+    drawNormalFace(createVector(-h, 0, 0), createVector(-1, 0, 0), stressComponents.xx, [255, 0, 0]);
+
+    // σ_yy on y-faces (blue)
+    drawNormalFace(createVector(0,  h, 0), createVector(0,  1, 0), stressComponents.yy, [0, 96, 255]);
+    drawNormalFace(createVector(0, -h, 0), createVector(0, -1, 0), stressComponents.yy, [0, 96, 255]);
+
+    // σ_zz on z-faces (green)
+    drawNormalFace(createVector(0, 0,  h), createVector(0, 0,  1), stressComponents.zz, [0, 176, 0]);
+    drawNormalFace(createVector(0, 0, -h), createVector(0, 0, -1), stressComponents.zz, [0, 176, 0]);
+
+    // --- SHEAR STRESSES ---
+    const drawShearOnFace = (faceCenter, shearDir, val, colorArr) => {
+      const L = this._lenFrom(val, 50, 20, 1.5);
+      const d = shearDir.copy().normalize();
+
+      // Arrows from mid - L/2 to mid + L/2, showing shear direction
+      const midPt = faceCenter.copy();
+      const start = p5.Vector.add(midPt, p5.Vector.mult(d, -L/2));
+      const tip   = p5.Vector.add(midPt, p5.Vector.mult(d,  L/2));
+      this._drawArrowFromTo(start, tip, 10, 4, colorArr, 2);
+    };
+
+    // τ_xy (purple) on +x, -x, +y, -y faces
+    drawShearOnFace(createVector( h, 0, 0), createVector(0,  1, 0), stressComponents.xy, [255, 0, 255]);
+    drawShearOnFace(createVector(-h, 0, 0), createVector(0, -1, 0), stressComponents.xy, [255, 0, 255]);
+    drawShearOnFace(createVector(0,  h, 0), createVector( 1, 0, 0), stressComponents.xy, [255, 0, 255]);
+    drawShearOnFace(createVector(0, -h, 0), createVector(-1, 0, 0), stressComponents.xy, [255, 0, 255]);
+
+    // τ_yz (cyan) on +y, -y, +z, -z faces
+    drawShearOnFace(createVector(0,  h, 0), createVector(0, 0,  1), stressComponents.yz, [0, 255, 255]);
+    drawShearOnFace(createVector(0, -h, 0), createVector(0, 0, -1), stressComponents.yz, [0, 255, 255]);
+    drawShearOnFace(createVector(0, 0,  h), createVector(0,  1, 0), stressComponents.yz, [0, 255, 255]);
+    drawShearOnFace(createVector(0, 0, -h), createVector(0, -1, 0), stressComponents.yz, [0, 255, 255]);
+
+    // τ_xz (yellow) on +x, -x, +z, -z faces
+    drawShearOnFace(createVector( h, 0, 0), createVector(0, 0,  1), stressComponents.xz, [255, 255, 0]);
+    drawShearOnFace(createVector(-h, 0, 0), createVector(0, 0, -1), stressComponents.xz, [255, 255, 0]);
+    drawShearOnFace(createVector(0, 0,  h), createVector( 1, 0, 0), stressComponents.xz, [255, 255, 0]);
+    drawShearOnFace(createVector(0, 0, -h), createVector(-1, 0, 0), stressComponents.xz, [255, 255, 0]);
+  }
+
+  drawPrincipalStresses() {
+    const h = this.size / 2;
+    if (!principalStresses.v1 || !principalStresses.v2 || !principalStresses.v3) return;
+
+    push();
+    strokeWeight(3);
+    stroke(255, 128, 0);
+    fill(255, 128, 0, 100);
+
+    const length = h * 0.8;
+    const drawPrincipal = (value, direction) => {
+      const d = createVector(direction[0], direction[1], direction[2]).normalize();
+      const p1 = p5.Vector.mult(d,  length);
+      const p2 = p5.Vector.mult(d, -length);
+      line(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+
+      push();
+      translate(p1.x, p1.y, p1.z);
+      noStroke();
+      sphere(5);
+      pop();
+    };
+
+    drawPrincipal(principalStresses.s1, principalStresses.v1);
+    drawPrincipal(principalStresses.s2, principalStresses.v2);
+    drawPrincipal(principalStresses.s3, principalStresses.v3);
+    pop();
+  }
+
+  drawFailureCriteria() {
+    push();
+    const h = this.size / 2;
+    const vm = failureCriteria.vonMises.value;
+    const yieldStr = materialProperties.isotropic.yieldStrength;
+
+    if (vm > yieldStr) {
+      stroke(255, 0, 0, 150);
+      strokeWeight(4);
+      noFill();
+      box(this.size + 20);
     } else {
-        feedbackElement.innerHTML = "Incorrect. Try again!";
-        feedbackElement.className = "feedback incorrect";
+      stroke(0, 255, 0, 150);
+      strokeWeight(2);
+      noFill();
+      box(this.size + 10);
     }
+    pop();
+  }
 }
 
-// Function to toggle solution visibility
+// ------------------------------
+// UI controls setup
+// ------------------------------
+function setupControls() {
+  // Sliders
+  const sliders = [
+    { id: 'sigma-xx', component: 'xx' },
+    { id: 'sigma-yy', component: 'yy' },
+    { id: 'sigma-zz', component: 'zz' },
+    { id: 'tau-xy',   component: 'xy' },
+    { id: 'tau-yz',   component: 'yz' },
+    { id: 'tau-xz',   component: 'xz' }
+  ];
+
+  sliders.forEach(({ id, component }) => {
+    const slider = document.getElementById(id);
+    if (!slider) return;
+    slider.addEventListener('input', function() {
+      stressComponents[component] = parseFloat(this.value);
+      document.getElementById(`${id}-value`).textContent = this.value;
+      recalculateAndUpdate();
+    });
+  });
+
+  // Buttons
+  const resetBtn = document.getElementById('reset-view');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => { angle = 0; });
+  }
+
+  const principalBtn = document.getElementById('toggle-principal');
+  if (principalBtn) {
+    principalBtn.addEventListener('click', () => {
+      showPrincipal = !showPrincipal;
+      principalBtn.textContent = showPrincipal ? 'Hide Principal Stresses' : 'Show Principal Stresses';
+    });
+  }
+
+  // Checkbox
+  const defCheck = document.getElementById('show-deformation');
+  if (defCheck) {
+    // Set initial state to checked
+    defCheck.checked = true;
+    showDeformation = true;
+    
+    defCheck.addEventListener('change', function() {
+      showDeformation = this.checked;
+    });
+  }
+}
+
+// ------------------------------
+// Stress calculations
+// ------------------------------
+function calculatePrincipalStresses() {
+  const s = stressComponents;
+  const A = [
+    [s.xx, s.xy, s.xz],
+    [s.xy, s.yy, s.yz],
+    [s.xz, s.yz, s.zz]
+  ];
+
+  const { eigenvalues, eigenvectors } = jacobiEigenvalues(A);
+  eigenvalues.sort((a, b) => b - a); // descending
+
+  principalStresses.s1 = eigenvalues[0];
+  principalStresses.s2 = eigenvalues[1];
+  principalStresses.s3 = eigenvalues[2];
+  principalStresses.v1 = eigenvectors[0];
+  principalStresses.v2 = eigenvectors[1];
+  principalStresses.v3 = eigenvectors[2];
+}
+
+// Jacobi eigenvalue algorithm for symmetric 3x3
+function jacobiEigenvalues(A, maxIter = 100, tol = 1e-10) {
+  const n = 3;
+  let V = [[1,0,0],[0,1,0],[0,0,1]]; // identity
+  let B = A.map(row => [...row]);     // copy
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    // Find largest off-diagonal
+    let maxVal = 0, p = 0, q = 1;
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        if (Math.abs(B[i][j]) > maxVal) {
+          maxVal = Math.abs(B[i][j]);
+          p = i; q = j;
+        }
+      }
+    }
+    if (maxVal < tol) break;
+
+    // Compute rotation angle
+    const theta = 0.5 * Math.atan2(2 * B[p][q], B[q][q] - B[p][p]);
+    const c = Math.cos(theta);
+    const s = Math.sin(theta);
+
+    // Apply rotation to B
+    const Bpq = B[p][q];
+    B[p][p] = c*c*B[p][p] - 2*s*c*Bpq + s*s*B[q][q];
+    B[q][q] = s*s*B[p][p] + 2*s*c*Bpq + c*c*B[q][q];
+    B[p][q] = B[q][p] = 0;
+
+    for (let k = 0; k < n; k++) {
+      if (k !== p && k !== q) {
+        const Bkp = B[k][p];
+        const Bkq = B[k][q];
+        B[k][p] = B[p][k] = c*Bkp - s*Bkq;
+        B[k][q] = B[q][k] = s*Bkp + c*Bkq;
+      }
+    }
+
+    // Update eigenvectors
+    for (let k = 0; k < n; k++) {
+      const Vkp = V[k][p];
+      const Vkq = V[k][q];
+      V[k][p] = c*Vkp - s*Vkq;
+      V[k][q] = s*Vkp + c*Vkq;
+    }
+  }
+
+  const eigenvalues = [B[0][0], B[1][1], B[2][2]];
+  const eigenvectors = [[V[0][0],V[1][0],V[2][0]],
+                         [V[0][1],V[1][1],V[2][1]],
+                         [V[0][2],V[1][2],V[2][2]]];
+  return { eigenvalues, eigenvectors };
+}
+
+// Failure criteria
+function calculateFailureCriteria() {
+  const { s1, s2, s3 } = principalStresses;
+  const yieldStrength = materialProperties.isotropic.yieldStrength;
+
+  // Tresca (Maximum Shear Stress)
+  const maxShear = Math.max(Math.abs(s1 - s2), Math.abs(s2 - s3), Math.abs(s3 - s1)) / 2;
+  failureCriteria.tresca.value = maxShear * 2;
+  failureCriteria.tresca.status = (maxShear * 2 >= yieldStrength) ? 'Fail' : 'Safe';
+
+  // Von Mises
+  const vm = Math.sqrt(0.5 * ((s1 - s2)**2 + (s2 - s3)**2 + (s3 - s1)**2));
+  failureCriteria.vonMises.value = vm;
+  failureCriteria.vonMises.status = (vm >= yieldStrength) ? 'Fail' : 'Safe';
+}
+
+// ------------------------------
+// Display update
+// ------------------------------
+function updateDisplay() {
+  // Stress matrix
+  const matrixElement = document.getElementById('stress-matrix');
+  if (matrixElement) {
+    matrixElement.innerHTML = `[${stressComponents.xx.toFixed(1).padStart(6)} ${stressComponents.xy.toFixed(1).padStart(6)} ${stressComponents.xz.toFixed(1).padStart(6)}]
+[${stressComponents.xy.toFixed(1).padStart(6)} ${stressComponents.yy.toFixed(1).padStart(6)} ${stressComponents.yz.toFixed(1).padStart(6)}]
+[${stressComponents.xz.toFixed(1).padStart(6)} ${stressComponents.yz.toFixed(1).padStart(6)} ${stressComponents.zz.toFixed(1).padStart(6)}] MPa`;
+  }
+
+  // Principal stresses
+  const principalElement = document.getElementById('principal-stresses');
+  if (principalElement) {
+    principalElement.innerHTML = `<p><strong>σ₁:</strong> ${principalStresses.s1.toFixed(1)} MPa</p>
+<p><strong>σ₂:</strong> ${principalStresses.s2.toFixed(1)} MPa</p>
+<p><strong>σ₃:</strong> ${principalStresses.s3.toFixed(1)} MPa</p>`;
+  }
+
+  // Failure criteria
+  const failureElement = document.getElementById('failure-criteria');
+  if (failureElement) {
+    failureElement.innerHTML = `<p><strong>Tresca:</strong> ${failureCriteria.tresca.value.toFixed(1)} MPa - <span class="${failureCriteria.tresca.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.tresca.status}</span></p>
+<p><strong>Von Mises:</strong> ${failureCriteria.vonMises.value.toFixed(1)} MPa - <span class="${failureCriteria.vonMises.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.vonMises.status}</span></p>`;
+  }
+
+  // Mohr's circles
+  createMohrCirclePlot();
+}
+
+// Plotly Mohr's circles: keep circular
+function createMohrCirclePlot() {
+  const mohrCircleElement = document.getElementById('mohr-circle-3d');
+  if (!mohrCircleElement) return;
+
+  const centers = [
+    (principalStresses.s1 + principalStresses.s2) / 2,
+    (principalStresses.s2 + principalStresses.s3) / 2,
+    (principalStresses.s3 + principalStresses.s1) / 2
+  ];
+
+  const radii = [
+    Math.abs(principalStresses.s1 - principalStresses.s2) / 2,
+    Math.abs(principalStresses.s2 - principalStresses.s3) / 2,
+    Math.abs(principalStresses.s3 - principalStresses.s1) / 2
+  ];
+
+  const circle1Points = generateCirclePoints(centers[0], radii[0], 180);
+  const circle2Points = generateCirclePoints(centers[1], radii[1], 180);
+  const circle3Points = generateCirclePoints(centers[2], radii[2], 180);
+
+  const trace1 = { x: circle1Points.x, y: circle1Points.y, mode: 'lines', name: 'σ₁—σ₂' };
+  const trace2 = { x: circle2Points.x, y: circle2Points.y, mode: 'lines', name: 'σ₂—σ₃' };
+  const trace3 = { x: circle3Points.x, y: circle3Points.y, mode: 'lines', name: 'σ₃—σ₁' };
+
+  const layout = {
+    title: "3D Mohr's Circles",
+    xaxis: { title: 'Normal Stress (MPa)', zeroline: true },
+    yaxis: {
+      title: 'Shear Stress (MPa)',
+      zeroline: true,
+      scaleanchor: 'x',  // ← equal scaling
+      scaleratio: 1
+    },
+    showlegend: true,
+    margin: { l: 50, r: 50, b: 50, t: 50, pad: 4 },
+    height: 380,
+    autosize: true
+  };
+
+  Plotly.newPlot(mohrCircleElement, [trace1, trace2, trace3], layout, { responsive: true, displayModeBar: false });
+}
+
+// Circle points helper
+function generateCirclePoints(center, radius, numPoints) {
+  const x = [], y = [];
+  for (let i = 0; i <= numPoints; i++) {
+    const a = (i / numPoints) * 2 * Math.PI;
+    x.push(center + radius * Math.cos(a));
+    y.push(            radius * Math.sin(a));
+  }
+  return { x, y };
+}
+
+// Recalculate & refresh all outputs
+function recalculateAndUpdate() {
+  calculatePrincipalStresses();
+  calculateFailureCriteria();
+  updateDisplay();
+}
+
+// ------------------------------
+// Solution toggle for practice problems
+// ------------------------------
 function toggleSolution(id) {
-    const solution = document.getElementById(id);
-    
-    if (solution.classList.contains('shown')) {
-        solution.style.display = "none";
-        solution.classList.remove('shown');
-        const toggleElement = solution.previousElementSibling;
-        toggleElement.textContent = "Show Solution";
-    } else {
-        solution.style.display = "block";
-        solution.classList.add('shown');
-        const toggleElement = solution.previousElementSibling;
-        toggleElement.textContent = "Hide Solution";
-    }
+  const solution = document.getElementById(id);
+  const button = solution.previousElementSibling;
+  
+  if (solution.style.display === "none" || solution.style.display === "") {
+    solution.style.display = "block";
+    button.textContent = "Hide Solution";
+  } else {
+    solution.style.display = "none";
+    button.textContent = "Show Solution";
+  }
 }
+
+// ------------------------------
+// On load: initialise everything
+// ------------------------------
+window.onload = function () {
+  // Sync slider readouts
+  const setVal = (id, v) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = v;
+  };
+  
+  setVal('sigma-xx-value', stressComponents.xx);
+  setVal('sigma-yy-value', stressComponents.yy);
+  setVal('sigma-zz-value', stressComponents.zz);
+  setVal('tau-xy-value',   stressComponents.xy);
+  setVal('tau-yz-value',   stressComponents.yz);
+  setVal('tau-xz-value',   stressComponents.xz);
+
+  // Status colours
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .safe { color: green; font-weight: bold; }
+    .fail { color: red;   font-weight: bold;  }
+  `;
+  document.head.appendChild(style);
+
+  // Initial compute/plot
+  recalculateAndUpdate();
+  
+  // Quiz functionality
+  const quizBtn = document.getElementById('submit-quiz');
+  if (quizBtn) {
+    quizBtn.addEventListener('click', function() {
+      const answers = {
+        q1: 'c', // Diagonal elements represent shear stresses is FALSE
+        q2: 'c', // Distortion energy reaches critical value
+        q3: 'd', // Isotropic requires fewest constants
+        q4: 'b', // Principal stresses are eigenvalues
+        q5: 'a'  // Max shear = (200-50)/2 = 75 MPa
+      };
+      
+      let score = 0;
+      let feedback = '<h3>Quiz Results:</h3>';
+      
+      for (let question in answers) {
+        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+        if (selectedOption) {
+          if (selectedOption.value === answers[question]) {
+            score++;
+            feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+          } else {
+            feedback += `<p>Question ${question.substring(1)}: Incorrect. ✗</p>`;
+          }
+        } else {
+          feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+        }
+      }
+      
+      feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
+      
+      const resultsDiv = document.getElementById('quiz-results');
+      if (resultsDiv) {
+        resultsDiv.innerHTML = feedback;
+        resultsDiv.classList.remove('hidden');
+      }
+    });
+  }
+};
