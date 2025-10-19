@@ -1,10 +1,3 @@
-
-/* balancing-rotating-masses.js
- * Enhanced version with gravity equilibrium, balancing calculations, and vibration
- * Wired angle sliders; dashed 0° reference that ROTATES with rotor; auto-remove balance on any non-RPM input change
- * British English spelling and comments throughout
- */
-
 /* -----------------------------------------------------------
    Global parameters and state
 ----------------------------------------------------------- */
@@ -55,20 +48,21 @@ function dashedZeroRay(p, len, thetaRad) {
 // Single plane parameters
 const singleParams = {
   omega: 0,
-  radius_mm: 60,
-  mass_g: 50,
   rotorRadius_mm: 110,
   isBalanced: false,
   balanceMass_g: 0,
   balanceRadius_mm: 80,
-  balanceAngle: 0,
-  equilibriumAngle: 0,
-  angularVel: 0, // For gravity settling
+  balanceAngle: Math.PI,
+  masses: [
+    { m_g: 50, r_mm: 60, phase: deg2rad(0),   posPct: 50, colour: 'red' },
+    { m_g: 30, r_mm: 80, phase: deg2rad(60),  posPct: 50, colour: 'blue' },
+    { m_g: 40, r_mm: 50, phase: deg2rad(120), posPct: 50, colour: 'orange' },
+  ],
 };
 const SINGLE_DEFAULTS = { 
   rpm: 0,
-  mass_g: singleParams.mass_g,
-  radius_mm: singleParams.radius_mm,
+  mass_g: 0,
+  radius_mm: 0,
   balanceRadius_mm: singleParams.balanceRadius_mm,
   balanceAngle: Math.PI,
   isBalanced: false
@@ -159,10 +153,17 @@ function calculateMultiCentreOfMass(theta) {
 }
 
 function calculateSingleBalance() {
-  const MR_unbalance = singleParams.mass_g * singleParams.radius_mm;
-  singleParams.balanceRadius_mm = 80;
-  singleParams.balanceMass_g = MR_unbalance / singleParams.balanceRadius_mm;
-  singleParams.balanceAngle = Math.PI;
+  let MRx = 0, MRy = 0;
+  for (const m of singleParams.masses) {
+    const MR = m.m_g * m.r_mm;
+    MRx += MR * Math.cos(m.phase);
+    MRy += MR * Math.sin(m.phase);
+  }
+  const MR_mag = Math.hypot(MRx, MRy);
+  const MR_ang = Math.atan2(MRy, MRx);
+  if (!singleParams.balanceRadius_mm) singleParams.balanceRadius_mm = 80;
+  singleParams.balanceMass_g = MR_mag / singleParams.balanceRadius_mm;
+  singleParams.balanceAngle = (MR_ang + Math.PI) % (2*Math.PI);
 }
 
 /* Use plane L as the reference for balancing */
@@ -216,7 +217,7 @@ function updateBalanceDisplay() {
   if (singleBalanceEl && singleAngleEl) {
     if (singleParams.isBalanced) {
       singleBalanceEl.textContent = singleParams.balanceMass_g.toFixed(1) + ' g';
-      singleAngleEl.textContent = '180';
+      singleAngleEl.textContent = ((rad2deg(singleParams.balanceAngle)+360)%360).toFixed(0) + ' °';
     } else {
       singleBalanceEl.textContent = '-- g';
       singleAngleEl.textContent = '-- ';
@@ -282,17 +283,26 @@ function autoUnapplyMultiBalance() {
 function resetSingle() {
   singleParams.omega = 0;
   singleParams.isBalanced = SINGLE_DEFAULTS.isBalanced;
-  singleParams.mass_g = SINGLE_DEFAULTS.mass_g;
-  singleParams.radius_mm = SINGLE_DEFAULTS.radius_mm;
+  const DEF = [
+    { m_g: 50, r_mm: 60, phase: 0,   posPct: 50 },
+    { m_g: 30, r_mm: 80, phase: 60,  posPct: 50 },
+    { m_g: 40, r_mm: 50, phase: 120, posPct: 50 },
+  ];
+  singleParams.masses.forEach((m, i)=>{
+    m.m_g = DEF[i].m_g; m.r_mm = DEF[i].r_mm; m.phase = deg2rad(DEF[i].phase); m.posPct = DEF[i].posPct;
+  });
   singleParams.balanceMass_g = 0;
   singleParams.balanceRadius_mm = SINGLE_DEFAULTS.balanceRadius_mm;
   singleParams.balanceAngle = SINGLE_DEFAULTS.balanceAngle;
 
   const setVal = (id, v) => { const e = $(id); if (e) { e.value = String(v); e.dispatchEvent(new Event('input', {bubbles:true})); } };
   setVal('single-rpm', 0);  setVal('single-rpm-value', 0);
-  setVal('single-mass', singleParams.mass_g); setVal('single-mass-value', singleParams.mass_g);
-  setVal('single-radius', singleParams.radius_mm); setVal('single-radius-value', singleParams.radius_mm);
-  setVal('single-balance-radius', singleParams.balanceRadius_mm); setVal('single-balance-radius-value', singleParams.balanceRadius_mm);
+  for (let i=1;i<=3;i++) {
+    setVal(`single-mass{i}`, DEF[i-1].m_g); setVal(`single-mass{i}-value`, DEF[i-1].m_g);
+    setVal(`single-radius{i}`, DEF[i-1].r_mm); setVal(`single-radius{i}-value`, DEF[i-1].r_mm);
+    setVal(`single-angle{i}`, (DEF[i-1].phase+360)%360); setVal(`single-angle{i}-value`, (DEF[i-1].phase+360)%360);
+    setVal(`single-position{i}`, 50); setVal(`single-position{i}-value`, 50);
+  }
   updateBalanceLabel('single-apply', singleParams.isBalanced);
   updateSlowmoLabel('single-slowmo');
 }
@@ -300,10 +310,24 @@ function resetSingle() {
 function wireSingleControls() {
   bindRangeNumber('single-rpm', 'single-rpm-value', (rpm) => {
     singleParams.omega = (rpm * 2 * Math.PI) / 60;
-    // RPM change does NOT auto-remove balance (as requested)
   });
-  bindRangeNumber('single-mass', 'single-mass-value', (m) => { singleParams.mass_g = m; autoUnapplySingleBalance(); });
-  bindRangeNumber('single-radius', 'single-radius-value', (r) => { singleParams.radius_mm = r; autoUnapplySingleBalance(); });
+  const bindMassControls = (i) => {
+    bindRangeNumber(`single-mass${i}`, `single-mass${i}-value`, (v) => { singleParams.masses[i-1].m_g = v; autoUnapplySingleBalance(); });
+    bindRangeNumber(`single-radius${i}`, `single-radius${i}-value`, (v) => { singleParams.masses[i-1].r_mm = v; autoUnapplySingleBalance(); });
+    bindRangeNumber(`single-angle${i}`, `single-angle${i}-value`, (v) => { singleParams.masses[i-1].phase = deg2rad(v); autoUnapplySingleBalance(); });
+    const posSlider = $(`single-position${i}`);
+    const posNumber = $(`single-position${i}-value`);
+    if (posSlider && posNumber) {
+      const syncPos = (val) => { singleParams.masses.forEach(m => m.posPct = val); posSlider.value = val; posNumber.value = val; };
+      posSlider.addEventListener('input', (e)=> syncPos(+e.target.value));
+      posNumber.addEventListener('input', (e)=> syncPos(+e.target.value));
+      syncPos(50);
+      posSlider.disabled = true; posNumber.disabled = true;
+    }
+  };
+  bindMassControls(1);
+  bindMassControls(2);
+  bindMassControls(3);
 
   const balanceBtn = $('single-apply');
   if (balanceBtn && !balanceBtn._bound) {
@@ -315,6 +339,7 @@ function wireSingleControls() {
       updateBalanceDisplay();
     });
   }
+
 
   const pauseBtn = $('single-pause');
   if (pauseBtn && !pauseBtn._bound) {
@@ -413,6 +438,7 @@ function wireMultiControls() {
       updateBalanceDisplay();
     });
   }
+  
 
   const pauseBtn = $('multi-pause');
   if (pauseBtn && !pauseBtn._bound) {
@@ -467,7 +493,21 @@ const singleFrontSketch = (p) => {
     const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
 
     if (singleParams.omega < 0.1) {
-      const targetAngle = singleParams.isBalanced ? 0 : Math.PI/2;
+      // Gravity settling: align resultant unbalance vector downward
+      // Compute alpha0 = angle of resultant at theta=0 (include balance if applied)
+      let Rx=0, Ry=0;
+      for (const m of singleParams.masses) {
+        const MR = m.m_g * m.r_mm;
+        Rx += MR * Math.cos(m.phase);
+        Ry += MR * Math.sin(m.phase);
+      }
+      if (singleParams.isBalanced) {
+        const MRb = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
+        Rx += MRb * Math.cos(singleParams.balanceAngle);
+        Ry += MRb * Math.sin(singleParams.balanceAngle);
+      }
+      const alpha0 = Math.atan2(Ry, Rx);
+      const targetAngle = (isFinite(alpha0) && (Math.abs(Rx) + Math.abs(Ry) > 1e-6)) ? (Math.PI/2 - alpha0) : 0;
       const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
       const settleRate = 2.0;
       theta += diff * Math.min(1, dt * settleRate);
@@ -477,16 +517,19 @@ const singleFrontSketch = (p) => {
 
     let vibrationX = 0, vibrationY = 0;
     if (!singleParams.isBalanced && singleParams.omega > 0.1) {
-      const vibrationMag = Math.min(10, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 10000);
-      vibrationX = vibrationMag * Math.cos(theta);
-      vibrationY = vibrationMag * Math.sin(theta);
+      let MRx=0,MRy=0; 
+      for (const m of singleParams.masses){ const MR=m.m_g*m.r_mm; MRx += MR*Math.cos(theta+m.phase); MRy += MR*Math.sin(theta+m.phase); }
+      const vibrationMag = Math.min(10, Math.hypot(MRx,MRy) / 1000);
+      const phi = Math.atan2(MRy, MRx);
+      vibrationX = vibrationMag * Math.cos(phi);
+      vibrationY = vibrationMag * Math.sin(phi);
     }
 
     p.push();
     p.translate(p.width/2 + vibrationX, p.height/2 + vibrationY);
 
     const margin = 24;
-    const maxR = Math.max(singleParams.rotorRadius_mm, singleParams.radius_mm);
+    const maxR = Math.max(singleParams.rotorRadius_mm, ...singleParams.masses.map(m=>m.r_mm));
     const s = (Math.min(p.width, p.height) - 2*margin) / (2*maxR);
 
     // dashed 0° reference (rotating)
@@ -498,30 +541,19 @@ const singleFrontSketch = (p) => {
     p.strokeWeight(2);
     p.circle(0, 0, 2 * singleParams.rotorRadius_mm * s);
 
+    // draw masses (front view)
+    singleParams.masses.forEach((m)=>{
+      const x = (m.r_mm * s) * Math.cos(theta + m.phase);
+      const y = (m.r_mm * s) * Math.sin(theta + m.phase);
+      const col = (m.colour==='red'? colours.red : m.colour==='blue'? colours.blue : colours.orange);
+      p.noStroke(); p.fill(...col);
+      p.circle(x, y, 10);
+    });
+
     p.stroke(0, 20);
     for (let i = 0; i < 8; i++) {
       const a = theta + (i * Math.PI) / 4;
       p.line(0, 0, Math.cos(a) * singleParams.rotorRadius_mm * s, Math.sin(a) * singleParams.rotorRadius_mm * s);
-    }
-
-    const r = singleParams.radius_mm * s;
-    const mx = Math.cos(theta) * r;
-    const my = Math.sin(theta) * r;
-    p.stroke(colours.red, 120);
-    drawArrow(p, 0, 0, mx, my, 10, Math.PI/7, 2);
-    p.noStroke();
-    p.fill(colours.red);
-    p.circle(mx, my, 12);
-
-    if (singleParams.isBalanced) {
-      const br = singleParams.balanceRadius_mm * s;
-      const bx = Math.cos(theta + singleParams.balanceAngle) * br;
-      const by = Math.sin(theta + singleParams.balanceAngle) * br;
-      p.stroke(colours.green, 120);
-      drawArrow(p, 0, 0, bx, by, 10, Math.PI/7, 2);
-      p.noStroke();
-      p.fill(colours.green);
-      p.circle(bx, by, 12);
     }
 
     p.fill(0);
@@ -571,7 +603,21 @@ const singleSideSketch = (p) => {
     const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
 
     if (singleParams.omega < 0.1) {
-      const targetAngle = singleParams.isBalanced ? 0 : -Math.PI/2;
+      // Gravity settling: align resultant unbalance vector downward
+      // Compute alpha0 = angle of resultant at theta=0 (include balance if applied)
+      let Rx=0, Ry=0;
+      for (const m of singleParams.masses) {
+        const MR = m.m_g * m.r_mm;
+        Rx += MR * Math.cos(m.phase);
+        Ry += MR * Math.sin(m.phase);
+      }
+      if (singleParams.isBalanced) {
+        const MRb = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
+        Rx += MRb * Math.cos(singleParams.balanceAngle);
+        Ry += MRb * Math.sin(singleParams.balanceAngle);
+      }
+      const alpha0 = Math.atan2(Ry, Rx);
+      const targetAngle = (isFinite(alpha0) && (Math.abs(Rx) + Math.abs(Ry) > 1e-6)) ? (-Math.PI/2 - alpha0) : 0;
       const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
       const settleRate = 2.0;
       theta += diff * Math.min(1, dt * settleRate);
@@ -581,7 +627,7 @@ const singleSideSketch = (p) => {
 
     let vibrationY = 0;
     if (!singleParams.isBalanced && singleParams.omega > 0.1) {
-      vibrationY = Math.min(15, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 10000) * Math.sin(theta);
+      vibrationY = Math.min(15, ((singleParams.masses.reduce((acc,m)=>acc+ m.m_g*m.r_mm,0)/ (singleParams.masses.length>0?1:1)) * singleParams.omega * singleParams.omega) / 10000) * Math.sin(theta);
     }
 
     const leftX = 60;
@@ -598,16 +644,22 @@ const singleSideSketch = (p) => {
     p.line(leftX, midY - 30, leftX, midY + 30);
     p.line(rightX, midY - 30, rightX, midY + 30);
 
+    
     const s_side = (p.height - 60) / (2 * Math.max(1, singleParams.rotorRadius_mm));
-    const y = s_side * singleParams.radius_mm * Math.sin(theta);
-
-    p.stroke(colours.red[0], colours.red[1], colours.red[2]);
-    p.strokeWeight(3);
-    p.line(centerX, midY + vibrationY, centerX, midY + vibrationY - y);
-    p.noStroke();
-    p.fill(colours.red[0], colours.red[1], colours.red[2]);
-    p.circle(centerX, midY + vibrationY - y, 10);
-
+    // Draw 3 masses at the middle axial position (like multi-side but z=0)
+    const zSpan = singleParams.rotorRadius_mm; // dummy scaling for arrows
+    for (const m of singleParams.masses) {
+      const ymm = m.r_mm * Math.sin(theta + m.phase);
+      const zmm = 0; // all at middle plane
+      const col = (m.colour==='red'? colours.red : m.colour==='blue'? colours.blue : colours.orange);
+      p.stroke(...col);
+      p.strokeWeight(3);
+      drawArrow(p, centerX, midY + vibrationY, centerX, midY + vibrationY - ymm * s_side, 10, Math.PI/7, 3);
+      p.noStroke();
+      p.fill(...col);
+      p.circle(centerX, midY + vibrationY - ymm * s_side, 10);
+    }
+    
     if (singleParams.isBalanced) {
       const by = s_side * singleParams.balanceRadius_mm * Math.sin(theta + singleParams.balanceAngle);
       p.stroke(colours.green[0], colours.green[1], colours.green[2]);
@@ -651,7 +703,21 @@ const singleMRSketch = (p) => {
     const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
 
     if (singleParams.omega < 0.1) {
-      const targetAngle = singleParams.isBalanced ? 0 : Math.PI/2;
+      // Gravity settling: align resultant unbalance vector downward
+      // Compute alpha0 = angle of resultant at theta=0 (include balance if applied)
+      let Rx=0, Ry=0;
+      for (const m of singleParams.masses) {
+        const MR = m.m_g * m.r_mm;
+        Rx += MR * Math.cos(m.phase);
+        Ry += MR * Math.sin(m.phase);
+      }
+      if (singleParams.isBalanced) {
+        const MRb = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
+        Rx += MRb * Math.cos(singleParams.balanceAngle);
+        Ry += MRb * Math.sin(singleParams.balanceAngle);
+      }
+      const alpha0 = Math.atan2(Ry, Rx);
+      const targetAngle = (isFinite(alpha0) && (Math.abs(Rx) + Math.abs(Ry) > 1e-6)) ? (Math.PI/2 - alpha0) : 0;
       const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
       const settleRate = 2.0;
       theta += diff * Math.min(1, dt * settleRate);
@@ -659,10 +725,15 @@ const singleMRSketch = (p) => {
       theta += singleParams.omega * dt;
     }
 
+    
     const vectors = [];
-    const MR = singleParams.mass_g * singleParams.radius_mm;
-    vectors.push({ x: MR * Math.cos(theta), y: MR * Math.sin(theta), colour: colours.red, label: 'Unbalance' });
-
+    // Mass vectors (tip-to-tail order)
+    singleParams.masses.forEach((m,i) => {
+      const MR = m.m_g * m.r_mm;
+      const col = (m.colour==='red'? colours.red : m.colour==='blue'? colours.blue : colours.orange);
+      vectors.push({ x: MR * Math.cos(theta + m.phase), y: MR * Math.sin(theta + m.phase), colour: col, label: `m${i+1}` });
+    });
+    // Balance vector (if applied)
     if (singleParams.isBalanced) {
       const MR_bal = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
       vectors.push({ x: MR_bal * Math.cos(theta + singleParams.balanceAngle), y: MR_bal * Math.sin(theta + singleParams.balanceAngle), colour: colours.green, label: 'Balance' });
@@ -672,7 +743,8 @@ const singleMRSketch = (p) => {
     for (const v of vectors) { totalX += v.x; totalY += v.y; }
 
     const margin = 28;
-    const s = MR_FIXED_SCALE;
+    
+    const s = MR_MULTI_FIXED_SCALE;
 
     p.push();
     p.translate(p.width/2, p.height/2);
@@ -689,15 +761,35 @@ const singleMRSketch = (p) => {
     const mrLen = (p.width / 2) - margin;
     dashedZeroRay(p, mrLen, theta);
 
+    // Draw tip-to-tail polygon for MR vectors
     let cx = 0, cy = 0;
-    for (const v of vectors) {
+    for (let i = 0; i < vectors.length; i++) {
+      const v = vectors[i];
       p.stroke(v.colour[0], v.colour[1], v.colour[2]);
       p.strokeWeight(3);
       const nx = cx + v.x * s;
       const ny = cy + v.y * s;
-      drawArrow(p, cx, cy, nx, ny, 12, Math.PI/7, 3);
+      drawArrow(p, cx, cy, nx, ny, 10, Math.PI/7, 3);
       cx = nx; cy = ny;
     }
+
+    // Resultant (black) from origin to final point
+    const resMag = Math.hypot(totalX, totalY);
+    const EPS = 1e-2; // g·mm threshold to avoid jitter when balanced
+    if (!singleParams.isBalanced && resMag > EPS) {
+      p.stroke(0);
+      p.strokeWeight(3);
+      drawArrow(p, 0, 0, cx, cy, 12, Math.PI/7, 3);
+    }
+
+
+
+
+
+
+
+
+
 
     if (!singleParams.isBalanced && (Math.abs(totalX) > 0.1 || Math.abs(totalY) > 0.1)) {
       p.stroke(0, 0, 0, 140);
@@ -736,12 +828,26 @@ const singleForcesSketch = (p) => {
     p.resizeCanvas(w, h);
   };
 
+  
   p.draw = function() {
     p.background(255);
     const dt = (p.deltaTime / 1000) * (singlePaused ? 0 : timeScale);
-
     if (singleParams.omega < 0.1) {
-      const targetAngle = singleParams.isBalanced ? 0 : -Math.PI/2;
+      // Gravity settling: align resultant unbalance vector downward
+      // Compute alpha0 = angle of resultant at theta=0 (include balance if applied)
+      let Rx=0, Ry=0;
+      for (const m of singleParams.masses) {
+        const MR = m.m_g * m.r_mm;
+        Rx += MR * Math.cos(m.phase);
+        Ry += MR * Math.sin(m.phase);
+      }
+      if (singleParams.isBalanced) {
+        const MRb = singleParams.balanceMass_g * singleParams.balanceRadius_mm;
+        Rx += MRb * Math.cos(singleParams.balanceAngle);
+        Ry += MRb * Math.sin(singleParams.balanceAngle);
+      }
+      const alpha0 = Math.atan2(Ry, Rx);
+      const targetAngle = (isFinite(alpha0) && (Math.abs(Rx) + Math.abs(Ry) > 1e-6)) ? (-Math.PI/2 - alpha0) : 0;
       const diff = Math.atan2(Math.sin(targetAngle - theta), Math.cos(targetAngle - theta));
       const settleRate = 2.0;
       theta += diff * Math.min(1, dt * settleRate);
@@ -749,57 +855,82 @@ const singleForcesSketch = (p) => {
       theta += singleParams.omega * dt;
     }
 
-    const leftX = 50, rightX = p.width - 50, midY = p.height/2;
-
-    let vibrationY = 0;
-    if (!singleParams.isBalanced && singleParams.omega > 0.1) {
-      vibrationY = Math.min(15, (singleParams.mass_g * singleParams.radius_mm * singleParams.omega * singleParams.omega) / 20000) * Math.sin(theta);
+    // Compute resultant force vector components (g*mm) at rotation angle
+    let Fx=0, Fy=0;
+    for (const m of singleParams.masses) {
+      const MR = m.m_g * m.r_mm;
+      Fx += MR * Math.cos(theta + m.phase);
+      Fy += MR * Math.sin(theta + m.phase);
     }
 
-    p.stroke(0, 60);
-    p.strokeWeight(3);
-    p.line(leftX, midY + vibrationY, rightX, midY + vibrationY);
+    // Fake isometric axes
+    p.push();
+    const margin = 20;
+    p.translate(margin + (p.width - 2*margin)/2, margin + (p.height - 2*margin)/2);
 
+    const iso = (x,y,z) => {
+      // Simple cavalier projection
+      const k = 0.5;
+      const X = x + k*z;
+      const Y = -y + k*z * 0.5;
+      return [X, Y];
+    };
+
+    // Shaft and supports (isometric)
+    const L = 220; // mm half length for drawing
+    const supOffset = 180;
+    p.stroke(0,40);
     p.strokeWeight(2);
-    p.line(leftX, midY + 25, leftX, midY - 25);
-    p.line(rightX, midY + 25, rightX, midY - 25);
+    const [sx1, sy1] = iso(-supOffset, 0, 0);
+    const [sx2, sy2] = iso(supOffset, 0, 0);
+    p.line(sx1, sy1, sx2, sy2);
 
-    const F = singleParams.mass_g * singleParams.radius_mm * (singleParams.omega ** 2);
+    // Supports
+    p.stroke(0); p.fill(230);
+    const drawSupport = (x) => {
+      const [a,b] = iso(x, 0, 0);
+      p.rectMode(p.CENTER);
+      p.rect(a, b+20, 18, 12, 3);
+    };
+    drawSupport(-supOffset);
+    drawSupport( supOffset);
+
+    // Mass centrifugal forces (at center plane, z=0)
     const scaleF = FORCE_FIXED_SCALE;
-
-    const F1 = singleParams.mass_g * singleParams.radius_mm * (singleParams.omega ** 2);
-    const Fx1 = F1 * Math.cos(theta) * scaleF;
-    const Fy1 = F1 * Math.sin(theta) * scaleF;
-    p.stroke(colours.red[0], colours.red[1], colours.red[2]);
-    drawArrow(p, (leftX + rightX)/2, midY + vibrationY, (leftX + rightX)/2 + Fx1, midY + vibrationY - Fy1, 10, Math.PI/7, 3);
-
-    let Fx2 = 0, Fy2 = 0;
-    if (singleParams.isBalanced) {
-      const F2 = singleParams.balanceMass_g * singleParams.balanceRadius_mm * (singleParams.omega ** 2);
-      Fx2 = F2 * Math.cos(theta + singleParams.balanceAngle) * scaleF;
-      Fy2 = F2 * Math.sin(theta + singleParams.balanceAngle) * scaleF;
-      p.stroke(colours.green[0], colours.green[1], colours.green[2]);
-      drawArrow(p, (leftX + rightX)/2, midY + vibrationY, (leftX + rightX)/2 + Fx2, midY + vibrationY - Fy2, 10, Math.PI/7, 3);
+    for (const m of singleParams.masses) {
+      const MR = m.m_g * m.r_mm * (singleParams.omega ** 2);
+      const fx = MR * Math.cos(theta + m.phase);
+      const fy = MR * Math.sin(theta + m.phase);
+      const [mx, my] = iso(0, 0, 0);
+      const [tx, ty] = iso(fx*scaleF, fy*scaleF, 0);
+      const col = (m.colour==='red'? colours.red : m.colour==='blue'? colours.blue : colours.orange);
+      p.stroke(...col);
+      p.strokeWeight(2.5);
+      drawArrow(p, mx, my, tx, ty, 8, Math.PI/8, 2);
     }
 
-    const Rx = -(Fx1 + Fx2) / 2;
-    const Ry =  (Fy1 + Fy2) / 2;
-    p.stroke(colours.purple[0], colours.purple[1], colours.purple[2]);
-    drawArrow(p, leftX, midY, leftX + Rx, midY - Ry, 8, Math.PI/7, 2);
-    drawArrow(p, rightX, midY, rightX + Rx, midY - Ry, 8, Math.PI/7, 2);
+    // Reaction forces at supports (equal and opposite of resultant, split)
+    const FRx = -Fx * (singleParams.omega ** 2);
+    const FRy = -Fy * (singleParams.omega ** 2);
+    const [rxLx, rxLy] = iso(-supOffset, 0, 0);
+    const [rxRx, rxRy] = iso( supOffset, 0, 0);
+    const [rLtx, rLty] = iso(rxLx + 0.5*FRx*scaleF, 0.5*FRy*scaleF, 0);
+    const [rRtx, rRty] = iso(rxRx + 0.5*FRx*scaleF, 0.5*FRy*scaleF, 0);
+    p.stroke(40,170,40); // green reactions
+    p.strokeWeight(2.5);
+    drawArrow(p, rxLx, rxLy, rLtx, rLty, 8, Math.PI/8, 2);
+    drawArrow(p, rxRx, rxRy, rRtx, rRty, 8, Math.PI/8, 2);
 
+    p.pop();
+
+    // Label
     p.noStroke();
     p.fill(30);
     p.textSize(12);
     p.textAlign(p.LEFT, p.TOP);
-    p.text(`Single * Forces & Reactions\nStatus: ${singleParams.isBalanced ? 'Balanced' : 'Unbalanced'}`, 10, 10);
-
-    const forceEl = $('single-force');
-    if (forceEl) {
-      const forceN = F * 0.001 * 0.001 * (singleParams.omega ** 2);
-      forceEl.textContent = forceN.toFixed(1) + ' N';
-    }
+    p.text(`Single * Forces & Reactions (isometric)`, 10, 10);
   };
+
 };
 
 /* -----------------------------------------------------------

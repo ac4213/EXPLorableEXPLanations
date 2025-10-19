@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Word Quest - Daily Challenge</title>
+    <title>Word Quest ENG - Daily Challenge</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     <style>
         * {
@@ -414,7 +414,7 @@
 <body>
     <div id="gameContainer">
         <div id="header">
-            <h1>🎯 Word Quest</h1>
+            <h1>🎯 Word Quest ENG ⚙</h1>
             <div id="gameInfo">
                 <span id="modeDisplay">Daily: <span id="wordCount">1/8</span></span>
                 <span>Score: <span id="score">0</span></span>
@@ -500,77 +500,97 @@
     </div>
 
     <script>
-        // Word lists by length with categories
-        const wordLists = {
-            4: [
-                {word: 'BIRD', category: 'Animal'},
-                {word: 'TREE', category: 'Nature'},
-                {word: 'BOOK', category: 'Object'},
-                {word: 'RAIN', category: 'Weather'},
-                {word: 'FOOD', category: 'General'},
-                {word: 'GAME', category: 'Activity'},
-                {word: 'STAR', category: 'Space'},
-                {word: 'FISH', category: 'Animal'},
-                {word: 'ROAD', category: 'Place'},
-                {word: 'TIME', category: 'Concept'},
-                {word: 'CAKE', category: 'Food'},
-                {word: 'MOON', category: 'Space'},
-                {word: 'LAKE', category: 'Nature'},
-                {word: 'SHIP', category: 'Vehicle'},
-                {word: 'DESK', category: 'Furniture'}
-            ],
-            5: [
-                {word: 'HOUSE', category: 'Building'},
-                {word: 'BEACH', category: 'Place'},
-                {word: 'APPLE', category: 'Food'},
-                {word: 'CLOUD', category: 'Weather'},
-                {word: 'MUSIC', category: 'Art'},
-                {word: 'PLANT', category: 'Nature'},
-                {word: 'CHAIR', category: 'Furniture'},
-                {word: 'BREAD', category: 'Food'},
-                {word: 'LIGHT', category: 'Physics'},
-                {word: 'OCEAN', category: 'Nature'},
-                {word: 'SMILE', category: 'Expression'},
-                {word: 'PHONE', category: 'Technology'},
-                {word: 'RIVER', category: 'Nature'},
-                {word: 'STONE', category: 'Material'},
-                {word: 'TRAIN', category: 'Vehicle'}
-            ],
-            6: [
-                {word: 'GARDEN', category: 'Place'},
-                {word: 'COFFEE', category: 'Drink'},
-                {word: 'WINDOW', category: 'Building'},
-                {word: 'MARKET', category: 'Place'},
-                {word: 'SUNSET', category: 'Nature'},
-                {word: 'BRIDGE', category: 'Structure'},
-                {word: 'FLOWER', category: 'Nature'},
-                {word: 'SUMMER', category: 'Season'},
-                {word: 'FAMILY', category: 'People'},
-                {word: 'CASTLE', category: 'Building'},
-                {word: 'BUTTER', category: 'Food'},
-                {word: 'FOREST', category: 'Nature'},
-                {word: 'WINTER', category: 'Season'},
-                {word: 'STREET', category: 'Place'},
-                {word: 'FRIEND', category: 'People'}
-            ],
-            7: [
-                {word: 'LIBRARY', category: 'Building'},
-                {word: 'KITCHEN', category: 'Room'},
-                {word: 'PICTURE', category: 'Art'},
-                {word: 'JOURNEY', category: 'Travel'},
-                {word: 'WEATHER', category: 'Nature'},
-                {word: 'MORNING', category: 'Time'},
-                {word: 'HISTORY', category: 'Subject'},
-                {word: 'VILLAGE', category: 'Place'},
-                {word: 'HOLIDAY', category: 'Event'},
-                {word: 'BLANKET', category: 'Object'},
-                {word: 'COUNTRY', category: 'Place'},
-                {word: 'CHICKEN', category: 'Animal'},
-                {word: 'DANCING', category: 'Activity'},
-                {word: 'EVENING', category: 'Time'},
-                {word: 'PARKING', category: 'Place'}
-            ]
-        };
+    // Engineering word lists by length with categories
+    const wordLists = {
+        4: [
+            {word: 'GEAR', category: 'Mechanical'},
+            {word: 'BOLT', category: 'Fastener'},
+            {word: 'WELD', category: 'Joining'},
+            {word: 'WIRE', category: 'Electrical'},
+            {word: 'PUMP', category: 'Fluid System'},
+            {word: 'BEAM', category: 'Structure'},
+            {word: 'VOLT', category: 'Unit'},
+            {word: 'COIL', category: 'Component'},
+            {word: 'FUSE', category: 'Protection'},
+            {word: 'LOAD', category: 'Force'},
+            {word: 'FLUX', category: 'Flow'},
+            {word: 'TORR', category: 'Pressure'},
+            {word: 'CORE', category: 'Center'},
+            {word: 'GRID', category: 'Network'},
+            {word: 'DUCT', category: 'Channel'},
+            {word: 'RIVET', category: 'Fastener'},
+            {word: 'PIPE', category: 'Conduit'},
+            {word: 'ARCH', category: 'Structure'},
+            {word: 'LOOP', category: 'Circuit'},
+            {word: 'NODE', category: 'Point'}
+        ],
+        5: [
+            {word: 'MOTOR', category: 'Machine'},
+            {word: 'VALVE', category: 'Control'},
+            {word: 'STEEL', category: 'Material'},
+            {word: 'CABLE', category: 'Conductor'},
+            {word: 'LASER', category: 'Technology'},
+            {word: 'RELAY', category: 'Switch'},
+            {word: 'ALLOY', category: 'Material'},
+            {word: 'TRUSS', category: 'Structure'},
+            {word: 'BRAKE', category: 'System'},
+            {word: 'SHAFT', category: 'Component'},
+            {word: 'GAUGE', category: 'Instrument'},
+            {word: 'POWER', category: 'Energy'},
+            {word: 'LEVER', category: 'Mechanism'},
+            {word: 'DIODE', category: 'Electronics'},
+            {word: 'FORCE', category: 'Physics'},
+            {word: 'RIVET', category: 'Fastener'},
+            {word: 'RESIN', category: 'Material'},
+            {word: 'CLAMP', category: 'Tool'},
+            {word: 'SCREW', category: 'Fastener'},
+            {word: 'SERVO', category: 'Control'}
+        ],
+        6: [
+            {word: 'ENGINE', category: 'Machine'},
+            {word: 'PISTON', category: 'Component'},
+            {word: 'BRIDGE', category: 'Structure'},
+            {word: 'SENSOR', category: 'Device'},
+            {word: 'WELDER', category: 'Tool'},
+            {word: 'TORQUE', category: 'Force'},
+            {word: 'FLANGE', category: 'Connection'},
+            {word: 'COPPER', category: 'Material'},
+            {word: 'SOLDER', category: 'Joining'},
+            {word: 'SOCKET', category: 'Connector'},
+            {word: 'STRAIN', category: 'Stress'},
+            {word: 'FILTER', category: 'Component'},
+            {word: 'PRIMER', category: 'Coating'},
+            {word: 'ROCKER', category: 'Mechanism'},
+            {word: 'THREAD', category: 'Feature'},
+            {word: 'PULLEY', category: 'Mechanism'},
+            {word: 'WASHER', category: 'Fastener'},
+            {word: 'GASKET', category: 'Seal'},
+            {word: 'SPACER', category: 'Component'},
+            {word: 'ROUTER', category: 'Tool'}
+        ],
+        7: [
+            {word: 'BEARING', category: 'Component'},
+            {word: 'TURBINE', category: 'Machine'},
+            {word: 'REACTOR', category: 'Vessel'},
+            {word: 'ADAPTER', category: 'Connector'},
+            {word: 'ANTENNA', category: 'Device'},
+            {word: 'BRACKET', category: 'Support'},
+            {word: 'WELDING', category: 'Process'},
+            {word: 'VOLTAGE', category: 'Electrical'},
+            {word: 'DAMPING', category: 'Control'},
+            {word: 'POLYMER', category: 'Material'},
+            {word: 'NOZZLES', category: 'Component'},
+            {word: 'SPINDLE', category: 'Shaft'},
+            {word: 'THERMAL', category: 'Heat'},
+            {word: 'BUSHING', category: 'Component'},
+            {word: 'MACHINE', category: 'Equipment'},
+            {word: 'VENTING', category: 'System'},
+            {word: 'RATCHET', category: 'Mechanism'},
+            {word: 'BELLOWS', category: 'Flexible'},
+            {word: 'CONSOLE', category: 'Control'},
+            {word: 'GEARBOX', category: 'Assembly'}
+        ]
+    };
 
         // Game state
         let gameState = {
@@ -1276,9 +1296,9 @@
             
             return [
                 // Today's scores
-                { name: 'WordMaster', score: 385, date: today },
-                { name: 'Sarah', score: 360, date: today },
-                { name: 'Mike_123', score: 340, date: today },
+                { name: 'Dr Arnaldo Delli Carri', score: 385, date: today },
+                { name: 'ac4213@coventry.ac.uk', score: 360, date: today },
+                { name: 'Coventry University', score: 340, date: today },
                 { name: 'GrannySmith', score: 320, date: today },
                 { name: 'Bob', score: 295, date: today },
                 { name: 'Alice', score: 280, date: today },

@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
 
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Balancing Rotating Masses - Interactive Lecture</title>
-    <!-- Import the p5.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <!-- Import MathJax for LaTeX rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
-    <!-- External CSS - using common main.css -->
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <!-- Your script goes here -->
-    <script src="balancing-rotating-masses.js"></script>
-    <style>
-        /* Simulation container styling */
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Balancing of Rotating Masses - Interactive Lecture</title>
+<!-- Import p5.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<!-- Import MathJax for LaTeX rendering -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+<!-- External CSS -->
+<link href="/assets/css/main.css" rel="stylesheet"/>
+<!-- JavaScript for simulations -->
+<script defer="" src="balancerot.js"></script>
+<style>
+        /* Additional styles for this page */
         .simulation-container {
             background-color: #f9f9f9;
             border-radius: 8px;
@@ -23,45 +23,9 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* Tab navigation */
-        .tab-navigation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color);
-        }
-        
-        .tab-button {
-            padding: 10px 20px;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 5px 5px 0 0;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-        }
-        
-        .tab-button:hover:not(.active) {
-            background-color: #e0e0e0;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Simulation grid */
         .simulation-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -147,40 +111,63 @@
         .button-row {
             display: flex;
             gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
+            margin-top: 20px;
             flex-wrap: wrap;
         }
         
         .control-button {
+            flex: 1;
+            min-width: 120px;
             padding: 10px 20px;
             background-color: var(--primary-color);
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 1em;
             transition: background-color 0.3s;
         }
         
         .control-button:hover {
-            background-color: var(--secondary-color);
+            background-color: #916d00;
         }
         
-        .control-button.pause {
-            background-color: #ff6b6b;
+        /* Tab navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
-        .control-button.pause:hover {
-            background-color: #ff5252;
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         /* Status display */
         .status-display {
-            background-color: white;
+            background-color: #f0f0f0;
             border-radius: 8px;
             padding: 15px;
-            margin: 20px 0;
-            border: 2px solid #ddd;
+            margin-top: 20px;
         }
         
         .status-grid {
@@ -190,10 +177,10 @@
         }
         
         .status-item {
+            background-color: white;
             padding: 10px;
-            background-color: #f9f9f9;
             border-radius: 5px;
-            text-align: center;
+            border: 1px solid #ddd;
         }
         
         .status-label {
@@ -208,577 +195,352 @@
             color: #333;
         }
         
-        .balanced {
-            background-color: #d4edda;
-            color: #155724;
+        .status-value.balanced {
+            color: #28a745;
         }
         
-        .unbalanced {
-            background-color: #f8d7da;
-            color: #721c24;
+        .status-value.unbalanced {
+            color: #dc3545;
         }
         
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .simulation-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .control-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .slider-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .slider-label {
-                flex: none;
-            }
-            
-            input[type="range"] {
-                width: 100%;
-            }
+        /* Equations */
+        .equation-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .key-point {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
         }
     </style>
 </head>
-
 <body>
-    <header>
-        <h1>Balancing Rotating Masses</h1>
-        <p class="subtitle">Interactive Lecture & Simulation</p>
-    </header>
-
-    <div class="content-section">
-        <h2>Understanding Rotational Balancing</h2>
-        <p>The balancing of rotating masses is a crucial concept in mechanical engineering, particularly in the design and maintenance of machinery with rotating components such as turbines, motors, engines, and pumps.</p>
-        
-        <p>When a machine with rotating parts operates with unbalanced masses, it experiences:</p>
-        <ul>
-            <li>Vibration that can damage bearings and other components</li>
-            <li>Increased noise levels</li>
-            <li>Reduced efficiency</li>
-            <li>Accelerated wear and fatigue of components</li>
-            <li>Potential catastrophic failure at critical speeds</li>
-        </ul>
-
-        <div class="key-point">
-            <p><strong>Key Concept:</strong> A rotating mass generates a centrifugal force that is proportional to the mass, the radius of rotation, and the square of the angular velocity.</p>
-            <p>The centrifugal force is given by: \(F = m \cdot r \cdot \omega^2\)</p>
-            <p>Where:</p>
-            <ul>
-                <li>\(m\) is the mass (kg)</li>
-                <li>\(r\) is the radius of rotation (m)</li>
-                <li>\(\omega\) is the angular velocity (rad/s)</li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Types of Unbalance</h2>
-        
-        <h3>Static Unbalance</h3>
-        <p>Static unbalance (also called force unbalance) occurs when the centre of mass is displaced from the axis of rotation. This can be detected even when the rotor is not rotating - the heavy side will settle at the bottom.</p>
-        
-        <div class="equation-box">
-            <p>The unbalance force is: \(F_u = m_u \cdot r_u \cdot \omega^2\)</p>
-            <p>Static unbalance can be corrected by adding a single balance mass in the same plane, positioned 180° opposite to the unbalance.</p>
-        </div>
-        
-        <h3>Dynamic Unbalance</h3>
-        <p>Dynamic unbalance is the most common type in rotating machinery. It occurs when there are multiple unbalanced masses in different axial planes along the shaft. This causes:</p>
-        <ul>
-            <li>Vibration in multiple planes</li>
-            <li>Varying reactions at the bearings</li>
-            <li>Both force and moment unbalance</li>
-        </ul>
-        
-        <div class="key-point">
-            <p><strong>Important:</strong> Dynamic unbalance requires correction in at least two planes (two-plane balancing) to achieve both force and moment balance.</p>
-        </div>
-    </div>
-
-    <div class="simulation-container">
-        <h2>Interactive Simulations</h2>
-        
-        <div class="tab-navigation">
-            <button class="tab-button active" onclick="switchTab(event,'single')">Single Plane Balancing</button>
-            <button class="tab-button" onclick="switchTab(event,'multi')">Multi-Plane Balancing</button>
-        </div>
-        
-        <!-- Single Plane Simulation -->
-        <div id="single-tab" class="tab-content active">
-            <p>Explore single plane (static) unbalance. At 0 RPM, the shaft rotates to its stable position with the heavy side down.</p>
-            
-            <div class="simulation-grid">
-                <div class="view-panel">
-                    <span class="view-title">Side View</span>
-                    <div id="single-side-view"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">Front View</span>
-                    <div id="single-front-view"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">MR Polygon</span>
-                    <div id="single-mr-diagram"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">Forces & Reactions</span>
-                    <div id="single-force-diagram"></div>
-                </div>
-            </div>
-            
-            <div class="control-panel">
-                <div class="control-row">
-                    <div class="control-group">
-                        <h4>Shaft Speed</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">RPM:</span>
-                            <input type="range" id="single-rpm" min="0" max="180" value="0" step="10">
-                            <input type="number" id="single-rpm-value" min="0" max="180" value="0" step="10">
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <h4>Unbalance Mass</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">Mass (g):</span>
-                            <input type="range" id="single-mass" min="10" max="50" value="10" step="2">
-                            <input type="number" id="single-mass-value" min="10" max="50" value="10" step="2">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Radius (mm):</span>
-                            <input type="range" id="single-radius" min="10" max="50" value="20" step="2">
-                            <input type="number" id="single-radius-value" min="10" max="50" value="20" step="2">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="button-row">
-                    <button class="control-button" id="single-pause">Pause</button>
-                    <button class="control-button" id="single-slowmo">Slow-mo</button>
-                    <button class="control-button" id="single-apply">Apply Balance</button>
-                    <button class="control-button" id="single-reset">Reset</button>
-                </div>
-            </div>
-            
-            <div class="status-display">
-                <div class="status-grid">
-                    <div class="status-item" id="single-status">
-                        <div class="status-label">System Status</div>
-                        <div class="status-value unbalanced">Unbalanced</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Total Force</div>
-                        <div class="status-value" id="single-force">0 N</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Balance Mass Required</div>
-                        <div class="status-value" id="single-balance-mass">-- g</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Balance Angle</div>
-                        <div class="status-value" id="single-balance-angle">-- °</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Multi-Plane Simulation -->
-        <div id="multi-tab" class="tab-content">
-            <p>Explore multi-plane (dynamic) unbalance with three adjustable masses. Balance is achieved using two correction planes near the bearings.</p>
-            
-            <div class="simulation-grid">
-                <div class="view-panel">
-                    <span class="view-title">Side View</span>
-                    <div id="multi-side-view"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">Front View</span>
-                    <div id="multi-front-view"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">MR Polygon</span>
-                    <div id="multi-mr-diagram"></div>
-                </div>
-                <div class="view-panel">
-                    <span class="view-title">MRL Polygon</span>
-                    <div id="multi-mrl-diagram"></div>
-                </div>
-            </div>
-            
-            <div class="control-panel">
-                <div class="control-row">
-                    <div class="control-group">
-                        <h4>Shaft Speed</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">RPM:</span>
-                            <input type="range" id="multi-rpm" min="0" max="180" value="0" step="10">
-                            <input type="number" id="multi-rpm-value" min="0" max="180" value="0" step="10">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="control-row">
-                    <div class="control-group">
-                        <h4>Mass 1 (Red)</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">Mass (g):</span>
-                            <input type="range" id="multi-mass1" min="0" max="150" value="50" step="5">
-                            <input type="number" id="multi-mass1-value" value="50" min="0" max="150">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Radius (mm):</span>
-                            <input type="range" id="multi-radius1" min="20" max="100" value="60" step="5">
-                            <input type="number" id="multi-radius1-value" value="60" min="20" max="100">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Angle (°):</span>
-                            <input type="range" id="multi-angle1" min="0" max="360" value="0" step="1">
-                            <input type="number" id="multi-angle1-value" value="0" min="0" max="360" step="1">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Position (%):</span>
-                            <input type="range" id="multi-position1" min="15" max="85" value="25" step="5">
-                            <input type="number" id="multi-position1-value" value="25" min="15" max="85">
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <h4>Mass 2 (Blue)</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">Mass (g):</span>
-                            <input type="range" id="multi-mass2" min="0" max="150" value="30" step="5">
-                            <input type="number" id="multi-mass2-value" value="30" min="0" max="150">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Radius (mm):</span>
-                            <input type="range" id="multi-radius2" min="20" max="100" value="80" step="5">
-                            <input type="number" id="multi-radius2-value" value="80" min="20" max="100">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Angle (°):</span>
-                            <input type="range" id="multi-angle2" min="0" max="360" value="60" step="1">
-                            <input type="number" id="multi-angle2-value" value="60" min="0" max="360" step="1">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Position (%):</span>
-                            <input type="range" id="multi-position2" min="15" max="85" value="50" step="5">
-                            <input type="number" id="multi-position2-value" value="50" min="15" max="85">
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <h4>Mass 3 (Orange)</h4>
-                        <div class="slider-row">
-                            <span class="slider-label">Mass (g):</span>
-                            <input type="range" id="multi-mass3" min="0" max="150" value="40" step="5">
-                            <input type="number" id="multi-mass3-value" value="40" min="0" max="150">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Radius (mm):</span>
-                            <input type="range" id="multi-radius3" min="20" max="100" value="50" step="5">
-                            <input type="number" id="multi-radius3-value" value="50" min="20" max="100">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Angle (°):</span>
-                            <input type="range" id="multi-angle3" min="0" max="360" value="120" step="1">
-                            <input type="number" id="multi-angle3-value" value="120" min="0" max="360" step="1">
-                        </div>
-                        <div class="slider-row">
-                            <span class="slider-label">Position (%):</span>
-                            <input type="range" id="multi-position3" min="15" max="85" value="75" step="5">
-                            <input type="number" id="multi-position3-value" value="75" min="15" max="85">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="button-row">
-                    <button class="control-button" id="multi-pause">Pause</button>
-                    <button class="control-button" id="multi-slowmo">Slow-mo</button>
-                    <button class="control-button" id="multi-apply">Apply Balance</button>
-                    <button class="control-button" id="multi-reset">Reset</button>
-                </div>
-            </div>
-            
-            <div class="status-display">
-                <div class="status-grid">
-                    <div class="status-item" id="multi-status">
-                        <div class="status-label">System Status</div>
-                        <div class="status-value unbalanced">Unbalanced</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Total Force</div>
-                        <div class="status-value" id="multi-force">0 N</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Total Moment</div>
-                        <div class="status-value" id="multi-moment">0 N·m</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Left Bearing</div>
-                        <div class="status-value" id="multi-left-bearing">0 N</div>
-                    </div>
-                    <div class="status-item">
-                        <div class="status-label">Right Bearing</div>
-                        <div class="status-value" id="multi-right-bearing">0 N</div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 20px; padding: 15px; background-color: #e6f7ff; border-radius: 5px;">
-                    <h4 style="margin-top: 0; color: #1890ff;">Balance Masses (Green)</h4>
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <div class="status-label">Plane A (10% position)</div>
-                            <div class="status-value" id="multi-balance-a">-- g @ -- °</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-label">Plane B (90% position)</div>
-                            <div class="status-value" id="multi-balance-b">-- g @ -- °</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Balancing Methods</h2>
-        
-        <h3>Single-Plane Balancing</h3>
-        <p>Used for disc-like rotors where the axial dimension is small compared to the diameter. The procedure:</p>
-        <ol>
-            <li>Identify the magnitude and angle of unbalance</li>
-            <li>Calculate the required correction mass</li>
-            <li>Place the correction mass 180° opposite to the unbalance</li>
-            <li>Verify that the resultant force equals zero</li>
-        </ol>
-        
-        <h3>Two-Plane Balancing</h3>
-        <p>Required for longer rotors with multiple unbalances. This method ensures both force and moment balance:</p>
-        
-        <div class="equation-box">
-            <p>For balance, two conditions must be satisfied:</p>
-            <p>Force balance: \(\sum \vec{F} = 0\) → \(\sum MR = 0\)</p>
-            <p>Moment balance: \(\sum \vec{M} = 0\) → \(\sum MRL = 0\)</p>
-            <p>Where L is the axial distance from a reference plane.</p>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Practice Problems</h2>
-        
-        <div class="practice-problems">
-            <h3>Problem 1: Static Balancing</h3>
-            <p>A flywheel has an unbalance of 100 g at a radius of 150 mm. If a balancing mass can be placed at a radius of 120 mm, calculate:</p>
-            <ol>
-                <li>The required balancing mass</li>
-                <li>Its angular position</li>
-                <li>The centrifugal force at 1200 RPM</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p><strong>Solution:</strong></p>
-                <p>Given: \(m_u = 100\) g, \(r_u = 150\) mm, \(r_b = 120\) mm</p>
-                
-                <p>Step 1: For balance, \(m_u \cdot r_u = m_b \cdot r_b\)</p>
-                <p>\(m_b = \frac{m_u \cdot r_u}{r_b} = \frac{100 \times 150}{120} = 125\) g</p>
-                
-                <p>Step 2: Angular position = 180° from unbalance</p>
-                
-                <p>Step 3: At 1200 RPM, \(\omega = \frac{2\pi \times 1200}{60} = 125.66\) rad/s</p>
-                <p>\(F = m \cdot r \cdot \omega^2 = 0.1 \times 0.15 \times 125.66^2 = 236.9\) N</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 2: Two-Plane Balancing</h3>
-            <p>A shaft has three unbalanced masses:</p>
-            <ul>
-                <li>Mass 1: 50 g at 60 mm radius, 100 mm from left bearing</li>
-                <li>Mass 2: 80 g at 40 mm radius, 250 mm from left bearing</li>
-                <li>Mass 3: 60 g at 50 mm radius, 400 mm from left bearing</li>
-            </ul>
-            <p>Balance planes are at 50 mm and 450 mm from the left bearing, both at 70 mm radius. Calculate the required balancing masses.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p><strong>Solution:</strong></p>
-                <p>Step 1: Calculate MR values (all at 0° for simplicity)</p>
-                <p>\(MR_1 = 50 \times 60 = 3000\) g·mm</p>
-                <p>\(MR_2 = 80 \times 40 = 3200\) g·mm</p>
-                <p>\(MR_3 = 60 \times 50 = 3000\) g·mm</p>
-                <p>\(\sum MR = 9200\) g·mm</p>
-                
-                <p>Step 2: Calculate MRL values (reference at left bearing)</p>
-                <p>\(MRL_1 = 3000 \times 100 = 300,000\) g·mm²</p>
-                <p>\(MRL_2 = 3200 \times 250 = 800,000\) g·mm²</p>
-                <p>\(MRL_3 = 3000 \times 400 = 1,200,000\) g·mm²</p>
-                <p>\(\sum MRL = 2,300,000\) g·mm²</p>
-                
-                <p>Step 3: Solve for balance masses at planes A (50 mm) and B (450 mm)</p>
-                <p>Using simultaneous equations:</p>
-                <p>\(MR_A + MR_B = -9200\)</p>
-                <p>\(50 \cdot MR_A + 450 \cdot MR_B = -2,300,000\)</p>
-                
-                <p>Solving: \(MR_A = -3800\) g·mm, \(MR_B = -5400\) g·mm</p>
-                
-                <p>Step 4: Calculate masses at 70 mm radius</p>
-                <p>\(m_A = \frac{3800}{70} = 54.3\) g at 180°</p>
-                <p>\(m_B = \frac{5400}{70} = 77.1\) g at 180°</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="content-section">
-        <h2>Interactive Quiz</h2>
-        <div class="quiz-container" id="quiz">
-            <div class="quiz-question">
-                <h3>Question 1: Which type of unbalance can be detected when the rotor is stationary?</h3>
-                <div class="quiz-options">
-                    <label><input type="radio" name="q1" value="a"> a) Dynamic unbalance only</label>
-                    <label><input type="radio" name="q1" value="b"> b) Static unbalance</label>
-                    <label><input type="radio" name="q1" value="c"> c) Both static and dynamic</label>
-                    <label><input type="radio" name="q1" value="d"> d) Neither</label>
-                </div>
-            </div>
-            
-            <div class="quiz-question">
-                <h3>Question 2: The centrifugal force due to unbalance is proportional to:</h3>
-                <div class="quiz-options">
-                    <label><input type="radio" name="q2" value="a"> a) Angular velocity</label>
-                    <label><input type="radio" name="q2" value="b"> b) Square of angular velocity</label>
-                    <label><input type="radio" name="q2" value="c"> c) Cube of angular velocity</label>
-                    <label><input type="radio" name="q2" value="d"> d) Square root of angular velocity</label>
-                </div>
-            </div>
-            
-            <div class="quiz-question">
-                <h3>Question 3: For complete balancing of a rotor with unbalances in multiple planes, how many correction planes are needed?</h3>
-                <div class="quiz-options">
-                    <label><input type="radio" name="q3" value="a"> a) One</label>
-                    <label><input type="radio" name="q3" value="b"> b) At least two</label>
-                    <label><input type="radio" name="q3" value="c"> c) Same as number of unbalances</label>
-                    <label><input type="radio" name="q3" value="d"> d) Always three</label>
-                </div>
-            </div>
-            
-            <div class="quiz-question">
-                <h3>Question 4: At 0 RPM, an unbalanced shaft will:</h3>
-                <div class="quiz-options">
-                    <label><input type="radio" name="q4" value="a"> a) Remain in any position</label>
-                    <label><input type="radio" name="q4" value="b"> b) Rotate until heavy side is at bottom</label>
-                    <label><input type="radio" name="q4" value="c"> c) Rotate until heavy side is at top</label>
-                    <label><input type="radio" name="q4" value="d"> d) Oscillate continuously</label>
-                </div>
-            </div>
-            
-            <div class="quiz-question">
-                <h3>Question 5: The MR value represents:</h3>
-                <div class="quiz-options">
-                    <label><input type="radio" name="q5" value="a"> a) Moment × Radius</label>
-                    <label><input type="radio" name="q5" value="b"> b) Mass × Rotation speed</label>
-                    <label><input type="radio" name="q5" value="c"> c) Mass × Radius</label>
-                    <label><input type="radio" name="q5" value="d"> d) Moment × Reaction</label>
-                </div>
-            </div>
-            
-            <button id="submit-quiz">Submit Quiz</button>
-            <div id="quiz-results" class="hidden"></div>
-        </div>
-    </div>
-    
-    <div class="content-section">
-        <h2>Summary</h2>
-        
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li>Static unbalance can be corrected with a single balancing mass</li>
-                <li>Dynamic unbalance requires at least two correction planes</li>
-                <li>Centrifugal force increases with the square of rotational speed</li>
-                <li>At rest, an unbalanced rotor settles with its heavy side down</li>
-                <li>Complete balance requires both force balance (\(\sum MR = 0\)) and moment balance (\(\sum MRL = 0\))</li>
-                <li>Proper balancing reduces vibration, extends bearing life, and improves machine efficiency</li>
-            </ol>
-        </div>
-    </div>
-
-    <footer>
-        <script src="/assets/common/footer.js"></script>
-    </footer>
-
-    <script>
-        // Tab switching function
-        function switchTab(ev, tabName) {
-  // Hide all tabs
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-
-  // Show selected tab + highlight the clicked button
-  const panel = document.getElementById(`${tabName}-tab`);
-  if (panel) panel.classList.add('active');
-  ev?.currentTarget?.classList.add('active');
-
-  // Make p5 canvases re-measure their parents now that visibility changed
-  window.dispatchEvent(new Event('resize'));
-}
-        
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
+<header>
+<h1>Balancing of Rotating Masses</h1>
+<p class="subtitle">Interactive Simulation &amp; Theory</p>
+</header>
+<div class="content-section">
+<h2>Understanding Rotating Mass Unbalance</h2>
+<h3>Static (Single Plane) Unbalance</h3>
+<p>Static unbalance occurs when the centre of mass of a rotating system is displaced from the axis of rotation. Key characteristics:</p>
+<ul>
+<li>Can be detected when the rotor is stationary (heavy side rotates down)</li>
+<li>Causes vibration perpendicular to the shaft axis</li>
+<li>Can be corrected with a single balance mass in one plane</li>
+</ul>
+<div class="equation-box">
+<p><strong>Centrifugal Force:</strong> \( F = m \cdot r \cdot \omega^2 \)</p>
+<p>Where:</p>
+<ul style="list-style: none;">
+<li>\( m \) = unbalance mass (kg)</li>
+<li>\( r \) = radius from axis (m)</li>
+<li>\( \omega \) = angular velocity (rad/s)</li>
+</ul>
+</div>
+<h3>Dynamic (Multi-Plane) Unbalance</h3>
+<p>Dynamic unbalance occurs when there are multiple unbalanced masses in different axial planes along the shaft. This causes:</p>
+<ul>
+<li>Vibration in multiple planes</li>
+<li>Varying reactions at the bearings</li>
+<li>Both force and moment unbalance</li>
+</ul>
+<div class="key-point">
+<p><strong>Important:</strong> Dynamic unbalance requires correction in at least two planes (two-plane balancing) to achieve both force and moment balance.</p>
+</div>
+</div>
+<div class="simulation-container">
+<h2>Interactive Simulations</h2>
+<div class="tab-navigation">
+<button class="tab-button active" onclick="switchTab(event,'single')">Single Plane Balancing</button>
+<button class="tab-button" onclick="switchTab(event,'multi')">Multi-Plane Balancing</button>
+</div>
+<!-- Single Plane Simulation -->
+<div class="tab-content active" id="single-tab">
+<p>Explore single plane (static) unbalance. At 0 RPM, the shaft rotates to its stable position with the heavy side down.</p>
+<div class="simulation-grid">
+<div class="view-panel">
+<span class="view-title">Side View</span>
+<div id="single-side-view"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">Front View</span>
+<div id="single-front-view"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">MR Polygon</span>
+<div id="single-mr-diagram"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">Forces &amp; Reactions</span>
+<div id="single-force-diagram"></div>
+</div>
+</div>
+<div class="control-panel">
+<div class="control-row">
+<div class="control-group">
+<h4>Shaft Speed</h4>
+<div class="slider-row">
+<span class="slider-label">RPM:</span>
+<input id="single-rpm" max="180" min="0" step="10" type="range" value="0"/>
+<input id="single-rpm-value" max="180" min="0" step="10" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="control-row">
+<div class="control-group">
+<h4>Mass 1 (Red)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="single-mass1" max="150" min="0" step="5" type="range" value="50"/>
+<input id="single-mass1-value" max="150" min="0" type="number" value="50"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="single-radius1" max="100" min="20" step="5" type="range" value="60"/>
+<input id="single-radius1-value" max="100" min="20" type="number" value="60"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="single-angle1" max="360" min="0" step="1" type="range" value="0"/>
+<input id="single-angle1-value" max="360" min="0" step="1" type="number" value="0"/>
+</div><div class="slider-row"><span class="slider-label">Position (%):</span><input disabled="disabled" id="single-position1" max="85" min="15" step="5" type="range" value="50"/><input disabled="disabled" id="single-position1-value" max="85" min="15" type="number" value="50"/></div>
+</div>
+<div class="control-group">
+<h4>Mass 2 (Blue)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="single-mass2" max="150" min="0" step="5" type="range" value="30"/>
+<input id="single-mass2-value" max="150" min="0" type="number" value="30"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="single-radius2" max="100" min="20" step="5" type="range" value="80"/>
+<input id="single-radius2-value" max="100" min="20" type="number" value="80"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="single-angle2" max="360" min="0" step="1" type="range" value="60"/>
+<input id="single-angle2-value" max="360" min="0" step="1" type="number" value="60"/>
+</div><div class="slider-row"><span class="slider-label">Position (%):</span><input disabled="disabled" id="single-position2" max="85" min="15" step="5" type="range" value="50"/><input disabled="disabled" id="single-position2-value" max="85" min="15" type="number" value="50"/></div>
+</div>
+<div class="control-group">
+<h4>Mass 3 (Orange)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="single-mass3" max="150" min="0" step="5" type="range" value="40"/>
+<input id="single-mass3-value" max="150" min="0" type="number" value="40"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="single-radius3" max="100" min="20" step="5" type="range" value="50"/>
+<input id="single-radius3-value" max="100" min="20" type="number" value="50"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="single-angle3" max="360" min="0" step="1" type="range" value="120"/>
+<input id="single-angle3-value" max="360" min="0" step="1" type="number" value="120"/>
+</div><div class="slider-row"><span class="slider-label">Position (%):</span><input disabled="disabled" id="single-position3" max="85" min="15" step="5" type="range" value="50"/><input disabled="disabled" id="single-position3-value" max="85" min="15" type="number" value="50"/></div>
+</div>
+</div>
+<div class="button-row">
+<button class="control-button" id="single-pause">Pause</button>
+<button class="control-button" id="single-slowmo">Slow-mo</button>
+<button class="control-button" id="single-apply">Apply Balance</button>
+<button class="control-button" id="single-reset">Reset</button>
+</div>
+</div>
+<div class="status-display">
+<div class="status-grid">
+<div class="status-item" id="single-status">
+<div class="status-label">System Status</div>
+<div class="status-value unbalanced">Unbalanced</div>
+</div>
+<div class="status-item">
+<div class="status-label">Total Force</div>
+<div class="status-value" id="single-force">0 N</div>
+</div>
+<div class="status-item">
+<div class="status-label">Balance Mass Required</div>
+<div class="status-value" id="single-balance-mass">-- g</div>
+</div>
+<div class="status-item">
+<div class="status-label">Balance Angle</div>
+<div class="status-value" id="single-balance-angle">-- °</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Multi-Plane Simulation -->
+<div class="tab-content" id="multi-tab">
+<p>Explore multi-plane (dynamic) unbalance with three adjustable masses. Balance is achieved using two correction planes near the bearings.</p>
+<div class="simulation-grid">
+<div class="view-panel">
+<span class="view-title">Side View</span>
+<div id="multi-side-view"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">Front View</span>
+<div id="multi-front-view"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">MR Polygon</span>
+<div id="multi-mr-diagram"></div>
+</div>
+<div class="view-panel">
+<span class="view-title">MRL Polygon</span>
+<div id="multi-mrl-diagram"></div>
+</div>
+</div>
+<div class="control-panel">
+<div class="control-row">
+<div class="control-group">
+<h4>Shaft Speed</h4>
+<div class="slider-row">
+<span class="slider-label">RPM:</span>
+<input id="multi-rpm" max="180" min="0" step="10" type="range" value="0"/>
+<input id="multi-rpm-value" max="180" min="0" step="10" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="control-row">
+<div class="control-group">
+<h4>Mass 1 (Red)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="multi-mass1" max="150" min="0" step="5" type="range" value="50"/>
+<input id="multi-mass1-value" max="150" min="0" type="number" value="50"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="multi-radius1" max="100" min="20" step="5" type="range" value="60"/>
+<input id="multi-radius1-value" max="100" min="20" type="number" value="60"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="multi-angle1" max="360" min="0" step="1" type="range" value="0"/>
+<input id="multi-angle1-value" max="360" min="0" step="1" type="number" value="0"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Position (%):</span>
+<input id="multi-position1" max="85" min="15" step="5" type="range" value="25"/>
+<input id="multi-position1-value" max="85" min="15" type="number" value="25"/>
+</div>
+</div>
+<div class="control-group">
+<h4>Mass 2 (Blue)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="multi-mass2" max="150" min="0" step="5" type="range" value="30"/>
+<input id="multi-mass2-value" max="150" min="0" type="number" value="30"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="multi-radius2" max="100" min="20" step="5" type="range" value="80"/>
+<input id="multi-radius2-value" max="100" min="20" type="number" value="80"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="multi-angle2" max="360" min="0" step="1" type="range" value="60"/>
+<input id="multi-angle2-value" max="360" min="0" step="1" type="number" value="60"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Position (%):</span>
+<input id="multi-position2" max="85" min="15" step="5" type="range" value="50"/>
+<input id="multi-position2-value" max="85" min="15" type="number" value="50"/>
+</div>
+</div>
+<div class="control-group">
+<h4>Mass 3 (Orange)</h4>
+<div class="slider-row">
+<span class="slider-label">Mass (g):</span>
+<input id="multi-mass3" max="150" min="0" step="5" type="range" value="40"/>
+<input id="multi-mass3-value" max="150" min="0" type="number" value="40"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Radius (mm):</span>
+<input id="multi-radius3" max="100" min="20" step="5" type="range" value="50"/>
+<input id="multi-radius3-value" max="100" min="20" type="number" value="50"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Angle (°):</span>
+<input id="multi-angle3" max="360" min="0" step="1" type="range" value="120"/>
+<input id="multi-angle3-value" max="360" min="0" step="1" type="number" value="120"/>
+</div>
+<div class="slider-row">
+<span class="slider-label">Position (%):</span>
+<input id="multi-position3" max="85" min="15" step="5" type="range" value="75"/>
+<input id="multi-position3-value" max="85" min="15" type="number" value="75"/>
+</div>
+</div>
+</div>
+<div class="button-row">
+<button class="control-button" id="multi-pause">Pause</button>
+<button class="control-button" id="multi-slowmo">Slow-mo</button>
+<button class="control-button" id="multi-apply">Apply Balance</button>
+<button class="control-button" id="multi-reset">Reset</button>
+</div>
+</div>
+<div class="status-display">
+<div class="status-grid">
+<div class="status-item" id="multi-status">
+<div class="status-label">System Status</div>
+<div class="status-value unbalanced">Unbalanced</div>
+</div>
+<div class="status-item">
+<div class="status-label">Total MR</div>
+<div class="status-value" id="multi-mr-total">0 g·mm</div>
+</div>
+<div class="status-item">
+<div class="status-label">Plane L Balance</div>
+<div class="status-value" id="multi-balance-a">L: -- g @ -- °</div>
+</div>
+<div class="status-item">
+<div class="status-label">Plane M Balance</div>
+<div class="status-value" id="multi-balance-b">M: -- g @ -- °</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="content-section">
+<h2>Balancing Procedure</h2>
+<h3>Single Plane Balancing</h3>
+<ol>
+<li>Identify the magnitude and angular position of unbalance</li>
+<li>Calculate required balance mass: \( m_b = \frac{MR_{unbalance}}{r_b} \)</li>
+<li>Place balance mass at 180° opposite to the resultant unbalance</li>
+</ol>
+<h3>Two Plane Balancing</h3>
+<p>For complete dynamic balance, we must satisfy two conditions:</p>
+<div class="equation-box">
+<p><strong>Force Balance:</strong> \( \sum MR = 0 \)</p>
+<p><strong>Moment Balance:</strong> \( \sum MR \cdot L = 0 \)</p>
+</div>
+<p>This requires balance masses in two correction planes, typically near the bearings for maximum effectiveness.</p>
+</div>
+<script>
+        function switchTab(event, tabName) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
             }
+            
+            // Remove active class from all buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let button of tabButtons) {
+                button.classList.remove('active');
+            }
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.currentTarget.classList.add('active');
         }
-        
-        // Quiz functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const quizBtn = document.getElementById('submit-quiz');
-            if (quizBtn) {
-                quizBtn.addEventListener('click', function() {
-                    const answers = {
-                        q1: 'b', // Static unbalance
-                        q2: 'b', // Square of angular velocity
-                        q3: 'b', // At least two
-                        q4: 'b', // Heavy side at bottom
-                        q5: 'c'  // Mass × Radius
-                    };
-                    
-                    let score = 0;
-                    let feedback = '<h3>Quiz Results:</h3>';
-                    
-                    for (let question in answers) {
-                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
-                        if (selectedOption) {
-                            if (selectedOption.value === answers[question]) {
-                                score++;
-                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
-                            } else {
-                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
-                            }
-                        } else {
-                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
-                        }
-                    }
-                    
-                    feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
-                    
-                    const resultsDiv = document.getElementById('quiz-results');
-                    resultsDiv.innerHTML = feedback;
-                    resultsDiv.classList.remove('hidden');
-                });
-            }
-        });
     </script>
 </body>
 </html>

@@ -344,15 +344,15 @@ function drawSupports(y){
 }
 
 function drawArrow(x1,y1,x2,y2){
-  stroke(220,0,0); strokeWeight(3); line(x1,y1,x2,y2);
+  strokeWeight(3); line(x1,y1,x2,y2);
   const ang=Math.atan2(y2-y1,x2-x1);
   push(); translate(x2,y2); rotate(ang); line(0,0,-8,-5); line(0,0,-8,5); pop();
 }
 
 function drawLoads(y){
   const aPx = beamStartX + cfg.a*beamLenPx;
-  if (cfg.P>0) { drawArrow(aPx,y-60,aPx,y); noStroke(); fill(180,0,0); text(`${cfg.P} kN`, aPx+10, y-40); }
-  if (cfg.w>0){ for(let x=beamStartX; x<=beamEndX; x+=18) drawArrow(x,y-40,x,y); noStroke(); fill(180,0,0); text(`w=${cfg.w} kN/m`, (beamStartX+beamEndX)/2, y-50); }
+  if (cfg.w>0){stroke(220,0,0);  for(let x=beamStartX; x<=beamEndX; x+=18) drawArrow(x,y-30,x,y); noStroke(); fill(180,0,0); text(`w=${cfg.w} kN/m`, (beamStartX+beamEndX)/2-100, y-40); }
+  if (cfg.P>0) {stroke(0,200,0); drawArrow(aPx,y-60,aPx,y); noStroke(); fill(0,200,0); text(`${cfg.P} kN`, aPx+25, y-50); }
 }
 
 // DEFLECTION

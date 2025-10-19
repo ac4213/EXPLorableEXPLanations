@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Circular Motion - Interactive Lecture</title>
+    <!-- Import the p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <!-- Footer Script -->
+    <script src="footer.js"></script>
+    <!-- Page-specific styles -->
+    <style>
+        #sketch-holder {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
+            margin: 20px 0;
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>2D Circular Motion</h1>
+        <p class="subtitle">Understanding Angular Motion and Centripetal Forces</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Fundamental Concepts</h2>
+        
+        <h3>Angular Velocity</h3>
+        <p>Angular velocity (\(\omega\)) represents the rate of change of angular displacement. It describes how quickly an object rotates about a fixed axis.</p>
+        
+        <div class="equation-box">
+            <strong>Angular Velocity:</strong> 
+            \[\omega = \frac{d\theta}{dt} = \frac{v}{r}\]
+            where: \(\omega\) = angular velocity (rad/s), \(\theta\) = angular displacement (rad), \(v\) = linear velocity (m/s), \(r\) = radius (m)
+        </div>
+        
+        <h3>Uniform Circular Motion and Centripetal Acceleration</h3>
+        <p>When an object moves in a circle at constant speed, it experiences centripetal acceleration directed towards the centre. Despite constant speed, the velocity vector continuously changes direction.</p>
+        
+        <div class="equation-box">
+            <strong>Centripetal Acceleration:</strong> 
+            \[a_c = \frac{v^2}{r} = \omega^2 r\]
+            <strong>Centripetal Force:</strong> 
+            \[F_c = ma_c = \frac{mv^2}{r} = m\omega^2 r\]
+        </div>
+        
+        <div class="key-point">
+            <strong>Key Point:</strong> In uniform circular motion, the acceleration is always perpendicular to the velocity, causing only a change in direction, not speed.
+        </div>
+        
+        <h3>Angular Kinematics - SUVAT Equivalents</h3>
+        <p>The equations of angular motion parallel those of linear motion, with angular quantities replacing linear ones:</p>
+        
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Linear Motion</th>
+                        <th>Angular Motion</th>
+                        <th>Relationship</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>\(v = u + at\)</td>
+                        <td>\(\omega = \omega_0 + \alpha t\)</td>
+                        <td>\(v = r\omega\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(s = ut + \frac{1}{2}at^2\)</td>
+                        <td>\(\theta = \omega_0 t + \frac{1}{2}\alpha t^2\)</td>
+                        <td>\(s = r\theta\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(v^2 = u^2 + 2as\)</td>
+                        <td>\(\omega^2 = \omega_0^2 + 2\alpha\theta\)</td>
+                        <td>\(a_t = r\alpha\)</td>
+                    </tr>
+                    <tr>
+                        <td>\(s = \frac{1}{2}(u + v)t\)</td>
+                        <td>\(\theta = \frac{1}{2}(\omega_0 + \omega)t\)</td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <h3>Angular Acceleration</h3>
+        <p>Angular acceleration (\(\alpha\)) is the rate of change of angular velocity. It describes how quickly the rotation speed changes.</p>
+        
+        <div class="equation-box">
+            <strong>Angular Acceleration:</strong> 
+            \[\alpha = \frac{d\omega}{dt} = \frac{d^2\theta}{dt^2}\]
+            where: \(\alpha\) = angular acceleration (rad/s²)
+        </div>
+        
+        <h3>Accelerated Circular Motion and Tangential Acceleration</h3>
+        <p>When angular velocity changes, the object experiences both centripetal and tangential accelerations:</p>
+        
+        <div class="equation-box">
+            <strong>Tangential Acceleration:</strong> 
+            \[a_t = r\alpha\]
+            <strong>Total Acceleration:</strong> 
+            \[a = \sqrt{a_c^2 + a_t^2}\]
+            where: \(a_t\) = tangential acceleration (m/s²)
+        </div>
+        
+        <div class="key-point">
+            <strong>Important:</strong> In non-uniform circular motion, the total acceleration has two components:
+            <ul>
+                <li>Centripetal (radial) component: Changes the direction of velocity</li>
+                <li>Tangential component: Changes the magnitude of velocity</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Bead on a String</h2>
+        <div id="sketch-holder"></div>
+        
+        <div class="interactive-controls">
+            <div class="control-group">
+                <label for="angularVelocity">Initial Angular Velocity (\(\omega_0\)): <span id="angVelValue">2.0</span> rad/s</label>
+                <input type="range" id="angularVelocity" min="0" max="10" step="0.1" value="2.0">
+            </div>
+            
+            <div class="control-group">
+                <label for="angularAcceleration">Angular Acceleration (\(\alpha\)): <span id="angAccValue">0.0</span> rad/s²</label>
+                <input type="range" id="angularAcceleration" min="-5" max="5" step="0.1" value="0">
+            </div>
+            
+            <div class="control-group">
+                <label for="stringLength">String Length: <span id="lengthValue">150</span> px</label>
+                <input type="range" id="stringLength" min="50" max="200" step="10" value="150">
+            </div>
+            
+            <div class="control-group">
+                <label><input type="checkbox" id="showTension" checked> Show String Tension</label>
+                <label><input type="checkbox" id="showVelocity" checked> Show Velocity Vector</label>
+                <label><input type="checkbox" id="showAccelerations" checked> Show Accelerations</label>
+            </div>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 10px; margin: 20px 0;">
+            <button id="cutString">Cut String</button>
+            <button id="resetSimulation">Reset</button>
+            <button id="pauseSimulation">Pause</button>
+        </div>
+        
+        <div class="key-point">
+            <strong>Simulation Legend:</strong>
+            <ul>
+                <li><span style="color: #0066ff;">Blue Arrow</span>: String Tension (Centripetal Force)</li>
+                <li><span style="color: #00cc00;">Green Arrow</span>: Velocity Vector</li>
+                <li><span style="color: #ff0066;">Red Arrow</span>: Centripetal Acceleration</li>
+                <li><span style="color: #ff9900;">Orange Arrow</span>: Tangential Acceleration</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        
+        <div class="practice-problems">
+            <h3>Problem 1: Uniform Circular Motion</h3>
+            <p>A bead of mass 50 g is attached to a string of length 0.8 m and rotates in a horizontal circle at a constant angular velocity of 5 rad/s. Calculate:</p>
+            <ol type="a">
+                <li>The linear speed of the bead</li>
+                <li>The centripetal acceleration</li>
+                <li>The tension in the string</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="solution" style="display: none;">
+                <p><strong>Given:</strong> \(m = 0.05\) kg, \(r = 0.8\) m, \(\omega = 5\) rad/s</p>
+                <p><strong>a) Linear speed:</strong><br>
+                \(v = r\omega = 0.8 \times 5 = 4\) m/s</p>
+                <p><strong>b) Centripetal acceleration:</strong><br>
+                \(a_c = \omega^2 r = 5^2 \times 0.8 = 25 \times 0.8 = 20\) m/s²</p>
+                <p><strong>c) Tension (Centripetal force):</strong><br>
+                \(T = F_c = ma_c = 0.05 \times 20 = 1.0\) N</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 2: Angular Acceleration</h3>
+            <p>A wheel starts from rest and accelerates uniformly to 120 rpm in 4 seconds. Find:</p>
+            <ol type="a">
+                <li>The angular acceleration</li>
+                <li>The number of revolutions made in these 4 seconds</li>
+                <li>The tangential acceleration of a point 0.3 m from the axis</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="solution" style="display: none;">
+                <p><strong>Given:</strong> \(\omega_0 = 0\), \(\omega = 120\) rpm \(= 120 \times \frac{2\pi}{60} = 4\pi\) rad/s, \(t = 4\) s, \(r = 0.3\) m</p>
+                <p><strong>a) Angular acceleration:</strong><br>
+                \(\alpha = \frac{\omega - \omega_0}{t} = \frac{4\pi}{4} = \pi\) rad/s² \(\approx 3.14\) rad/s²</p>
+                <p><strong>b) Angular displacement:</strong><br>
+                \(\theta = \omega_0 t + \frac{1}{2}\alpha t^2 = 0 + \frac{1}{2} \times \pi \times 16 = 8\pi\) rad<br>
+                Number of revolutions \(= \frac{8\pi}{2\pi} = 4\) revolutions</p>
+                <p><strong>c) Tangential acceleration:</strong><br>
+                \(a_t = r\alpha = 0.3 \times \pi \approx 0.942\) m/s²</p>
+            </div>
+        </div>
+        
+        <div class="practice-problems">
+            <h3>Problem 3: Non-Uniform Circular Motion</h3>
+            <p>A particle moves in a circle of radius 2 m with an angular velocity that increases from 2 rad/s to 6 rad/s over a distance of \(4\pi\) radians. Calculate:</p>
+            <ol type="a">
+                <li>The angular acceleration</li>
+                <li>The time taken for this change</li>
+                <li>The magnitude of total acceleration when \(\omega = 4\) rad/s</li>
+            </ol>
+            
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="solution" style="display: none;">
+                <p><strong>Given:</strong> \(r = 2\) m, \(\omega_0 = 2\) rad/s, \(\omega = 6\) rad/s, \(\theta = 4\pi\) rad</p>
+                <p><strong>a) Angular acceleration:</strong><br>
+                Using \(\omega^2 = \omega_0^2 + 2\alpha\theta\)<br>
+                \(36 = 4 + 2\alpha(4\pi)\)<br>
+                \(32 = 8\pi\alpha\)<br>
+                \(\alpha = \frac{4}{\pi} \approx 1.27\) rad/s²</p>
+                <p><strong>b) Time taken:</strong><br>
+                \(\omega = \omega_0 + \alpha t\)<br>
+                \(6 = 2 + \frac{4}{\pi}t\)<br>
+                \(t = \frac{4\pi}{4} = \pi \approx 3.14\) s</p>
+                <p><strong>c) Total acceleration at \(\omega = 4\) rad/s:</strong><br>
+                \(a_c = \omega^2 r = 16 \times 2 = 32\) m/s²<br>
+                \(a_t = r\alpha = 2 \times \frac{4}{\pi} \approx 2.55\) m/s²<br>
+                \(a_{total} = \sqrt{32^2 + 2.55^2} \approx 32.1\) m/s²</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Quick Quiz</h2>
+        
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1</h3>
+                <p>In uniform circular motion, which statement is correct?</p>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> The velocity is constant</label>
+                    <label><input type="radio" name="q1" value="b"> The speed is constant but velocity changes</label>
+                    <label><input type="radio" name="q1" value="c"> Both speed and velocity are constant</label>
+                    <label><input type="radio" name="q1" value="d"> The acceleration is zero</label>
+                </div>
+                <button onclick="checkAnswer('q1', 'b', 'q1-feedback')">Check Answer</button>
+                <div id="q1-feedback" class="feedback"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 2</h3>
+                <p>A particle moves in a circle of radius 0.5 m with angular velocity 4 rad/s. What is its centripetal acceleration?</p>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> 2 m/s²</label>
+                    <label><input type="radio" name="q2" value="b"> 4 m/s²</label>
+                    <label><input type="radio" name="q2" value="c"> 8 m/s²</label>
+                    <label><input type="radio" name="q2" value="d"> 16 m/s²</label>
+                </div>
+                <button onclick="checkAnswer('q2', 'c', 'q2-feedback')">Check Answer</button>
+                <div id="q2-feedback" class="feedback"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 3</h3>
+                <p>When a string is cut during circular motion, the object:</p>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> Continues in circular motion</label>
+                    <label><input type="radio" name="q3" value="b"> Moves radially outward</label>
+                    <label><input type="radio" name="q3" value="c"> Moves tangentially in a straight line</label>
+                    <label><input type="radio" name="q3" value="d"> Falls vertically downward</label>
+                </div>
+                <button onclick="checkAnswer('q3', 'c', 'q3-feedback')">Check Answer</button>
+                <div id="q3-feedback" class="feedback"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 4</h3>
+                <p>The relationship between angular acceleration \(\alpha\) and tangential acceleration \(a_t\) is:</p>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> \(a_t = \alpha/r\)</label>
+                    <label><input type="radio" name="q4" value="b"> \(a_t = \alpha r\)</label>
+                    <label><input type="radio" name="q4" value="c"> \(a_t = \alpha^2 r\)</label>
+                    <label><input type="radio" name="q4" value="d"> \(a_t = r/\alpha\)</label>
+                </div>
+                <button onclick="checkAnswer('q4', 'b', 'q4-feedback')">Check Answer</button>
+                <div id="q4-feedback" class="feedback"></div>
+            </div>
+            
+            <div class="quiz-question">
+                <h3>Question 5</h3>
+                <p>A wheel completes 10 revolutions in 5 seconds starting from rest with uniform acceleration. What is the angular acceleration?</p>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> \(2\pi\) rad/s²</label>
+                    <label><input type="radio" name="q5" value="b"> \(4\pi\) rad/s²</label>
+                    <label><input type="radio" name="q5" value="c"> \(\frac{8\pi}{5}\) rad/s²</label>
+                    <label><input type="radio" name="q5" value="d"> \(\frac{16\pi}{25}\) rad/s²</label>
+                </div>
+                <button onclick="checkAnswer('q5', 'c', 'q5-feedback')">Check Answer</button>
+                <div id="q5-feedback" class="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer will be automatically generated by footer.js -->
+
+    <script>
+        // p5.js sketch for circular motion simulation
+        let sketch = function(p) {
+            let angle = 0;
+            let omega = 2.0; // Current angular velocity (rad/s)
+            let omega0 = 2.0; // Initial angular velocity
+            let alpha = 0; // Angular acceleration (rad/s²)
+            let radius = 150;
+            let stringCut = false;
+            let beadPos;
+            let beadVel;
+            let isPaused = false;
+            let centerX, centerY;
+            let trailPoints = [];
+            let mass = 0.1; // kg (for display purposes)
+            let time = 0; // Time since last reset
+            
+            p.setup = function() {
+                let canvas = p.createCanvas(p.windowWidth > 800 ? 800 : p.windowWidth - 40, 500);
+                canvas.parent('sketch-holder');
+                centerX = p.width / 2;
+                centerY = p.height / 2;
+                beadPos = p.createVector(centerX + radius, centerY);
+                beadVel = p.createVector(0, 0);
+            };
+            
+            p.draw = function() {
+                p.background(250);
+                
+                // Draw grid for reference
+                p.stroke(230);
+                p.strokeWeight(1);
+                for(let i = 0; i < p.width; i += 50) {
+                    p.line(i, 0, i, p.height);
+                }
+                for(let i = 0; i < p.height; i += 50) {
+                    p.line(0, i, p.width, i);
+                }
+                
+                // Draw centre point
+                p.fill(100);
+                p.noStroke();
+                p.ellipse(centerX, centerY, 10, 10);
+                
+                // Update values from sliders
+                if (!isPaused) {
+                    omega0 = parseFloat(document.getElementById('angularVelocity').value);
+                    alpha = parseFloat(document.getElementById('angularAcceleration').value);
+                    radius = parseFloat(document.getElementById('stringLength').value);
+                    
+                    // Calculate current angular velocity based on initial velocity and acceleration
+                    omega = omega0 + alpha * time;
+                    
+                    // Clamp omega to reasonable bounds
+                    omega = p.constrain(omega, -10, 10);
+                    
+                    // Update time
+                    time += 0.016; // Assuming ~60fps
+                }
+                
+                // Calculate position
+                if (!stringCut && !isPaused) {
+                    angle += omega * 0.016; // Convert to angle change per frame
+                    beadPos.x = centerX + radius * p.cos(angle);
+                    beadPos.y = centerY + radius * p.sin(angle);
+                    
+                    // Calculate velocity
+                    beadVel.x = -omega * radius * p.sin(angle);
+                    beadVel.y = omega * radius * p.cos(angle);
+                } else if (stringCut && !isPaused) {
+                    // Move in straight line when string is cut
+                    beadPos.x += beadVel.x * 0.016;
+                    beadPos.y += beadVel.y * 0.016;
+                }
+                
+                // Add to trail
+                if (!isPaused) {
+                    trailPoints.push(p.createVector(beadPos.x, beadPos.y));
+                    if (trailPoints.length > 50) {
+                        trailPoints.shift();
+                    }
+                }
+                
+                // Draw trail
+                p.noFill();
+                p.strokeWeight(2);
+                for(let i = 0; i < trailPoints.length - 1; i++) {
+                    let alpha = p.map(i, 0, trailPoints.length, 0, 100);
+                    p.stroke(200, 200, 200, alpha);
+                    p.line(trailPoints[i].x, trailPoints[i].y, trailPoints[i+1].x, trailPoints[i+1].y);
+                }
+                
+                // Draw string (if not cut)
+                if (!stringCut) {
+                    p.stroke(50);
+                    p.strokeWeight(2);
+                    p.line(centerX, centerY, beadPos.x, beadPos.y);
+                    
+                    // Draw tension vector (centripetal force)
+                    if (document.getElementById('showTension').checked) {
+                        let tension = mass * omega * omega * radius;
+                        let tensionScale = p.min(tension * 50, radius * 0.8);
+                        p.stroke(0, 102, 255);
+                        p.strokeWeight(3);
+                        drawArrow(p, beadPos.x, beadPos.y, 
+                                 beadPos.x - tensionScale * p.cos(angle), 
+                                 beadPos.y - tensionScale * p.sin(angle));
+                    }
+                }
+                
+                // Draw velocity vector (scaled up for better visibility)
+                if (document.getElementById('showVelocity').checked) {
+                    p.stroke(0, 204, 0);
+                    p.strokeWeight(3);
+                    let velScale = 10; // Changed from 30 to 10 for larger arrows
+                    drawArrow(p, beadPos.x, beadPos.y, 
+                             beadPos.x + beadVel.x / velScale, 
+                             beadPos.y + beadVel.y / velScale);
+                }
+                
+                // Draw acceleration vectors
+                if (document.getElementById('showAccelerations').checked && !stringCut) {
+                    // Centripetal acceleration
+                    let ac = omega * omega * radius;
+                    let acScale = p.min(ac, radius * 0.6);
+                    p.stroke(255, 0, 102);
+                    p.strokeWeight(3);
+                    drawArrow(p, beadPos.x, beadPos.y, 
+                             beadPos.x - acScale * p.cos(angle), 
+                             beadPos.y - acScale * p.sin(angle));
+                    
+                    // Tangential acceleration (scaled down for better proportion)
+                    if (Math.abs(alpha) > 0.01) {
+                        let at = radius * alpha;
+                        let atScale = at * 10; // Changed from 30 to 10 for smaller arrows
+                        p.stroke(255, 153, 0);
+                        p.strokeWeight(3);
+                        drawArrow(p, beadPos.x, beadPos.y, 
+                                 beadPos.x - atScale * p.sin(angle), 
+                                 beadPos.y + atScale * p.cos(angle));
+                    }
+                }
+                
+                // Draw bead
+                p.fill(255, 50, 50);
+                p.noStroke();
+                p.ellipse(beadPos.x, beadPos.y, 20, 20);
+                
+                // Display values
+                p.fill(0);
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text(`Current Angular Velocity: ${omega.toFixed(2)} rad/s`, 10, 20);
+                p.text(`Linear Speed: ${Math.abs(omega * radius / 100).toFixed(2)} m/s`, 10, 40);
+                p.text(`Centripetal Acc: ${(omega * omega * radius / 100).toFixed(2)} m/s²`, 10, 60);
+                if (Math.abs(alpha) > 0.01) {
+                    p.text(`Tangential Acc: ${Math.abs(radius * alpha / 100).toFixed(2)} m/s²`, 10, 80);
+                }
+                if (stringCut) {
+                    p.fill(255, 0, 0);
+                    p.text("STRING CUT - Object moving tangentially", 10, 100);
+                }
+            };
+            
+            function drawArrow(p, x1, y1, x2, y2) {
+                p.line(x1, y1, x2, y2);
+                let angle = p.atan2(y2 - y1, x2 - x1);
+                let arrowSize = 7;
+                p.push();
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.line(0, 0, -arrowSize, arrowSize/2);
+                p.line(0, 0, -arrowSize, -arrowSize/2);
+                p.pop();
+            }
+            
+            p.windowResized = function() {
+                p.resizeCanvas(p.windowWidth > 800 ? 800 : p.windowWidth - 40, 500);
+                centerX = p.width / 2;
+                centerY = p.height / 2;
+            };
+            
+            // Public methods for button controls
+            p.cutString = function() {
+                stringCut = true;
+            };
+            
+            p.reset = function() {
+                angle = 0;
+                omega = 2.0;
+                omega0 = 2.0;
+                time = 0;
+                stringCut = false;
+                isPaused = false;
+                trailPoints = [];
+                beadPos = p.createVector(centerX + radius, centerY);
+                document.getElementById('angularVelocity').value = 2.0;
+                document.getElementById('angularAcceleration').value = 0;
+                document.getElementById('angVelValue').textContent = '2.0';
+                document.getElementById('angAccValue').textContent = '0.0';
+                document.getElementById('pauseSimulation').textContent = 'Pause';
+            };
+            
+            p.togglePause = function() {
+                isPaused = !isPaused;
+                document.getElementById('pauseSimulation').textContent = isPaused ? 'Resume' : 'Pause';
+            };
+        };
+        
+        // Create p5 instance
+        let myp5 = new p5(sketch);
+        
+        // Button event handlers
+        document.getElementById('cutString').addEventListener('click', function() {
+            myp5.cutString();
+        });
+        
+        document.getElementById('resetSimulation').addEventListener('click', function() {
+            myp5.reset();
+        });
+        
+        document.getElementById('pauseSimulation').addEventListener('click', function() {
+            myp5.togglePause();
+        });
+        
+        // Slider event handlers
+        document.getElementById('angularVelocity').addEventListener('input', function(e) {
+            document.getElementById('angVelValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('angularAcceleration').addEventListener('input', function(e) {
+            document.getElementById('angAccValue').textContent = e.target.value;
+        });
+        
+        document.getElementById('stringLength').addEventListener('input', function(e) {
+            document.getElementById('lengthValue').textContent = e.target.value;
+        });
+        
+        // Toggle solution visibility
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            const toggleText = solution.previousElementSibling;
+            if (solution.style.display === "block") {
+                solution.style.display = "none";
+                toggleText.textContent = "Show Solution";
+            } else {
+                solution.style.display = "block";
+                toggleText.textContent = "Hide Solution";
+            }
+        }
+        
+        // Check quiz answers
+        function checkAnswer(questionName, correctAnswer, feedbackId) {
+            const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+            const feedbackElement = document.getElementById(feedbackId);
+            
+            if (!selectedOption) {
+                feedbackElement.textContent = "Please select an answer.";
+                feedbackElement.className = "feedback";
+                return;
+            }
+            
+            if (selectedOption.value === correctAnswer) {
+                feedbackElement.textContent = "Correct! Well done.";
+                feedbackElement.className = "feedback correct";
+            } else {
+                feedbackElement.textContent = "Incorrect. Try again!";
+                feedbackElement.className = "feedback incorrect";
+            }
+        }
+    </script>
+</body>
+</html>
