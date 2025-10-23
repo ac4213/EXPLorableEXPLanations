@@ -492,8 +492,12 @@
 <div class="status-value unbalanced">Unbalanced</div>
 </div>
 <div class="status-item">
-<div class="status-label">Total MR</div>
-<div class="status-value" id="multi-mr-total">0 g·mm</div>
+<div class="status-label">Unbalance Force</div>
+<div class="status-value" id="multi-force">0 N</div>
+</div>
+<div class="status-item">
+<div class="status-label">Unbalance Moment</div>
+<div class="status-value" id="multi-moment">0 Nm</div>
 </div>
 <div class="status-item">
 <div class="status-label">Plane L Balance</div>
@@ -530,16 +534,21 @@
             for (let content of tabContents) {
                 content.classList.remove('active');
             }
-            
+
             // Remove active class from all buttons
             const tabButtons = document.getElementsByClassName('tab-button');
             for (let button of tabButtons) {
                 button.classList.remove('active');
             }
-            
+
             // Show selected tab
             document.getElementById(tabName + '-tab').classList.add('active');
             event.currentTarget.classList.add('active');
+
+            // Trigger window resize event to recalculate canvas sizes
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+            }, 50);
         }
     </script>
 </body>
