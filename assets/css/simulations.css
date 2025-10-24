@@ -9,6 +9,35 @@
     padding: 15px;
     border-radius: 8px;
     margin: 10px 0;
+    flex-shrink: 0;
+    scroll-behavior: smooth;
+}
+
+/* Smooth scrollbar styling for controls */
+.simulation-controls::-webkit-scrollbar,
+.control-panel::-webkit-scrollbar,
+.controls-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.simulation-controls::-webkit-scrollbar-track,
+.control-panel::-webkit-scrollbar-track,
+.controls-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.simulation-controls::-webkit-scrollbar-thumb,
+.control-panel::-webkit-scrollbar-thumb,
+.controls-panel::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.simulation-controls::-webkit-scrollbar-thumb:hover,
+.control-panel::-webkit-scrollbar-thumb:hover,
+.controls-panel::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 .interactive-controls {
@@ -16,6 +45,7 @@
     flex-wrap: wrap;
     gap: 10px;
     margin: 15px 0;
+    max-width: 100%;
 }
 
 /* Control Rows and Columns */
@@ -30,12 +60,14 @@
 .control-column {
     flex: 1;
     min-width: 250px;
+    max-width: 100%;
 }
 
 .control-group {
     display: flex;
     flex-direction: column;
     margin-right: 20px;
+    max-width: 100%;
 }
 
 /* Slider Containers - Responsive Design */
@@ -140,12 +172,14 @@ label {
     border-radius: 5px;
     margin: 10px 0;
     flex-wrap: wrap;
+    gap: 10px;
 }
 
 .stat-box {
     text-align: center;
     padding: 5px;
-    min-width: 150px;
+    min-width: 120px;
+    flex: 1 1 auto;
 }
 
 .winner-announcement {
@@ -164,6 +198,8 @@ label {
     padding: 20px;
     margin: 20px 0;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
 }
 
 .simulation-grid {
@@ -202,6 +238,8 @@ label {
     border-radius: 8px;
     padding: 20px;
     margin-top: 20px;
+    flex-shrink: 0;
+    scroll-behavior: smooth;
 }
 
 .control-panel .control-group {
@@ -308,10 +346,15 @@ label {
     color: #dc3545;
 }
 
-/* Sketch Holders - Specific Sizing */
-#sketch-holder-drag-race, #sketch-holder-acc-demo {
+/* Sketch Holders - Universal Canvas Container Rules */
+/* Apply to all divs that contain p5.js canvases */
+div[id*="sketch"],
+div[id*="view"],
+div[id*="canvas"],
+#sketch-holder-drag-race,
+#sketch-holder-acc-demo {
     width: 100%;
-    height: 400px;
+    max-width: 100%;
     position: relative;
     overflow: hidden;
     border: 1px solid #ddd;
@@ -320,7 +363,280 @@ label {
     margin: 10px 0;
 }
 
+/* Ensure all canvases scale within their containers */
+div[id*="sketch"] canvas,
+div[id*="view"] canvas,
+div[id*="canvas"] canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    object-fit: contain;
+}
+
+/* For p5.js canvases that need to maintain aspect ratio */
+.simulation-section canvas,
+.simulation-container canvas,
+.simulation-wrapper canvas {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    object-fit: contain;
+}
+
+/* Specific sizing for drag race and acceleration demo */
+#sketch-holder-drag-race, #sketch-holder-acc-demo {
+    height: 400px;
+}
+
+/* Simulation Wrappers - Ensure they don't overflow */
+.simulation-wrapper,
+.simulation-section {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Ensure buttons are responsive */
+button,
+.control-button {
+    min-width: 80px;
+    padding: 8px 16px;
+    white-space: nowrap;
+}
+
+/* Global Responsive Rules - Prevent Overflow */
+* {
+    box-sizing: border-box;
+}
+
+img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================
+   DESKTOP LAYOUT - Side-by-side controls
+   ============================================ */
+@media (min-width: 1200px) {
+    /* Pattern 1: Simple simulations with .simulation-section */
+    .simulation-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    /* Titles and descriptions take full width */
+    .simulation-section > h2,
+    .simulation-section > h3,
+    .simulation-section > p,
+    .simulation-section > .key-point {
+        flex: 1 0 100%;
+    }
+
+    /* Canvas holders take remaining space on left */
+    .simulation-section > div[id*="sketch-holder"],
+    .simulation-section > div[id*="sketch"],
+    .simulation-section > div[id*="canvas"] {
+        flex: 1 1 60%;
+        min-width: 500px;
+        margin: 0;
+    }
+
+    /* Controls take fixed width on right */
+    .simulation-section > .simulation-controls {
+        flex: 0 0 380px;
+        width: 380px;
+        min-width: 350px;
+        max-width: 420px;
+        margin: 0;
+        align-self: flex-start;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    /* Results and stats take full width below */
+    .simulation-section > .race-stats,
+    .simulation-section > .winner-announcement,
+    .simulation-section > div[id*="results"],
+    .simulation-section > div[id*="winner"] {
+        flex: 1 0 100%;
+    }
+
+    /* Pattern 2: Multi-view with .simulation-container */
+    .simulation-container {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .simulation-grid {
+        flex: 1 1 60%;
+        min-width: 500px;
+        margin-bottom: 0;
+    }
+
+    .control-panel {
+        flex: 0 0 380px;
+        width: 380px;
+        min-width: 350px;
+        max-width: 420px;
+        margin-top: 0;
+        position: sticky;
+        top: 20px;
+        align-self: flex-start;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    /* Tab navigation should stay at top full width */
+    .simulation-container > .tab-navigation {
+        flex: 1 0 100%;
+        order: -1;
+    }
+
+    /* Tab content wrapper for side-by-side layout */
+    .tab-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+    }
+
+    .tab-content > .simulation-grid {
+        flex: 1 1 60%;
+        min-width: 500px;
+    }
+
+    .tab-content > .control-panel {
+        flex: 0 0 380px;
+        width: 380px;
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    /* Status displays should stay below, full width */
+    .tab-content > .status-display,
+    .simulation-container > .status-display {
+        flex: 1 0 100%;
+        width: 100%;
+        order: 100;
+    }
+
+    /* Pattern 3: .simulation-wrapper (alternative pattern like PlaneStress) */
+    .simulation-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .simulation-wrapper > h2,
+    .simulation-wrapper > h3,
+    .simulation-wrapper > p {
+        flex: 1 0 100%;
+    }
+
+    .simulation-wrapper > div[id*="sketch"],
+    .simulation-wrapper > div[id*="canvas"] {
+        flex: 1 1 60%;
+        min-width: 500px;
+        margin: 0;
+    }
+
+    .simulation-wrapper > .controls-panel {
+        flex: 0 0 380px;
+        width: 380px;
+        min-width: 350px;
+        max-width: 420px;
+        margin: 0;
+        position: sticky;
+        top: 20px;
+        align-self: flex-start;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+
+    .simulation-wrapper > .results-panel {
+        flex: 1 0 100%;
+    }
+}
+
 /* Responsive Design for Simulations */
+/* Tablet breakpoint - optimize for iPad and similar devices */
+@media (max-width: 1199px) {
+    /* Reset desktop side-by-side layout back to stacking */
+    .simulation-section,
+    .simulation-wrapper {
+        display: block;
+    }
+
+    .simulation-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tab-content {
+        display: block;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .simulation-controls,
+    .control-panel {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        margin: 10px 0;
+    }
+
+    .simulation-section > div[id*="sketch-holder"],
+    .simulation-section > div[id*="sketch"],
+    .simulation-section > div[id*="canvas"],
+    .simulation-wrapper > div[id*="sketch"],
+    .simulation-wrapper > div[id*="canvas"] {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .simulation-grid {
+        width: 100%;
+    }
+}
+
+@media (max-width: 1024px) {
+    .simulation-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    /* Make canvas containers more flexible */
+    div[id*="sketch"],
+    div[id*="view"],
+    div[id*="canvas"] {
+        min-height: 250px;
+    }
+
+    /* Adjust control panel spacing */
+    .control-panel {
+        padding: 18px;
+    }
+
+    .control-group {
+        margin-right: 15px;
+    }
+
+    /* Reduce min-width for control columns on tablets */
+    .control-column {
+        min-width: 200px;
+    }
+}
+
 @media (max-width: 900px) {
     .simulation-grid {
         grid-template-columns: 1fr;
@@ -334,6 +650,13 @@ label {
     .control-column {
         min-width: 100%;
     }
+
+    /* Scale canvas containers */
+    div[id*="sketch"],
+    div[id*="view"],
+    div[id*="canvas"] {
+        min-height: 300px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -341,26 +664,30 @@ label {
         flex-direction: column;
     }
 
+    /* Keep sliders compact - label, slider, and number on same line for tablets */
     .slider-row {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        gap: 8px;
     }
 
     .slider-label {
-        flex: 1 0 100%;
-        max-width: 100%;
-        margin-bottom: 5px;
+        flex: 0 0 auto;
+        min-width: 70px;
+        max-width: 100px;
+        margin-bottom: 0;
+        font-size: 0.9em;
     }
 
     .slider-row input[type="range"] {
-        flex: 1 1 100%;
-        min-width: 100%;
-        margin-bottom: 5px;
+        flex: 1 1 auto;
+        min-width: 100px;
+        margin-bottom: 0;
     }
 
     .slider-row input[type="number"] {
         flex: 0 0 auto;
-        width: 80px;
-        max-width: 80px;
+        width: 65px;
+        max-width: 65px;
     }
 
     #sketch-holder-drag-race, #sketch-holder-acc-demo {
@@ -372,6 +699,10 @@ label {
     }
 
     .control-panel {
+        padding: 15px;
+    }
+
+    .simulation-wrapper {
         padding: 15px;
     }
 
@@ -391,25 +722,56 @@ label {
     .status-grid {
         grid-template-columns: 1fr;
     }
+
+    /* Scale view panels */
+    .view-panel {
+        min-height: 250px;
+    }
+
+    /* Ensure simulation grids are responsive */
+    .simulation-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
 }
 
 @media (max-width: 576px) {
+    /* Compact sliders for small phones */
+    .slider-row {
+        gap: 6px;
+    }
+
     .slider-label {
         font-size: 0.85em;
+        min-width: 60px;
+        max-width: 85px;
+    }
+
+    .slider-row input[type="range"] {
+        min-width: 80px;
     }
 
     .slider-row input[type="number"] {
-        width: 70px;
-        max-width: 70px;
+        width: 60px;
+        max-width: 60px;
         font-size: 0.85em;
+        padding: 3px;
     }
 
     #sketch-holder-drag-race, #sketch-holder-acc-demo {
         height: 250px;
     }
 
-    .simulation-container {
-        padding: 15px;
+    /* Reduce canvas container heights */
+    div[id*="sketch"],
+    div[id*="view"],
+    div[id*="canvas"] {
+        min-height: 200px;
+    }
+
+    .simulation-container,
+    .simulation-wrapper {
+        padding: 12px;
     }
 
     .control-panel .control-group {
@@ -417,12 +779,35 @@ label {
     }
 
     .view-panel {
-        min-height: 250px;
+        min-height: 200px;
+        padding: 8px;
     }
 
     .tab-button {
-        padding: 8px 15px;
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+
+    .control-panel {
+        padding: 12px;
+    }
+
+    /* Ensure control groups stack nicely */
+    .control-group {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+
+    /* Reduce stat box minimum width */
+    .stat-box {
+        min-width: 100px;
         font-size: 0.9em;
+    }
+
+    /* Make race stats more compact */
+    .race-stats {
+        gap: 8px;
+        padding: 8px;
     }
 }
 
@@ -431,16 +816,61 @@ label {
         padding: 8px;
     }
 
-    .control-panel {
+    .control-panel,
+    .simulation-wrapper,
+    .simulation-container {
         padding: 10px;
     }
 
     #sketch-holder-drag-race, #sketch-holder-acc-demo {
-        height: 200px;
+        height: 180px;
+    }
+
+    /* Extra compact sliders for very small screens */
+    .slider-row {
+        gap: 4px;
+    }
+
+    .slider-label {
+        min-width: 50px;
+        max-width: 70px;
+        font-size: 0.8em;
+    }
+
+    .slider-row input[type="range"] {
+        min-width: 60px;
     }
 
     .slider-row input[type="number"] {
-        width: 60px;
-        max-width: 60px;
+        width: 50px;
+        max-width: 50px;
+        font-size: 0.8em;
+        padding: 2px;
+    }
+
+    /* Scale down canvas containers */
+    div[id*="sketch"],
+    div[id*="view"],
+    div[id*="canvas"] {
+        min-height: 180px;
+    }
+
+    .view-panel {
+        min-height: 180px;
+        padding: 6px;
+    }
+
+    .tab-button {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+
+    /* Make text smaller in status displays */
+    .status-label {
+        font-size: 0.8em;
+    }
+
+    .status-value {
+        font-size: 1em;
     }
 }
