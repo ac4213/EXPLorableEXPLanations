@@ -13,41 +13,10 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
-    
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+
     <style>
-        /* Additional styles specific to this page */
-        .control-panel {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        
-        .control-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .control-row label {
-            width: 150px;
-            font-weight: bold;
-            color: #666;
-        }
-        
-        .control-row input[type="range"] {
-            flex: 1;
-            min-width: 150px;
-            margin: 0 10px;
-        }
-        
-        .control-row span {
-            width: 80px;
-            text-align: right;
-            color: #333;
-        }
-        
+        /* Page-specific styles for relative motion simulation */
         .pov-buttons {
             display: flex;
             justify-content: center;
@@ -98,38 +67,6 @@
             font-size: 0.95em;
         }
         
-        #sketch-holder {
-            min-height: 500px;
-        }
-        
-        @media (max-width: 768px) {
-            .velocity-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .control-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .control-row label {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            
-            .control-row input[type="range"] {
-                width: 100%;
-                margin: 5px 0;
-            }
-            
-            .pov-buttons {
-                flex-direction: column;
-            }
-            
-            .pov-button {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>

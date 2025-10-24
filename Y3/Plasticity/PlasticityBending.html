@@ -9,15 +9,15 @@
   <!-- MathJax -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
   <!-- External CSS -->
-  <link rel="stylesheet" href="/assets/css/main.css" />
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/simulations.css">
+
   <style>
+    /* Page-specific styles for plasticity simulations */
     .stress-stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:15px 0}
     .stage-card{background:#f9f9f9;border:2px solid #ddd;border-radius:5px;padding:10px;text-align:center;transition:.3s}
     .stage-card.active{background:#fff3cd;border-color:#ffc107;font-weight:700}
-    .simulation-container{background:#fff;border-radius:8px;padding:20px;margin:20px 0;box-shadow:0 2px 5px rgba(0,0,0,.1)}
     .simulation-title{background:var(--primary-color);color:var(--text-color);padding:10px;margin:-20px -20px 20px;border-radius:8px 8px 0 0;text-align:center;font-weight:700}
-    .controls{display:flex;flex-wrap:wrap;gap:15px;margin:15px 0;padding:15px;background:#f9f9f9;border-radius:5px}
-    .control-group{display:flex;align-items:center;gap:10px}
     .value-display{display:inline-block;min-width:50px;padding:4px 8px;background:#fff;border:1px solid #ddd;border-radius:3px;text-align:center;font-weight:700;color:#cc9900}
     .info-panel{background:#e6f7ff;border-left:4px solid #1890ff;padding:15px;margin:15px 0;border-radius:0 4px 4px 0}
     .info-panel p{margin:5px 0}

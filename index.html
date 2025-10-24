@@ -14,47 +14,23 @@
     <!-- favicon for iOS/Apple devices -->
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
 
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+
+    <!-- Homepage-specific styles -->
     <style>
-        :root {
-            --primary-color: #ffd700;
-            --secondary-color: #ffb300;
-            --text-color: #333;
-            --background-color: #fffbeb;
-            --link-color: #cc9900;
-            --link-hover-color: #1c01b8;
+        .logo-container {
+            margin-bottom: 20px;
         }
-        
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background-color);
-        }
-        
-        header {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            text-align: center;
-            padding: 1rem;
-            border-radius: 5px;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-variant: small-caps;
-        }
-        
+
         nav {
             background-color: var(--secondary-color);
             padding: 0.5rem;
             border-radius: 5px;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
-        
+
         nav ul {
             list-style-type: none;
             padding: 0;
@@ -63,11 +39,11 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         nav ul li {
             margin: 5px 10px;
         }
-        
+
         nav ul li a {
             color: var(--text-color);
             text-decoration: none;
@@ -76,92 +52,55 @@
             border-radius: 3px;
             transition: background-color 0.3s;
         }
-        
+
         nav ul li a:hover, nav ul li a:focus {
             background-color: var(--primary-color);
             outline: none;
         }
-        
+
         main {
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             margin-top: 20px;
         }
-        
-        section {
+
+        .intro {
             background-color: white;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            width: calc(33.33% - 20px);
+            width: 100%;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .small-caps {
-            font-variant: small-caps;
+
+        section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: calc(33.33% - 14px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        h2 {
-            color: #b38600;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
+
+        @media screen and (max-width: 900px) {
+            section {
+                width: calc(50% - 10px);
+            }
         }
-        
-        ul {
-            padding-left: 20px;
-        }
-        
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        a:hover, a:focus {
-            text-decoration: underline;
-            color: var(--link-hover-color);
-            outline: none;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-        
+
         @media screen and (max-width: 768px) {
             section {
                 width: 100%;
             }
-            
+
             nav ul {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             nav ul li {
                 margin: 5px 0;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-        }
-        
-        @media screen and (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 1.8em;
-            }
-            
-            h2 {
-                font-size: 1.5em;
             }
         }
     </style>

@@ -13,14 +13,15 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- Import Plotly for graphs -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <!-- Import custom CSS - FIXED: Now properly importing main.css -->
-    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <!-- Import custom CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
     <!-- Custom script -->
     <script src="3d-stress-strain.js"></script>
-    
-    <!-- Additional styles for consistency -->
+
+    <!-- Page-specific styles -->
     <style>
-        /* Ensure practice problem solutions are hidden by default */
+        /* Solution toggle styles specific to this page */
         .solution {
             display: none;
             background-color: #f9f9f9;
@@ -29,7 +30,7 @@
             margin-top: 10px;
             border-radius: 0 4px 4px 0;
         }
-        
+
         .solution-toggle {
             background-color: var(--secondary-color);
             color: white;
@@ -42,92 +43,34 @@
             transition: background-color 0.3s;
             display: inline-block;
         }
-        
+
         .solution-toggle:hover {
             background-color: var(--primary-color);
         }
-        
-        /* Feedback styles consistent with other files */
+
+        /* Feedback styles specific to this page */
         .feedback {
             margin-top: 10px;
             padding: 10px;
             border-radius: 4px;
             display: none;
         }
-        
+
         .feedback.correct {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
             display: block;
         }
-        
+
         .feedback.incorrect {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
             display: block;
         }
-        
-        /* Slider styles */
-        .slider-container {
-            margin-bottom: 10px;
-        }
-        
-        .slider-container label {
-            display: inline-block;
-            width: 60px;
-            font-weight: bold;
-        }
-        
-        .slider {
-            width: 200px;
-            margin: 0 10px;
-        }
-        
-        .slider-container span {
-            display: inline-block;
-            width: 50px;
-            text-align: right;
-            font-weight: bold;
-            color: #666;
-        }
-        
-        /* Control panel styling */
-        .control-panel {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .control-group {
-            margin-bottom: 20px;
-        }
-        
-        .control-group h3 {
-            margin-bottom: 10px;
-            color: #cc9900;
-        }
-        
-        .button-container {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .checkbox-container {
-            margin-top: 10px;
-        }
-        
-        .checkbox-container label {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        /* Results panels */
+
+        /* Results panels specific to this page */
         .results-section {
             background-color: white;
             border-radius: 8px;
@@ -135,26 +78,26 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        
+
         .result-panels {
             display: grid;
-            grid-template-columns: 1fr;  /* always one column */
+            grid-template-columns: 1fr;
             gap: 20px;
         }
-        
+
         .result-panel {
             background-color: #f9f9f9;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #ddd;
         }
-        
+
         .result-panel h3 {
             margin-top: 0;
             margin-bottom: 10px;
             color: #cc9900;
         }
-        
+
         .matrix {
             font-family: 'Courier New', monospace;
             white-space: pre;
@@ -163,7 +106,7 @@
             border-radius: 4px;
             border: 1px solid #ddd;
         }
-        
+
         .plot-container {
             background-color: white;
             border-radius: 8px;
@@ -175,6 +118,17 @@
         #mohr-circle-3d {
             height: 400px;
             width: 100%;
+        }
+
+        .checkbox-container {
+            margin-top: 10px;
+        }
+
+        .checkbox-container label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
     </style>
 </head>

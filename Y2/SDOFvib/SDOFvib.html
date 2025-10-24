@@ -15,265 +15,48 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <!-- Import Plotly for graphs -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+
     <!-- Main script for the simulation -->
     <script src="SDOFvib.js"></script>
-    
+
     <style>
-        :root {
-            --primary-color: #ffd700;
-            --secondary-color: #ffb300;
-            --text-color: #333;
-            --background-color: #fffbeb;
-            --link-color: #cc9900;
-            --link-hover-color: #1c01b8;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--background-color);
-        }
-        
-        header {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            text-align: center;
-            padding: 1rem;
-            border-radius: 5px;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-variant: small-caps;
-        }
-        
-        .subtitle {
-            font-variant: small-caps;
-            margin-top: 5px;
-        }
-        
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        
-        .content-section {
-            background-color: white;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-            width: 100%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .simulation-section {
-            background-color: white;
-            border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-            width: 100%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .key-point {
-            background-color: #f5f5f5;
-            border-left: 4px solid var(--primary-color);
-            padding: 10px 15px;
-            margin: 15px 0;
-            border-radius: 0 5px 5px 0;
-        }
-        
-        .equation-box {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow-x: auto;
-        }
-        
-        h2 {
-            color: #b38600;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-        
-        h3 {
-            color: #cc9900;
-            margin-top: 20px;
-        }
-        
+        /* Page-specific styles */
         #sketch-holder {
             width: 200px;
             height: 500px;
             float: left;
             margin-right: 20px;
         }
-        
+
         #chart-container {
             margin-left: 220px;
             width: calc(100% - 240px);
         }
-        
+
         #TimeHistory, #FRFamp, #FRFphase {
             width: 100%;
             margin-bottom: 15px;
         }
-        
-        .parameter-controls {
-            margin: 20px 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-        
-        .control-group {
-            margin-bottom: 15px;
-            width: 45%;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        input[type="range"] {
-            width: 90%;
-        }
-        
+
         .parameter-value {
             display: inline-block;
             width: 50px;
             text-align: right;
         }
-        
-        .problem {
-            background-color: #f9f9f9;
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0 5px 5px 0;
-        }
-        
-        .solution-toggle {
-            color: var(--link-color);
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: underline;
-            margin: 10px 0;
-        }
-        
-        .solution {
-            display: none;
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .quiz-container {
-            margin-top: 20px;
-        }
-        
-        .quiz-question {
-            background-color: #f9f9f9;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border-left: 4px solid var(--secondary-color);
-        }
-        
-        .quiz-question form {
-            margin: 10px 0;
-        }
-        
-        .quiz-question label {
-            display: inline-block;
-            margin: 5px 0;
-        }
-        
-        .quiz-question button {
-            margin-top: 10px;
-            padding: 5px 10px;
-            background-color: var(--secondary-color);
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        
-        .quiz-question button:hover {
-            background-color: var(--primary-color);
-        }
-        
-        .feedback {
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 4px;
-        }
-        
-        .correct {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        
-        .incorrect {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        
-        .small-caps {
-            font-variant: small-caps;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            border-radius: 5px;
-        }
-        
-        .back-link {
-            display: block;
-            margin: 10px 0;
-            color: var(--link-color);
-            text-decoration: none;
-        }
-        
-        .back-link:hover {
-            color: var(--link-hover-color);
-            text-decoration: underline;
-        }
-        
+
         @media screen and (max-width: 768px) {
-            .simulation-section, .content-section {
-                width: 100%;
-            }
-            
             #sketch-holder {
                 float: none;
                 margin: 0 auto 20px auto;
             }
-            
+
             #chart-container {
                 margin-left: 0;
                 width: 100%;
-            }
-            
-            .control-group {
-                width: 100%;
-            }
-            
-            h1 {
-                font-size: 2em;
             }
         }
     </style>
@@ -831,8 +614,8 @@
             frequencySlider.closest('.control-group').style.display = 'none';
         });
     </script>
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
 </body>
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
 </html>

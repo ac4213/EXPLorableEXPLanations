@@ -9,17 +9,19 @@
   <link rel="stylesheet" type="text/css" href="https://tikzjax.com/v1/fonts.css">
   <script src="https://tikzjax.com/v1/tikzjax.js"></script>
   <script src="sketchMulti2.js"></script>
-  <link rel="stylesheet" type="text/css" href="vec-algebra-style.css">
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/simulations.css">
   <meta charset="utf-8" />
 </head>
 
 <body>
-  <main>
-    <title>Vector Algebra</title>
-    <h1>FORCES AS VECTORS</h1>
+    <header>
+        <h1>Vector Algebra</h1>
+        <p class="subtitle">Forces as Vectors - Interactive Lecture</p>
+    </header>
 
-    <section id="Vectorial representation">
-      <h2>Vectorial representation</h2>
+    <div class="content-section">
+      <h2>Vectorial Representation</h2>
 
       <p>Forces have an intensity (magnitude), a direction (line of action) and a verse (sense), and a single number is
         not sufficient to represent these aspects, so they need a special mathematical object to represent them: this
@@ -86,12 +88,14 @@
 
         the left column to pass from Cartesian to Polar, the right one from Polar to Cartesian.
       </p>
-    </section>
-    <section id="Scalar multiplication">
-      <h2>Scalar multiplication (scaling)</h2>
-      <p>A vector \(\mathbf{F}\) can be multiplied by a real number \(\alpha\). Doing so, results in the "scaling" of
-        the vector, hence why the name "scalar" for the factor \(\alpha \in \mathbb{R} \). \[ \mathbf{R}=\alpha
-        \mathbf{F} \]</p>
+    </div>
+
+    <div class="content-section">
+      <h2>Scalar Multiplication (Scaling)</h2>
+      <div class="key-point">
+        <p><strong>Key Concept:</strong> A vector \(\mathbf{F}\) can be multiplied by a real number \(\alpha\). Doing so, results in the "scaling" of the vector, hence why the name "scalar" for the factor \(\alpha \in \mathbb{R} \).</p>
+        <p>\[ \mathbf{R}=\alpha \mathbf{F} \]</p>
+      </div>
       <p>It is easy to see, using cartesian representation, that the scale factor affects both components in the same
         way
         \[\mathbf{R} = \alpha\,\mathbf{F}=\left(\alpha F_x\right) \, \mathbf{i} + \left(\alpha F_y\right) \,
@@ -112,9 +116,10 @@
             their angles are 180° apart) </li>
       </ul>
       </p>
-    </section>
-    <section id="Vector sum">
-      <h2>Vector sum</h2>
+    </div>
+
+    <div class="content-section">
+      <h2>Vector Sum</h2>
       <p>Vectors can be easily added together using their cartesian representation:
         \[
         \mathbf{A}+\mathbf{B}=\left(A_x\,\mathbf{i}+A_y\,\mathbf{j}\right)+\left(B_x\,\mathbf{i}+B_y\, \mathbf{j}
@@ -133,18 +138,19 @@
         consecutively.</p>
       <div id="VectorTriangleRule"></div>
 
-      <p>As it's possible to observe, the vector summation being a commutative operation means that the order of the
-        addends does not matter.</p>
-    </section>
+      <div class="key-point">
+        <p><strong>Important:</strong> Vector summation is a commutative operation, meaning the order of the addends does not matter.</p>
+      </div>
+    </div>
 
-    <section id="practice-problems">
+    <div class="content-section">
       <h2>Practice Problems</h2>
-      
-      <div class="problem">
+
+      <div class="practice-problems">
         <h3>Problem 1: Cartesian to Polar Conversion</h3>
         <p>Convert the following vector from Cartesian to polar form: \(\mathbf{V} = -3\mathbf{i} + 4\mathbf{j}\)</p>
-        <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
-        <div class="solution" id="solution1">
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div class="hidden" id="solution1">
           <p>The magnitude of the vector is:</p>
           <p>\(|\mathbf{V}| = \sqrt{(-3)^2 + 4^2} = \sqrt{9 + 16} = \sqrt{25} = 5\)</p>
           <p>The angle can be found using:</p>
@@ -154,12 +160,12 @@
           <p>Therefore, the polar form is \(\mathbf{V} = (5, 126.87°)\)</p>
         </div>
       </div>
-      
-      <div class="problem">
+
+      <div class="practice-problems">
         <h3>Problem 2: Vector Addition</h3>
         <p>Vector \(\mathbf{A}\) has a magnitude of 10 units and points in the direction of 30° from the positive x-axis. Vector \(\mathbf{B}\) has a magnitude of 15 units and points in the direction of 135° from the positive x-axis. Find the resultant vector \(\mathbf{R} = \mathbf{A} + \mathbf{B}\) in both Cartesian and polar form.</p>
-        <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
-        <div class="solution" id="solution2">
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div class="hidden" id="solution2">
           <p>First, convert both vectors to Cartesian form:</p>
           <p>\(\mathbf{A} = 10\cos(30°)\mathbf{i} + 10\sin(30°)\mathbf{j} = 8.66\mathbf{i} + 5\mathbf{j}\)</p>
           <p>\(\mathbf{B} = 15\cos(135°)\mathbf{i} + 15\sin(135°)\mathbf{j} = -10.61\mathbf{i} + 10.61\mathbf{j}\)</p>
@@ -172,8 +178,8 @@
           <p>Therefore, \(\mathbf{R} = -1.95\mathbf{i} + 15.61\mathbf{j} = (15.73, 97.1°)\)</p>
         </div>
       </div>
-      
-      <div class="problem">
+
+      <div class="practice-problems">
         <h3>Problem 3: Scalar Multiplication</h3>
         <p>Given vector \(\mathbf{V} = 4\mathbf{i} - 3\mathbf{j}\), find:</p>
         <ol type="a">
@@ -182,8 +188,8 @@
           <li>The vector \(-0.5\mathbf{V}\)</li>
           <li>The unit vector in the direction of \(\mathbf{V}\)</li>
         </ol>
-        <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
-        <div class="solution" id="solution3">
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div class="hidden" id="solution3">
           <p>a) Magnitude: \(|\mathbf{V}| = \sqrt{4^2 + (-3)^2} = \sqrt{16 + 9} = \sqrt{25} = 5\)</p>
           <p>Direction: \(\theta = \tan^{-1}((-3)/4) = \tan^{-1}(-0.75) = -36.9°\)</p>
           <p>Since the x-component is positive and the y-component is negative, the vector is in the fourth quadrant, so the angle is correct as is: \(\theta = -36.9° = 323.1°\) (if expressing in the 0-360° range)</p>
@@ -198,78 +204,56 @@
           <p>This has magnitude 1 and the same direction as \(\mathbf{V}\), which is \(-36.9°\)</p>
         </div>
       </div>
-    </section>
-    
-    <section id="quiz">
-      <h2>Self-Assessment Quiz</h2>
-      
+    </div>
+
+    <div class="content-section">
+      <h2>Interactive Quiz</h2>
+
       <div class="quiz-container">
         <div class="quiz-question">
-          <p><strong>Question 1:</strong> Which of the following statements about vector addition is FALSE?</p>
-          <form id="q1">
-            <input type="radio" id="q1a" name="q1" value="a">
-            <label for="q1a">a) Vector addition is commutative</label><br>
-            <input type="radio" id="q1b" name="q1" value="b">
-            <label for="q1b">b) Vector addition can be visualized using the parallelogram rule</label><br>
-            <input type="radio" id="q1c" name="q1" value="c">
-            <label for="q1c">c) The magnitude of the sum of two vectors equals the sum of their magnitudes</label><br>
-            <input type="radio" id="q1d" name="q1" value="d">
-            <label for="q1d">d) Vector addition can be performed by adding the corresponding components</label><br>
-            <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
-          </form>
-          <div id="q1-feedback" class="feedback"></div>
+          <h3>Question 1: Which of the following statements about vector addition is FALSE?</h3>
+          <div class="quiz-options">
+            <label><input type="radio" name="q1" value="a"> a) Vector addition is commutative</label>
+            <label><input type="radio" name="q1" value="b"> b) Vector addition can be visualized using the parallelogram rule</label>
+            <label><input type="radio" name="q1" value="c"> c) The magnitude of the sum of two vectors equals the sum of their magnitudes</label>
+            <label><input type="radio" name="q1" value="d"> d) Vector addition can be performed by adding the corresponding components</label>
+          </div>
         </div>
-        
+
         <div class="quiz-question">
-          <p><strong>Question 2:</strong> If \(\mathbf{A} = 3\mathbf{i} + 4\mathbf{j}\) and \(\mathbf{B} = -2\mathbf{i} + 5\mathbf{j}\), what is \(\mathbf{A} + \mathbf{B}\)?</p>
-          <form id="q2">
-            <input type="radio" id="q2a" name="q2" value="a">
-            <label for="q2a">a) \(\mathbf{i} + 9\mathbf{j}\)</label><br>
-            <input type="radio" id="q2b" name="q2" value="b">
-            <label for="q2b">b) \(5\mathbf{i} - \mathbf{j}\)</label><br>
-            <input type="radio" id="q2c" name="q2" value="c">
-            <label for="q2c">c) \(\mathbf{i} + \mathbf{j}\)</label><br>
-            <input type="radio" id="q2d" name="q2" value="d">
-            <label for="q2d">d) \(6\mathbf{i} + 20\mathbf{j}\)</label><br>
-            <button type="button" onclick="checkAnswer('q2', 'a')">Check Answer</button>
-          </form>
-          <div id="q2-feedback" class="feedback"></div>
+          <h3>Question 2: If \(\mathbf{A} = 3\mathbf{i} + 4\mathbf{j}\) and \(\mathbf{B} = -2\mathbf{i} + 5\mathbf{j}\), what is \(\mathbf{A} + \mathbf{B}\)?</h3>
+          <div class="quiz-options">
+            <label><input type="radio" name="q2" value="a"> a) \(\mathbf{i} + 9\mathbf{j}\)</label>
+            <label><input type="radio" name="q2" value="b"> b) \(5\mathbf{i} - \mathbf{j}\)</label>
+            <label><input type="radio" name="q2" value="c"> c) \(\mathbf{i} + \mathbf{j}\)</label>
+            <label><input type="radio" name="q2" value="d"> d) \(6\mathbf{i} + 20\mathbf{j}\)</label>
+          </div>
         </div>
-        
+
         <div class="quiz-question">
-          <p><strong>Question 3:</strong> A vector has a magnitude of 10 units and makes an angle of 60° with the positive x-axis. What are its Cartesian components?</p>
-          <form id="q3">
-            <input type="radio" id="q3a" name="q3" value="a">
-            <label for="q3a">a) \(5\mathbf{i} + 5\sqrt{3}\mathbf{j}\)</label><br>
-            <input type="radio" id="q3b" name="q3" value="b">
-            <label for="q3b">b) \(5\mathbf{i} + 5\mathbf{j}\)</label><br>
-            <input type="radio" id="q3c" name="q3" value="c">
-            <label for="q3c">c) \(5\sqrt{3}\mathbf{i} + 5\mathbf{j}\)</label><br>
-            <input type="radio" id="q3d" name="q3" value="d">
-            <label for="q3d">d) \(5\mathbf{i} - 5\sqrt{3}\mathbf{j}\)</label><br>
-            <button type="button" onclick="checkAnswer('q3', 'a')">Check Answer</button>
-          </form>
-          <div id="q3-feedback" class="feedback"></div>
+          <h3>Question 3: A vector has a magnitude of 10 units and makes an angle of 60° with the positive x-axis. What are its Cartesian components?</h3>
+          <div class="quiz-options">
+            <label><input type="radio" name="q3" value="a"> a) \(5\mathbf{i} + 5\sqrt{3}\mathbf{j}\)</label>
+            <label><input type="radio" name="q3" value="b"> b) \(5\mathbf{i} + 5\mathbf{j}\)</label>
+            <label><input type="radio" name="q3" value="c"> c) \(5\sqrt{3}\mathbf{i} + 5\mathbf{j}\)</label>
+            <label><input type="radio" name="q3" value="d"> d) \(5\mathbf{i} - 5\sqrt{3}\mathbf{j}\)</label>
+          </div>
         </div>
-        
+
         <div class="quiz-question">
-          <p><strong>Question 4:</strong> If vector \(\mathbf{V}\) has magnitude 6 and direction 30°, what is the effect of multiplying it by the scalar -2?</p>
-          <form id="q4">
-            <input type="radio" id="q4a" name="q4" value="a">
-            <label for="q4a">a) The magnitude becomes 12 and the direction remains 30°</label><br>
-            <input type="radio" id="q4b" name="q4" value="b">
-            <label for="q4b">b) The magnitude becomes 12 and the direction changes to 210°</label><br>
-            <input type="radio" id="q4c" name="q4" value="c">
-            <label for="q4c">c) The magnitude becomes 3 and the direction changes to 210°</label><br>
-            <input type="radio" id="q4d" name="q4" value="d">
-            <label for="q4d">d) The magnitude becomes -12 and the direction remains 30°</label><br>
-            <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-          </form>
-          <div id="q4-feedback" class="feedback"></div>
+          <h3>Question 4: If vector \(\mathbf{V}\) has magnitude 6 and direction 30°, what is the effect of multiplying it by the scalar -2?</h3>
+          <div class="quiz-options">
+            <label><input type="radio" name="q4" value="a"> a) The magnitude becomes 12 and the direction remains 30°</label>
+            <label><input type="radio" name="q4" value="b"> b) The magnitude becomes 12 and the direction changes to 210°</label>
+            <label><input type="radio" name="q4" value="c"> c) The magnitude becomes 3 and the direction changes to 210°</label>
+            <label><input type="radio" name="q4" value="d"> d) The magnitude becomes -12 and the direction remains 30°</label>
+          </div>
         </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results" class="hidden"></div>
       </div>
-    </section>
-  </main>
+    </div>
 
   <script>
     new p5(sketch1, 'VectorRepresentation');
@@ -277,102 +261,51 @@
     new p5(sketch3, 'Vector2Sum');
     new p5(sketch4, 'VectorTriangleRule');
     
-    // Functions for practice problems and quiz
+    // Toggle solution function
     function toggleSolution(id) {
       const solution = document.getElementById(id);
-      if (solution.style.display === "block") {
-        solution.style.display = "none";
+      if (solution.classList.contains('hidden')) {
+        solution.classList.remove('hidden');
+        solution.previousElementSibling.textContent = 'Hide Solution';
       } else {
-        solution.style.display = "block";
+        solution.classList.add('hidden');
+        solution.previousElementSibling.textContent = 'Show Solution';
       }
     }
-    
-    function checkAnswer(questionId, correctAnswer) {
-      const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-      const feedbackElement = document.getElementById(`${questionId}-feedback`);
-      
-      if (!selectedOption) {
-        feedbackElement.innerHTML = "Please select an answer.";
-        feedbackElement.className = "feedback";
-        return;
-      }
-      
-      if (selectedOption.value === correctAnswer) {
-        feedbackElement.innerHTML = "Correct! Well done.";
-        feedbackElement.className = "feedback correct";
-      } else {
-        feedbackElement.innerHTML = "Incorrect. Try again!";
-        feedbackElement.className = "feedback incorrect";
-      }
-    }
-  </script>
 
-<style>
-  .problem {
-    background-color: #f9f9f9;
-    border-left: 4px solid #ffd700;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 0 5px 5px 0;
-  }
-  
-  .solution-toggle {
-    color: #b38600;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: underline;
-    margin: 10px 0;
-  }
-  
-  .solution {
-    display: none;
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-  }
-  
-  .quiz-container {
-    margin-top: 20px;
-  }
-  
-  .quiz-question {
-    background-color: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border-left: 4px solid #ffb300;
-  }
-  
-  .quiz-question form {
-    margin: 10px 0;
-  }
-  
-  .quiz-question label {
-    display: inline-block;
-    margin: 5px 0;
-  }
-  
-  .quiz-question button {
-    margin-top: 10px;
-  }
-  
-  .feedback {
-    margin-top: 10px;
-    padding: 8px;
-    border-radius: 4px;
-  }
-  
-  .correct {
-    background-color: #d4edda;
-    color: #155724;
-  }
-  
-  .incorrect {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-</style>
+    // Quiz submission
+    document.getElementById('submit-quiz').addEventListener('click', function() {
+      const answers = {
+        q1: 'c',
+        q2: 'a',
+        q3: 'a',
+        q4: 'b'
+      };
+
+      let score = 0;
+      let feedback = '<h3>Quiz Results:</h3>';
+
+      for (let question in answers) {
+        const selected = document.querySelector(`input[name="${question}"]:checked`);
+        if (selected) {
+          if (selected.value === answers[question]) {
+            score++;
+            feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+          } else {
+            feedback += `<p>Question ${question.substring(1)}: Incorrect. ✗</p>`;
+          }
+        } else {
+          feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+        }
+      }
+
+      feedback += `<p><strong>Your score: ${score}/4</strong></p>`;
+
+      const resultsDiv = document.getElementById('quiz-results');
+      resultsDiv.innerHTML = feedback;
+      resultsDiv.classList.remove('hidden');
+    });
+  </script>
 </body>
 <footer>
   <script src="/assets/common/footer.js"></script>

@@ -4,11 +4,11 @@
     <title>Interactive 3DOFs Free Damped Vibration</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
+        /* Page-specific styles for 3DOFs layout */
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -19,26 +19,10 @@
             gap: 10px;
             margin-bottom: 10px;
         }
-        .control-group {
-            background-color: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-        }
         .control-group h3 {
             margin-top: 0;
             margin-bottom: 10px;
             font-size: 14px;
-        }
-        .slider-container {
-            margin-bottom: 5px;
-        }
-        .slider-container label {
-            display: inline-block;
-            width: 100%;
-            font-size: 12px;
-        }
-        .slider-container input {
-            width: 100%;
         }
         .value-display {
             display: inline-block;
@@ -50,18 +34,6 @@
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #45a049;
         }
         canvas {
             border: 1px solid #ddd;

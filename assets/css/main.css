@@ -1,3 +1,9 @@
+/* ============================================
+   Explorable Explanations - Main Stylesheet
+   Common styles for all pages
+   ============================================ */
+
+/* CSS Variables */
 :root {
     --primary-color: #ffd700;
     --secondary-color: #ffb300;
@@ -6,14 +12,19 @@
     --link-color: #cc9900;
     --link-hover-color: #1c01b8;
     --section-bg: white;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    --transition-speed: 0.3s;
 }
 
+/* Global Reset & Box-Sizing */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+/* Body & Layout */
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
@@ -24,38 +35,21 @@ body {
     background-color: var(--background-color);
 }
 
+/* Header */
 header {
     background-color: var(--primary-color);
     color: var(--text-color);
     text-align: center;
     padding: 1.5rem;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     margin-bottom: 20px;
 }
 
+/* Typography */
 h1 {
     font-size: 2.5em;
     font-variant: small-caps;
     margin-bottom: 10px;
-}
-
-.subtitle {
-    font-style: italic;
-    font-size: 1.2em;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.content-section, .simulation-section {
-    background-color: var(--section-bg);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
 }
 
 h2 {
@@ -66,8 +60,18 @@ h2 {
 }
 
 h3 {
-    color: #cc9900;
+    color: var(--text-color);
     margin: 15px 0 10px 0;
+}
+
+h4 {
+    color: #b38600;
+    margin: 10px 0;
+}
+
+.subtitle {
+    font-style: italic;
+    font-size: 1.2em;
 }
 
 p, ul, ol {
@@ -78,22 +82,45 @@ ul, ol {
     padding-left: 25px;
 }
 
-/* Fix for numbered lists in boxed areas */
-.key-point ol, .practice-problems ol {
-    padding-left: 25px;
-    margin-left: 15px;
+/* Links */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color var(--transition-speed);
 }
 
-.key-point li, .practice-problems li {
-    margin-bottom: 8px;
+a:hover, a:focus {
+    color: var(--link-hover-color);
+    text-decoration: underline;
 }
 
+/* Main Container & Grid */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* Content Sections */
+.content-section, .simulation-section {
+    background-color: var(--section-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 20px;
+}
+
+/* Special Content Boxes */
 .equation-box {
     background-color: #f9f9f9;
     border-left: 4px solid var(--primary-color);
     padding: 15px;
     margin: 15px 0;
     border-radius: 0 4px 4px 0;
+}
+
+.equation-box ol, .equation-box ul {
+    margin-bottom: 10px;
 }
 
 .key-point {
@@ -104,69 +131,13 @@ ul, ol {
     border-radius: 0 4px 4px 0;
 }
 
-#react-visualizer {
-    width: 100%;
-    padding: 20px;
-    background-color: var(--section-bg);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin: 20px auto;
+.key-point ol, .key-point li {
+    padding-left: 25px;
+    margin-left: 15px;
+    margin-bottom: 8px;
 }
 
-#sketch-holder {
-    width: 100%;
-    height: fit-content;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-}
-
-#button-container {
-    display: flex;
-    justify-content: center;
-    margin: 10px 0;
-    flex-wrap: wrap;
-}
-
-button {
-    background-color: var(--primary-color);
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: var(--secondary-color);
-}
-
-.interactive-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 15px 0;
-}
-
-.control-group {
-    display: flex;
-    flex-direction: column;
-    margin-right: 20px;
-}
-
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input[type="range"] {
-    width: 200px;
-}
-
+/* Practice Problems Section */
 .practice-problems {
     background-color: #e6f7ff;
     border-left: 4px solid #1890ff;
@@ -175,10 +146,18 @@ input[type="range"] {
     border-radius: 0 4px 4px 0;
 }
 
+.practice-problems ol, .practice-problems li {
+    padding-left: 25px;
+    margin-left: 15px;
+    margin-bottom: 8px;
+}
+
+/* Toggle Sections */
 .toggle-section {
     cursor: pointer;
     color: var(--link-color);
     font-weight: bold;
+    transition: color var(--transition-speed);
 }
 
 .toggle-section:hover {
@@ -190,18 +169,23 @@ input[type="range"] {
     display: none;
 }
 
+/* Quiz Sections */
 .quiz-container {
     background-color: #f0f8ff;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     padding: 20px;
     margin: 20px 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: var(--box-shadow);
 }
 
 .quiz-question {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid #ddd;
+}
+
+.quiz-question:last-of-type {
+    border-bottom: none;
 }
 
 .quiz-question h3 {
@@ -229,29 +213,14 @@ input[type="range"] {
 
 .quiz-options input {
     margin-right: 10px;
-}
-
-#submit-quiz {
-    background-color: var(--primary-color);
-    color: var(--text-color);
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#submit-quiz:hover {
-    background-color: var(--secondary-color);
 }
 
 #quiz-results {
     margin-top: 20px;
     padding: 15px;
     background-color: #f9f9f9;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     border-left: 4px solid var(--primary-color);
 }
 
@@ -259,6 +228,55 @@ input[type="range"] {
     margin: 5px 0;
 }
 
+/* Buttons */
+button, .control-button, #submit-quiz {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color var(--transition-speed);
+}
+
+button:hover, .control-button:hover, #submit-quiz:hover {
+    background-color: var(--secondary-color);
+}
+
+button:active, .control-button:active {
+    transform: scale(0.98);
+}
+
+#button-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+/* Canvas & Sketch Holders */
+#sketch-holder, #react-visualizer {
+    width: 100%;
+    height: fit-content;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    margin: 10px 0;
+}
+
+#react-visualizer {
+    padding: 20px;
+    background-color: var(--section-bg);
+    box-shadow: var(--box-shadow);
+    margin: 20px auto;
+}
+
+/* Tables */
 .equation-table {
     overflow-x: auto;
     margin: 20px 0;
@@ -291,141 +309,14 @@ input[type="range"] {
     background-color: #f1f1f1;
 }
 
+/* Footer */
 footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 15px;
     background-color: var(--primary-color);
     color: var(--text-color);
-    border-radius: 5px;
-}
-
-.back-link {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--link-color);
-    text-decoration: none;
-}
-
-.back-link:hover {
-    color: var(--link-hover-color);
-    text-decoration: underline;
-}
-
-/* Media Queries for Responsive Design */
-@media (max-width: 900px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
-    
-    h1 {
-        font-size: 2em;
-    }
-    
-    .equation-table {
-        font-size: 0.9em;
-    }
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-    
-    header {
-        padding: 1rem;
-    }
-    
-    h1 {
-        font-size: 1.8em;
-    }
-    
-    h2 {
-        font-size: 1.5em;
-    }
-    
-    h3 {
-        font-size: 1.2em;
-    }
-    
-    .content-section, .simulation-section {
-        padding: 15px;
-    }
-    
-    #sketch-holder {
-        height: 450px;
-    }
-    
-    .equation-box, .key-point, .practice-problems {
-        padding: 10px;
-    }
-    
-    button {
-        padding: 8px 15px;
-    }
-}
-
-@media (max-width: 576px) {
-    h1 {
-        font-size: 1.6em;
-    }
-    
-    #sketch-holder {
-        height: 350px;
-    }
-    
-    .quiz-options label {
-        padding: 6px;
-    }
-    
-    .equation-table td, .equation-table th {
-        padding: 8px 10px;
-    }
-    
-    .equation-table {
-        font-size: 0.8em;
-    }
-    
-    input[type="range"] {
-        width: 100%;
-    }
-    
-    footer {
-        padding: 10px;
-        font-size: 0.9em;
-    }
-}
-
-/* Additional improvements for very small screens */
-@media (max-width: 320px) {
-    body {
-        padding: 5px;
-    }
-    
-    header {
-        padding: 0.8rem;
-    }
-    
-    h1 {
-        font-size: 1.4em;
-    }
-    
-    #sketch-holder {
-        height: 300px;
-    }
-    
-    .content-section, .simulation-section {
-        padding: 10px;
-    }
-}
-/* Footer styling for Explorable Explanations website */
-footer {
-    background-color: #ffd700;
-    color: #333;
     text-align: center;
     padding: 15px;
     margin-top: 30px;
-    border-radius: 5px;
+    border-radius: var(--border-radius);
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -448,7 +339,7 @@ footer .footer-links {
 footer a {
     color: #cc9900;
     text-decoration: none;
-    transition: color 0.3s;
+    transition: color var(--transition-speed);
 }
 
 footer a:hover, footer a:focus {
@@ -460,9 +351,9 @@ footer .back-link {
     display: inline-block;
     margin-top: 10px;
     padding: 5px 10px;
-    background-color: #ffb300;
+    background-color: var(--secondary-color);
     border-radius: 3px;
-    color: #333;
+    color: var(--text-color);
     font-weight: bold;
 }
 
@@ -471,8 +362,108 @@ footer .back-link:hover {
     color: #fff;
 }
 
-@media screen and (max-width: 768px) {
+/* Responsive Design */
+@media (max-width: 900px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .equation-table {
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    h3 {
+        font-size: 1.2em;
+    }
+
+    .content-section, .simulation-section {
+        padding: 15px;
+    }
+
+    #sketch-holder {
+        height: 450px;
+    }
+
+    .equation-box, .key-point, .practice-problems {
+        padding: 10px;
+    }
+
+    button, .control-button {
+        padding: 8px 15px;
+    }
+
     footer {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.6em;
+    }
+
+    #sketch-holder {
+        height: 350px;
+    }
+
+    .quiz-options label {
+        padding: 6px;
+    }
+
+    .equation-table td, .equation-table th {
+        padding: 8px 10px;
+    }
+
+    .equation-table {
+        font-size: 0.8em;
+    }
+
+    footer {
+        padding: 10px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 320px) {
+    body {
+        padding: 5px;
+    }
+
+    header {
+        padding: 0.8rem;
+    }
+
+    h1 {
+        font-size: 1.4em;
+    }
+
+    #sketch-holder {
+        height: 300px;
+    }
+
+    .content-section, .simulation-section {
         padding: 10px;
     }
 }

@@ -10,16 +10,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
-    
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+
     <style>
-        .simulation-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
+        /* Page-specific styles for work and energy simulations */
         .sim-holder {
             width: 100%;
             min-height: 400px;
@@ -30,7 +24,7 @@
             margin: 10px 0;
             overflow: hidden;
         }
-        
+
         .energy-bars {
             display: flex;
             gap: 15px;
@@ -74,53 +68,6 @@
             margin-top: 5px;
             font-size: 0.85em;
             color: #555;
-        }
-        
-        .controls-panel {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        
-        .control-item {
-            display: flex;
-            flex-direction: column;
-            min-width: 200px;
-        }
-        
-        .control-item label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .control-item input[type="range"] {
-            width: 100%;
-        }
-        
-        .control-value {
-            text-align: center;
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        
-        @media (max-width: 768px) {
-            .sim-holder {
-                min-height: 300px;
-            }
-            
-            .energy-bars {
-                flex-direction: column;
-            }
-            
-            .energy-bar-wrapper {
-                height: 100px;
-            }
         }
     </style>
 </head>
