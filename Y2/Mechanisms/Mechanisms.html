@@ -683,7 +683,8 @@
 
             p.draw = function() {
                 p.background(245);
-                p.translate(canvasWidth * 0.25, canvasHeight * 0.6);
+                // Center the mechanism in the canvas
+                p.translate(canvasWidth * 0.4, canvasHeight * 0.5);
 
                 // Update animation if not paused
                 if (!isPaused) {
@@ -904,7 +905,8 @@ let slidercrankSketch = function(p) {
     
     p.draw = function() {
         p.background(245);
-        p.translate(canvasWidth * 0.33, canvasHeight * 0.5);
+        // Center the mechanism in the canvas
+        p.translate(canvasWidth * 0.25, canvasHeight * 0.5);
         
         const dt = 0.016; // ~60 fps timestep
 
@@ -1118,9 +1120,9 @@ let quickreturnSketch = function(p) {
             theta += omega * dt;
         }
 
-        // Crank origin (shifted right 50px)
-        const originX = canvasWidth * 0.28 + 50;
-        const originY = canvasHeight * 0.38;
+        // Crank origin - centered better to account for mechanism extent
+        const originX = canvasWidth * 0.22;
+        const originY = canvasHeight * 0.45;
 
         p.push();
         p.translate(originX, originY);
@@ -1198,19 +1200,25 @@ let quickreturnSketch = function(p) {
         p.pop(); // restore origin
 
         // --- Graph (slider vs θ) ---
-        let currentTheta = theta % (2*p.PI);
-        if (currentTheta < prevThetaCycle) {
-            graphData = []; // reset at full revolution
+        // Fix: Handle both forward and reverse rotation correctly
+        let normalizedTheta = ((theta % (2*p.PI)) + 2*p.PI) % (2*p.PI);
+
+        // Detect full revolution in either direction
+        if (omega > 0 && normalizedTheta < prevThetaCycle && prevThetaCycle - normalizedTheta > p.PI) {
+            graphData = []; // reset at full revolution (forward)
+        } else if (omega < 0 && normalizedTheta > prevThetaCycle && normalizedTheta - prevThetaCycle > p.PI) {
+            graphData = []; // reset at full revolution (backward)
         }
-        prevThetaCycle = currentTheta;
+        prevThetaCycle = normalizedTheta;
 
-        graphData.push({theta: currentTheta, pos: Sx});
-        if (graphData.length > 500) graphData.shift();
+        graphData.push({theta: normalizedTheta, pos: Sx, absTheta: theta});
+        if (graphData.length > 800) graphData.shift();
 
-        let gx = canvasWidth*0.65;
-        let gy = canvasHeight*0.15;
-        let gw = canvasWidth*0.3;
-        let gh = canvasHeight*0.35;
+        // Move graph to bottom right
+        let gw = canvasWidth*0.28;
+        let gh = canvasHeight*0.3;
+        let gx = canvasWidth - gw - 15;
+        let gy = canvasHeight - gh - 15;
 
         p.push();
         p.translate(gx, gy);
@@ -1256,14 +1264,25 @@ let quickreturnSketch = function(p) {
             }
         }
 
-        // --- Text readout ---
+        // --- Info box at top left ---
+        p.push();
+        p.translate(15, 15);
+        p.fill(230, 247, 255, 220);
+        p.stroke(100, 150, 200);
+        p.strokeWeight(1);
+        p.rect(0, 0, 180, 100, 5);
+
         p.noStroke();
         p.fill(0);
         p.textAlign(p.LEFT, p.TOP);
-        p.text(`θ = ${(theta % (2*p.PI)).toFixed(2)} rad`, 10, canvasHeight-80);
-        p.text(`ω = ${omega.toFixed(2)} rad/s`, 10, canvasHeight-60);
-        p.text(`α = ${alpha.toFixed(2)} rad/s²`, 10, canvasHeight-40);
-        p.text(`QRR ≈ ${QRR}`, 10, canvasHeight-20);
+        p.textSize(13);
+        p.text("Mechanism Info", 8, 8);
+        p.textSize(12);
+        p.text(`θ = ${(theta % (2*p.PI)).toFixed(2)} rad`, 8, 28);
+        p.text(`ω = ${omega.toFixed(2)} rad/s`, 8, 45);
+        p.text(`α = ${alpha.toFixed(2)} rad/s²`, 8, 62);
+        p.text(`QRR ≈ ${QRR}`, 8, 79);
+        p.pop();
     };
 
     // Controls (same IDs)

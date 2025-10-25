@@ -163,16 +163,16 @@ function initializeAngularSimulation() {
         }
 
         function drawInfoPanel() {
-            // Background panel
-            p.fill(0, 0, 0, 180);
+            // Background panel - made smaller and more transparent
+            p.fill(0, 0, 0, 100);
             p.noStroke();
-            p.rect(5, 5, 280, 140, 5);
-            
+            p.rect(5, 5, 250, 120, 5);
+
             // Text information
             p.fill(255);
             p.noStroke();
             p.textAlign(p.LEFT, p.TOP);
-            p.textSize(14);
+            p.textSize(11);
             p.text(`Angular Velocity: ${(angularVel * 60).toFixed(2)} rad/s`, 10, 10);
             p.text(`Moment of Inertia: ${momentOfInertia.toFixed(4)} kg·m²`, 10, 30);
             p.text(`Angular Momentum: 120 kg·m²/s`, 10, 50);

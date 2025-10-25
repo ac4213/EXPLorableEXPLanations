@@ -579,10 +579,17 @@ function initHaighDiagram() {
     const enduranceLimit = parseFloat(document.getElementById('endurance-limit-input').value);
     const pointMeanStress = parseFloat(document.getElementById('point-mean-stress').value);
     const pointStressAmplitude = parseFloat(document.getElementById('point-stress-amplitude').value);
-    
+
     const data = generateHaighDiagramData(ultimateStrength, yieldStrength, enduranceLimit);
-    
-    Plotly.newPlot('haigh-diagram', [{
+    const intercepts = calculateLoadLineIntercepts(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
+
+    // Calculate load line extending to plot boundary
+    const maxPlotX = ultimateStrength * 1.1;
+    const maxPlotY = Math.max(enduranceLimit, yieldStrength) * 1.1;
+    const slope = pointMeanStress > 0 ? pointStressAmplitude / pointMeanStress : 0;
+    const loadLineEndX = Math.min(maxPlotX, maxPlotY / slope);
+
+    const traces = [{
         x: data.goodman.x,
         y: data.goodman.y,
         type: 'scatter',
@@ -610,14 +617,77 @@ function initHaighDiagram() {
         mode: 'lines',
         line: { color: '#000000ff', width: 2, dash: 'dash' },
         name: 'Yield Line'
-    }, {
+    }];
+
+    // Add load line if point is not at origin
+    if (pointMeanStress > 0 || pointStressAmplitude > 0) {
+        traces.push({
+            x: [0, loadLineEndX],
+            y: [0, slope * loadLineEndX],
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#9933ff', width: 1.5 },
+            name: 'Load Line',
+            showlegend: true
+        });
+    }
+
+    // Add intercept markers
+    const interceptX = [];
+    const interceptY = [];
+    const interceptColors = [];
+    const interceptNames = [];
+
+    if (intercepts.goodman) {
+        interceptX.push(intercepts.goodman.x);
+        interceptY.push(intercepts.goodman.y);
+        interceptColors.push('#ff0000');
+        interceptNames.push('Goodman');
+    }
+    if (intercepts.gerber) {
+        interceptX.push(intercepts.gerber.x);
+        interceptY.push(intercepts.gerber.y);
+        interceptColors.push('#006e12');
+        interceptNames.push('Gerber');
+    }
+    if (intercepts.soderberg) {
+        interceptX.push(intercepts.soderberg.x);
+        interceptY.push(intercepts.soderberg.y);
+        interceptColors.push('#0099ff');
+        interceptNames.push('Soderberg');
+    }
+
+    if (interceptX.length > 0) {
+        traces.push({
+            x: interceptX,
+            y: interceptY,
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                symbol: 'x',
+                size: 12,
+                color: interceptColors,
+                line: { width: 2 }
+            },
+            name: 'Intercepts',
+            showlegend: false,
+            hovertemplate: interceptNames.map((name, i) =>
+                `${name} intercept<br>σₘ: ${interceptX[i].toFixed(1)} MPa<br>σₐ: ${interceptY[i].toFixed(1)} MPa<extra></extra>`
+            )
+        });
+    }
+
+    // Add assessment point last so it appears on top
+    traces.push({
         x: [pointMeanStress],
         y: [pointStressAmplitude],
         type: 'scatter',
         mode: 'markers',
         marker: { color: '#aa00aaff', size: 12 },
         name: 'Assessment Point'
-    }], {
+    });
+
+    Plotly.newPlot('haigh-diagram', traces, {
         title: { text: 'Haigh Diagram', font: { size: 16 }},
         xaxis: { title: 'Mean Stress (MPa)', range: [0, ultimateStrength * 1.1] },
         yaxis: { title: 'Stress Amplitude (MPa)', range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1] },
@@ -627,7 +697,7 @@ function initHaighDiagram() {
     }, {
         responsive: true
     });
-    
+
     updateSafetyFactors(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
 }
 
@@ -637,10 +707,17 @@ function updateHaighDiagram() {
     const enduranceLimit = parseFloat(document.getElementById('endurance-limit-input').value);
     const pointMeanStress = parseFloat(document.getElementById('point-mean-stress').value);
     const pointStressAmplitude = parseFloat(document.getElementById('point-stress-amplitude').value);
-    
+
     const data = generateHaighDiagramData(ultimateStrength, yieldStrength, enduranceLimit);
-    
-    Plotly.react('haigh-diagram', [{
+    const intercepts = calculateLoadLineIntercepts(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
+
+    // Calculate load line extending to plot boundary
+    const maxPlotX = ultimateStrength * 1.1;
+    const maxPlotY = Math.max(enduranceLimit, yieldStrength) * 1.1;
+    const slope = pointMeanStress > 0 ? pointStressAmplitude / pointMeanStress : 0;
+    const loadLineEndX = Math.min(maxPlotX, maxPlotY / slope);
+
+    const traces = [{
         x: data.goodman.x,
         y: data.goodman.y,
         type: 'scatter',
@@ -668,14 +745,77 @@ function updateHaighDiagram() {
         mode: 'lines',
         line: { color: '#000000ff', width: 2, dash: 'dash' },
         name: 'Yield Line'
-    }, {
+    }];
+
+    // Add load line if point is not at origin
+    if (pointMeanStress > 0 || pointStressAmplitude > 0) {
+        traces.push({
+            x: [0, loadLineEndX],
+            y: [0, slope * loadLineEndX],
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#9933ff', width: 1.5 },
+            name: 'Load Line',
+            showlegend: true
+        });
+    }
+
+    // Add intercept markers
+    const interceptX = [];
+    const interceptY = [];
+    const interceptColors = [];
+    const interceptNames = [];
+
+    if (intercepts.goodman) {
+        interceptX.push(intercepts.goodman.x);
+        interceptY.push(intercepts.goodman.y);
+        interceptColors.push('#ff0000');
+        interceptNames.push('Goodman');
+    }
+    if (intercepts.gerber) {
+        interceptX.push(intercepts.gerber.x);
+        interceptY.push(intercepts.gerber.y);
+        interceptColors.push('#006e12');
+        interceptNames.push('Gerber');
+    }
+    if (intercepts.soderberg) {
+        interceptX.push(intercepts.soderberg.x);
+        interceptY.push(intercepts.soderberg.y);
+        interceptColors.push('#0099ff');
+        interceptNames.push('Soderberg');
+    }
+
+    if (interceptX.length > 0) {
+        traces.push({
+            x: interceptX,
+            y: interceptY,
+            type: 'scatter',
+            mode: 'markers',
+            marker: {
+                symbol: 'x',
+                size: 12,
+                color: interceptColors,
+                line: { width: 2 }
+            },
+            name: 'Intercepts',
+            showlegend: false,
+            hovertemplate: interceptNames.map((name, i) =>
+                `${name} intercept<br>σₘ: ${interceptX[i].toFixed(1)} MPa<br>σₐ: ${interceptY[i].toFixed(1)} MPa<extra></extra>`
+            )
+        });
+    }
+
+    // Add assessment point last so it appears on top
+    traces.push({
         x: [pointMeanStress],
         y: [pointStressAmplitude],
         type: 'scatter',
         mode: 'markers',
         marker: { color: '#aa00aaff', size: 12 },
         name: 'Assessment Point'
-    }], {
+    });
+
+    Plotly.react('haigh-diagram', traces, {
         title: { text: 'Haigh Diagram', font: { size: 16 }},
         xaxis: { title: 'Mean Stress (MPa)', range: [0, ultimateStrength * 1.1] },
         yaxis: { title: 'Stress Amplitude (MPa)', range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1] },
@@ -683,7 +823,7 @@ function updateHaighDiagram() {
         plot_bgcolor: 'white',
         margin: { l: 60, r: 40, t: 50, b: 60 }
     });
-    
+
     updateSafetyFactors(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
 }
 
@@ -749,6 +889,63 @@ function calculateGerberSF(sm, sa, Se, Sut) {
 function calculateSoderbergSF(sm, sa, Se, Sy) {
     if (sa === 0 && sm === 0) return Infinity;
     return 1 / (sa/Se + sm/Sy);
+}
+
+// Calculate intercepts of load line with criterion lines
+function calculateLoadLineIntercepts(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit) {
+    const intercepts = {
+        goodman: null,
+        gerber: null,
+        soderberg: null
+    };
+
+    // If point is at origin, no intercepts
+    if (pointMeanStress === 0 && pointStressAmplitude === 0) {
+        return intercepts;
+    }
+
+    // Load line slope: m = σ_a / σ_m
+    const slope = pointStressAmplitude / pointMeanStress;
+
+    // Goodman intercept: σ_a = S_e * (1 - σ_m/S_ut) and σ_a = slope * σ_m
+    // slope * σ_m = S_e * (1 - σ_m/S_ut)
+    // slope * σ_m = S_e - (S_e/S_ut) * σ_m
+    // σ_m * (slope + S_e/S_ut) = S_e
+    // σ_m = S_e / (slope + S_e/S_ut)
+    const sm_goodman = enduranceLimit / (slope + enduranceLimit/ultimateStrength);
+    const sa_goodman = slope * sm_goodman;
+    if (sm_goodman >= 0 && sm_goodman <= ultimateStrength && sa_goodman >= 0) {
+        intercepts.goodman = { x: sm_goodman, y: sa_goodman };
+    }
+
+    // Gerber intercept: σ_a = S_e * (1 - (σ_m/S_ut)²) and σ_a = slope * σ_m
+    // slope * σ_m = S_e * (1 - (σ_m/S_ut)²)
+    // slope * σ_m = S_e - S_e * (σ_m²/S_ut²)
+    // S_e * (σ_m²/S_ut²) + slope * σ_m - S_e = 0
+    // Quadratic: a*x² + b*x + c = 0 where x = σ_m
+    const a = enduranceLimit / (ultimateStrength * ultimateStrength);
+    const b = slope;
+    const c = -enduranceLimit;
+    const discriminant = b*b - 4*a*c;
+    if (discriminant >= 0) {
+        const sm_gerber = (-b + Math.sqrt(discriminant)) / (2*a);
+        const sa_gerber = slope * sm_gerber;
+        if (sm_gerber >= 0 && sm_gerber <= ultimateStrength && sa_gerber >= 0) {
+            intercepts.gerber = { x: sm_gerber, y: sa_gerber };
+        }
+    }
+
+    // Soderberg intercept: σ_a = S_e * (1 - σ_m/S_y) and σ_a = slope * σ_m
+    // slope * σ_m = S_e * (1 - σ_m/S_y)
+    // slope * σ_m = S_e - (S_e/S_y) * σ_m
+    // σ_m * (slope + S_e/S_y) = S_e
+    const sm_soderberg = enduranceLimit / (slope + enduranceLimit/yieldStrength);
+    const sa_soderberg = slope * sm_soderberg;
+    if (sm_soderberg >= 0 && sm_soderberg <= yieldStrength && sa_soderberg >= 0) {
+        intercepts.soderberg = { x: sm_soderberg, y: sa_soderberg };
+    }
+
+    return intercepts;
 }
 
 function setupHaighDiagramControls() {

@@ -26,6 +26,7 @@ const STRESS_ARROW_SCALE = 6.0; // ← master scale for ALL stress arrows (norma
 // ------------------------------
 let cube;
 let angle = 0;
+let autoRotate = true; // control autorotation
 let showPrincipal = false;
 let showFailure   = false;
 let showDeformation = true; // controlled by #show-deformation if present
@@ -83,8 +84,11 @@ function draw() {
   if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     rotateY(map(mouseX, 0, width, -PI, PI));
     rotateX(map(mouseY, 0, height, PI, -PI));
-  } else {
+  } else if (autoRotate) {
     angle += 0.01;
+    rotateY(angle);
+    rotateX(sin(angle * 0.5) * 0.5);
+  } else {
     rotateY(angle);
     rotateX(sin(angle * 0.5) * 0.5);
   }
@@ -408,6 +412,14 @@ function setupControls() {
     resetBtn.addEventListener('click', () => { angle = 0; });
   }
 
+  const rotationBtn = document.getElementById('toggle-rotation');
+  if (rotationBtn) {
+    rotationBtn.addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      rotationBtn.textContent = autoRotate ? 'Stop Rotation' : 'Start Rotation';
+    });
+  }
+
   const principalBtn = document.getElementById('toggle-principal');
   if (principalBtn) {
     principalBtn.addEventListener('click', () => {
@@ -537,16 +549,27 @@ function updateDisplay() {
   // Principal stresses
   const principalElement = document.getElementById('principal-stresses');
   if (principalElement) {
-    principalElement.innerHTML = `<p><strong>σ₁:</strong> ${principalStresses.s1.toFixed(1)} MPa</p>
-<p><strong>σ₂:</strong> ${principalStresses.s2.toFixed(1)} MPa</p>
-<p><strong>σ₃:</strong> ${principalStresses.s3.toFixed(1)} MPa</p>`;
+    principalElement.innerHTML = `<p style="margin: 3px 0;"><strong>σ₁:</strong> ${principalStresses.s1.toFixed(1)} MPa</p>
+<p style="margin: 3px 0;"><strong>σ₂:</strong> ${principalStresses.s2.toFixed(1)} MPa</p>
+<p style="margin: 3px 0;"><strong>σ₃:</strong> ${principalStresses.s3.toFixed(1)} MPa</p>`;
+  }
+
+  // Principal directions
+  const directionsElement = document.getElementById('principal-directions');
+  if (directionsElement && principalStresses.v1 && principalStresses.v2 && principalStresses.v3) {
+    const v1 = principalStresses.v1;
+    const v2 = principalStresses.v2;
+    const v3 = principalStresses.v3;
+    directionsElement.innerHTML = `[${v1[0].toFixed(3).padStart(7)} ${v1[1].toFixed(3).padStart(7)} ${v1[2].toFixed(3).padStart(7)}]
+[${v2[0].toFixed(3).padStart(7)} ${v2[1].toFixed(3).padStart(7)} ${v2[2].toFixed(3).padStart(7)}]
+[${v3[0].toFixed(3).padStart(7)} ${v3[1].toFixed(3).padStart(7)} ${v3[2].toFixed(3).padStart(7)}]`;
   }
 
   // Failure criteria
   const failureElement = document.getElementById('failure-criteria');
   if (failureElement) {
-    failureElement.innerHTML = `<p><strong>Tresca:</strong> ${failureCriteria.tresca.value.toFixed(1)} MPa - <span class="${failureCriteria.tresca.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.tresca.status}</span></p>
-<p><strong>Von Mises:</strong> ${failureCriteria.vonMises.value.toFixed(1)} MPa - <span class="${failureCriteria.vonMises.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.vonMises.status}</span></p>`;
+    failureElement.innerHTML = `<p style="margin: 5px 0;"><strong>Tresca:</strong> ${failureCriteria.tresca.value.toFixed(1)} MPa - <span class="${failureCriteria.tresca.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.tresca.status}</span></p>
+<p style="margin: 5px 0;"><strong>Von Mises:</strong> ${failureCriteria.vonMises.value.toFixed(1)} MPa - <span class="${failureCriteria.vonMises.status === 'Safe' ? 'safe' : 'fail'}">${failureCriteria.vonMises.status}</span></p>`;
   }
 
   // Mohr's circles

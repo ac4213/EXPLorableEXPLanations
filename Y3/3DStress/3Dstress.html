@@ -158,35 +158,39 @@
             <div class="control-panel">
                 <div class="control-group">
                     <h3>Stress Components (MPa)</h3>
-                    <div class="slider-container">
-                        <label for="sigma-xx">σ<sub>xx</sub>:</label>
-                        <input type="range" id="sigma-xx" min="-100" max="100" value="50" class="slider">
-                        <span id="sigma-xx-value">50</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px;">
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="sigma-xx" style="display: block; margin-bottom: 5px;">σ<sub>xx</sub>:</label>
+                            <input type="range" id="sigma-xx" min="-100" max="100" value="50" class="slider" style="width: 100%;">
+                            <span id="sigma-xx-value" style="display: block; text-align: center; margin-top: 3px;">50</span>
+                        </div>
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="sigma-yy" style="display: block; margin-bottom: 5px;">σ<sub>yy</sub>:</label>
+                            <input type="range" id="sigma-yy" min="-100" max="100" value="30" class="slider" style="width: 100%;">
+                            <span id="sigma-yy-value" style="display: block; text-align: center; margin-top: 3px;">30</span>
+                        </div>
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="sigma-zz" style="display: block; margin-bottom: 5px;">σ<sub>zz</sub>:</label>
+                            <input type="range" id="sigma-zz" min="-100" max="100" value="10" class="slider" style="width: 100%;">
+                            <span id="sigma-zz-value" style="display: block; text-align: center; margin-top: 3px;">10</span>
+                        </div>
                     </div>
-                    <div class="slider-container">
-                        <label for="sigma-yy">σ<sub>yy</sub>:</label>
-                        <input type="range" id="sigma-yy" min="-100" max="100" value="30" class="slider">
-                        <span id="sigma-yy-value">30</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="sigma-zz">σ<sub>zz</sub>:</label>
-                        <input type="range" id="sigma-zz" min="-100" max="100" value="10" class="slider">
-                        <span id="sigma-zz-value">10</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="tau-xy">τ<sub>xy</sub>:</label>
-                        <input type="range" id="tau-xy" min="-50" max="50" value="15" class="slider">
-                        <span id="tau-xy-value">15</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="tau-yz">τ<sub>yz</sub>:</label>
-                        <input type="range" id="tau-yz" min="-50" max="50" value="5" class="slider">
-                        <span id="tau-yz-value">5</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="tau-xz">τ<sub>xz</sub>:</label>
-                        <input type="range" id="tau-xz" min="-50" max="50" value="10" class="slider">
-                        <span id="tau-xz-value">10</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="tau-xy" style="display: block; margin-bottom: 5px;">τ<sub>xy</sub>:</label>
+                            <input type="range" id="tau-xy" min="-50" max="50" value="15" class="slider" style="width: 100%;">
+                            <span id="tau-xy-value" style="display: block; text-align: center; margin-top: 3px;">15</span>
+                        </div>
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="tau-yz" style="display: block; margin-bottom: 5px;">τ<sub>yz</sub>:</label>
+                            <input type="range" id="tau-yz" min="-50" max="50" value="5" class="slider" style="width: 100%;">
+                            <span id="tau-yz-value" style="display: block; text-align: center; margin-top: 3px;">5</span>
+                        </div>
+                        <div class="slider-container" style="margin: 0;">
+                            <label for="tau-xz" style="display: block; margin-bottom: 5px;">τ<sub>xz</sub>:</label>
+                            <input type="range" id="tau-xz" min="-50" max="50" value="10" class="slider" style="width: 100%;">
+                            <span id="tau-xz-value" style="display: block; text-align: center; margin-top: 3px;">10</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -194,6 +198,7 @@
                     <h3>View Controls</h3>
                     <div class="button-container">
                         <button id="reset-view">Reset View</button>
+                        <button id="toggle-rotation">Stop Rotation</button>
                         <button id="toggle-principal">Show Principal Stresses</button>
                         <div class="checkbox-container">
                         <label><input type="checkbox" id="show-deformation" checked> Show deformation</label>
@@ -205,23 +210,26 @@
 
         <div class="results-section">
             <h2>Calculation Results</h2>
-            <div class="result-panels" style="grid-template-columns:1fr">
-                <div class="result-panel">
-                    <h3>Stress Tensor</h3>
-                    <div id="stress-matrix" class="matrix"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="result-panel" style="background-color: #e6f7ff; border-left: 4px solid #1890ff;">
+                    <h3 style="color: #1890ff; margin-top: 0;">Stress State & Principal Analysis</h3>
+                    <h4 style="margin-top: 15px; margin-bottom: 8px; font-size: 14px;">Stress Tensor (MPa)</h4>
+                    <div id="stress-matrix" class="matrix" style="font-size: 12px;"></div>
+                    <h4 style="margin-top: 15px; margin-bottom: 8px; font-size: 14px;">Principal Stresses</h4>
+                    <div id="principal-stresses" style="font-size: 13px;"></div>
+                    <h4 style="margin-top: 15px; margin-bottom: 8px; font-size: 14px;">Principal Directions</h4>
+                    <div id="principal-directions" class="matrix" style="font-size: 12px;"></div>
                 </div>
-                <div class="result-panel">
-                    <h3>Principal Stresses</h3>
-                    <div id="principal-stresses"></div>
-                </div>
-                <div class="result-panel">
-                    <h3>Equivalent Failure Stress (σ_Y=110 MPa)</h3>
-                    <div id="failure-criteria"></div>
-                </div>
-            </div>
-            <div class="visualisation-panels">
-                <div id="mohr-circle-3d" class="plot-container">
-                    <!-- 3D Mohr's Circle plot will go here -->
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div class="result-panel" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #b38600; margin-top: 0;">Equivalent Failure Stresses (σ_Y=110 MPa)</h3>
+                        <div id="failure-criteria" style="font-size: 13px;"></div>
+                    </div>
+                    <div class="plot-container" style="flex-grow: 1;">
+                        <div id="mohr-circle-3d" style="height: 100%;">
+                            <!-- 3D Mohr's Circle plot will go here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

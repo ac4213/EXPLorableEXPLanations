@@ -14,9 +14,11 @@
 
   <style>
     /* Page-specific styles for plasticity simulations */
-    .stress-stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:15px 0}
-    .stage-card{background:#f9f9f9;border:2px solid #ddd;border-radius:5px;padding:10px;text-align:center;transition:.3s}
+    .stress-stages{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:15px 0}
+    .stage-card{background:#f9f9f9;border:2px solid #ddd;border-radius:5px;padding:8px 5px;text-align:center;transition:.3s;font-size:12px;}
     .stage-card.active{background:#fff3cd;border-color:#ffc107;font-weight:700}
+    .stage-card strong{display:block;margin-bottom:3px;}
+    .stage-card p{margin:0;font-size:11px;}
     .simulation-title{background:var(--primary-color);color:var(--text-color);padding:10px;margin:-20px -20px 20px;border-radius:8px 8px 0 0;text-align:center;font-weight:700}
     .value-display{display:inline-block;min-width:50px;padding:4px 8px;background:#fff;border:1px solid #ddd;border-radius:3px;text-align:center;font-weight:700;color:#cc9900}
     .info-panel{background:#e6f7ff;border-left:4px solid #1890ff;padding:15px;margin:15px 0;border-radius:0 4px 4px 0}
@@ -74,14 +76,14 @@
         </select>
       </div>
       <div class="control-group">
-        <label>Bending Moment (kN·m):</label>
-        <input type="range" id="momentSlider1" min="0" max="300" value="0" step="1"/>
-        <span class="value-display" id="momentValue1">0</span>
-      </div>
-      <div class="control-group">
         <label>Yield Stress (MPa):</label>
         <input type="range" id="yieldStress1" min="200" max="500" value="250" step="10"/>
         <span class="value-display" id="yieldValue1">250</span>
+      </div>
+      <div class="control-group">
+        <label>Bending Moment (kN·m):</label>
+        <input type="range" id="momentSlider1" min="0" max="300" value="0" step="1"/>
+        <span class="value-display" id="momentValue1">0</span>
       </div>
       <button id="resetBtn1">Reset</button>
       <div class="legend">
@@ -132,11 +134,6 @@
 
     <div class="controls">
       <div class="control-group">
-        <label>Applied Moment (kN·m):</label>
-        <input type="range" id="momentSlider2" min="0" max="300" value="0" step="1" disabled/>
-        <span class="value-display" id="momentValue2">0</span>
-      </div>
-      <div class="control-group">
         <label>Fibre Position (y/h):</label>
         <input type="range" id="fibrePosition" min="-1" max="1" value="0.5" step="0.05"/>
         <span class="value-display" id="fibreValue">0.50</span>
@@ -146,16 +143,21 @@
         <button id="unloadBtn" disabled>Unload to 0</button>
         <button id="resetBtn2">Reset</button>
       </div>
+      <div class="control-group">
+        <label>Applied Moment (kN·m):</label>
+        <input type="range" id="momentSlider2" min="0" max="300" value="0" step="1" disabled/>
+        <span class="value-display" id="momentValue2">0</span>
+      </div>
       <div class="legend">
         <span class="chip-blue">Current stress (loading)</span>
         <span class="chip-red">Residual (after unload)</span>
       </div>
     </div>
 
-    <div class="info-panel">
-      <p><strong>Loading State:</strong> <span id="loadingState">Unloaded</span></p>
-      <p><strong>Maximum Moment Reached:</strong> <span id="maxMoment">0</span> kN·m</p>
-      <p><strong>Residual Stress at Selected Fibre:</strong> <span id="residualStress">0</span> MPa</p>
+    <div class="info-panel" style="display:flex; flex-wrap:wrap; gap:20px; justify-content:space-between;">
+      <p style="margin:5px 0;"><strong>Loading State:</strong> <span id="loadingState">Unloaded</span></p>
+      <p style="margin:5px 0;"><strong>Maximum Moment:</strong> <span id="maxMoment">0</span> kN·m</p>
+      <p style="margin:5px 0;"><strong>Residual Stress:</strong> <span id="residualStress">0</span> MPa</p>
     </div>
 
     <div id="sketch-holder-2"></div>
@@ -417,26 +419,47 @@ function createSimulation1(){
     };
 
     function drawPlasticBands(sol){
-      // shade plastic regions as horizontal red bands over the section area
+      // shade plastic regions as horizontal red bands within the actual section bounds
       if(sol.stage==='elastic') return;
       const x0=220, pixPerMm=300/geom.H;
-      const bandX = 170; // half width of overlay band (covers the section graphics)
       const yNA = sol.stage==='plastic' ? geom.y_pna : sol.y0;
       const c   = sol.c || 0;
 
-      const yTopBand = (Math.min(geom.H, yNA + c) - geom.H/2)*pixPerMm;
-      const yTopEnd  = (geom.H/2)*pixPerMm;
-      const yBotBand = (-geom.H/2)*pixPerMm;
-      const yBotEnd  = (Math.max(0, yNA - c) - geom.H/2)*pixPerMm;
+      const yTopBand = Math.min(geom.H, yNA + c);
+      const yTopEnd  = geom.H;
+      const yBotBand = 0;
+      const yBotEnd  = Math.max(0, yNA - c);
 
       p.push();
       p.translate(x0, HEIGHT/2);
       p.noStroke();
       p.fill(231,76,60,70); // translucent red
-      // top band
-      if(yTopBand < yTopEnd) p.rect(-bandX, yTopBand, 2*bandX, yTopEnd - yTopBand);
-      // bottom band
-      if(yBotBand < yBotEnd) p.rect(-bandX, yBotBand, 2*bandX, yBotEnd - yBotBand);
+
+      // Draw top plastic band (line by line to respect section width)
+      if(yTopBand < yTopEnd) {
+        const step = 0.5; // mm resolution for shading
+        for(let y = yTopBand; y < yTopEnd; y += step) {
+          const width = geom.widthAtY(y);
+          if(width > 0) {
+            const w = Math.min(260, width*pixPerMm);
+            const yPix = (y - geom.H/2)*pixPerMm;
+            p.rect(-w/2, yPix, w, step*pixPerMm);
+          }
+        }
+      }
+
+      // Draw bottom plastic band (line by line to respect section width)
+      if(yBotBand < yBotEnd) {
+        const step = 0.5; // mm resolution for shading
+        for(let y = yBotBand; y < yBotEnd; y += step) {
+          const width = geom.widthAtY(y);
+          if(width > 0) {
+            const w = Math.min(260, width*pixPerMm);
+            const yPix = (y - geom.H/2)*pixPerMm;
+            p.rect(-w/2, yPix, w, step*pixPerMm);
+          }
+        }
+      }
       p.pop();
     }
 

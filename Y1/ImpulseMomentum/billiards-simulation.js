@@ -14,7 +14,7 @@ function initializeBilliardsSimulation() {
         let pixelsPerMeter = 40; // Scale factor
         let isRunning = false;
         let hasCollided = false;
-        let timeScale = 0.3; // Slow down factor for animation
+        let timeScale = 0.15; // Slow down factor for animation (15% speed)
         
         // Initial conditions
         let whiteYPos = 200;
@@ -335,12 +335,12 @@ function initializeBilliardsSimulation() {
             p.stroke(0);
             p.strokeWeight(1);
             p.textAlign(p.LEFT, p.TOP);
-            p.textSize(14);
-            
-            // Background for text
-            p.fill(0, 0, 0, 180);
+            p.textSize(11);
+
+            // Background for text - made smaller and more transparent
+            p.fill(0, 0, 0, 100);
             p.noStroke();
-            p.rect(5, 5, 380, 200, 5);
+            p.rect(5, 5, 290, 165, 5);
             
             p.fill(255);
             p.text('Initial Conditions:', 10, 10);
@@ -370,9 +370,9 @@ function initializeBilliardsSimulation() {
                                0.5 * blueBall.mass * blueBall.vel.magSq();
             kineticEnergy = kineticEnergy / (pixelsPerMeter * pixelsPerMeter);
             
-            p.fill(0, 0, 0, 180);
+            p.fill(0, 0, 0, 100);
             p.noStroke();
-            p.rect(tableWidth - 255, 5, 250, 100, 5);
+            p.rect(tableWidth - 220, 5, 215, 90, 5);
             
             p.fill(255);
             p.textAlign(p.RIGHT, p.TOP);

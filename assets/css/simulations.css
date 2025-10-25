@@ -173,7 +173,7 @@ label {
 
 .simulation-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr); /* 2x2 grid for large screens */
     gap: 15px;
     margin-bottom: 20px;
 }
@@ -381,37 +381,10 @@ img, svg, video, canvas, audio, iframe, embed, object {
 }
 
 /* Responsive Design for Simulations */
-/* Tablet breakpoint - optimize for iPad and similar devices */
-@media (max-width: 1024px) {
-    .simulation-grid {
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-
-    /* Make canvas containers more flexible */
-    div[id*="sketch"],
-    div[id*="view"],
-    div[id*="canvas"] {
-        min-height: 250px;
-    }
-
-    /* Adjust control panel spacing */
-    .control-panel {
-        padding: 18px;
-    }
-
-    .control-group {
-        margin-right: 15px;
-    }
-
-    /* Reduce min-width for control columns on tablets */
-    .control-column {
-        min-width: 200px;
-    }
-}
-
+/* Single column layout for small screens (tablets and phones) */
 @media (max-width: 900px) {
     .simulation-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Single column for small screens */
     }
 
     .control-row {

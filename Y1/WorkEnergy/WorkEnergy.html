@@ -628,7 +628,82 @@ let slideSketch = function(p) {
     p.line(beadXY.x - 30, beadXY.y, beadXY.x + 30, beadXY.y);
 
     p.drawingContext.setLineDash([]);
+
+    // Draw energy bars
+    drawEnergyBars(KE, PE, energyLost_J, initialEnergy_J);
   };
+
+  // --- Energy bars drawing function ---
+  function drawEnergyBars(ke, pe, lost, initial) {
+    // Energy bar dimensions
+    let barX = 600;
+    let barY = 120;
+    let barWidth = 40;
+    let barHeight = 180;
+    let barSpacing = 60;
+
+    // Background for bars
+    p.fill(240);
+    p.noStroke();
+    p.rect(barX - 20, barY - 40, barWidth * 3 + barSpacing * 2 + 40, barHeight + 100);
+
+    // Title
+    p.fill(0);
+    p.textAlign(p.CENTER);
+    p.textSize(12);
+    p.text('Energy Distribution', barX + barWidth * 1.5 + barSpacing, barY - 20);
+
+    // Calculate percentages
+    let pePercent = initial > 0 ? (pe / initial) * 100 : 0;
+    let kePercent = initial > 0 ? (ke / initial) * 100 : 0;
+    let lostPercent = initial > 0 ? (lost / initial) * 100 : 0;
+
+    // PE Bar
+    p.fill(200);
+    p.stroke(50);
+    p.strokeWeight(2);
+    p.rect(barX, barY, barWidth, barHeight);
+    p.fill(33, 150, 243);
+    p.noStroke();
+    let peHeight = (pePercent / 100) * barHeight;
+    p.rect(barX, barY + barHeight - peHeight, barWidth, peHeight);
+
+    // KE Bar
+    p.fill(200);
+    p.stroke(50);
+    p.strokeWeight(2);
+    p.rect(barX + barSpacing, barY, barWidth, barHeight);
+    p.fill(76, 175, 80);
+    p.noStroke();
+    let keHeight = (kePercent / 100) * barHeight;
+    p.rect(barX + barSpacing, barY + barHeight - keHeight, barWidth, keHeight);
+
+    // Lost Energy Bar
+    p.fill(200);
+    p.stroke(50);
+    p.strokeWeight(2);
+    p.rect(barX + barSpacing * 2, barY, barWidth, barHeight);
+    p.fill(255, 152, 0);
+    p.noStroke();
+    let lostHeight = (lostPercent / 100) * barHeight;
+    p.rect(barX + barSpacing * 2, barY + barHeight - lostHeight, barWidth, lostHeight);
+
+    // Labels
+    p.fill(0);
+    p.textAlign(p.CENTER);
+    p.textSize(10);
+    p.text('PE', barX + barWidth/2, barY + barHeight + 15);
+    p.text(`${pe.toFixed(1)} J`, barX + barWidth/2, barY + barHeight + 28);
+    p.text(`${pePercent.toFixed(0)}%`, barX + barWidth/2, barY + barHeight + 41);
+
+    p.text('KE', barX + barSpacing + barWidth/2, barY + barHeight + 15);
+    p.text(`${ke.toFixed(1)} J`, barX + barSpacing + barWidth/2, barY + barHeight + 28);
+    p.text(`${kePercent.toFixed(0)}%`, barX + barSpacing + barWidth/2, barY + barHeight + 41);
+
+    p.text('Lost', barX + barSpacing * 2 + barWidth/2, barY + barHeight + 15);
+    p.text(`${lost.toFixed(1)} J`, barX + barSpacing * 2 + barWidth/2, barY + barHeight + 28);
+    p.text(`${lostPercent.toFixed(0)}%`, barX + barSpacing * 2 + barWidth/2, barY + barHeight + 41);
+  }
 
   // --- Controls wiring (keep existing element IDs) ---
 

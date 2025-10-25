@@ -496,6 +496,8 @@ const simpleGearSimulation = function(p) {
 
     function updateSimpleGearInfo(ratio, speed, hasIdler) {
         document.getElementById('gear-ratio-simple').textContent = ratio.toFixed(2);
+        // Unity numerator format: 1:X
+        document.getElementById('gear-ratio-simple-unity').textContent = "1:" + ratio.toFixed(2);
         document.getElementById('output-speed-simple').textContent = (speed / ratio).toFixed(2) + " RPM";
         document.getElementById('output-direction-simple').textContent =
             hasIdler ? "Same as driver" : "Opposite to driver";
@@ -703,8 +705,11 @@ const compoundGearSimulation = function(p) {
 
     function updateCompoundGearInfo(ratio1, ratio2, overall, speed) {
         document.getElementById('stage1-ratio').textContent = ratio1.toFixed(2);
+        document.getElementById('stage1-ratio-unity').textContent = "1:" + ratio1.toFixed(2);
         document.getElementById('stage2-ratio').textContent = ratio2.toFixed(2);
+        document.getElementById('stage2-ratio-unity').textContent = "1:" + ratio2.toFixed(2);
         document.getElementById('overall-ratio').textContent = overall.toFixed(2);
+        document.getElementById('overall-ratio-unity').textContent = "1:" + overall.toFixed(2);
         document.getElementById('intermediate-speed').textContent = (speed / ratio1).toFixed(2) + " RPM";
         document.getElementById('output-speed-compound').textContent = (speed / overall).toFixed(2) + " RPM";
     }
@@ -952,19 +957,35 @@ const epicyclicGearSimulation = function(p) {
         let carrierRPM = carrierSpeed * 10;
         let ringRPM = ringSpeed * 10;
 
-        document.getElementById('sun-speed').textContent = 
+        document.getElementById('sun-speed').textContent =
             fixedComponent === 'sun' ? "0.00 RPM (Fixed)" : sunRPM.toFixed(2) + " RPM";
-        document.getElementById('carrier-speed').textContent = 
+        document.getElementById('carrier-speed').textContent =
             fixedComponent === 'carrier' ? "0.00 RPM (Fixed)" : carrierRPM.toFixed(2) + " RPM";
-        document.getElementById('ring-speed').textContent = 
+        document.getElementById('ring-speed').textContent =
             fixedComponent === 'ring' ? "0.00 RPM (Fixed)" : ringRPM.toFixed(2) + " RPM";
 
+        // Determine input component and calculate gear ratio
         let ratio = 1;
-        if (fixedComponent === 'ring') ratio = 1 + ringTeeth / sunTeeth;
-        else if (fixedComponent === 'carrier') ratio = -ringTeeth / sunTeeth;
-        else if (fixedComponent === 'sun') ratio = 1 + sunTeeth / ringTeeth;
+        let inputComponent = '';
+        let outputComponent = '';
 
+        if (fixedComponent === 'ring') {
+            ratio = 1 + ringTeeth / sunTeeth;
+            inputComponent = 'Sun';
+            outputComponent = 'Carrier';
+        } else if (fixedComponent === 'carrier') {
+            ratio = -ringTeeth / sunTeeth;
+            inputComponent = 'Sun';
+            outputComponent = 'Ring';
+        } else if (fixedComponent === 'sun') {
+            ratio = 1 + sunTeeth / ringTeeth;
+            inputComponent = 'Carrier';
+            outputComponent = 'Ring';
+        }
+
+        document.getElementById('input-component').textContent = inputComponent + ' → ' + outputComponent;
         document.getElementById('epicyclic-ratio').textContent = Math.abs(ratio).toFixed(2);
+        document.getElementById('epicyclic-ratio-unity').textContent = "1:" + Math.abs(ratio).toFixed(2);
     }
 };
 

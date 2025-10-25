@@ -12,6 +12,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .row {
             display: flex;
@@ -20,6 +22,11 @@
         .cell {
             margin: 5px;
             text-align: center;
+        }
+        #sketch-holder {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
         canvas {
             margin-top: 5px;
@@ -126,9 +133,11 @@
         
         function setup() {
             setupSystem();
-            
+
             let canvas = createCanvas(900, 750); // Increased canvas width and height
             canvas.parent('sketch-holder');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
             
             // Setup animate button
             let animateBtn = document.getElementById('animateBtn');
