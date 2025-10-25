@@ -24,17 +24,16 @@
     <script src="SDOFvib.js"></script>
 
     <style>
-        /* Page-specific styles */
+        /* Page-specific styles - vertical stacking layout */
         #sketch-holder {
             width: 200px;
             height: 500px;
-            float: left;
-            margin-right: 20px;
+            margin: 0 auto 20px auto; /* Center the sketch and add bottom margin */
         }
 
         #chart-container {
-            margin-left: 220px;
-            width: calc(100% - 240px);
+            width: 100%; /* Full width for charts */
+            margin: 0 auto;
         }
 
         #TimeHistory, #FRFamp, #FRFphase {
@@ -46,18 +45,6 @@
             display: inline-block;
             width: 50px;
             text-align: right;
-        }
-
-        @media screen and (max-width: 768px) {
-            #sketch-holder {
-                float: none;
-                margin: 0 auto 20px auto;
-            }
-
-            #chart-container {
-                margin-left: 0;
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -186,9 +173,7 @@
                     <div id="FRFphase"></div>
                 </div>
             </div>
-            
-            <div style="clear: both;"></div>
-            
+
             <h3>System Response Characteristics</h3>
             <div id="system-info">
                 <p><strong>Natural Frequency (fn):</strong> <span id="natural-freq">3.56</span> Hz</p>

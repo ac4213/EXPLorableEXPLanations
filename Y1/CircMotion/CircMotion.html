@@ -148,12 +148,12 @@
         <div class="interactive-controls">
             <div class="control-group">
                 <label for="angularVelocity">Initial Angular Velocity (\(\omega_0\)): <span id="angVelValue">2.0</span> rad/s</label>
-                <input type="range" id="angularVelocity" min="0" max="10" step="0.1" value="2.0">
+                <input type="range" id="angularVelocity" min="-3" max="3" step="0.1" value="2.0">
             </div>
             
             <div class="control-group">
                 <label for="angularAcceleration">Angular Acceleration (\(\alpha\)): <span id="angAccValue">0.0</span> rad/s²</label>
-                <input type="range" id="angularAcceleration" min="-5" max="5" step="0.1" value="0">
+                <input type="range" id="angularAcceleration" min="-1" max="1" step="0.1" value="0">
             </div>
             
             <div class="control-group">
@@ -449,7 +449,7 @@
                 if (document.getElementById('showVelocity').checked) {
                     p.stroke(0, 204, 0);
                     p.strokeWeight(3);
-                    let velScale = 10; // Changed from 30 to 10 for larger arrows
+                    let velScale = 5; // Changed from 30 to 10 for larger arrows
                     drawArrow(p, beadPos.x, beadPos.y, 
                              beadPos.x + beadVel.x / velScale, 
                              beadPos.y + beadVel.y / velScale);
@@ -459,7 +459,7 @@
                 if (document.getElementById('showAccelerations').checked && !stringCut) {
                     // Centripetal acceleration
                     let ac = omega * omega * radius;
-                    let acScale = p.min(ac, radius * 0.6);
+                    let acScale = 30;
                     p.stroke(255, 0, 102);
                     p.strokeWeight(3);
                     drawArrow(p, beadPos.x, beadPos.y, 
@@ -469,7 +469,7 @@
                     // Tangential acceleration (scaled down for better proportion)
                     if (Math.abs(alpha) > 0.01) {
                         let at = radius * alpha;
-                        let atScale = at * 10; // Changed from 30 to 10 for smaller arrows
+                        let atScale = at; // Changed from 30 to 10 for smaller arrows
                         p.stroke(255, 153, 0);
                         p.strokeWeight(3);
                         drawArrow(p, beadPos.x, beadPos.y, 

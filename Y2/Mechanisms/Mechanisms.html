@@ -906,7 +906,7 @@ let slidercrankSketch = function(p) {
     p.draw = function() {
         p.background(245);
         // Center the mechanism in the canvas
-        p.translate(canvasWidth * 0.25, canvasHeight * 0.5);
+        p.translate(canvasWidth * 0.35, canvasHeight * 0.5);
         
         const dt = 0.016; // ~60 fps timestep
 
@@ -1121,7 +1121,7 @@ let quickreturnSketch = function(p) {
         }
 
         // Crank origin - centered better to account for mechanism extent
-        const originX = canvasWidth * 0.22;
+        const originX = canvasWidth * 0.45;
         const originY = canvasHeight * 0.45;
 
         p.push();
@@ -1148,7 +1148,7 @@ let quickreturnSketch = function(p) {
         // --- Ground / guide ---
         p.stroke(200);
         p.strokeWeight(3 * SCALE);
-        p.line(-200*SCALE, 0, 900*SCALE, 0);
+        p.line(-500*SCALE, 0, 500*SCALE, 0);
 
         // --- Lever slot ---
         p.push();
@@ -1177,7 +1177,7 @@ let quickreturnSketch = function(p) {
         p.push();
         p.translate(Ax, Ay);
         p.rotate(phi);
-        p.fill(170, 80, 220);
+        p.fill(100, 255, 0);
         p.stroke(110, 30, 180);
         p.strokeWeight(1.5 * SCALE);
         p.rectMode(p.CENTER);

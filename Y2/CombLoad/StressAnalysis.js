@@ -1034,15 +1034,15 @@ function drawDoubleArrow(p, x1, y1, x2, y2, headSize = 8) {
             torqueVal.textContent = T.toFixed(1);
         });
 
-        // Infinitesimal element radial position slider (0=center → 1=edge)
+        // Infinitesimal element radial position slider (-1=left edge → 0=center → 1=right edge)
         const elemPosSlider = document.getElementById('torElementPos');
         const elemPosVal = document.getElementById('torElementPosVal');
         if (elemPosSlider && elemPosVal) {
             const updateElemPos = () => {
                 elementR = parseFloat(elemPosSlider.value);
-                // keep within [0,1]
+                // keep within [-1,1]
                 if (!isFinite(elementR)) elementR = 0;
-                elementR = Math.max(0, Math.min(1, elementR));
+                elementR = Math.max(-1, Math.min(1, elementR));
                 elemPosVal.textContent = elementR.toFixed(2);
             };
             elemPosSlider.addEventListener('input', updateElemPos);
@@ -1174,7 +1174,7 @@ function drawDoubleArrow(p, x1, y1, x2, y2, headSize = 8) {
         // Draw small element on section at chosen radius on 0° line
         const elemX = elementR * outerRadius;
         const elemY = 0;
-        const isVoidHere = (sectionType === 'hollow' && (elementR * outerRadius) < innerRadius);
+        const isVoidHere = (sectionType === 'hollow' && Math.abs(elementR * outerRadius) < innerRadius);
         p.fill(isVoidHere ? 240 : colours.infinitesimal);
         p.stroke(isVoidHere ? 150 : 0);
         p.strokeWeight(1);
@@ -1335,8 +1335,8 @@ function drawDoubleArrow(p, x1, y1, x2, y2, headSize = 8) {
         p.strokeWeight(2);
         p.rect(-blockSize/2, -blockSize/2, blockSize, blockSize);
         
-        // Calculate stress at chosen radius
-        let r_elem = elementR * outerRadius;
+        // Calculate stress at chosen radius (use absolute value since stress depends on distance from center)
+        let r_elem = Math.abs(elementR * outerRadius);
         let inVoid = false;
         if (sectionType === 'hollow' && r_elem < innerRadius) {
             // inside hollow region → no material → no stress

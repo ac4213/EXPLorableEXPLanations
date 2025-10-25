@@ -192,7 +192,7 @@
             let canvasHeight = 700;
             let boxSize = 40;
             let boxSpacing = 100;
-            let yPosition = 100;
+            let yPosition = 120;
             let plotWidth = 400;
             let plotHeight = 200;
             
@@ -244,7 +244,7 @@
                     // Animation (bottom)
                     drawAnimation(
                         50,
-                        350,
+                        420,
                         sf * physicalData[0][timeIndex], 
                         sf * physicalData[1][timeIndex], 
                         sf * physicalData[2][timeIndex],
@@ -660,12 +660,15 @@
                 p.strokeWeight(1);
                 
                 // Draw grid
+                p.push();
+                p.stroke(230)
                 for (let i = 0; i <= 20; i += 2) {
                     p.line(i * 40, -150, i * 40, 150);
                 }
                 for (let i = -3; i <= 3; i++) {
                     p.line(0, i * 50, 800, i * 50);
                 }
+                p.pop();
                 
                 // Draw main axes
                 p.stroke(0);

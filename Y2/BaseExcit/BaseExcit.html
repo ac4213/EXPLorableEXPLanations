@@ -376,7 +376,6 @@
             let baseDisplacement = 0;
             let massDisplacement = 0;
             let relativeDisplacement = 0;
-            let relativeVelocity = 0;
             
             p.setup = function() {
                 let canvas = p.createCanvas(canvasWidth, canvasHeight);
@@ -646,22 +645,34 @@
             function updateSimulation() {
                 // Increment time
                 time += dt;
-                
+
                 // Calculate base motion (harmonic)
                 const omega = 2 * Math.PI * frequency;
+                const omegaN = naturalFrequency;
+                const r = omega / omegaN; // Frequency ratio
+                const zeta = dampingRatio;
+
                 baseDisplacement = amplitude * Math.sin(omega * time);
-                const baseAcceleration = -amplitude * omega * omega * Math.sin(omega * time);
-                
-                // Equation of motion: m*z'' + c*z' + k*z = -m*y''
-                const relativeAcceleration = (-mass * baseAcceleration - damping * relativeVelocity - 
-                                            stiffness * relativeDisplacement) / mass;
-                
-                // Update using simple Euler integration
-                relativeVelocity += relativeAcceleration * dt;
-                relativeDisplacement += relativeVelocity * dt;
-                
-                // Calculate absolute mass displacement
-                massDisplacement = baseDisplacement + relativeDisplacement;
+
+                // Use analytical steady-state solution for accurate phase representation
+                // For base excitation: X/Y = TR * exp(i*phi)
+                // where TR is transmissibility and phi is phase angle
+
+                // Transmissibility (amplitude ratio)
+                const TR = Math.sqrt((1 + Math.pow(2*zeta*r, 2)) /
+                                    (Math.pow(1 - r*r, 2) + Math.pow(2*zeta*r, 2)));
+
+                // Phase angle of absolute mass motion relative to base
+                // tan(phi) = (2*zeta*r^3) / (1 - r^2 + (2*zeta*r)^2)
+                const phaseNumerator = 2 * zeta * Math.pow(r, 3);
+                const phaseDenominator = 1 - r*r + Math.pow(2*zeta*r, 2);
+                const phase = Math.atan2(phaseNumerator, phaseDenominator);
+
+                // Absolute mass displacement with correct phase
+                massDisplacement = amplitude * TR * Math.sin(omega * time - phase);
+
+                // Relative displacement
+                relativeDisplacement = massDisplacement - baseDisplacement;
                 
                 // Store in history buffer (circular buffer)
                 historyData.time[historyIndex] = time;
@@ -707,8 +718,7 @@
                 baseDisplacement = 0;
                 massDisplacement = 0;
                 relativeDisplacement = 0;
-                relativeVelocity = 0;
-                
+
                 // Clear history
                 for (let i = 0; i < historySize; i++) {
                     historyData.time[i] = 0;

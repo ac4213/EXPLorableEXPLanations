@@ -94,6 +94,9 @@
 const cfg = {
   beamType:'ss-point', P:20, w:10, a:0.5, s:0.8, L:1.0,
   showDefl:true, showShear:true, showMoment:true, scale:70,
+  // Diagram scaling factors (adjust these to change SFD/BMD appearance)
+  sfdScale: 2,   // Shear Force Diagram scaling factor
+  bmdScale: 6,   // Bending Moment Diagram scaling factor (2x larger than SFD)
 };
 
 // UI
@@ -353,7 +356,16 @@ function drawArrow(x1,y1,x2,y2){
 
 function drawLoads(y){
   const aPx = beamStartX + cfg.a*beamLenPx;
-  if (cfg.w>0){stroke(220,0,0);  for(let x=beamStartX; x<=beamEndX; x+=18) drawArrow(x,y-30,x,y); noStroke(); fill(180,0,0); text(`w=${cfg.w} kN/m`, (beamStartX+beamEndX)/2-100, y-40); }
+  if (cfg.w>0){
+    stroke(220,0,0);
+    // Draw UDL arrows aligned with vertical grid ticks (every beamLenPx/50)
+    const tickSpacing = beamLenPx/50;
+    for(let i=0; i<=50; i++){
+      const x = beamStartX + i*tickSpacing;
+      drawArrow(x,y-30,x,y);
+    }
+    noStroke(); fill(180,0,0); text(`w=${cfg.w} kN/m`, (beamStartX+beamEndX)/2-100, y-40);
+  }
   if (cfg.P>0) {stroke(0,200,0); drawArrow(aPx,y-60,aPx,y); noStroke(); fill(0,200,0); text(`${cfg.P} kN`, aPx+25, y-50); }
 }
 
@@ -376,11 +388,13 @@ function drawDeflection(samples, yBase){
 function drawDiagram(samples, yBase, what){
   const n=samples.length; noFill(); strokeWeight(2);
   if (what==='V'){ stroke(0,120,0); fill(0,120,0,40);} else { stroke(220,0,0); fill(220,0,0,40);}
+  // Use separate scaling factors for SFD and BMD
+  const scaleFactor = (what==='V') ? cfg.sfdScale : cfg.bmdScale;
   beginShape(); vertex(beamStartX, yBase);
   for(let i=0;i<n;i++){
     const px = beamStartX + samples[i].x*beamLenPx;
     const val = (what==='V') ? samples[i].V : samples[i].M;
-    vertex(px, yBase - val*2);
+    vertex(px, yBase - val*scaleFactor);
   }
   vertex(beamEndX, yBase); endShape(CLOSE);
   noStroke(); fill(what==='V'?color(0,120,0):color(220,0,0));

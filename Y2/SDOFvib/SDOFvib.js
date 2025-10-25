@@ -1,3 +1,11 @@
+// ======== CONFIGURATION ========
+// Deflection scaling factor for visualization
+// Adjust this value to control how much the mass moves in the animation
+// Lower values = less movement (prevents flying off screen)
+// Higher values = more movement (more dramatic visualization)
+const DEFLECTION_SCALE_FACTOR = 200; // Default: 200 (reduced from 500 to prevent flying off screen)
+// ================================
+
 // Mass object constructor
 function Mass(x, y, wdth, hght) {
     this.x = x;
@@ -5,19 +13,20 @@ function Mass(x, y, wdth, hght) {
     this.wdth = wdth;
     this.hght = hght;
     this.baseY = y; // Remember the base position
-    
+
     // Move the mass based on the calculated displacement
     this.move = function(y, reset) {
         if (reset) {
             this.y = this.baseY;
             this.display();
         } else {
-            // Apply a scaling factor for better visualization but allow unrestricted motion
-            const scaleFactor = 500; // Larger scaling factor for more visible motion
-            let normalizedY = y * scaleFactor;
-            
-            // No limits on displacement - allow mass to move out of view if needed
-            this.y = this.baseY - normalizedY;
+            // Apply the global deflection scaling factor for better visualization
+            let normalizedY = y * DEFLECTION_SCALE_FACTOR;
+
+            // Clamp the displacement to keep mass on screen
+            const maxDisplacement = this.baseY - 50; // Keep at least 50px from top
+            const minDisplacement = this.baseY + 150; // Keep reasonable distance from bottom
+            this.y = constrain(this.baseY - normalizedY, 50, height - 50);
             this.display();
         }
     };

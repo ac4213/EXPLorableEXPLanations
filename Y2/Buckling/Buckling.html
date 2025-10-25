@@ -588,20 +588,32 @@
                 // Draw buckled shape
                 stroke(255, 50, 50); // Red for buckled
                 
-                // Generate buckled shape
+                // Generate buckled shape with mathematically correct mode shapes
                 let amplitude = Math.min(50, (appliedLoad * 1000 / Pcr - 1) * 30);
                 let points = [];
-                
+
                 for (let i = 0; i <= numPoints; i++) {
-                    let t = i / numPoints;
+                    let t = i / numPoints; // t goes from 0 (bottom) to 1 (top)
                     let y = lerp(baseY, topY, t);
-                    let deflection = amplitude * sin(PI * t);
-                    
-                    // Adjust deflection based on end conditions
-                    if (endCondition === 'cantilever') {
-                        deflection = amplitude * sin(PI * t / 2) * t;
+                    let deflection = 0;
+
+                    // Mathematically correct deflection shapes for each boundary condition
+                    if (endCondition === 'pinned') {
+                        // Pinned-pinned: sin(π*x/L)
+                        deflection = amplitude * sin(PI * t);
+                    } else if (endCondition === 'fixed') {
+                        // Fixed-fixed: sin(2π*x/L) - more complex, use approximation
+                        // Actual shape: (1 - cos(2π*t))/2 gives zero slope at ends
+                        deflection = amplitude * (1 - cos(2 * PI * t)) / 2;
+                    } else if (endCondition === 'cantilever') {
+                        // Fixed-free (cantilever): 1 - cos(π*x/(2L))
+                        deflection = amplitude * (1 - cos(PI * t / 2));
+                    } else if (endCondition === 'fixedPinned') {
+                        // Fixed-pinned: approximately sin(1.43π*x/L)
+                        // Using sin(4.49*t) for first mode (4.49 ≈ 1.43π)
+                        deflection = amplitude * sin(1.43 * PI * t);
                     }
-                    
+
                     points.push({x: centerX + deflection, y: y});
                 }
                 
