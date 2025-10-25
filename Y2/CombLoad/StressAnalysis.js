@@ -511,7 +511,7 @@ function importantLevels(parts){
         const t0 = breadthAtY(parts, 0);
         const { Q:Q0 } = QAbove_withCentroid(parts, 0);
         const tau0 = (t0>0) ? (V*Q0)/(props.I*t0) : 0; // MPa
-        const arrowLen = Math.min(50, Math.abs(tau0) * 2.5);
+        const arrowLen = Math.abs(tau0)*2;
 
         const blockW = 60, blockH = 60;
         const cx = BOTTOM_BLOCK_X;
@@ -1347,27 +1347,28 @@ function drawDoubleArrow(p, x1, y1, x2, y2, headSize = 8) {
         const tau_elem_MPa = tau_elem / 1e6;
         
         // Arrow length proportional to stress
-        const arrowLen = p.map(Math.abs(tau_elem_MPa), 0, 50, 0, 100);
+        const arrowLen = Math.abs(tau_elem_MPa)*5;
         
-        if (T !== 0 && !inVoid) {
+        if (T !== 0 && !inVoid && arrowLen !== 0) {
             // Four complementary shear arrows (orange like in other sketches)
-            const sign = Math.sign(T);
-            
-            // Top face - rightward for positive T
-            drawMidpointArrow(p, 0, -blockSize/2 - 10, sign, 0, arrowLen, 
-                sign > 0 ? 'positive' : 'negative', colours.twistingTorque);
-            
-            // Bottom face - leftward for positive T
-            drawMidpointArrow(p, 0, blockSize/2 + 10, -sign, 0, arrowLen, 
-                sign > 0 ? 'positive' : 'negative', colours.twistingTorque);
-            
-            // Right face - downward for positive T
-            drawMidpointArrow(p, blockSize/2 + 10, 0, 0, sign, arrowLen, 
+            // The arrows should reverse based on which side of the shaft we're on
+            const sign = Math.sign(T) * Math.sign(elementR);
+
+            // Top face - rightward for positive T and positive elementR
+            drawMidpointArrow(p, 0, -blockSize/2 - 10, sign, 0, arrowLen,
                 sign < 0 ? 'positive' : 'negative', colours.twistingTorque);
-            
-            // Left face - upward for positive T
-            drawMidpointArrow(p, -blockSize/2 - 10, 0, 0, -sign, arrowLen, 
+
+            // Bottom face - leftward for positive T and positive elementR
+            drawMidpointArrow(p, 0, blockSize/2 + 10, -sign, 0, arrowLen,
                 sign < 0 ? 'positive' : 'negative', colours.twistingTorque);
+
+            // Right face - downward for positive T and positive elementR
+            drawMidpointArrow(p, blockSize/2 + 10, 0, 0, sign, arrowLen,
+                sign > 0 ? 'positive' : 'negative', colours.twistingTorque);
+
+            // Left face - upward for positive T and positive elementR
+            drawMidpointArrow(p, -blockSize/2 - 10, 0, 0, -sign, arrowLen,
+                sign > 0 ? 'positive' : 'negative', colours.twistingTorque);
         }
         
         // Labels

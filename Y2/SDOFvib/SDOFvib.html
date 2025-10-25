@@ -24,21 +24,27 @@
     <script src="SDOFvib.js"></script>
 
     <style>
-        /* Page-specific styles - vertical stacking layout */
+        /* Page-specific styles*/
+        .sim-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
         #sketch-holder {
-            width: 200px;
+            flex: 0 0 200px; /* Fixed width */
             height: 500px;
-            margin: 0 auto 20px auto; /* Center the sketch and add bottom margin */
+            margin: 0; /* Remove auto margins */
         }
 
         #chart-container {
-            width: 100%; /* Full width for charts */
-            margin: 0 auto;
+            flex: 1; /* Take remaining space */
+            min-width: 0; /* Prevent overflow */
         }
 
         #TimeHistory, #FRFamp, #FRFphase {
             width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .parameter-value {
@@ -54,10 +60,9 @@
         <h1>Single Degree of Freedom Vibration</h1>
         <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
-    
-    <div class="container">
-        <div class="content-section">
-            <h2>Understanding SDOF Vibration</h2>
+
+    <div class="content-section">
+        <h2>Understanding SDOF Vibration</h2>
             <p>Single Degree of Freedom (SDOF) vibration is a fundamental concept in mechanical engineering that describes the oscillatory motion of a system with one principal direction of movement. These systems are characterized by:</p>
             <ul>
                 <li>One mass or inertial element</li>
@@ -162,7 +167,9 @@
                 </div>
             </div>
             
+            
             <div id="simulation-display">
+            <div class="sim-container">
                 <div id="sketch-holder">
                     <!-- Our sketch will go here! -->
                 </div>
@@ -172,6 +179,7 @@
                     <div id="FRFamp"></div>
                     <div id="FRFphase"></div>
                 </div>
+            </div>
             </div>
 
             <h3>System Response Characteristics</h3>
@@ -191,9 +199,8 @@
                 <li>When forced, the system amplitude peaks near the natural frequency (resonance)</li>
                 <li>The phase shift changes from 0° (displacement in the same direction as forcing) to -180° (displacement in opposite direction of forcing) as the forcing frequency passes through resonance</li>
             </ul>
-        </div>
     </div>
-    
+
     <div class="content-section">
         <h2>Engineering Applications</h2>
         

@@ -1015,75 +1015,105 @@ function updateDamagePlot() {
     const damage3 = cycles3 / cyclesTo3;
     const totalDamage = damage1 + damage2 + damage3;
     
-    // Create bar chart for Palmgren-Miner damage accumulation
-    const trace1 = {
-        x: ['Block 1', 'Block 2', 'Block 3', 'Total'],
-        y: [damage1, damage2, damage3, totalDamage],
-        text: [
-            `${(damage1 * 100).toFixed(1)}%`,
-            `${(damage2 * 100).toFixed(1)}%`,
-            `${(damage3 * 100).toFixed(1)}%`,
-            `${(totalDamage * 100).toFixed(1)}%`
-        ],
-        textposition: 'outside',
-        type: 'bar',
+    // Create ring chart (donut chart) for Palmgren-Miner damage accumulation
+    // Build segments: each loading block + remaining capacity
+    const labels = [];
+    const values = [];
+    const colors = [];
+    const textInfo = [];
+
+    // Add each loading block
+    if (damage1 > 0) {
+        labels.push(`Block 1<br>${stressAmp1} MPa<br>${cycles1.toLocaleString()} cycles`);
+        values.push(damage1);
+        colors.push('#4BC0C0'); // Teal
+        textInfo.push(`${(damage1 * 100).toFixed(1)}%`);
+    }
+
+    if (damage2 > 0) {
+        labels.push(`Block 2<br>${stressAmp2} MPa<br>${cycles2.toLocaleString()} cycles`);
+        values.push(damage2);
+        colors.push('#FFCE56'); // Yellow
+        textInfo.push(`${(damage2 * 100).toFixed(1)}%`);
+    }
+
+    if (damage3 > 0) {
+        labels.push(`Block 3<br>${stressAmp3} MPa<br>${cycles3.toLocaleString()} cycles`);
+        values.push(damage3);
+        colors.push('#FF6384'); // Pink
+        textInfo.push(`${(damage3 * 100).toFixed(1)}%`);
+    }
+
+    // Add remaining capacity (or over-damage if total > 1)
+    const remaining = 1 - totalDamage;
+    if (remaining > 0) {
+        labels.push('Remaining Capacity');
+        values.push(remaining);
+        colors.push('#E8E8E8'); // Light gray
+        textInfo.push(`${(remaining * 100).toFixed(1)}%`);
+    } else if (totalDamage > 1) {
+        // Show over-damage in red
+        labels.push('Over-Damage<br>(FAILURE!)');
+        values.push(totalDamage - 1);
+        colors.push('#DC3545'); // Red
+        textInfo.push(`+${((totalDamage - 1) * 100).toFixed(1)}%`);
+    }
+
+    const trace = {
+        labels: labels,
+        values: values,
+        type: 'pie',
+        hole: 0.5, // Creates the ring/donut effect
         marker: {
-            color: [
-                damage1 < 0.33 ? '#4BC0C0' : damage1 < 0.67 ? '#FFCE56' : '#FF6384',
-                damage2 < 0.33 ? '#4BC0C0' : damage2 < 0.67 ? '#FFCE56' : '#FF6384',
-                damage3 < 0.33 ? '#4BC0C0' : damage3 < 0.67 ? '#FFCE56' : '#FF6384',
-                totalDamage < 0.7 ? '#4BC0C0' : totalDamage < 1.0 ? '#FFCE56' : '#FF6384'
-            ]
-        }
+            colors: colors,
+            line: { color: 'white', width: 2 }
+        },
+        text: textInfo,
+        textposition: 'auto',
+        textinfo: 'label+percent',
+        hovertemplate: '<b>%{label}</b><br>Damage: %{value:.3f}<br>%{percent}<extra></extra>',
+        direction: 'clockwise',
+        sort: false
     };
-    
-    // Add failure line
-    const failureLine = {
-        x: ['Block 1', 'Block 2', 'Block 3', 'Total'],
-        y: [1, 1, 1, 1],
-        type: 'scatter',
-        mode: 'lines',
-        line: { color: '#721c24', width: 2, dash: 'dash' },
-        name: 'Failure Limit (D = 1.0)'
-    };
-    
-    // Add conservative design line
-    const conservativeLine = {
-        x: ['Block 1', 'Block 2', 'Block 3', 'Total'],
-        y: [0.7, 0.7, 0.7, 0.7],
-        type: 'scatter',
-        mode: 'lines',
-        line: { color: '#856404', width: 2, dash: 'dot' },
-        name: 'Conservative Limit (D = 0.7)'
-    };
-    
+
+    // Determine status and color for center annotation
+    let statusText, statusColor;
+    if (totalDamage >= 1.0) {
+        statusText = `FAILURE<br>D = ${totalDamage.toFixed(2)}`;
+        statusColor = '#DC3545'; // Red
+    } else if (totalDamage >= 0.7) {
+        statusText = `WARNING<br>D = ${totalDamage.toFixed(2)}`;
+        statusColor = '#FFC107'; // Amber
+    } else {
+        statusText = `SAFE<br>D = ${totalDamage.toFixed(2)}`;
+        statusColor = '#28A745'; // Green
+    }
+
     const layout = {
-        title: { text: 'Palmgren-Miner Damage Accumulation', font: { size: 16 }},
-        xaxis: { title: 'Loading Block' },
-        yaxis: { 
-            title: 'Damage Fraction (D)',
-            range: [0, Math.max(1.2, totalDamage * 1.2)]
+        title: {
+            text: 'Palmgren-Miner Damage Accumulation',
+            font: { size: 16 }
         },
         showlegend: true,
+        legend: {
+            orientation: 'v',
+            x: 1.1,
+            y: 0.5
+        },
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 60, r: 40, t: 50, b: 60 },
+        margin: { l: 20, r: 180, t: 50, b: 20 },
         annotations: [{
-            x: 'Total',
-            y: totalDamage,
-            text: totalDamage >= 1 ? 'FAILURE' : totalDamage >= 0.7 ? 'WARNING' : 'SAFE',
-            showarrow: true,
-            arrowhead: 2,
-            ax: 0,
-            ay: -40,
-            font: {
-                size: 14,
-                color: totalDamage >= 1 ? '#721c24' : totalDamage >= 0.7 ? '#856404' : '#155724'
-            }
-        }]
+            font: { size: 18, color: statusColor },
+            showarrow: false,
+            text: statusText,
+            x: 0.5,
+            y: 0.5
+        }],
+        height: 400
     };
-    
-    Plotly.react('damage-plot', [trace1, failureLine, conservativeLine], layout, { responsive: true });
+
+    Plotly.react('damage-plot', [trace], layout, { responsive: true });
     
     updateDamageResults(totalDamage);
 }

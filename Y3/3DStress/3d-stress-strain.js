@@ -26,6 +26,8 @@ const STRESS_ARROW_SCALE = 6.0; // ← master scale for ALL stress arrows (norma
 // ------------------------------
 let cube;
 let angle = 0;
+let angleY = 0; // Store Y rotation for manual control
+let angleX = 0; // Store X rotation for manual control
 let autoRotate = true; // control autorotation
 let showPrincipal = false;
 let showFailure   = false;
@@ -82,15 +84,22 @@ function draw() {
 
   // Orbit-like rotation
   if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-    rotateY(map(mouseX, 0, width, -PI, PI));
-    rotateX(map(mouseY, 0, height, PI, -PI));
+    // User is dragging - update stored angles based on mouse position
+    angleY = map(mouseX, 0, width, -PI, PI);
+    angleX = map(mouseY, 0, height, PI, -PI);
+    rotateY(angleY);
+    rotateX(angleX);
   } else if (autoRotate) {
+    // Auto-rotation mode - continuously increment angle
     angle += 0.01;
-    rotateY(angle);
-    rotateX(sin(angle * 0.5) * 0.5);
+    angleY = angle;
+    angleX = sin(angle * 0.5) * 0.5;
+    rotateY(angleY);
+    rotateX(angleX);
   } else {
-    rotateY(angle);
-    rotateX(sin(angle * 0.5) * 0.5);
+    // Rotation stopped - maintain last known angles (from dragging or auto-rotation)
+    rotateY(angleY);
+    rotateX(angleX);
   }
 
   cube.display();

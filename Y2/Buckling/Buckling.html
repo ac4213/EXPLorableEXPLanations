@@ -539,7 +539,7 @@
             fill(100);
             
             // Bottom support
-            if (endCondition === 'pinned' || endCondition === 'fixedPinned') {
+            if (endCondition === 'pinned') {
                 // Pinned support
                 triangle(centerX - 15, baseY, centerX + 15, baseY, centerX, baseY - 15);
             } else {
@@ -551,7 +551,7 @@
             }
             
             // Top support
-            if (endCondition === 'pinned') {
+            if (endCondition === 'pinned' || endCondition === 'fixedPinned') {
                 // Pinned support (inverted)
                 triangle(centerX - 15, topY, centerX + 15, topY, centerX, topY + 15);
             } else if (endCondition === 'fixed' || endCondition === 'fixedPinned') {
@@ -609,9 +609,10 @@
                         // Fixed-free (cantilever): 1 - cos(π*x/(2L))
                         deflection = amplitude * (1 - cos(PI * t / 2));
                     } else if (endCondition === 'fixedPinned') {
-                        // Fixed-pinned: approximately sin(1.43π*x/L)
-                        // Using sin(4.49*t) for first mode (4.49 ≈ 1.43π)
-                        deflection = amplitude * sin(1.43 * PI * t);
+                        // Fixed-pinned: y = x^2 * (L-x) shape
+                        // This satisfies: y(0)=0, dy/dx(0)=0, y(L)=0
+                        // Normalized: maximum at t ≈ 2/3
+                        deflection = amplitude * 6.75 * t * t * (1 - t);
                     }
 
                     points.push({x: centerX + deflection, y: y});

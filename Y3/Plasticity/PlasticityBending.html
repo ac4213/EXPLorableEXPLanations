@@ -323,9 +323,9 @@ function createSimulation1(){
       }
       let y0_root = mid;
 
-      const dir = Math.sign(geom.y_pna - geom.yc) || 1;
-      if(dir > 0) return Math.max(y0_prev, y0_root);
-      return Math.min(y0_prev, y0_root);
+      // Return the calculated root directly to allow continuous shifting
+      // The root is already constrained to lie between yc and y_pna
+      return y0_root;
     }
 
     function solveDistribution(){
@@ -482,20 +482,33 @@ function createSimulation1(){
         p.rect(-bf/2,  h/2-tf, bf, tf);
       }
 
-      // Elastic centroidal NA (gray)
-      p.stroke(150); p.strokeWeight(1);
+      // Elastic centroidal NA (thin gray dashed)
+      p.stroke(150); p.strokeWeight(1); setDashed(p,true);
       p.line(-170, (geom.yc - geom.H/2)*pixPerMm, 170, (geom.yc - geom.H/2)*pixPerMm);
-
-      // Current NA (dashed black)
-      const naY = sol.stage==='plastic' ? geom.y_pna : sol.y0;
-      p.stroke(0); p.strokeWeight(1); setDashed(p,true);
-      p.line(-170, (naY - geom.H/2)*pixPerMm, 170, (naY - geom.H/2)*pixPerMm);
       setDashed(p,false);
 
-      // Plastic NA / Bisectrix (gold)
+      // Current NA (thick solid line - changes color by stage)
+      const naY = sol.stage==='plastic' ? geom.y_pna : sol.y0;
+      const naPix = (naY - geom.H/2)*pixPerMm;
+
+      // Color based on stage: blue=elastic, orange=elastoplastic, red=plastic
+      if(sol.stage==='elastic') p.stroke(0,96,255);
+      else if(sol.stage==='elastoplastic') p.stroke(255,140,0);
+      else p.stroke(220,20,60);
+
+      p.strokeWeight(3);
+      p.line(-170, naPix, 170, naPix);
+
+      // Add NA label showing current position
+      p.noStroke(); p.fill(0);
+      p.textAlign(p.LEFT, p.CENTER); p.textSize(11);
+      p.text(`NA: ${naY.toFixed(1)} mm`, 175, naPix);
+
+      // Plastic NA / Bisectrix (thin gold dashed) for reference
       if(sectionType!=='rectangular'){
-        p.stroke(218,165,32); p.strokeWeight(2);
+        p.stroke(218,165,32); p.strokeWeight(1); setDashed(p,true);
         p.line(-170, (geom.y_pna - geom.H/2)*pixPerMm, 170, (geom.y_pna - geom.H/2)*pixPerMm);
+        setDashed(p,false);
       }
 
       p.noStroke(); p.fill(51); p.textAlign(p.CENTER);

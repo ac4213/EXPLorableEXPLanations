@@ -185,36 +185,50 @@ function setupButtonContainer(p) {
     let showPolar = false;
     let showCartesian = false;
     let gridStep;
-    
+
     p.setup = function() {
-      p.createCanvas(400, 400);
+      const containerWidth = p.select('#VectorRepresentation').width;
+      const canvasSize = Math.min(containerWidth, 400);
+      p.createCanvas(canvasSize, canvasSize);
       gridStep = p.width / 10;
       p.textAlign(p.CENTER, p.CENTER);
-      
+
       const origin = p.createVector(0, 0);
       const end = p.createVector(3 * gridStep, -4 * gridStep);
-      vectors.push(new Vector(p, origin, end, { 
+      vectors.push(new Vector(p, origin, end, {
         gridStep,
         type: "actionable"  // Changed to actionable to ensure it works with the controls
       }));
-      
+
       // Create UI buttons
       const buttonContainer = setupButtonContainer(p);
-      
+
     /*const btnHandles = p.createButton("Toggle Handles");
       btnHandles.parent(buttonContainer);
       btnHandles.mousePressed(() => {
         showHandles = !showHandles;
         vectors.forEach(v => v.controllable = showHandles);
       });*/
-      
+
       const btnCartesian = p.createButton("Toggle Cartesian");
       btnCartesian.parent(buttonContainer);
       btnCartesian.mousePressed(() => showCartesian = !showCartesian);
-      
+
       const btnPolar = p.createButton("Toggle Polar");
       btnPolar.parent(buttonContainer);
       btnPolar.mousePressed(() => showPolar = !showPolar);
+    };
+
+    p.windowResized = function() {
+      const containerWidth = p.select('#VectorRepresentation').width;
+      const canvasSize = Math.min(containerWidth, 400);
+      p.resizeCanvas(canvasSize, canvasSize);
+      gridStep = p.width / 10;
+
+      // Update vector positions based on new grid
+      vectors[0].x2 = 3 * gridStep;
+      vectors[0].y2 = -4 * gridStep;
+      vectors[0].gridStep = gridStep;
     };
     
     p.draw = function() {
@@ -271,42 +285,60 @@ function setupButtonContainer(p) {
     let showCartesian = false;
     let gridStep;
     let scaleInput;
-    
+
     p.setup = function() {
-      const canvas = p.createCanvas(400, 400);
+      const containerWidth = p.select('#VectorScaling').width;
+      const canvasSize = Math.min(containerWidth, 400);
+      const canvas = p.createCanvas(canvasSize, canvasSize);
       gridStep = p.width / 30;
       p.textAlign(p.CENTER, p.CENTER);
-      
+
       const origin = p.createVector(0, 0);
       const end = p.createVector(3 * gridStep, -4 * gridStep);
-      
+
       // Base vector - make this actionable so it can be dragged
-      vectors.push(new Vector(p, origin, end, { 
+      vectors.push(new Vector(p, origin, end, {
         gridStep,
         type: "actionable"
       }));
-      
+
       // Resultant (scaled) vector
-      vectors.push(new Vector(p, origin, end, { 
-        gridStep, 
-        isResultant: true, 
-        color: p.color(255, 0, 0) 
+      vectors.push(new Vector(p, origin, end, {
+        gridStep,
+        isResultant: true,
+        color: p.color(255, 0, 0)
       }));
-      
+
       // Create UI
       const buttonContainer = setupButtonContainer(p);
-      
+
       const btnCartesian = p.createButton("Toggle Cartesian");
       btnCartesian.parent(buttonContainer);
       btnCartesian.mousePressed(() => showCartesian = !showCartesian);
-      
+
       const btnPolar = p.createButton("Toggle Polar");
       btnPolar.parent(buttonContainer);
       btnPolar.mousePressed(() => showPolar = !showPolar);
-      
+
       scaleInput = p.createInput("1", "number");
       scaleInput.parent(buttonContainer);
       scaleInput.size(40);
+    };
+
+    p.windowResized = function() {
+      const containerWidth = p.select('#VectorScaling').width;
+      const canvasSize = Math.min(containerWidth, 400);
+      p.resizeCanvas(canvasSize, canvasSize);
+      gridStep = p.width / 30;
+
+      // Update vector positions and gridStep
+      const scale = parseFloat(scaleInput.value()) || 0;
+      vectors[0].x2 = 3 * gridStep;
+      vectors[0].y2 = -4 * gridStep;
+      vectors[0].gridStep = gridStep;
+      vectors[1].x2 = scale * vectors[0].x2;
+      vectors[1].y2 = scale * vectors[0].y2;
+      vectors[1].gridStep = gridStep;
     };
     
     p.draw = function() {
@@ -368,52 +400,70 @@ function setupButtonContainer(p) {
     let showParallelogram = false;
     let showLabels = false;
     let gridStep;
-    
+
     p.setup = function() {
-      const canvas = p.createCanvas(600, 600);
+      const containerWidth = p.select('#Vector2Sum').width;
+      const canvasSize = Math.min(containerWidth, 600);
+      const canvas = p.createCanvas(canvasSize, canvasSize);
       gridStep = p.width / 30;
       p.textAlign(p.CENTER, p.BOTTOM);
-      
+
       const origin = p.createVector(0, 0);
       const endA = p.createVector(3 * gridStep, -5 * gridStep);
       const endB = p.createVector(2 * gridStep, 2 * gridStep);
-      
-      vectors.push(new Vector(p, origin, endA, { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, endA, {
+        gridStep,
         type: "actionable",
-        color: p.color(0, 0, 255) 
+        color: p.color(0, 0, 255)
       }));
-      
-      vectors.push(new Vector(p, origin, endB, { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, endB, {
+        gridStep,
         type: "actionable",
-        color: p.color(0, 200, 255) 
+        color: p.color(0, 200, 255)
       }));
-      
-      vectors.push(new Vector(p, origin, p.createVector(0, 0), { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, p.createVector(0, 0), {
+        gridStep,
         type: "resultant",
-        color: p.color(255, 0, 0) 
+        color: p.color(255, 0, 0)
       }));
-      
+
       // Create UI
       const buttonContainer = setupButtonContainer(p);
-      
+
       const btnCartesian = p.createButton("Toggle Cartesian");
       btnCartesian.parent(buttonContainer);
       btnCartesian.mousePressed(() => showCartesian = !showCartesian);
-      
+
       const btnPolar = p.createButton("Toggle Polar");
       btnPolar.parent(buttonContainer);
       btnPolar.mousePressed(() => showPolar = !showPolar);
-      
+
       const btnParallel = p.createButton("Toggle Parallelogram");
       btnParallel.parent(buttonContainer);
       btnParallel.mousePressed(() => showParallelogram = !showParallelogram);
-      
+
       const btnLabels = p.createButton("Toggle Labels");
       btnLabels.parent(buttonContainer);
       btnLabels.mousePressed(() => showLabels = !showLabels);
+    };
+
+    p.windowResized = function() {
+      const containerWidth = p.select('#Vector2Sum').width;
+      const canvasSize = Math.min(containerWidth, 600);
+      p.resizeCanvas(canvasSize, canvasSize);
+      gridStep = p.width / 30;
+
+      // Update vector positions and gridStep
+      vectors[0].x2 = 3 * gridStep;
+      vectors[0].y2 = -5 * gridStep;
+      vectors[0].gridStep = gridStep;
+      vectors[1].x2 = 2 * gridStep;
+      vectors[1].y2 = 2 * gridStep;
+      vectors[1].gridStep = gridStep;
+      vectors[2].gridStep = gridStep;
     };
     
     p.draw = function() {
@@ -517,57 +567,59 @@ function setupButtonContainer(p) {
     let gridStep;
     let tempVectors = [];
     let tempD1; // To store intermediate points for animation
-    
+
     p.setup = function() {
-      const canvas = p.createCanvas(600, 600);
+      const containerWidth = p.select('#VectorTriangleRule').width;
+      const canvasSize = Math.min(containerWidth, 600);
+      const canvas = p.createCanvas(canvasSize, canvasSize);
       gridStep = p.width / 30;
       p.textAlign(p.CENTER, p.BOTTOM);
-      
+
       const origin = p.createVector(0, 0);
-      
-      vectors.push(new Vector(p, origin, p.createVector(6 * gridStep, -9 * gridStep), { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, p.createVector(6 * gridStep, -9 * gridStep), {
+        gridStep,
         type: "actionable",
         color: p.color(0, 0, 255),
         label: "A"
       }));
-      
-      vectors.push(new Vector(p, origin, p.createVector(0 * gridStep, 5 * gridStep), { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, p.createVector(0 * gridStep, 5 * gridStep), {
+        gridStep,
         type: "actionable",
         color: p.color(0, 150, 255),
         label: "B"
       }));
-      
-      vectors.push(new Vector(p, origin, p.createVector(-10 * gridStep, -3 * gridStep), { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, p.createVector(-10 * gridStep, -3 * gridStep), {
+        gridStep,
         type: "actionable",
         color: p.color(0, 255, 255),
         label: "C"
       }));
-      
-      vectors.push(new Vector(p, origin, p.createVector(0, 0), { 
-        gridStep, 
+
+      vectors.push(new Vector(p, origin, p.createVector(0, 0), {
+        gridStep,
         type: "resultant",
         color: p.color(255, 0, 0),
         label: "R"
       }));
-      
+
       // Create UI
       const buttonContainer = setupButtonContainer(p);
-      
+
       const btnCartesian = p.createButton("Toggle Cartesian");
       btnCartesian.parent(buttonContainer);
       btnCartesian.mousePressed(() => showCartesian = !showCartesian);
-      
+
       const btnPolar = p.createButton("Toggle Polar");
       btnPolar.parent(buttonContainer);
       btnPolar.mousePressed(() => showPolar = !showPolar);
-      
+
       const btnLabels = p.createButton("Toggle Labels");
       btnLabels.parent(buttonContainer);
       btnLabels.mousePressed(() => showLabels = !showLabels);
-      
+
       const btnPlay = p.createButton("Play Triangle Rule");
       btnPlay.parent(buttonContainer);
       btnPlay.mousePressed(() => {
@@ -576,7 +628,7 @@ function setupButtonContainer(p) {
         tempVectors = [];
         p.frameRate(10);
       });
-      
+
       const btnReset = p.createButton("RESET");
       btnReset.parent(buttonContainer);
       btnReset.mousePressed(() => {
@@ -586,6 +638,25 @@ function setupButtonContainer(p) {
         tempVectors = [];
         p.frameRate(60);
       });
+    };
+
+    p.windowResized = function() {
+      const containerWidth = p.select('#VectorTriangleRule').width;
+      const canvasSize = Math.min(containerWidth, 600);
+      p.resizeCanvas(canvasSize, canvasSize);
+      gridStep = p.width / 30;
+
+      // Update vector positions and gridStep
+      vectors[0].x2 = 6 * gridStep;
+      vectors[0].y2 = -9 * gridStep;
+      vectors[0].gridStep = gridStep;
+      vectors[1].x2 = 0 * gridStep;
+      vectors[1].y2 = 5 * gridStep;
+      vectors[1].gridStep = gridStep;
+      vectors[2].x2 = -10 * gridStep;
+      vectors[2].y2 = -3 * gridStep;
+      vectors[2].gridStep = gridStep;
+      vectors[3].gridStep = gridStep;
     };
     
     p.draw = function() {
