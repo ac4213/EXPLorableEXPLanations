@@ -96,6 +96,29 @@
             margin-bottom: 12px;
           }
         }
+
+        /* Fix for numeric input fields - make them larger and more readable */
+        #failure-criteria-sketch + .controls-panel input[type="number"] {
+          width: 100px;
+          min-width: 100px;
+          padding: 8px 12px;
+          font-size: 16px;
+          border: 2px solid #ddd;
+          border-radius: 4px;
+          text-align: center;
+        }
+
+        /* Style the spinner buttons to be more visible but not overwhelming */
+        #failure-criteria-sketch + .controls-panel input[type="number"]::-webkit-inner-spin-button,
+        #failure-criteria-sketch + .controls-panel input[type="number"]::-webkit-outer-spin-button {
+          opacity: 1;
+          height: 30px;
+        }
+
+        #failure-criteria-sketch + .controls-panel input[type="number"]:focus {
+          border-color: var(--primary-color);
+          outline: none;
+        }
     </style>
 </head>
 

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tuned Mass Damper Simulation</title>
+    <title>Tuned Mass Damper - Interactive Lecture</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
 
@@ -64,6 +65,67 @@
     </style>
 </head>
 <body>
+    <header>
+        <h1>Tuned Mass Damper</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Tuned Mass Dampers</h2>
+        <p>A Tuned Mass Damper (TMD) is a passive vibration control device consisting of a mass, spring, and damper attached to a primary structure. The TMD is "tuned" so that its natural frequency matches the dominant frequency of the primary structure, allowing it to absorb vibrational energy and reduce the motion of the main system.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> When properly tuned, a TMD can dramatically reduce the vibration amplitude of the primary structure by transferring energy to the secondary mass, where it is dissipated through damping.</p>
+        </div>
+
+        <h3>How TMDs Work</h3>
+        <p>The TMD operates on the principle of dynamic vibration absorption. When the primary structure vibrates, the TMD oscillates out of phase with the structure, creating an inertial force that opposes the motion of the main system.</p>
+
+        <h3>TMD Equations of Motion</h3>
+        <p>For a 2-DOF system with a primary mass \(m_1\) and TMD mass \(m_2\):</p>
+        <div class="equation-box">
+            <p>\[m_1\ddot{x}_1 + c_1\dot{x}_1 + k_1x_1 + k_2(x_1-x_2) + c_2(\dot{x}_1-\dot{x}_2) = F_0\cos(\omega t)\]</p>
+            <p>\[m_2\ddot{x}_2 + k_2(x_2-x_1) + c_2(\dot{x}_2-\dot{x}_1) = 0\]</p>
+            <p>where:</p>
+            <ul>
+                <li>\(m_1, k_1, c_1\) = primary system parameters</li>
+                <li>\(m_2, k_2, c_2\) = TMD parameters</li>
+                <li>\(F_0\cos(\omega t)\) = harmonic forcing</li>
+            </ul>
+        </div>
+
+        <h3>TMD Design Parameters</h3>
+        <div class="equation-box">
+            <p><strong>Mass Ratio:</strong> \(\mu = \frac{m_2}{m_1}\) (typically 0.01 to 0.05)</p>
+            <p><strong>Frequency Ratio:</strong> \(f = \frac{\omega_2}{\omega_1}\) where \(\omega_1 = \sqrt{\frac{k_1}{m_1}}\) and \(\omega_2 = \sqrt{\frac{k_2}{m_2}}\)</p>
+            <p><strong>Optimal tuning:</strong> \(f_{opt} = \frac{1}{1 + \mu}\)</p>
+            <p><strong>Optimal damping ratio:</strong> \(\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}}\)</p>
+        </div>
+
+        <h3>Frequency Response</h3>
+        <p>The amplitude ratio of the primary mass is given by:</p>
+        <div class="equation-box">
+            <p>\[\frac{X_1}{X_{st}} = \frac{\sqrt{[1-(\omega/\omega_2)^2]^2 + [2\zeta_2(\omega/\omega_2)]^2}}{\left|[1+k_{12}-(\omega/\omega_1)^2][1-(\omega/\omega_2)^2] - k_{12}\right|}\]</p>
+            <p>where \(X_{st} = F_0/k_1\) is the static deflection and \(k_{12} = k_2/k_1 = \mu\) for optimal tuning.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Two Fixed Points:</strong> A properly designed TMD creates two fixed points in the frequency response curve, independent of damping. This ensures robust performance across a range of damping values.</p>
+        </div>
+
+        <h3>Real-World Applications</h3>
+        <ul>
+            <li><strong>Tall Buildings:</strong> Taipei 101 (660-ton TMD), Shanghai Tower, Tokyo Skytree</li>
+            <li><strong>Bridges:</strong> London Millennium Bridge, Brooklyn Bridge</li>
+            <li><strong>Industrial Equipment:</strong> Large turbines, compressors</li>
+            <li><strong>Wind Turbines:</strong> Nacelle vibration reduction</li>
+        </ul>
+    </div>
+
+    <div class="simulation-container">
+        <h2>Interactive TMD Simulation</h2>
+        <p>Compare the unprotected and TMD-protected systems. Adjust the TMD mass ratio, damping, and forcing frequency to observe their effects on vibration amplitude.</p>
+
     <div class="app-container">
         <div class="left-panel">
             <div class="controls">
@@ -418,6 +480,168 @@
         new p5(tmdMassPlot, 'tmdMassFRF');
         new p5(animation, 'animationContainer');
     </script>
+
+</div> <!-- End app-container -->
+</div> <!-- End simulation-container -->
+
+<div class="content-section">
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+        <h3>Problem 1: TMD Design</h3>
+        <p>A building with mass m₁ = 500 kg and natural frequency ω₁ = 10 rad/s needs a TMD with mass ratio μ = 0.05. Calculate:</p>
+        <ol type="a">
+            <li>The TMD mass m₂</li>
+            <li>The optimal TMD frequency ω₂</li>
+            <li>The optimal damping ratio ζ₂</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div id="solution1" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>a) TMD mass:</p>
+            <p>\(m_2 = \mu \cdot m_1 = 0.05 \times 500 = 25\) kg</p>
+
+            <p>b) Optimal TMD frequency (tuned to match primary frequency):</p>
+            <p>\(f_{opt} = \frac{1}{1 + \mu} = \frac{1}{1 + 0.05} = 0.952\)</p>
+            <p>\(\omega_2 = f_{opt} \cdot \omega_1 = 0.952 \times 10 = 9.52\) rad/s</p>
+
+            <p>c) Optimal damping ratio:</p>
+            <p>\(\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}} = \sqrt{\frac{3(0.05)}{8(1.05)^3}} = \sqrt{\frac{0.15}{9.26}} = 0.127\)</p>
+
+            <p>Required stiffness: \(k_2 = m_2\omega_2^2 = 25 \times 9.52^2 = 2266\) N/m</p>
+            <p>Required damping: \(c_2 = 2\zeta_2m_2\omega_2 = 2 \times 0.127 \times 25 \times 9.52 = 60.5\) Ns/m</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 2: TMD Effectiveness</h3>
+        <p>A structure without TMD has maximum amplitude X₁ = 50 mm at resonance. With a properly tuned TMD (μ = 0.05), what is the theoretical amplitude reduction factor?</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div id="solution2" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>For an optimally tuned TMD, the amplitude reduction factor at the primary resonance is approximately:</p>
+            <p>\[\text{Reduction Factor} = \frac{1}{2\mu}\]</p>
+
+            <p>For μ = 0.05:</p>
+            <p>\[\text{Reduction Factor} = \frac{1}{2 \times 0.05} = 10\]</p>
+
+            <p>New maximum amplitude:</p>
+            <p>\(X_{1,TMD} = \frac{X_1}{10} = \frac{50}{10} = 5\) mm</p>
+
+            <p>This represents a 90% reduction in vibration amplitude!</p>
+
+            <p><strong>Note:</strong> This is the theoretical maximum effectiveness. Real systems may achieve 70-85% reduction due to practical constraints.</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Self-Assessment Quiz</h2>
+
+    <div class="quiz-container">
+        <div class="quiz-question">
+            <p><strong>Question 1:</strong> What is the primary purpose of a Tuned Mass Damper?</p>
+            <form id="q1">
+                <input type="radio" id="q1a" name="q1" value="a">
+                <label for="q1a">a) To increase the natural frequency of a structure</label><br>
+                <input type="radio" id="q1b" name="q1" value="b">
+                <label for="q1b">b) To absorb vibrational energy and reduce motion</label><br>
+                <input type="radio" id="q1c" name="q1" value="c">
+                <label for="q1c">c) To amplify structural vibrations</label><br>
+                <input type="radio" id="q1d" name="q1" value="d">
+                <label for="q1d">d) To eliminate all vibrations completely</label><br>
+                <button type="button" onclick="checkAnswer('q1', 'b')">Check Answer</button>
+            </form>
+            <div id="q1-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 2:</strong> For optimal TMD performance, what should the mass ratio μ typically be?</p>
+            <form id="q2">
+                <input type="radio" id="q2a" name="q2" value="a">
+                <label for="q2a">a) 0.5 to 1.0</label><br>
+                <input type="radio" id="q2b" name="q2" value="b">
+                <label for="q2b">b) 0.1 to 0.3</label><br>
+                <input type="radio" id="q2c" name="q2" value="c">
+                <label for="q2c">c) 0.01 to 0.05</label><br>
+                <input type="radio" id="q2d" name="q2" value="d">
+                <label for="q2d">d) Greater than 1.0</label><br>
+                <button type="button" onclick="checkAnswer('q2', 'c')">Check Answer</button>
+            </form>
+            <div id="q2-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 3:</strong> How does a TMD reduce structural vibrations?</p>
+            <form id="q3">
+                <input type="radio" id="q3a" name="q3" value="a">
+                <label for="q3a">a) By moving in phase with the structure</label><br>
+                <input type="radio" id="q3b" name="q3" value="b">
+                <label for="q3b">b) By moving out of phase to create an opposing force</label><br>
+                <input type="radio" id="q3c" name="q3" value="c">
+                <label for="q3c">c) By increasing structural stiffness</label><br>
+                <input type="radio" id="q3d" name="q3" value="d">
+                <label for="q3d">d) By locking the structure in place</label><br>
+                <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
+            </form>
+            <div id="q3-feedback" class="feedback"></div>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Summary</h2>
+    <div class="key-point">
+        <h3>Key Takeaways</h3>
+        <ol>
+            <li>TMDs are passive vibration control devices that absorb energy from primary structures</li>
+            <li>Optimal tuning requires matching the TMD frequency to the structure's natural frequency</li>
+            <li>A small mass ratio (1-5%) can provide significant vibration reduction (up to 90%)</li>
+            <li>The TMD creates two fixed points in the frequency response, ensuring robust performance</li>
+            <li>Real-world applications include skyscrapers, bridges, and rotating machinery</li>
+            <li>Proper damping is crucial for TMD effectiveness across a range of frequencies</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// Toggle solution visibility
+function toggleSolution(id) {
+    const solution = document.getElementById(id);
+    if (solution.classList.contains('hidden')) {
+        solution.classList.remove('hidden');
+        solution.previousElementSibling.textContent = "Hide Solution";
+    } else {
+        solution.classList.add('hidden');
+        solution.previousElementSibling.textContent = "Show Solution";
+    }
+}
+
+// Function to check quiz answers
+function checkAnswer(questionId, correctAnswer) {
+    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+    const feedbackElement = document.getElementById(`${questionId}-feedback`);
+
+    if (!selectedOption) {
+        feedbackElement.innerHTML = "Please select an answer.";
+        feedbackElement.className = "feedback";
+        return;
+    }
+
+    if (selectedOption.value === correctAnswer) {
+        feedbackElement.innerHTML = "✓ Correct! Well done.";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "green";
+    } else {
+        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "red";
+    }
+}
+</script>
+
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

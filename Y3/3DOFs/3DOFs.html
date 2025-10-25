@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Interactive 3DOFs Free Damped Vibration</title>
+    <title>Multi-Degree of Freedom Vibration - Interactive Lecture</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
 
@@ -96,8 +97,70 @@
     </style>
 </head>
 <body>
+    <header>
+        <h1>Multi-Degree of Freedom Vibration</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Multi-DOF Systems</h2>
+        <p>Multi-degree of freedom (MDOF) systems are mechanical systems that require more than one coordinate to describe their motion. Unlike SDOF systems, MDOF systems exhibit coupled behavior where motion in one coordinate affects motion in others.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> A 3-DOF system requires three independent coordinates to describe its configuration. Each mass can move independently, but they are coupled through springs and dampers, creating complex vibrational behavior with multiple natural frequencies.</p>
+        </div>
+
+        <h3>Equations of Motion</h3>
+        <p>For a 3-DOF system with masses \(m_1, m_2, m_3\) and springs \(k_1, k_2, k_3, k_4\), the equations of motion are:</p>
+        <div class="equation-box">
+            <p>\[m_1\ddot{x}_1 + c_1\dot{x}_1 + (k_1 + k_2)x_1 - k_2x_2 = 0\]</p>
+            <p>\[m_2\ddot{x}_2 + c_2\dot{x}_2 - k_2x_1 + (k_2 + k_3)x_2 - k_3x_3 = 0\]</p>
+            <p>\[m_3\ddot{x}_3 + c_3\dot{x}_3 - k_3x_2 + (k_3 + k_4)x_3 = 0\]</p>
+            <p>In matrix form:</p>
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+        </div>
+
+        <h3>Modal Analysis</h3>
+        <p>The key to understanding MDOF systems is modal analysis, which decomposes the coupled motion into independent modal coordinates.</p>
+
+        <div class="equation-box">
+            <p><strong>Eigenvalue Problem:</strong></p>
+            <p>\[(\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\]</p>
+            <p>Solving this gives:</p>
+            <ul>
+                <li><strong>Eigenvalues:</strong> \(\omega_1^2, \omega_2^2, \omega_3^2\) (natural frequencies squared)</li>
+                <li><strong>Eigenvectors:</strong> \(\mathbf{\Phi}_1, \mathbf{\Phi}_2, \mathbf{\Phi}_3\) (mode shapes)</li>
+            </ul>
+        </div>
+
+        <h3>Mode Shapes</h3>
+        <p>Each mode shape represents a particular pattern of vibration where all masses oscillate at the same frequency with fixed amplitude ratios:</p>
+        <ul>
+            <li><strong>First Mode:</strong> Usually has all masses moving in phase (lowest frequency)</li>
+            <li><strong>Second Mode:</strong> Shows one or more sign changes (intermediate frequency)</li>
+            <li><strong>Third Mode:</strong> More complex pattern with multiple sign changes (highest frequency)</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Orthogonality:</strong> Mode shapes are orthogonal with respect to mass and stiffness matrices, allowing the system to be decoupled into independent modal equations.</p>
+        </div>
+
+        <h3>Modal Decomposition</h3>
+        <div class="equation-box">
+            <p>Physical coordinates relate to modal coordinates by:</p>
+            <p>\[\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\]</p>
+            <p>Each modal equation becomes:</p>
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = 0\]</p>
+            <p>This is identical to a SDOF system!</p>
+        </div>
+    </div>
+
+    <div class="simulation-container">
+        <h2>Interactive 3-DOF Vibration Simulation</h2>
+        <p>Explore how changing masses, spring stiffnesses, and initial conditions affects the vibrational behavior. Observe both modal and physical responses.</p>
+
     <div class="container">
-        <h1>Interactive 3DOFs Free Damped Vibration</h1>
+        <h1 style="display:none;">Interactive 3DOFs Free Damped Vibration</h1>
         
         <div class="control-panel">
             <div class="control-group">
@@ -813,6 +876,160 @@
             }
         }, 'sketch-container');
     </script>
+
+</div> <!-- End simulation-container -->
+</div> <!-- End container -->
+
+<div class="content-section">
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+        <h3>Problem 1: Natural Frequencies</h3>
+        <p>A 3-DOF system has equal masses m = 2 kg and spring stiffnesses k₁ = k₂ = k₃ = k₄ = 1000 N/m. Calculate the three natural frequencies.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div id="solution1" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>Mass matrix: \(\mathbf{M} = m\mathbf{I} = 2\mathbf{I}\)</p>
+            <p>Stiffness matrix:</p>
+            <p>\[\mathbf{K} = \begin{bmatrix} 2k & -k & 0 \\ -k & 2k & -k \\ 0 & -k & 2k \end{bmatrix} = 1000\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}\]</p>
+
+            <p>Eigenvalue problem: \(\det(\mathbf{K} - \omega^2\mathbf{M}) = 0\)</p>
+            <p>This gives three natural frequencies:</p>
+            <p>\(\omega_1 = \sqrt{\frac{k}{m}(2 - \sqrt{2})} = \sqrt{\frac{1000}{2}(2 - \sqrt{2})} = 13.1\) rad/s</p>
+            <p>\(\omega_2 = \sqrt{\frac{2k}{m}} = \sqrt{\frac{2000}{2}} = 31.6\) rad/s</p>
+            <p>\(\omega_3 = \sqrt{\frac{k}{m}(2 + \sqrt{2})} = \sqrt{\frac{1000}{2}(2 + \sqrt{2})} = 38.3\) rad/s</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 2: Mode Shape Properties</h3>
+        <p>Explain why the mode shapes of a 3-DOF system are orthogonal with respect to the mass matrix.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div id="solution2" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>Mode shapes \(\mathbf{\Phi}_i\) and \(\mathbf{\Phi}_j\) satisfy the eigenvalue equations:</p>
+            <p>\(\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{M}\mathbf{\Phi}_i\)</p>
+            <p>\(\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{M}\mathbf{\Phi}_j\)</p>
+
+            <p>Pre-multiplying the first by \(\mathbf{\Phi}_j^T\) and the second by \(\mathbf{\Phi}_i^T\):</p>
+            <p>\(\mathbf{\Phi}_j^T\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i\)</p>
+            <p>\(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j\)</p>
+
+            <p>Since \(\mathbf{K}\) and \(\mathbf{M}\) are symmetric:</p>
+            <p>\((\omega_i^2 - \omega_j^2)\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\)</p>
+
+            <p>For \(\omega_i \neq \omega_j\), we must have:</p>
+            <p>\(\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\) (orthogonality condition)</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Self-Assessment Quiz</h2>
+
+    <div class="quiz-container">
+        <div class="quiz-question">
+            <p><strong>Question 1:</strong> For a 3-DOF system, how many natural frequencies exist?</p>
+            <form id="q1">
+                <input type="radio" id="q1a" name="q1" value="a">
+                <label for="q1a">a) One</label><br>
+                <input type="radio" id="q1b" name="q1" value="b">
+                <label for="q1b">b) Two</label><br>
+                <input type="radio" id="q1c" name="q1" value="c">
+                <label for="q1c">c) Three</label><br>
+                <input type="radio" id="q1d" name="q1" value="d">
+                <label for="q1d">d) Infinite</label><br>
+                <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
+            </form>
+            <div id="q1-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 2:</strong> What is the main advantage of modal decomposition?</p>
+            <form id="q2">
+                <input type="radio" id="q2a" name="q2" value="a">
+                <label for="q2a">a) It reduces computational cost</label><br>
+                <input type="radio" id="q2b" name="q2" value="b">
+                <label for="q2b">b) It decouples the equations of motion</label><br>
+                <input type="radio" id="q2c" name="q2" value="c">
+                <label for="q2c">c) It eliminates damping</label><br>
+                <input type="radio" id="q2d" name="q2" value="d">
+                <label for="q2d">d) It increases system stiffness</label><br>
+                <button type="button" onclick="checkAnswer('q2', 'b')">Check Answer</button>
+            </form>
+            <div id="q2-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 3:</strong> Which mode typically has the lowest natural frequency?</p>
+            <form id="q3">
+                <input type="radio" id="q3a" name="q3" value="a">
+                <label for="q3a">a) The mode with the most sign changes</label><br>
+                <input type="radio" id="q3b" name="q3" value="b">
+                <label for="q3b">b) The mode where all masses move in phase</label><br>
+                <input type="radio" id="q3c" name="q3" value="c">
+                <label for="q3c">c) The mode with highest amplitude</label><br>
+                <input type="radio" id="q3d" name="q3" value="d">
+                <label for="q3d">d) The mode with zero displacement</label><br>
+                <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
+            </form>
+            <div id="q3-feedback" class="feedback"></div>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Summary</h2>
+    <div class="key-point">
+        <h3>Key Takeaways</h3>
+        <ol>
+            <li>3-DOF systems require three coordinates and have three natural frequencies</li>
+            <li>Modal analysis decomposes coupled MDOF systems into independent SDOF systems</li>
+            <li>Mode shapes represent patterns of vibration and are orthogonal</li>
+            <li>Physical response is a superposition of all modal responses</li>
+            <li>Lower modes generally have larger spatial wavelengths and lower frequencies</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+// Toggle solution visibility
+function toggleSolution(id) {
+    const solution = document.getElementById(id);
+    if (solution.classList.contains('hidden')) {
+        solution.classList.remove('hidden');
+        solution.previousElementSibling.textContent = "Hide Solution";
+    } else {
+        solution.classList.add('hidden');
+        solution.previousElementSibling.textContent = "Show Solution";
+    }
+}
+
+// Function to check quiz answers
+function checkAnswer(questionId, correctAnswer) {
+    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+    const feedbackElement = document.getElementById(`${questionId}-feedback`);
+
+    if (!selectedOption) {
+        feedbackElement.innerHTML = "Please select an answer.";
+        feedbackElement.className = "feedback";
+        return;
+    }
+
+    if (selectedOption.value === correctAnswer) {
+        feedbackElement.innerHTML = "✓ Correct! Well done.";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "green";
+    } else {
+        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "red";
+    }
+}
+</script>
+
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

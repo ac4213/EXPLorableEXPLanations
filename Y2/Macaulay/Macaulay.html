@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Macaulay's Method</title>
+  <title>Macaulay's Method - Interactive Lecture</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/simulations.css">
   <style>
@@ -27,13 +28,72 @@
 </head>
 <body>
   <header>
-    <div class="wrap">
-      <h1>Macaulay's Method – Interactive Beam</h1>
-      <div class="note">Determinate diagrams use Macaulay. Indeterminate cases solved by compatibility (stiffness), not the force method.</div>
-    </div>
+    <h1>Macaulay's Method</h1>
+    <p class="subtitle">Interactive Lecture & Simulation</p>
   </header>
 
-  <div class="wrap">
+  <div class="content-section">
+    <h2>Understanding Macaulay's Method</h2>
+    <p>Macaulay's Method, also known as the Macaulay bracket method, is a powerful technique for determining deflections and slopes in beams subjected to various loading conditions. Developed by W. H. Macaulay in 1919, this method provides a systematic approach to handling discontinuous loads.</p>
+
+    <div class="key-point">
+      <p><strong>Core Insight:</strong> Macaulay's method uses discontinuity functions (bracket functions) to write a single equation for bending moment that is valid over the entire length of the beam, even when loads change position.</p>
+    </div>
+
+    <h3>The Macaulay Bracket Notation</h3>
+    <p>The Macaulay bracket is defined as:</p>
+    <div class="equation-box">
+      <p>\[\langle x - a \rangle^n = \begin{cases}
+      (x-a)^n & \text{if } x \geq a \\
+      0 & \text{if } x < a
+      \end{cases}\]</p>
+      <p>where \(a\) is the position where a load or discontinuity occurs.</p>
+    </div>
+
+    <h3>Sign Conventions</h3>
+    <ul>
+      <li><strong>Deflection (v):</strong> Positive downward</li>
+      <li><strong>Shear Force (V):</strong> Positive when causing clockwise rotation</li>
+      <li><strong>Bending Moment (M):</strong> Positive when causing sagging (tension at bottom)</li>
+      <li><strong>Distributed loads (w):</strong> Positive downward</li>
+    </ul>
+
+    <h3>Beam Differential Equations</h3>
+    <div class="equation-box">
+      <p>The fundamental beam relationships are:</p>
+      <p>\[\frac{d^2M}{dx^2} = -w(x)\]</p>
+      <p>\[\frac{dM}{dx} = V(x)\]</p>
+      <p>\[EI\frac{d^2v}{dx^2} = M(x)\]</p>
+      <p>where \(E\) is the Young's modulus, \(I\) is the second moment of area, and \(v\) is the deflection.</p>
+    </div>
+
+    <h3>Types of Loads in Macaulay's Method</h3>
+    <ol>
+      <li><strong>Point Load:</strong> \(P\langle x - a \rangle^0\)</li>
+      <li><strong>Point Moment:</strong> \(M_0\langle x - a \rangle^{-1}\)</li>
+      <li><strong>Uniformly Distributed Load (UDL):</strong> \(\frac{w}{2}\langle x - a \rangle^2\)</li>
+    </ol>
+
+    <h3>General Procedure</h3>
+    <div class="equation-box">
+      <ol>
+        <li>Determine support reactions using equilibrium equations</li>
+        <li>Write the bending moment equation using Macaulay brackets</li>
+        <li>Integrate once to get slope: \(EI\frac{dv}{dx} = \int M \, dx + C_1\)</li>
+        <li>Integrate again to get deflection: \(EIv = \int\int M \, dx^2 + C_1x + C_2\)</li>
+        <li>Apply boundary conditions to find constants \(C_1\) and \(C_2\)</li>
+        <li>Calculate slopes and deflections at any point</li>
+      </ol>
+    </div>
+
+    <div class="key-point">
+      <p><strong>Important:</strong> When integrating Macaulay brackets, maintain the bracket notation throughout. Only evaluate when the argument is positive (i.e., when \(x > a\)).</p>
+    </div>
+  </div>
+
+  <div class="simulation-container">
+    <h2>Interactive Beam Simulation</h2>
+    <p>Explore how different loading configurations affect beam deflection, shear force, and bending moment diagrams. The simulation uses Macaulay's method for determinate beams and the stiffness method for indeterminate cases.</p>
     <div class="panel">
       <div id="controls">
         <div class="control">
@@ -441,6 +501,173 @@ function titleText(){
   }
 }
 </script>
+
+</div> <!-- End simulation-container -->
+
+<div class="content-section">
+  <h2>Practice Problems</h2>
+
+  <div class="practice-problems">
+    <h3>Problem 1: Simply Supported Beam with Point Load</h3>
+    <p>A simply supported beam of length L = 6 m carries a point load P = 10 kN at a distance a = 2 m from the left support. The beam has EI = 12000 kNm². Calculate:</p>
+    <ol type="a">
+      <li>The maximum deflection and its location</li>
+      <li>The slope at the left support</li>
+      <li>The slope at the right support</li>
+    </ol>
+
+    <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+    <div id="solution1" class="hidden">
+      <p><strong>Solution:</strong></p>
+      <p>First, find reactions: \(R_A = \frac{P(L-a)}{L} = \frac{10(6-2)}{6} = 6.67\) kN</p>
+      <p>\(R_B = \frac{Pa}{L} = \frac{10 \times 2}{6} = 3.33\) kN</p>
+
+      <p>Bending moment equation:</p>
+      <p>\(M(x) = R_A x - P\langle x - a \rangle^1 = 6.67x - 10\langle x - 2 \rangle^1\)</p>
+
+      <p>Integrate to get slope:</p>
+      <p>\(EI\frac{dv}{dx} = \frac{6.67x^2}{2} - \frac{10\langle x - 2 \rangle^2}{2} + C_1\)</p>
+
+      <p>Integrate again for deflection:</p>
+      <p>\(EIv = \frac{6.67x^3}{6} - \frac{10\langle x - 2 \rangle^3}{6} + C_1x + C_2\)</p>
+
+      <p>Apply boundary conditions: At \(x = 0\), \(v = 0\) → \(C_2 = 0\)</p>
+      <p>At \(x = 6\) m, \(v = 0\) → \(C_1 = -26.67\) kNm²</p>
+
+      <p>Maximum deflection occurs where slope = 0, at approximately x = 2.67 m</p>
+      <p>\(v_{max} = -9.88\) mm (downward)</p>
+      <p>Slope at left support: \(\theta_A = -2.22 \times 10^{-3}\) rad</p>
+      <p>Slope at right support: \(\theta_B = 1.11 \times 10^{-3}\) rad</p>
+    </div>
+  </div>
+
+  <div class="practice-problems">
+    <h3>Problem 2: Cantilever with UDL</h3>
+    <p>A cantilever beam of length L = 4 m is fixed at the left end and carries a uniformly distributed load w = 5 kN/m over its entire length. EI = 8000 kNm². Find the deflection and slope at the free end.</p>
+
+    <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+    <div id="solution2" class="hidden">
+      <p><strong>Solution:</strong></p>
+      <p>For a cantilever with UDL over entire length, moment from right end:</p>
+      <p>\(M(x) = -\frac{w(L-x)^2}{2} = -\frac{5(4-x)^2}{2}\)</p>
+
+      <p>Or using Macaulay notation from left:</p>
+      <p>\(M(x) = -wL(x) + \frac{w}{2}\langle x - 0 \rangle^2 + \frac{wL^2}{2}\)</p>
+
+      <p>Integrating twice and applying boundary conditions at x = 0:</p>
+      <p>\(v(0) = 0\) and \(\frac{dv}{dx}(0) = 0\)</p>
+
+      <p>At the free end (x = L = 4 m):</p>
+      <p>Deflection: \(v(L) = \frac{wL^4}{8EI} = \frac{5 \times 4^4}{8 \times 8000} = 0.020\) m = 20 mm (downward)</p>
+      <p>Slope: \(\theta(L) = \frac{wL^3}{6EI} = \frac{5 \times 4^3}{6 \times 8000} = 0.00667\) rad</p>
+    </div>
+  </div>
+</div>
+
+<div class="content-section">
+  <h2>Self-Assessment Quiz</h2>
+
+  <div class="quiz-container">
+    <div class="quiz-question">
+      <p><strong>Question 1:</strong> What is the key advantage of Macaulay's method over traditional integration methods?</p>
+      <form id="q1">
+        <input type="radio" id="q1a" name="q1" value="a">
+        <label for="q1a">a) It is computationally faster</label><br>
+        <input type="radio" id="q1b" name="q1" value="b">
+        <label for="q1b">b) It allows writing a single equation valid for the entire beam length</label><br>
+        <input type="radio" id="q1c" name="q1" value="c">
+        <label for="q1c">c) It only works for determinate beams</label><br>
+        <input type="radio" id="q1d" name="q1" value="d">
+        <label for="q1d">d) It eliminates the need for boundary conditions</label><br>
+        <button type="button" onclick="checkAnswer('q1', 'b')">Check Answer</button>
+      </form>
+      <div id="q1-feedback" class="feedback"></div>
+    </div>
+
+    <div class="quiz-question">
+      <p><strong>Question 2:</strong> For a point load P at position 'a', how is it represented in Macaulay notation?</p>
+      <form id="q2">
+        <input type="radio" id="q2a" name="q2" value="a">
+        <label for="q2a">a) \(P(x - a)\)</label><br>
+        <input type="radio" id="q2b" name="q2" value="b">
+        <label for="q2b">b) \(P\langle x - a \rangle^0\)</label><br>
+        <input type="radio" id="q2c" name="q2" value="c">
+        <label for="q2c">c) \(P\langle x - a \rangle^1\)</label><br>
+        <input type="radio" id="q2d" name="q2" value="d">
+        <label for="q2d">d) \(P\langle x - a \rangle^2\)</label><br>
+        <button type="button" onclick="checkAnswer('q2', 'b')">Check Answer</button>
+      </form>
+      <div id="q2-feedback" class="feedback"></div>
+    </div>
+
+    <div class="quiz-question">
+      <p><strong>Question 3:</strong> What happens to a Macaulay bracket \(\langle x - a \rangle^n\) when \(x < a\)?</p>
+      <form id="q3">
+        <input type="radio" id="q3a" name="q3" value="a">
+        <label for="q3a">a) It equals \((x-a)^n\)</label><br>
+        <input type="radio" id="q3b" name="q3" value="b">
+        <label for="q3b">b) It equals zero</label><br>
+        <input type="radio" id="q3c" name="q3" value="c">
+        <label for="q3c">c) It equals \(a^n\)</label><br>
+        <input type="radio" id="q3d" name="q3" value="d">
+        <label for="q3d">d) It is undefined</label><br>
+        <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
+      </form>
+      <div id="q3-feedback" class="feedback"></div>
+    </div>
+  </div>
+</div>
+
+<div class="content-section">
+  <h2>Summary</h2>
+  <div class="key-point">
+    <h3>Key Takeaways</h3>
+    <ol>
+      <li>Macaulay's method uses bracket notation to handle discontinuities in beam loading</li>
+      <li>A single equation can describe bending moment over the entire beam length</li>
+      <li>The method is particularly efficient for beams with multiple point loads</li>
+      <li>Boundary conditions are applied after integration to find constants</li>
+      <li>For indeterminate beams, the stiffness (compatibility) method is required</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+// Toggle solution visibility
+function toggleSolution(id) {
+  const solution = document.getElementById(id);
+  if (solution.classList.contains('hidden')) {
+    solution.classList.remove('hidden');
+    solution.previousElementSibling.textContent = "Hide Solution";
+  } else {
+    solution.classList.add('hidden');
+    solution.previousElementSibling.textContent = "Show Solution";
+  }
+}
+
+// Function to check quiz answers
+function checkAnswer(questionId, correctAnswer) {
+  const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+  const feedbackElement = document.getElementById(`${questionId}-feedback`);
+
+  if (!selectedOption) {
+    feedbackElement.innerHTML = "Please select an answer.";
+    feedbackElement.className = "feedback";
+    return;
+  }
+
+  if (selectedOption.value === correctAnswer) {
+    feedbackElement.innerHTML = "✓ Correct! Well done.";
+    feedbackElement.className = "feedback";
+    feedbackElement.style.color = "green";
+  } else {
+    feedbackElement.innerHTML = "✗ Incorrect. Try again!";
+    feedbackElement.className = "feedback";
+    feedbackElement.style.color = "red";
+  }
+}
+</script>
+
 <footer>
   <script src="/assets/common/footer.js"></script>
 </footer>
