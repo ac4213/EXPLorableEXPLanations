@@ -29,6 +29,15 @@
     let score = 0;
     let lives = 3;
     let ballIsMoving = false;
+    let speedIncreaseInterval = 5000; // Increase speed every 5 seconds
+    let lastSpeedIncrease = 0;
+    let speedMultiplier = 1.0;
+    let powerups = [];
+    let powerupTypes = ['expand', 'slow', 'life'];
+    let activePowerups = {
+        expand: 0,
+        slow: 0
+    };
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
@@ -64,7 +73,7 @@
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 if (level[row][col] == 1) {
-                    bricks.push(new Brick(col * brickWidth, row * brickHeight));
+                    bricks.push(new Brick(col * brickWidth, row * brickHeight, row));
                 }
             }
         }
@@ -72,11 +81,17 @@
 
     function draw() {
         background(0);
-        
+
+        // Increase ball speed over time
+        if (ballIsMoving && millis() - lastSpeedIncrease > speedIncreaseInterval) {
+            speedMultiplier *= 1.08; // Increase by 8% every interval
+            lastSpeedIncrease = millis();
+        }
+
         // Display and update paddle
         paddle.display();
         paddle.move();
-        
+
         // Display and update ball
         ball.display();
         if (ballIsMoving) {
@@ -90,21 +105,61 @@
         for (let i = bricks.length - 1; i >= 0; i--) {
             bricks[i].display();
             if (ball.checkBrickCollision(bricks[i])) {
+                // Chance to spawn powerup (20% chance)
+                if (random() < 0.2) {
+                    let type = random(powerupTypes);
+                    powerups.push(new Powerup(bricks[i].x + bricks[i].w / 2, bricks[i].y, type));
+                }
                 bricks.splice(i, 1);
                 score += 10;
             }
         }
+
+        // Display and update powerups
+        for (let i = powerups.length - 1; i >= 0; i--) {
+            powerups[i].display();
+            powerups[i].move();
+
+            // Check if paddle catches powerup
+            if (powerups[i].checkPaddleCollision(paddle)) {
+                activatePowerup(powerups[i].type);
+                powerups.splice(i, 1);
+            } else if (powerups[i].y > height) {
+                // Remove powerup if it falls off screen
+                powerups.splice(i, 1);
+            }
+        }
+
+        // Update active powerup timers
+        updatePowerupTimers();
         
         // Display score and lives
         fill(255);
         textSize(24);
         text("Score: " + score, 10, height - 30);
         text("Lives: " + lives, 10, height - 10);
+
+        // Display active powerups
+        let powerupY = height - 60;
+        textSize(16);
+        if (activePowerups.expand > 0) {
+            fill(0, 255, 0);
+            let timeLeft = Math.ceil((activePowerups.expand - millis()) / 1000);
+            text("Expanded Paddle: " + timeLeft + "s", 10, powerupY);
+            powerupY -= 20;
+        }
+        if (activePowerups.slow > 0) {
+            fill(0, 150, 255);
+            let timeLeft = Math.ceil((activePowerups.slow - millis()) / 1000);
+            text("Slow Ball: " + timeLeft + "s", 10, powerupY);
+        }
         
         // Check if ball is lost
         if (ball.y > height) {
             lives--;
             ballIsMoving = false; // Stop the ball
+            speedMultiplier = 1.0; // Reset speed multiplier
+            lastSpeedIncrease = 0;
             if (lives > 0) {
                 ball.resetOnPaddle(paddle);
             } else {
@@ -136,9 +191,11 @@
         }
         
         move() {
-            this.x += this.xSpeed;
-            this.y += this.ySpeed;
-            
+            // Apply slow powerup if active
+            let slowEffect = (activePowerups.slow > 0) ? 0.5 : 1.0;
+            this.x += this.xSpeed * speedMultiplier * slowEffect;
+            this.y += this.ySpeed * speedMultiplier * slowEffect;
+
             // Wall collision
             if (this.x < 0 || this.x > width) {
                 this.xSpeed *= -1;
@@ -150,15 +207,56 @@
         
         checkPaddleCollision(paddle) {
             if (this.y + this.r > paddle.y && this.x > paddle.x && this.x < paddle.x + paddle.w) {
-                this.ySpeed *= -1;
+                // Calculate where on the paddle the ball hit (0 = left edge, 1 = right edge)
+                let hitPos = (this.x - paddle.x) / paddle.w;
+
+                // Map hit position to angle: center = straight up, edges = angled
+                // Range from -60 to 60 degrees (in radians)
+                let angle = map(hitPos, 0, 1, -PI/3, PI/3);
+
+                // Calculate speed magnitude to maintain consistent speed
+                let speed = sqrt(this.xSpeed * this.xSpeed + this.ySpeed * this.ySpeed);
+
+                // Set new velocity based on angle
+                this.xSpeed = speed * sin(angle);
+                this.ySpeed = -speed * cos(angle); // Negative because we want upward motion
+
                 this.y = paddle.y - this.r; // Avoid sticking to the paddle
             }
         }
         
         checkBrickCollision(brick) {
+            // Check if ball is colliding with brick
             if (this.x + this.r > brick.x && this.x - this.r < brick.x + brick.w &&
                 this.y + this.r > brick.y && this.y - this.r < brick.y + brick.h) {
-                this.ySpeed *= -1;
+
+                // Determine which side of the brick was hit
+                let overlapLeft = (this.x + this.r) - brick.x;
+                let overlapRight = (brick.x + brick.w) - (this.x - this.r);
+                let overlapTop = (this.y + this.r) - brick.y;
+                let overlapBottom = (brick.y + brick.h) - (this.y - this.r);
+
+                // Find the minimum overlap
+                let minOverlap = min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+                // Bounce based on which side has minimum overlap
+                if (minOverlap === overlapLeft || minOverlap === overlapRight) {
+                    this.xSpeed *= -1;
+                    // Push ball out of brick
+                    if (minOverlap === overlapLeft) {
+                        this.x = brick.x - this.r;
+                    } else {
+                        this.x = brick.x + brick.w + this.r;
+                    }
+                } else {
+                    this.ySpeed *= -1;
+                    // Push ball out of brick
+                    if (minOverlap === overlapTop) {
+                        this.y = brick.y - this.r;
+                    } else {
+                        this.y = brick.y + brick.h + this.r;
+                    }
+                }
                 return true;
             }
             return false;
@@ -189,22 +287,127 @@
 
     // Brick class
     class Brick {
-        constructor(x, y) {
+        constructor(x, y, row) {
             this.x = x;
             this.y = y;
             this.w = brickWidth;
             this.h = brickHeight;
+            this.row = row;
+            this.color = this.getColorForRow(row);
         }
-        
+
+        getColorForRow(row) {
+            // Create a rainbow gradient based on row number
+            let colors = [
+                [255, 0, 0],     // Red
+                [255, 127, 0],   // Orange
+                [255, 255, 0],   // Yellow
+                [0, 255, 0],     // Green
+                [0, 255, 127],   // Spring green
+                [0, 255, 255],   // Cyan
+                [0, 127, 255],   // Sky blue
+                [0, 0, 255],     // Blue
+                [127, 0, 255],   // Purple
+                [255, 0, 255],   // Magenta
+                [255, 0, 127],   // Pink
+                [255, 63, 63],   // Light red
+                [255, 127, 127], // Lighter red
+                [255, 191, 191]  // Very light red
+            ];
+            return colors[row % colors.length];
+        }
+
         display() {
-            fill(255, 0, 0);
+            fill(this.color[0], this.color[1], this.color[2]);
+            stroke(0);
+            strokeWeight(2);
             rect(this.x, this.y, this.w, this.h);
+        }
+    }
+
+    // Powerup class
+    class Powerup {
+        constructor(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.w = 30;
+            this.h = 15;
+            this.type = type;
+            this.speed = 2;
+        }
+
+        display() {
+            // Different colors for different powerups
+            if (this.type === 'expand') {
+                fill(0, 255, 0); // Green
+            } else if (this.type === 'slow') {
+                fill(0, 150, 255); // Blue
+            } else if (this.type === 'life') {
+                fill(255, 100, 200); // Pink
+            }
+
+            stroke(255);
+            strokeWeight(2);
+            rect(this.x - this.w / 2, this.y, this.w, this.h, 3);
+
+            // Add letter indicator
+            fill(255);
+            textSize(10);
+            textAlign(CENTER, CENTER);
+            if (this.type === 'expand') {
+                text('E', this.x, this.y + this.h / 2);
+            } else if (this.type === 'slow') {
+                text('S', this.x, this.y + this.h / 2);
+            } else if (this.type === 'life') {
+                text('L', this.x, this.y + this.h / 2);
+            }
+            textAlign(LEFT); // Reset alignment
+        }
+
+        move() {
+            this.y += this.speed;
+        }
+
+        checkPaddleCollision(paddle) {
+            return (this.y + this.h > paddle.y &&
+                    this.x > paddle.x &&
+                    this.x < paddle.x + paddle.w);
+        }
+    }
+
+    function activatePowerup(type) {
+        if (type === 'expand') {
+            // Expand paddle for 10 seconds
+            if (activePowerups.expand === 0) {
+                paddle.w *= 1.5;
+            }
+            activePowerups.expand = millis() + 10000;
+        } else if (type === 'slow') {
+            // Slow ball for 8 seconds
+            activePowerups.slow = millis() + 8000;
+        } else if (type === 'life') {
+            // Add extra life
+            lives++;
+        }
+    }
+
+    function updatePowerupTimers() {
+        // Check expand powerup
+        if (activePowerups.expand > 0 && millis() > activePowerups.expand) {
+            paddle.w /= 1.5;
+            activePowerups.expand = 0;
+        }
+
+        // Check slow powerup
+        if (activePowerups.slow > 0 && millis() > activePowerups.slow) {
+            activePowerups.slow = 0;
         }
     }
 
     function mousePressed() {
         if (!ballIsMoving) {
             ballIsMoving = true;
+            lastSpeedIncrease = millis(); // Start the speed increase timer
         }
     }
 

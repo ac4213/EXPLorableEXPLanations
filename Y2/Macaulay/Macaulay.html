@@ -67,12 +67,25 @@
       <p>where \(E\) is the Young's modulus, \(I\) is the second moment of area, and \(v\) is the deflection.</p>
     </div>
 
-    <h3>Types of Loads in Macaulay's Method</h3>
+    <h3>Types of Loads in Macaulay's Method for Bending Moment M(x)</h3>
+    <p>Macaulay's method is most commonly used to calculate the bending moment diagram M(x). Each type of load contributes to M(x) with a specific exponent:</p>
     <ol>
-      <li><strong>Point Load:</strong> \(P\langle x - a \rangle^0\)</li>
-      <li><strong>Point Moment:</strong> \(M_0\langle x - a \rangle^{-1}\)</li>
-      <li><strong>Uniformly Distributed Load (UDL):</strong> \(\frac{w}{2}\langle x - a \rangle^2\)</li>
+      <li><strong>Concentrated Moment \(M_0\) at position a:</strong> Contributes \(M_0\langle x - a \rangle^0\) to M(x)
+        <br><span class="note">Exponent = 0 (the bracket acts as a step function)</span>
+      </li>
+      <li><strong>Concentrated Force P at position a:</strong> Contributes \(P\langle x - a \rangle^1\) to M(x)
+        <br><span class="note">Exponent = 1 (linear contribution to moment)</span>
+      </li>
+      <li><strong>Uniformly Distributed Load (UDL) w starting at position a:</strong> Contributes \(\frac{w}{2}\langle x - a \rangle^2\) to M(x)
+        <br><span class="note">Exponent = 2 (parabolic contribution to moment)</span>
+      </li>
     </ol>
+
+    <div class="key-point">
+      <p><strong>Important Note on Partial UDLs:</strong> If a UDL does not extend to the end of the beam, you need to add a <em>compensating</em> term. For example, a downward UDL of magnitude w starting at position a and ending at position b contributes:</p>
+      <p>\[M(x) = -\frac{w}{2}\langle x - a \rangle^2 + \frac{w}{2}\langle x - b \rangle^2\]</p>
+      <p>The first term "turns on" the UDL at a, and the second term "turns it off" at b by adding an equal and opposite UDL.</p>
+    </div>
 
     <h3>General Procedure</h3>
     <div class="equation-box">
@@ -562,6 +575,38 @@ function titleText(){
       <p>Slope: \(\theta(L) = \frac{wL^3}{6EI} = \frac{5 \times 4^3}{6 \times 8000} = 0.00667\) rad</p>
     </div>
   </div>
+
+  <div class="practice-problems">
+    <h3>Problem 3: Simply Supported Beam with Partial UDL</h3>
+    <p>A simply supported beam of length L = 8 m carries a uniformly distributed load w = 12 kN/m that starts at x = 2 m and ends at x = 6 m. The beam has EI = 15000 kNm². Calculate:</p>
+    <ol type="a">
+      <li>The support reactions at A (x = 0) and B (x = 8 m)</li>
+      <li>The bending moment equation using Macaulay's method</li>
+      <li>The maximum bending moment and its location</li>
+    </ol>
+
+    <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+    <div id="solution3" class="hidden">
+      <p><strong>Solution:</strong></p>
+      <p><em>Part (a): Support Reactions</em></p>
+      <p>Total load: \(W = w \times (6-2) = 12 \times 4 = 48\) kN acting at midpoint x = 4 m</p>
+      <p>Taking moments about A:</p>
+      <p>\(R_B \times 8 = 48 \times 4\) → \(R_B = 24\) kN</p>
+      <p>\(R_A = 48 - 24 = 24\) kN</p>
+
+      <p><em>Part (b): Bending Moment Equation</em></p>
+      <p>Using Macaulay's method with the partial UDL notation:</p>
+      <p>\(M(x) = R_A x - \frac{w}{2}\langle x - 2 \rangle^2 + \frac{w}{2}\langle x - 6 \rangle^2\)</p>
+      <p>\(M(x) = 24x - 6\langle x - 2 \rangle^2 + 6\langle x - 6 \rangle^2\)</p>
+
+      <p><em>Part (c): Maximum Bending Moment</em></p>
+      <p>The maximum moment occurs where shear force V = 0.</p>
+      <p>\(\frac{dM}{dx} = V(x) = 24 - 12\langle x - 2 \rangle^1 + 12\langle x - 6 \rangle^1 = 0\)</p>
+      <p>For \(2 < x < 6\): \(24 - 12(x-2) = 0\) → \(x = 4\) m</p>
+      <p>\(M_{max} = M(4) = 24(4) - 6(4-2)^2 = 96 - 24 = 72\) kNm</p>
+      <p>The maximum bending moment is 72 kNm at x = 4 m (the center of the beam).</p>
+    </div>
+  </div>
 </div>
 
 <div class="content-section">
@@ -614,6 +659,38 @@ function titleText(){
         <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
       </form>
       <div id="q3-feedback" class="feedback"></div>
+    </div>
+
+    <div class="quiz-question">
+      <p><strong>Question 4:</strong> In Macaulay's method for calculating bending moment M(x), what exponent is used for a concentrated moment \(M_0\) at position a?</p>
+      <form id="q4">
+        <input type="radio" id="q4a" name="q4" value="a">
+        <label for="q4a">a) Exponent = -1</label><br>
+        <input type="radio" id="q4b" name="q4" value="b">
+        <label for="q4b">b) Exponent = 0</label><br>
+        <input type="radio" id="q4c" name="q4" value="c">
+        <label for="q4c">c) Exponent = 1</label><br>
+        <input type="radio" id="q4d" name="q4" value="d">
+        <label for="q4d">d) Exponent = 2</label><br>
+        <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
+      </form>
+      <div id="q4-feedback" class="feedback"></div>
+    </div>
+
+    <div class="quiz-question">
+      <p><strong>Question 5:</strong> A UDL of magnitude w starts at x = a and ends at x = b (where b < L). How is this represented in the bending moment equation M(x)?</p>
+      <form id="q5">
+        <input type="radio" id="q5a" name="q5" value="a">
+        <label for="q5a">a) \(M(x) = -\frac{w}{2}\langle x - a \rangle^2\)</label><br>
+        <input type="radio" id="q5b" name="q5" value="b">
+        <label for="q5b">b) \(M(x) = -\frac{w}{2}\langle x - a \rangle^2 + \frac{w}{2}\langle x - b \rangle^2\)</label><br>
+        <input type="radio" id="q5c" name="q5" value="c">
+        <label for="q5c">c) \(M(x) = -\frac{w}{2}\langle x - b \rangle^2\)</label><br>
+        <input type="radio" id="q5d" name="q5" value="d">
+        <label for="q5d">d) \(M(x) = -w\langle x - a \rangle^1 + w\langle x - b \rangle^1\)</label><br>
+        <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
+      </form>
+      <div id="q5-feedback" class="feedback"></div>
     </div>
   </div>
 </div>

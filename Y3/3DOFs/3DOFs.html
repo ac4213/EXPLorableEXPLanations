@@ -111,13 +111,15 @@
         </div>
 
         <h3>Equations of Motion</h3>
-        <p>For a 3-DOF system with masses \(m_1, m_2, m_3\) and springs \(k_1, k_2, k_3, k_4\), the equations of motion are:</p>
+        <p>For a 3-DOF undamped system with masses \(m_1, m_2, m_3\) and springs \(k_1, k_2, k_3, k_4\), the equations of motion are:</p>
         <div class="equation-box">
-            <p>\[m_1\ddot{x}_1 + c_1\dot{x}_1 + (k_1 + k_2)x_1 - k_2x_2 = 0\]</p>
-            <p>\[m_2\ddot{x}_2 + c_2\dot{x}_2 - k_2x_1 + (k_2 + k_3)x_2 - k_3x_3 = 0\]</p>
-            <p>\[m_3\ddot{x}_3 + c_3\dot{x}_3 - k_3x_2 + (k_3 + k_4)x_3 = 0\]</p>
+            <p>\[m_1\ddot{x}_1 + (k_1 + k_2)x_1 - k_2x_2 = 0\]</p>
+            <p>\[m_2\ddot{x}_2 - k_2x_1 + (k_2 + k_3)x_2 - k_3x_3 = 0\]</p>
+            <p>\[m_3\ddot{x}_3 - k_3x_2 + (k_3 + k_4)x_3 = 0\]</p>
             <p>In matrix form:</p>
-            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+            <p>where the mass matrix \(\mathbf{M}\) and stiffness matrix \(\mathbf{K}\) are:</p>
+            <p>\[\mathbf{M} = \begin{bmatrix} m_1 & 0 & 0 \\ 0 & m_2 & 0 \\ 0 & 0 & m_3 \end{bmatrix}, \quad \mathbf{K} = \begin{bmatrix} k_1+k_2 & -k_2 & 0 \\ -k_2 & k_2+k_3 & -k_3 \\ 0 & -k_3 & k_3+k_4 \end{bmatrix}\]</p>
         </div>
 
         <h3>Modal Analysis</h3>
@@ -141,17 +143,125 @@
             <li><strong>Third Mode:</strong> More complex pattern with multiple sign changes (highest frequency)</li>
         </ul>
 
+        <h3>Orthogonality of Mode Shapes</h3>
+        <p>One of the most important properties of mode shapes is their orthogonality with respect to both the mass and stiffness matrices. This property is fundamental to modal analysis and allows us to decouple the system equations.</p>
+
+        <div class="equation-box">
+            <p><strong>Orthogonality Conditions:</strong></p>
+            <p>For any two distinct mode shapes \(\mathbf{\Phi}_i\) and \(\mathbf{\Phi}_j\) where \(i \neq j\):</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{M} \mathbf{\Phi}_j = 0 \quad \text{(Mass orthogonality)}\]</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{K} \mathbf{\Phi}_j = 0 \quad \text{(Stiffness orthogonality)}\]</p>
+            <p>These conditions are often normalized such that:</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{M} \mathbf{\Phi}_i = 1 \quad \text{and} \quad \mathbf{\Phi}_i^T \mathbf{K} \mathbf{\Phi}_i = \omega_i^2\]</p>
+        </div>
+
         <div class="key-point">
-            <p><strong>Orthogonality:</strong> Mode shapes are orthogonal with respect to mass and stiffness matrices, allowing the system to be decoupled into independent modal equations.</p>
+            <p><strong>Why Orthogonality Matters:</strong> The orthogonality conditions allow us to transform the coupled system \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\) into \(n\) independent SDOF equations in modal coordinates. This is the essence of modal decomposition and makes solving MDOF systems tractable.</p>
+        </div>
+
+        <p><strong>Proof of Orthogonality:</strong> Consider two mode shapes satisfying the eigenvalue equations:</p>
+        <div class="equation-box">
+            <p>\[\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{M}\mathbf{\Phi}_i\]</p>
+            <p>\[\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{M}\mathbf{\Phi}_j\]</p>
+            <p>Pre-multiplying the first equation by \(\mathbf{\Phi}_j^T\) and the second by \(\mathbf{\Phi}_i^T\), then using the symmetry of \(\mathbf{M}\) and \(\mathbf{K}\), we get:</p>
+            <p>\[(\omega_i^2 - \omega_j^2)\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\]</p>
+            <p>For distinct natural frequencies (\(\omega_i \neq \omega_j\)), this implies \(\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\).</p>
         </div>
 
         <h3>Modal Decomposition</h3>
         <div class="equation-box">
             <p>Physical coordinates relate to modal coordinates by:</p>
             <p>\[\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\]</p>
-            <p>Each modal equation becomes:</p>
+            <p>For the undamped case, each modal equation becomes:</p>
+            <p>\[\ddot{q}_i + \omega_i^2 q_i = 0\]</p>
+            <p>This is identical to an undamped SDOF system!</p>
+        </div>
+
+        <h3>Damping in MDOF Systems</h3>
+        <p>In real systems, damping is always present. However, general damping matrices make modal decomposition ineffective because the modal equations remain coupled through the damping terms.</p>
+
+        <h4>Proportional (Rayleigh) Damping</h4>
+        <p>A special case that preserves the advantage of modal decomposition is <strong>proportional damping</strong> (also called Rayleigh damping), where the damping matrix is a linear combination of the mass and stiffness matrices:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{C} = \alpha \mathbf{M} + \beta \mathbf{K}\]</p>
+            <p>where \(\alpha\) and \(\beta\) are Rayleigh damping coefficients.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Key Property:</strong> With proportional damping, the mode shapes remain the same as for the undamped system, and the modal equations are decoupled. Each modal damping ratio becomes:</p>
+            <p>\[\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\]</p>
+        </div>
+
+        <p><strong>Determining Rayleigh Coefficients:</strong> If we know the damping ratios \(\zeta_i\) and \(\zeta_j\) at two different frequencies \(\omega_i\) and \(\omega_j\), we can solve for \(\alpha\) and \(\beta\):</p>
+
+        <div class="equation-box">
+            <p>\[\begin{bmatrix} \frac{1}{2\omega_i} & \frac{\omega_i}{2} \\ \frac{1}{2\omega_j} & \frac{\omega_j}{2} \end{bmatrix} \begin{bmatrix} \alpha \\ \beta \end{bmatrix} = \begin{bmatrix} \zeta_i \\ \zeta_j \end{bmatrix}\]</p>
+            <p>Solving this gives:</p>
+            <p>\[\alpha = \frac{2\omega_i\omega_j(\zeta_i\omega_j - \zeta_j\omega_i)}{\omega_j^2 - \omega_i^2}\]</p>
+            <p>\[\beta = \frac{2(\zeta_j\omega_j - \zeta_i\omega_i)}{\omega_j^2 - \omega_i^2}\]</p>
+        </div>
+
+        <p><strong>Damped Modal Equations:</strong> With proportional damping, the system equations in matrix form are:</p>
+        <div class="equation-box">
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+            <p>After modal transformation, each mode satisfies:</p>
             <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = 0\]</p>
-            <p>This is identical to a SDOF system!</p>
+            <p>This is identical to a damped SDOF system with solution:</p>
+            <p>\[q_i(t) = e^{-\zeta_i\omega_i t}\left(A_i\cos(\omega_{di}t) + B_i\sin(\omega_{di}t)\right)\]</p>
+            <p>where \(\omega_{di} = \omega_i\sqrt{1-\zeta_i^2}\) is the damped natural frequency.</p>
+        </div>
+
+        <h3>Forced Vibration of MDOF Systems</h3>
+        <p>When external forces are applied to an MDOF system, the equations of motion become:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{f}(t)\]</p>
+            <p>where \(\mathbf{f}(t) = [f_1(t), f_2(t), f_3(t)]^T\) is the vector of external forces applied to each mass.</p>
+        </div>
+
+        <h4>Modal Transformation for Forced Response</h4>
+        <p>Using the modal transformation \(\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t)\) and pre-multiplying by \(\mathbf{\Phi}^T\), we obtain decoupled modal equations:</p>
+
+        <div class="equation-box">
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = Q_i(t)\]</p>
+            <p>where the modal force is:</p>
+            <p>\[Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\]</p>
+        </div>
+
+        <h4>Harmonic Forcing</h4>
+        <p>For harmonic excitation \(\mathbf{f}(t) = \mathbf{F}_0\sin(\Omega t)\), where \(\Omega\) is the forcing frequency, each modal equation becomes:</p>
+
+        <div class="equation-box">
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = Q_{i0}\sin(\Omega t)\]</p>
+            <p>where \(Q_{i0} = \mathbf{\Phi}_i^T\mathbf{F}_0\).</p>
+            <p>The steady-state solution for each modal coordinate is:</p>
+            <p>\[q_i(t) = \frac{Q_{i0}/\omega_i^2}{\sqrt{(1-r_i^2)^2 + (2\zeta_i r_i)^2}}\sin(\Omega t - \phi_i)\]</p>
+            <p>where \(r_i = \Omega/\omega_i\) is the frequency ratio and \(\phi_i = \tan^{-1}\left(\frac{2\zeta_i r_i}{1-r_i^2}\right)\) is the phase angle.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Resonance Phenomenon:</strong> Resonance occurs when the forcing frequency \(\Omega\) approaches one of the natural frequencies \(\omega_i\). At resonance, the amplitude of that particular mode becomes very large (theoretically infinite for undamped systems), and that mode dominates the response. This is why it's critical to avoid operating machinery at natural frequencies.</p>
+        </div>
+
+        <h4>Modal Superposition</h4>
+        <p>The total physical response is obtained by summing all modal contributions:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\]</p>
+            <p>Each mode contributes based on:</p>
+            <ul>
+                <li>How close the forcing frequency is to that mode's natural frequency (resonance effect)</li>
+                <li>The magnitude of the modal force \(Q_{i0}\) (participation factor)</li>
+                <li>The damping ratio \(\zeta_i\) of that mode</li>
+            </ul>
+        </div>
+
+        <p><strong>General Forcing:</strong> For arbitrary time-varying forces \(\mathbf{f}(t)\), the Duhamel integral (convolution) can be used for each modal equation:</p>
+
+        <div class="equation-box">
+            <p>\[q_i(t) = \frac{1}{\omega_{di}}\int_0^t Q_i(\tau)e^{-\zeta_i\omega_i(t-\tau)}\sin(\omega_{di}(t-\tau))d\tau\]</p>
+            <p>where \(\omega_{di} = \omega_i\sqrt{1-\zeta_i^2}\) is the damped natural frequency.</p>
         </div>
     </div>
 
@@ -924,6 +1034,66 @@
             <p>\(\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\) (orthogonality condition)</p>
         </div>
     </div>
+
+    <div class="practice-problems">
+        <h3>Problem 3: Rayleigh Damping Coefficients</h3>
+        <p>A 3-DOF system has natural frequencies \(\omega_1 = 10\) rad/s and \(\omega_3 = 50\) rad/s. If we want damping ratios of \(\zeta_1 = 0.02\) and \(\zeta_3 = 0.05\), determine the Rayleigh damping coefficients \(\alpha\) and \(\beta\), and calculate the damping ratio for the second mode at \(\omega_2 = 30\) rad/s.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p><strong>Step 1:</strong> Use the Rayleigh damping formula \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</p>
+            <p>For the first and third modes:</p>
+            <p>\[0.02 = \frac{\alpha}{2(10)} + \frac{\beta(10)}{2}\]</p>
+            <p>\[0.05 = \frac{\alpha}{2(50)} + \frac{\beta(50)}{2}\]</p>
+
+            <p><strong>Step 2:</strong> Simplify:</p>
+            <p>\[0.02 = \frac{\alpha}{20} + 5\beta\]</p>
+            <p>\[0.05 = \frac{\alpha}{100} + 25\beta\]</p>
+
+            <p><strong>Step 3:</strong> Solve for \(\beta\) from the system of equations:</p>
+            <p>From equation 1: \(\alpha = 0.4 - 100\beta\)</p>
+            <p>Substituting into equation 2: \(0.05 = \frac{0.4 - 100\beta}{100} + 25\beta\)</p>
+            <p>\[0.05 = 0.004 - \beta + 25\beta\]</p>
+            <p>\[0.046 = 24\beta\]</p>
+            <p>\[\beta = 0.00192 \text{ s}\]</p>
+
+            <p><strong>Step 4:</strong> Find \(\alpha\):</p>
+            <p>\[\alpha = 0.4 - 100(0.00192) = 0.208 \text{ rad/s}\]</p>
+
+            <p><strong>Step 5:</strong> Calculate \(\zeta_2\) at \(\omega_2 = 30\) rad/s:</p>
+            <p>\[\zeta_2 = \frac{0.208}{2(30)} + \frac{0.00192(30)}{2} = 0.00347 + 0.0288 = 0.0323\]</p>
+
+            <p><strong>Answer:</strong> \(\alpha = 0.208\) rad/s, \(\beta = 0.00192\) s, and \(\zeta_2 = 0.0323\) (3.23%)</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 4: Forced Harmonic Response</h3>
+        <p>A 3-DOF system with natural frequencies \(\omega_1 = 15\) rad/s, \(\omega_2 = 30\) rad/s, and \(\omega_3 = 45\) rad/s is subjected to a harmonic force \(f_1(t) = 100\sin(32t)\) N on the first mass only. If all modes have damping ratio \(\zeta_i = 0.05\) and the modal participation factor for the second mode is \(Q_{20} = 50\) N, find the amplitude of the second modal coordinate.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+        <div id="solution4" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p><strong>Given:</strong> \(\omega_2 = 30\) rad/s, \(\Omega = 32\) rad/s, \(\zeta_2 = 0.05\), \(Q_{20} = 50\) N</p>
+
+            <p><strong>Step 1:</strong> Calculate the frequency ratio:</p>
+            <p>\[r_2 = \frac{\Omega}{\omega_2} = \frac{32}{30} = 1.067\]</p>
+
+            <p><strong>Step 2:</strong> Calculate the static deflection:</p>
+            <p>\[\delta_{st} = \frac{Q_{20}}{\omega_2^2} = \frac{50}{30^2} = \frac{50}{900} = 0.0556 \text{ m}\]</p>
+
+            <p><strong>Step 3:</strong> Calculate the dynamic magnification factor:</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(1-r_2^2)^2 + (2\zeta_2 r_2)^2}}\]</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(1-1.067^2)^2 + (2 \times 0.05 \times 1.067)^2}}\]</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(-0.138)^2 + (0.1067)^2}} = \frac{1}{\sqrt{0.0190 + 0.0114}} = \frac{1}{0.174} = 5.74\]</p>
+
+            <p><strong>Step 4:</strong> Calculate the amplitude of the second modal coordinate:</p>
+            <p>\[|q_2| = \delta_{st} \times D_2 = 0.0556 \times 5.74 = 0.319 \text{ m}\]</p>
+
+            <p><strong>Answer:</strong> The amplitude is 0.319 m or 319 mm. Note that this is a significant amplitude because the forcing frequency (32 rad/s) is very close to the second natural frequency (30 rad/s), creating a near-resonance condition.</p>
+        </div>
+    </div>
 </div>
 
 <div class="content-section">
@@ -977,6 +1147,38 @@
             </form>
             <div id="q3-feedback" class="feedback"></div>
         </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 4:</strong> What is the key property of proportional (Rayleigh) damping?</p>
+            <form id="q4">
+                <input type="radio" id="q4a" name="q4" value="a">
+                <label for="q4a">a) It eliminates all damping effects</label><br>
+                <input type="radio" id="q4b" name="q4" value="b">
+                <label for="q4b">b) It couples all modal equations together</label><br>
+                <input type="radio" id="q4c" name="q4" value="c">
+                <label for="q4c">c) It allows modal equations to remain decoupled</label><br>
+                <input type="radio" id="q4d" name="q4" value="d">
+                <label for="q4d">d) It increases system stiffness proportionally</label><br>
+                <button type="button" onclick="checkAnswer('q4', 'c')">Check Answer</button>
+            </form>
+            <div id="q4-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 5:</strong> In a forced vibration of an MDOF system, resonance occurs when:</p>
+            <form id="q5">
+                <input type="radio" id="q5a" name="q5" value="a">
+                <label for="q5a">a) The forcing frequency equals zero</label><br>
+                <input type="radio" id="q5b" name="q5" value="b">
+                <label for="q5b">b) The forcing frequency approaches one of the natural frequencies</label><br>
+                <input type="radio" id="q5c" name="q5" value="c">
+                <label for="q5c">c) All masses vibrate with the same amplitude</label><br>
+                <input type="radio" id="q5d" name="q5" value="d">
+                <label for="q5d">d) The damping ratio exceeds unity</label><br>
+                <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
+            </form>
+            <div id="q5-feedback" class="feedback"></div>
+        </div>
     </div>
 </div>
 
@@ -985,11 +1187,15 @@
     <div class="key-point">
         <h3>Key Takeaways</h3>
         <ol>
-            <li>3-DOF systems require three coordinates and have three natural frequencies</li>
-            <li>Modal analysis decomposes coupled MDOF systems into independent SDOF systems</li>
-            <li>Mode shapes represent patterns of vibration and are orthogonal</li>
-            <li>Physical response is a superposition of all modal responses</li>
-            <li>Lower modes generally have larger spatial wavelengths and lower frequencies</li>
+            <li><strong>Equations of Motion:</strong> Undamped MDOF systems are governed by \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\), with mass and stiffness matrices derived from free-body diagrams</li>
+            <li><strong>Natural Frequencies:</strong> 3-DOF systems have three natural frequencies found by solving the eigenvalue problem \((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</li>
+            <li><strong>Mode Shapes:</strong> Each natural frequency has an associated mode shape (eigenvector) representing the pattern of vibration</li>
+            <li><strong>Orthogonality:</strong> Mode shapes satisfy \(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) and \(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\), enabling modal decomposition</li>
+            <li><strong>Modal Decomposition:</strong> Coupled physical equations transform into independent modal equations: \(\ddot{q}_i + \omega_i^2 q_i = 0\)</li>
+            <li><strong>Proportional Damping:</strong> Rayleigh damping \(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\) preserves modal decoupling with damping ratios \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</li>
+            <li><strong>Forced Response:</strong> External forces are projected onto modal coordinates via \(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\), allowing each mode to be solved independently</li>
+            <li><strong>Resonance:</strong> Large amplitude responses occur when forcing frequency approaches a natural frequency, emphasizing the importance of knowing system eigenvalues</li>
+            <li><strong>Modal Superposition:</strong> Total response is the sum of all modal contributions: \(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</li>
         </ol>
     </div>
 </div>

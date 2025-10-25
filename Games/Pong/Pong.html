@@ -35,6 +35,12 @@ let sketch = function(p) {
     let baseSpeed = 5;
     let touchY = null;
     let scaleFactor = 1;
+    let particles = [];
+    let ballTrail = [];
+    let shakeAmount = 0;
+    let powerUps = [];
+    let rallyCount = 0;
+    let maxBallSpeed = 15;
 
     p.setup = function() {
         // Make canvas responsive
@@ -109,20 +115,28 @@ let sketch = function(p) {
     };
 
     function updateGame() {
-        // Mouse/Touch control for Player 1
-        if (p.mouseIsPressed || touchY !== null) {
-            let targetY = touchY !== null ? touchY : p.mouseY;
+        // CURSOR TRACKING - No clicking required on desktop
+        if (touchY === null) {
+            let targetY = p.mouseY;
             let diff = targetY - paddle1.y;
-            paddle1.y += p.constrain(diff, -paddle1.speed, paddle1.speed);
+            paddle1.y += p.constrain(diff, -paddle1.speed * 2, paddle1.speed * 2);
         }
-        // Keyboard control for Player 1
+
+        // Touch control for mobile (swipe/drag)
+        if (touchY !== null) {
+            let targetY = touchY;
+            let diff = targetY - paddle1.y;
+            paddle1.y += p.constrain(diff, -paddle1.speed * 2, paddle1.speed * 2);
+        }
+
+        // Keyboard control for Player 1 (optional)
         if (p.keyIsDown(87)) { // W key
             paddle1.y -= paddle1.speed;
         }
         if (p.keyIsDown(83)) { // S key
             paddle1.y += paddle1.speed;
         }
-        
+
         // Constrain paddle1
         paddle1.y = p.constrain(paddle1.y, paddle1.h/2, p.height - paddle1.h/2);
         
@@ -148,47 +162,311 @@ let sketch = function(p) {
         
         // Ball collision with paddles
         if (checkPaddleCollision(paddle1) || checkPaddleCollision(paddle2)) {
-            ball.speedX *= -1;
+            ball.speedX *= -1.05; // Increase speed by 5% each hit
             let paddle = checkPaddleCollision(paddle1) ? paddle1 : paddle2;
+
+            // ENHANCED ANGLE CONTROL - Hit position affects angle dramatically
             let relativeIntersectY = (paddle.y - ball.y)/(paddle.h/2);
-            ball.speedY = -relativeIntersectY * 7 * scaleFactor;
+            let angleMultiplier = 8; // Increased angle sensitivity
+            ball.speedY = -relativeIntersectY * angleMultiplier * scaleFactor;
+
+            // Cap maximum speed
+            let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
+            let maxSpeed = maxBallSpeed * scaleFactor;
+            if (currentSpeed > maxSpeed) {
+                let ratio = maxSpeed / currentSpeed;
+                ball.speedX *= ratio;
+                ball.speedY *= ratio;
+            }
+
+            // Rally counter
+            rallyCount++;
+
+            // Create particles on collision
+            createParticles(ball.x, ball.y, 15);
+
+            // Screen shake effect
+            shakeAmount = 8 * scaleFactor;
+
+            // Play hit sound
+            playHitSound();
         }
         
+        // Update particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            if (particles[i].isDead()) {
+                particles.splice(i, 1);
+            }
+        }
+
+        // Update ball trail
+        ballTrail.push({x: ball.x, y: ball.y, life: 1});
+        if (ballTrail.length > 10) {
+            ballTrail.shift();
+        }
+        for (let trail of ballTrail) {
+            trail.life -= 0.1;
+        }
+
+        // Update screen shake
+        if (shakeAmount > 0) {
+            shakeAmount *= 0.9;
+            if (shakeAmount < 0.1) shakeAmount = 0;
+        }
+
+        // Update power-ups
+        for (let i = powerUps.length - 1; i >= 0; i--) {
+            powerUps[i].update();
+            if (powerUps[i].collected || powerUps[i].isDead()) {
+                powerUps.splice(i, 1);
+            }
+        }
+
+        // Spawn power-ups randomly during long rallies
+        if (rallyCount > 0 && rallyCount % 7 === 0 && powerUps.length === 0 && p.random() > 0.5) {
+            spawnPowerUp();
+        }
+
         // Scoring
         if (ball.x < 0) {
             score2++;
+            rallyCount = 0;
+            playScoreSound();
+            createParticles(0, ball.y, 30);
             resetBall();
         } else if (ball.x > p.width) {
             score1++;
+            rallyCount = 0;
+            playScoreSound();
+            createParticles(p.width, ball.y, 30);
             resetBall();
         }
     }
 
     function checkPaddleCollision(paddle) {
-        return ball.x - ball.size/2 < paddle.x + paddle.w/2 && 
+        return ball.x - ball.size/2 < paddle.x + paddle.w/2 &&
                ball.x + ball.size/2 > paddle.x - paddle.w/2 &&
                ball.y > paddle.y - paddle.h/2 &&
                ball.y < paddle.y + paddle.h/2;
     }
 
+    // Particle system
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = p.random(-3, 3);
+            this.vy = p.random(-3, 3);
+            this.life = 1;
+            this.size = p.random(2, 6) * scaleFactor;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.02;
+        }
+
+        isDead() {
+            return this.life <= 0;
+        }
+
+        draw() {
+            p.noStroke();
+            p.fill(255, 255, 255, this.life * 255);
+            p.ellipse(this.x, this.y, this.size);
+        }
+    }
+
+    function createParticles(x, y, count) {
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle(x, y));
+        }
+    }
+
+    // Power-up system
+    class PowerUp {
+        constructor() {
+            this.x = p.random(p.width * 0.3, p.width * 0.7);
+            this.y = p.random(p.height * 0.2, p.height * 0.8);
+            this.size = 15 * scaleFactor;
+            this.life = 300; // frames
+            this.types = ['bigPaddle', 'speedBoost', 'slowBall'];
+            this.type = p.random(this.types);
+            this.collected = false;
+        }
+
+        update() {
+            this.life--;
+
+            // Check collision with ball
+            let d = p.dist(this.x, this.y, ball.x, ball.y);
+            if (d < this.size + ball.size/2) {
+                this.activate();
+                this.collected = true;
+            }
+        }
+
+        activate() {
+            if (this.type === 'bigPaddle') {
+                paddle1.h *= 1.5;
+                setTimeout(() => { paddle1.h /= 1.5; }, 5000);
+            } else if (this.type === 'speedBoost') {
+                paddle1.speed *= 1.5;
+                setTimeout(() => { paddle1.speed /= 1.5; }, 5000);
+            } else if (this.type === 'slowBall') {
+                ball.speedX *= 0.7;
+                ball.speedY *= 0.7;
+            }
+            playPowerUpSound();
+        }
+
+        isDead() {
+            return this.life <= 0;
+        }
+
+        draw() {
+            let pulse = 1 + Math.sin(p.frameCount * 0.1) * 0.2;
+            p.noStroke();
+
+            if (this.type === 'bigPaddle') {
+                p.fill(0, 255, 0, 200);
+            } else if (this.type === 'speedBoost') {
+                p.fill(255, 255, 0, 200);
+            } else if (this.type === 'slowBall') {
+                p.fill(0, 150, 255, 200);
+            }
+
+            p.ellipse(this.x, this.y, this.size * pulse);
+            p.fill(255);
+            p.textSize(8 * scaleFactor);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(this.type[0].toUpperCase(), this.x, this.y);
+        }
+    }
+
+    function spawnPowerUp() {
+        powerUps.push(new PowerUp());
+    }
+
+    // Sound effects using Web Audio API
+    function playHitSound() {
+        try {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let oscillator = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = 300 + rallyCount * 10;
+            oscillator.type = 'square';
+
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        } catch (e) {}
+    }
+
+    function playScoreSound() {
+        try {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let oscillator = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = 150;
+            oscillator.type = 'sawtooth';
+
+            gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        } catch (e) {}
+    }
+
+    function playPowerUpSound() {
+        try {
+            let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let oscillator = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = 600;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.2);
+        } catch (e) {}
+    }
+
     function drawGame() {
-        // Draw paddles
+        // Apply screen shake
+        p.push();
+        if (shakeAmount > 0) {
+            p.translate(p.random(-shakeAmount, shakeAmount), p.random(-shakeAmount, shakeAmount));
+        }
+
+        // Draw ball trail
+        for (let i = 0; i < ballTrail.length; i++) {
+            let trail = ballTrail[i];
+            if (trail.life > 0) {
+                p.noStroke();
+                let alpha = trail.life * 100;
+                p.fill(255, 255, 255, alpha);
+                let size = ball.size * trail.life;
+                p.ellipse(trail.x, trail.y, size, size);
+            }
+        }
+
+        // Draw particles
+        for (let particle of particles) {
+            particle.draw();
+        }
+
+        // Draw power-ups
+        for (let powerUp of powerUps) {
+            powerUp.draw();
+        }
+
+        // Draw paddles with glow effect
         p.noStroke();
         p.fill(255);
-        
-        // Left paddle (Player 1)
+
+        // Left paddle (Player 1) - with glow
+        p.fill(100, 200, 255, 50);
+        p.rect(paddle1.x - paddle1.w/2 - 3, paddle1.y - paddle1.h/2 - 3, paddle1.w + 6, paddle1.h + 6);
+        p.fill(255);
         p.rect(paddle1.x - paddle1.w/2, paddle1.y - paddle1.h/2, paddle1.w, paddle1.h);
-        
-        // Right paddle (AI)
+
+        // Right paddle (AI) - with glow
+        p.fill(255, 100, 100, 50);
+        p.rect(paddle2.x - paddle2.w/2 - 3, paddle2.y - paddle2.h/2 - 3, paddle2.w + 6, paddle2.h + 6);
+        p.fill(255);
         p.rect(paddle2.x - paddle2.w/2, paddle2.y - paddle2.h/2, paddle2.w, paddle2.h);
-        
-        // Draw ball
+
+        // Draw ball with glow
+        p.fill(255, 255, 100, 100);
+        p.ellipse(ball.x, ball.y, ball.size * 1.5, ball.size * 1.5);
+        p.fill(255);
         p.ellipse(ball.x, ball.y, ball.size, ball.size);
-        
+
         // Draw scores
         let scoreSize = 32 * scaleFactor;
         p.textSize(scoreSize);
         p.textAlign(p.CENTER);
+        p.fill(255);
         p.text(score1, p.width/4, scoreSize * 1.5);
         p.text(score2, 3*p.width/4, scoreSize * 1.5);
 
@@ -197,6 +475,22 @@ let sketch = function(p) {
         let currentLevel = Math.floor(totalScore / 10) + 1;
         p.textSize(16 * scaleFactor);
         p.text('Level ' + currentLevel, p.width/2, scoreSize * 1.5);
+
+        // Draw rally counter
+        if (rallyCount > 3) {
+            p.textSize(14 * scaleFactor);
+            p.fill(255, 255, 0);
+            p.text('Rally: ' + rallyCount, p.width/2, p.height - 20 * scaleFactor);
+        }
+
+        // Draw speed indicator
+        let currentSpeed = Math.sqrt(ball.speedX * ball.speedX + ball.speedY * ball.speedY);
+        let speedPercent = Math.floor((currentSpeed / (maxBallSpeed * scaleFactor)) * 100);
+        p.textSize(12 * scaleFactor);
+        p.fill(255, 200, 0);
+        p.text('Speed: ' + speedPercent + '%', p.width/2, p.height - 40 * scaleFactor);
+
+        p.pop();
     }
 
     // Touch controls

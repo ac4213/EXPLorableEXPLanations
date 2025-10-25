@@ -77,6 +77,13 @@ function playGameOverSound() {
     setTimeout(() => playTone(220, 0.3, 'sine'), 400);
 }
 
+function playLevelUpSound() {
+    playTone(523, 0.1, 'sine');
+    setTimeout(() => playTone(659, 0.1, 'sine'), 100);
+    setTimeout(() => playTone(784, 0.1, 'sine'), 200);
+    setTimeout(() => playTone(1047, 0.2, 'sine'), 300);
+}
+
 // Sound toggle
 document.getElementById('soundToggle').addEventListener('click', () => {
     isSoundEnabled = !isSoundEnabled;
@@ -100,23 +107,37 @@ new p5(function(p) {
     let lastMove = 0;
     let clearAnimationLines = [];
     let clearAnimationProgress = 0;
+    let particles = [];
+    let dropParticles = [];
+    let levelUpEffect = 0;
+    let comboCount = 0;
+    let lastClearTime = 0;
 
     const COLS = 10;
     const ROWS = 20;
-    const COLORS = [
-        '#FF0000', '#00FF00', '#0000FF', '#FFFF00', 
-        '#FF00FF', '#00FFFF', '#FFA500'
-    ];
 
-    const PIECES = [
-        [[1, 1, 1, 1]], // I
-        [[1, 1], [1, 1]], // O
-        [[0, 1, 0], [1, 1, 1]], // T
-        [[1, 0], [1, 0], [1, 1]], // L
-        [[0, 1], [0, 1], [1, 1]], // J
-        [[1, 1, 0], [0, 1, 1]], // S
-        [[0, 1, 1], [1, 1, 0]]  // Z
-    ];
+    // NES Tetris colors - each piece has its own color
+    const PIECE_COLORS = {
+        I: '#00F0F0', // Cyan
+        O: '#F0F000', // Yellow
+        T: '#A000F0', // Purple
+        L: '#F0A000', // Orange
+        J: '#0000F0', // Blue
+        S: '#00F000', // Green
+        Z: '#F00000'  // Red
+    };
+
+    const PIECES = {
+        I: { shape: [[1, 1, 1, 1]], color: PIECE_COLORS.I },
+        O: { shape: [[1, 1], [1, 1]], color: PIECE_COLORS.O },
+        T: { shape: [[0, 1, 0], [1, 1, 1]], color: PIECE_COLORS.T },
+        L: { shape: [[1, 0], [1, 0], [1, 1]], color: PIECE_COLORS.L },
+        J: { shape: [[0, 1], [0, 1], [1, 1]], color: PIECE_COLORS.J },
+        S: { shape: [[1, 1, 0], [0, 1, 1]], color: PIECE_COLORS.S },
+        Z: { shape: [[0, 1, 1], [1, 1, 0]], color: PIECE_COLORS.Z }
+    };
+
+    const PIECE_TYPES = ['I', 'O', 'T', 'L', 'J', 'S', 'Z'];
 
     p.setup = function() {
         cellSize = p.min(p.floor(p.windowHeight / 24), p.floor(p.windowWidth / 20));
@@ -138,9 +159,12 @@ new p5(function(p) {
     };
 
     function createPiece() {
+        const type = PIECE_TYPES[p.floor(p.random(PIECE_TYPES.length))];
+        const pieceData = PIECES[type];
         return {
-            shape: PIECES[p.floor(p.random(PIECES.length))],
-            color: COLORS[p.floor(p.random(COLORS.length))],
+            shape: pieceData.shape,
+            color: pieceData.color,
+            type: type,
             x: p.floor(COLS / 2) - 1,
             y: 0
         };
@@ -148,33 +172,67 @@ new p5(function(p) {
 
     p.draw = function() {
         p.background('#1a1a1a');
-        
+
         if (!gameOver) {
             if (p.millis() - lastMove > gameSpeed) {
                 movePiece(0, 1);
                 lastMove = p.millis();
             }
-            
-            // Draw game area border
+
+            // Draw game area border with glow effect
             p.stroke('#ffffff');
+            p.strokeWeight(2);
             p.noFill();
             p.rect(startX - 1, startY - 1, COLS * cellSize + 2, ROWS * cellSize + 2);
-            
-            // Draw grid
+            p.strokeWeight(1);
+
+            // Draw grid with subtle grid lines
             for (let y = 0; y < ROWS; y++) {
                 for (let x = 0; x < COLS; x++) {
+                    // Subtle grid background
+                    p.stroke(40, 40, 40);
+                    p.noFill();
+                    p.rect(startX + x * cellSize, startY + y * cellSize, cellSize, cellSize);
+
                     if (grid[y][x]) {
+                        // Draw blocks with 3D effect
+                        p.noStroke();
                         p.fill(grid[y][x]);
                         p.rect(startX + x * cellSize, startY + y * cellSize, cellSize, cellSize);
+
+                        // Add highlight
+                        p.fill(255, 255, 255, 60);
+                        p.rect(startX + x * cellSize, startY + y * cellSize, cellSize, 2);
+                        p.rect(startX + x * cellSize, startY + y * cellSize, 2, cellSize);
                     }
                 }
             }
-            
+
+            // Draw ghost piece (preview where piece will land)
+            //drawGhostPiece();
+
+            // Draw current piece
             drawPiece(currentPiece);
+
+            // Draw particles
+            updateAndDrawParticles();
+
+            // Draw drop particles
+            updateAndDrawDropParticles();
+
             drawUI();
-            
+
             if (clearAnimationLines.length > 0) {
                 drawClearAnimation();
+            }
+
+            // Level up effect
+            if (levelUpEffect > 0) {
+                p.fill(255, 255, 0, levelUpEffect);
+                p.textSize(cellSize * 2);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.text('LEVEL UP!', p.width / 2, p.height / 2);
+                levelUpEffect -= 5;
             }
         } else {
             drawGameOver();
@@ -183,22 +241,46 @@ new p5(function(p) {
 
     function drawUI() {
         let uiX = startX + (COLS * cellSize) + cellSize * 2;
-        
+
         p.fill('#ffffff');
         p.textSize(cellSize);
         p.textAlign(p.LEFT);
         p.text(`Score: ${score}`, uiX, startY + cellSize);
         p.text(`Lines: ${lines}`, uiX, startY + cellSize * 2.5);
         p.text(`Level: ${level}`, uiX, startY + cellSize * 4);
-        
+
+        // Show combo if active
+        if (comboCount > 1) {
+            p.fill(255, 255, 0);
+            p.textSize(cellSize * 0.8);
+            p.text(`COMBO x${comboCount}!`, uiX, startY + cellSize * 5.2);
+        }
+
+        // Next piece preview
+        p.fill('#ffffff');
+        p.textSize(cellSize * 0.7);
+        p.text('NEXT:', uiX, startY + cellSize * 6.5);
+
         p.stroke('#ffffff');
         p.noFill();
-        p.rect(uiX, startY + cellSize * 5, cellSize * 4, cellSize * 4);
-        
+        p.rect(uiX, startY + cellSize * 7, cellSize * 4, cellSize * 4);
+
         let previewX = uiX + cellSize * 2 - (nextPiece.shape[0].length * cellSize) / 2;
-        let previewY = startY + cellSize * 7 - (nextPiece.shape.length * cellSize) / 2;
-        
+        let previewY = startY + cellSize * 9 - (nextPiece.shape.length * cellSize) / 2;
+
         drawPieceAt(nextPiece, previewX, previewY);
+
+        // Controls info
+        p.fill(150);
+        p.textSize(cellSize * 0.5);
+        p.textAlign(p.LEFT);
+        let controlY = startY + cellSize * 12;
+        p.text('Controls:', uiX, controlY);
+        p.text('←→: Move', uiX, controlY + cellSize * 0.8);
+        p.text('↑: Rotate', uiX, controlY + cellSize * 1.5);
+        p.text('↓: Drop', uiX, controlY + cellSize * 2.2);
+        p.text('Tap: Rotate', uiX, controlY + cellSize * 3.2);
+        p.text('Swipe: Move/Drop', uiX, controlY + cellSize * 3.9);
     }
 
     function drawPiece(piece) {
@@ -206,13 +288,107 @@ new p5(function(p) {
     }
 
     function drawPieceAt(piece, x, y) {
+        p.noStroke();
         p.fill(piece.color);
         for (let row = 0; row < piece.shape.length; row++) {
             for (let col = 0; col < piece.shape[row].length; col++) {
                 if (piece.shape[row][col]) {
                     p.rect(x + col * cellSize, y + row * cellSize, cellSize, cellSize);
+
+                    // Add 3D highlight effect
+                    p.fill(255, 255, 255, 60);
+                    p.rect(x + col * cellSize, y + row * cellSize, cellSize, 2);
+                    p.rect(x + col * cellSize, y + row * cellSize, 2, cellSize);
+                    p.fill(piece.color);
                 }
             }
+        }
+    }
+
+    function drawGhostPiece() {
+        // Calculate where piece would land
+        let ghostY = currentPiece.y;
+        let testPiece = {
+            shape: currentPiece.shape,
+            x: currentPiece.x,
+            y: ghostY,
+            color: currentPiece.color
+        };
+
+        while (!collision(testPiece)) {
+            ghostY++;
+            testPiece.y = ghostY;
+        }
+        ghostY--;
+
+        // Draw ghost piece
+        p.noStroke();
+        for (let row = 0; row < currentPiece.shape.length; row++) {
+            for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                if (currentPiece.shape[row][col]) {
+                    let c = p.color(currentPiece.color);
+                    p.fill(p.red(c), p.green(c), p.blue(c), 50);
+                    p.rect(
+                        startX + (currentPiece.x + col) * cellSize,
+                        startY + (ghostY + row) * cellSize,
+                        cellSize,
+                        cellSize
+                    );
+                }
+            }
+        }
+    }
+
+    function createParticle(x, y, color) {
+        return {
+            x: x,
+            y: y,
+            vx: p.random(-2, 2),
+            vy: p.random(-3, -1),
+            life: 255,
+            color: color,
+            size: p.random(2, 6)
+        };
+    }
+
+    function updateAndDrawParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let particle = particles[i];
+
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vy += 0.2; // gravity
+            particle.life -= 5;
+
+            if (particle.life <= 0) {
+                particles.splice(i, 1);
+                continue;
+            }
+
+            p.noStroke();
+            let c = p.color(particle.color);
+            p.fill(p.red(c), p.green(c), p.blue(c), particle.life);
+            p.circle(particle.x, particle.y, particle.size);
+        }
+    }
+
+    function updateAndDrawDropParticles() {
+        for (let i = dropParticles.length - 1; i >= 0; i--) {
+            let particle = dropParticles[i];
+
+            particle.y += particle.vy;
+            particle.vy += 0.5;
+            particle.life -= 8;
+
+            if (particle.life <= 0) {
+                dropParticles.splice(i, 1);
+                continue;
+            }
+
+            p.noStroke();
+            let c = p.color(particle.color);
+            p.fill(p.red(c), p.green(c), p.blue(c), particle.life);
+            p.rect(particle.x, particle.y, particle.size, particle.size);
         }
     }
 
@@ -228,13 +404,20 @@ new p5(function(p) {
     }
 
     function drawClearAnimation() {
-        clearAnimationProgress += 15;
-        
+        clearAnimationProgress += 20;
+
         for (let line of clearAnimationLines) {
-            p.fill(255, 255, 255, clearAnimationProgress);
+            // Pulsing white overlay effect
+            let alpha = p.sin(clearAnimationProgress * 0.1) * 127 + 127;
+            p.fill(255, 255, 255, alpha);
             p.rect(startX, startY + line * cellSize, COLS * cellSize, cellSize);
+
+            // Horizontal line sweep effect
+            let sweepWidth = (clearAnimationProgress / 255) * COLS * cellSize;
+            p.fill(255, 255, 0, 200 - clearAnimationProgress);
+            p.rect(startX, startY + line * cellSize, sweepWidth, cellSize);
         }
-        
+
         if (clearAnimationProgress >= 255) {
             removeLines(clearAnimationLines);
             clearAnimationLines = [];
@@ -289,13 +472,13 @@ new p5(function(p) {
         return true;
     }
 
-    function collision() {
-        for (let y = 0; y < currentPiece.shape.length; y++) {
-            for (let x = 0; x < currentPiece.shape[y].length; x++) {
-                if (currentPiece.shape[y][x]) {
-                    let newX = currentPiece.x + x;
-                    let newY = currentPiece.y + y;
-                    
+    function collision(piece = currentPiece) {
+        for (let y = 0; y < piece.shape.length; y++) {
+            for (let x = 0; x < piece.shape[y].length; x++) {
+                if (piece.shape[y][x]) {
+                    let newX = piece.x + x;
+                    let newY = piece.y + y;
+
                     if (newX < 0 || newX >= COLS || newY >= ROWS) return true;
                     if (newY >= 0 && grid[newY][newX]) return true;
                 }
@@ -311,6 +494,20 @@ new p5(function(p) {
                     let newY = currentPiece.y + y;
                     if (newY >= 0) {
                         grid[newY][currentPiece.x + x] = currentPiece.color;
+
+                        // Create particles on merge
+                        let px = startX + (currentPiece.x + x) * cellSize + cellSize / 2;
+                        let py = startY + newY * cellSize + cellSize / 2;
+                        for (let i = 0; i < 3; i++) {
+                            dropParticles.push({
+                                x: px,
+                                y: py,
+                                vy: p.random(-2, 0),
+                                life: 255,
+                                color: currentPiece.color,
+                                size: p.random(3, 6)
+                            });
+                        }
                     }
                 }
             }
@@ -335,15 +532,50 @@ new p5(function(p) {
         
         if (linesToClear.length > 0) {
             clearAnimationLines = linesToClear;
+
+            // Create particles for cleared lines
+            for (let line of linesToClear) {
+                for (let x = 0; x < COLS; x++) {
+                    let px = startX + x * cellSize + cellSize / 2;
+                    let py = startY + line * cellSize + cellSize / 2;
+                    let color = grid[line][x];
+                    for (let i = 0; i < 5; i++) {
+                        particles.push(createParticle(px, py, color));
+                    }
+                }
+            }
+
+            // Check for combo
+            if (p.millis() - lastClearTime < 3000) {
+                comboCount++;
+            } else {
+                comboCount = 1;
+            }
+            lastClearTime = p.millis();
+
+            let oldLevel = level;
             lines += linesToClear.length;
-            score += calculateScore(linesToClear.length);
+            score += calculateScore(linesToClear.length) * comboCount;
             level = p.floor(lines / 10) + 1;
-            gameSpeed = p.max(100, 800 - (level - 1) * 50);
+
+            // Level up effect
+            if (level > oldLevel) {
+                levelUpEffect = 255;
+                playLevelUpSound();
+            }
+
+            // More aggressive speed increase: starts at 800ms, decreases by 70ms per level
+            // Minimum speed of 50ms at level 11+
+            gameSpeed = p.max(50, 800 - (level - 1) * 70);
             playClearSound();
         }
     }
 
     function removeLines(linesToRemove) {
+        // Sort in descending order to remove from bottom to top
+        // This prevents index shifting issues
+        linesToRemove.sort((a, b) => b - a);
+
         for (let line of linesToRemove) {
             grid.splice(line, 1);
             grid.unshift(new Array(COLS).fill(0));
@@ -374,29 +606,36 @@ new p5(function(p) {
 
     function handleTouchEnd(event) {
         if (!touchStartX || !touchStartY) return false;
-        
+
         let touchEndX = event.changedTouches[0].clientX;
         let touchEndY = event.changedTouches[0].clientY;
-        
+
         let dx = touchEndX - touchStartX;
         let dy = touchEndY - touchStartY;
-        
-        if (p.abs(dx) < 30 && p.abs(dy) < 30) return false;
-        
+
+        // Tap detection - if movement is small, it's a tap to rotate
+        if (p.abs(dx) < 30 && p.abs(dy) < 30) {
+            rotatePiece();
+            touchStartX = null;
+            touchStartY = null;
+            return false;
+        }
+
+        // Swipe detection
         if (p.abs(dx) > p.abs(dy)) {
+            // Horizontal swipe
             if (dx > 0) {
                 movePiece(1, 0);
             } else {
                 movePiece(-1, 0);
             }
         } else {
+            // Vertical swipe - only down for hard drop
             if (dy > 0) {
                 hardDrop();
-            } else {
-                rotatePiece();
             }
         }
-        
+
         touchStartX = null;
         touchStartY = null;
         return false;
@@ -439,6 +678,11 @@ new p5(function(p) {
         nextPiece = createPiece();
         clearAnimationLines = [];
         clearAnimationProgress = 0;
+        particles = [];
+        dropParticles = [];
+        levelUpEffect = 0;
+        comboCount = 0;
+        lastClearTime = 0;
     }
 
     p.windowResized = function() {

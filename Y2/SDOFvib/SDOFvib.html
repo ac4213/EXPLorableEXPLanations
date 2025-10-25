@@ -24,7 +24,7 @@
     <script src="SDOFvib.js"></script>
 
     <style>
-        /* Page-specific styles*/
+        /* Page-specific styles */
         .sim-container {
             display: flex;
             gap: 20px;
@@ -32,14 +32,14 @@
         }
 
         #sketch-holder {
-            flex: 0 0 200px; /* Fixed width */
+            flex: 0 0 200px;
             height: 500px;
-            margin: 0; /* Remove auto margins */
+            margin: 0;
         }
 
         #chart-container {
-            flex: 1; /* Take remaining space */
-            min-width: 0; /* Prevent overflow */
+            flex: 1;
+            min-width: 0;
         }
 
         #TimeHistory, #FRFamp, #FRFphase {
@@ -256,8 +256,8 @@
     
     <div class="content-section">
         <h2>Practice Problems</h2>
-        
-        <div class="problem">
+
+        <div class="practice-problems">
             <h3>Problem 1: Natural Frequency Calculation</h3>
             <p>A machine component has a mass of 5 kg and is supported by a spring with stiffness 8000 N/m. Calculate:</p>
             <ol type="a">
@@ -265,8 +265,9 @@
                 <li>The natural frequency in Hz</li>
                 <li>The period of oscillation</li>
             </ol>
-            <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
-            <div class="solution hidden" id="solution1">
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
                 <p>a) The natural frequency in rad/s:</p>
                 <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{8000}{5}} = \sqrt{1600} = 40\) rad/s</p>
                 
@@ -278,7 +279,7 @@
             </div>
         </div>
         
-        <div class="problem">
+        <div class="practice-problems">
             <h3>Problem 2: Damping Ratio Determination</h3>
             <p>A vibrating system with mass 2 kg and spring stiffness 1800 N/m has a logarithmic decrement of 0.5. Calculate:</p>
             <ol type="a">
@@ -287,8 +288,9 @@
                 <li>The critical damping coefficient</li>
                 <li>Classify the system as underdamped, critically damped, or overdamped</li>
             </ol>
-            <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
-            <div class="solution hidden" id="solution2">
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
                 <p>a) The damping ratio:</p>
                 <p>The logarithmic decrement \(\delta = 0.5\)</p>
                 <p>\(\zeta = \frac{\delta}{\sqrt{4\pi^2 + \delta^2}} = \frac{0.5}{\sqrt{4\pi^2 + 0.5^2}} = \frac{0.5}{\sqrt{39.74}} = \frac{0.5}{6.3} = 0.079\)</p>
@@ -304,7 +306,7 @@
             </div>
         </div>
         
-        <div class="problem">
+        <div class="practice-problems">
             <h3>Problem 3: Resonance and Amplitude</h3>
             <p>A machine with mass 100 kg is mounted on a spring with stiffness \(k = 4 \times 10^5\) N/m and a damper with damping coefficient \(c = 1000\) Ns/m. The machine is subjected to a harmonic force with amplitude \(F_0 = 5000\) N. Calculate:</p>
             <ol type="a">
@@ -312,8 +314,9 @@
                 <li>The amplitude of vibration at resonance</li>
                 <li>The amplitude of vibration when the forcing frequency is 10 Hz</li>
             </ol>
-            <div class="solution-toggle" onclick="toggleSolution('solution3')">Show Solution</div>
-            <div class="solution hidden" id="solution3">
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
                 <p>a) The natural frequency:</p>
                 <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{4 \times 10^5}{100}} = \sqrt{4000} = 63.25\) rad/s</p>
                 <p>\(f_n = \frac{\omega_n}{2\pi} = \frac{63.25}{2\pi} = 10.07\) Hz</p>
@@ -504,37 +507,39 @@
     </footer>
 
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                document.querySelector(`[onclick="toggleSolution('${id}')"]`).textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                document.querySelector(`[onclick="toggleSolution('${id}')"]`).textContent = "Show Solution";
-            }
-        }
+// Toggle solution visibility
+function toggleSolution(id) {
+    const solution = document.getElementById(id);
+    if (solution.classList.contains('hidden')) {
+        solution.classList.remove('hidden');
+        solution.previousElementSibling.textContent = "Hide Solution";
+    } else {
+        solution.classList.add('hidden');
+        solution.previousElementSibling.textContent = "Show Solution";
+    }
+}
         
-        // Function to check quiz answers
-        function checkAnswer(questionId, correctAnswer) {
-            const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-            const feedbackElement = document.getElementById(`${questionId}-feedback`);
-            
-            if (!selectedOption) {
-                feedbackElement.innerHTML = "Please select an answer.";
-                feedbackElement.className = "feedback";
-                return;
-            }
-            
-            if (selectedOption.value === correctAnswer) {
-                feedbackElement.innerHTML = "Correct! Well done.";
-                feedbackElement.className = "feedback correct";
-            } else {
-                feedbackElement.innerHTML = "Incorrect. Try again!";
-                feedbackElement.className = "feedback incorrect";
-            }
-        }
+// Function to check quiz answers
+function checkAnswer(questionId, correctAnswer) {
+    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+    const feedbackElement = document.getElementById(`${questionId}-feedback`);
+
+    if (!selectedOption) {
+        feedbackElement.innerHTML = "Please select an answer.";
+        feedbackElement.className = "feedback";
+        return;
+    }
+
+    if (selectedOption.value === correctAnswer) {
+        feedbackElement.innerHTML = "✓ Correct! Well done.";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "green";
+    } else {
+        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
+        feedbackElement.className = "feedback";
+        feedbackElement.style.color = "red";
+    }
+}
         
         // Create a new instance of the simulation when the page loads
         document.addEventListener('DOMContentLoaded', function() {
