@@ -12,6 +12,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Your script goes here -->
     <script src="StressAnalysis.js"></script>
 
@@ -303,6 +304,19 @@
     </div>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Combined loading stress analysis is fundamental across all engineering disciplines:</p>
+        <ul>
+            <li><strong>Mechanical Design:</strong> Shafts in gearboxes experience combined bending and torsion. Proper stress analysis ensures adequate fatigue life.</li>
+            <li><strong>Structural Engineering:</strong> Building columns undergo combined axial load and bending from wind. Beams experience shear and bending simultaneously.</li>
+            <li><strong>Pressure Vessels:</strong> Tanks and pipes experience combined internal pressure, bending, and torsion, requiring careful stress analysis for safety.</li>
+            <li><strong>Aerospace:</strong> Aircraft wing spars and fuselage frames experience complex combined loading during flight maneuvers.</li>
+            <li><strong>Automotive:</strong> Drive shafts, axles, and suspension components all experience multiple stress types simultaneously.</li>
+            <li><strong>Marine Engineering:</strong> Propeller shafts experience combined torsion from power transmission and bending from weight and hydrodynamic forces.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -366,7 +380,7 @@
     </div>
 
     <div class="content-section">
-        <h2>Interactive Quiz</h2>
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
                 <h3>Question 1: Which stress is uniform across a prismatic member's cross-section?</h3>
@@ -407,14 +421,24 @@
                     <label><input type="radio" name="q4" value="d"> d) The quarter points</label>
                 </div>
             </div>
-            
+
+            <div class="quiz-question">
+                <h3>Question 5: When combining axial and bending stresses, the maximum stress occurs at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) The neutral axis</label>
+                    <label><input type="radio" name="q5" value="b"> b) The extreme fibers where stresses add constructively</label>
+                    <label><input type="radio" name="q5" value="c"> c) The center of the cross-section</label>
+                    <label><input type="radio" name="q5" value="d"> d) Uniformly across the entire section</label>
+                </div>
+            </div>
+
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results" class="hidden"></div>
         </div>
     </div>
     
     <div class="content-section">
-        <h2>Summary: Key Equations Reference</h2>
+        <h2>Summary of Key Equations</h2>
         
         <div class="equation-table">
             <table>
@@ -478,21 +502,9 @@
     </footer>
 
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
-        
-        // Quiz functionality
+        // toggleSolution function now loaded from /assets/common/problems.js
+
+        // Quiz functionality - page-specific submitQuiz behavior
         document.addEventListener('DOMContentLoaded', function() {
             const quizBtn = document.getElementById('submit-quiz');
             if (quizBtn) {
@@ -501,12 +513,13 @@
                         q1: 'b', // Axial stress is uniform
                         q2: 'b', // Q is first moment of area above cut
                         q3: 'b', // Shear stress varies linearly with radius
-                        q4: 'c'  // Maximum shear at neutral axis
+                        q4: 'c', // Maximum shear at neutral axis
+                        q5: 'b'  // Max stress where stresses add constructively
                     };
-                    
+
                     let score = 0;
                     let feedback = '<h3>Quiz Results:</h3>';
-                    
+
                     for (let question in answers) {
                         const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
                         if (selectedOption) {
@@ -520,9 +533,9 @@
                             feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
                         }
                     }
-                    
-                    feedback += `<p>Your score: ${score}/4</p>`;
-                    
+
+                    feedback += `<p>Your score: ${score}/5</p>`;
+
                     const resultsDiv = document.getElementById('quiz-results');
                     resultsDiv.innerHTML = feedback;
                     resultsDiv.classList.remove('hidden');
@@ -531,5 +544,8 @@
         });
     </script>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 </html>

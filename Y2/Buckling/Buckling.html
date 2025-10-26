@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 </head>
 
 <body>
@@ -217,6 +218,19 @@
     </div>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Column buckling analysis is essential in numerous structural engineering applications:</p>
+        <ul>
+            <li><strong>Building Design:</strong> Steel and concrete columns in multi-story buildings must be designed to resist buckling under gravity loads and lateral forces.</li>
+            <li><strong>Bridge Engineering:</strong> Compression members in truss bridges and arch supports require careful buckling analysis to ensure safety.</li>
+            <li><strong>Aerospace Structures:</strong> Aircraft fuselages and wing ribs use thin-walled sections that are highly susceptible to buckling.</li>
+            <li><strong>Offshore Platforms:</strong> Jacket legs and bracing members in oil rigs experience large compressive forces and must resist buckling in harsh environments.</li>
+            <li><strong>Cranes and Towers:</strong> Boom sections and tower legs in cranes and transmission towers must be designed against buckling under operational loads.</li>
+            <li><strong>Mechanical Systems:</strong> Push rods, linkages, and actuators in machinery can fail by buckling if not properly designed.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -331,7 +345,45 @@
     </div>
 
     <div class="content-section">
-        <h2>Interactive Quiz</h2>
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Euler Buckling Load</td>
+                    <td>\(P_{cr} = \frac{\pi^2 EI}{(KL)^2}\)</td>
+                    <td>Critical load for slender columns</td>
+                </tr>
+                <tr>
+                    <td>Effective Length Factor</td>
+                    <td>\(K\)</td>
+                    <td>Depends on end conditions (0.5 to 2.0)</td>
+                </tr>
+                <tr>
+                    <td>Slenderness Ratio</td>
+                    <td>\(\lambda = \frac{KL}{r}\)</td>
+                    <td>Ratio of effective length to radius of gyration</td>
+                </tr>
+                <tr>
+                    <td>Critical Stress</td>
+                    <td>\(\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2 E}{(KL/r)^2}\)</td>
+                    <td>Buckling stress for slender columns</td>
+                </tr>
+                <tr>
+                    <td>Radius of Gyration</td>
+                    <td>\(r = \sqrt{\frac{I}{A}}\)</td>
+                    <td>Geometric property of cross-section</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
                 <h3>Question 1: Elastic instability (buckling) occurs when:</h3>
@@ -732,24 +784,12 @@
             // This function triggers recalculation - the actual calculation is done in updateDisplay()
         }
         
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
-        
+        // toggleSolution function now loaded from /assets/common/problems.js
+
         // Initialize page when loaded
         document.addEventListener('DOMContentLoaded', function() {
-            
-            // Quiz functionality
+
+            // Quiz functionality - page-specific submitQuiz behavior
             const quizBtn = document.getElementById('submit-quiz');
             if (quizBtn) {
                 quizBtn.addEventListener('click', function() {
@@ -760,10 +800,10 @@
                         q4: 'b', // Le/r
                         q5: 'b'  // Rankine-Gordon combines crushing and buckling
                     };
-                    
+
                     let score = 0;
                     let feedback = '<h3>Quiz Results:</h3>';
-                    
+
                     for (let question in answers) {
                         const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
                         if (selectedOption) {
@@ -777,16 +817,16 @@
                             feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
                         }
                     }
-                    
+
                     feedback += `<p>Your score: ${score}/5</p>`;
-                    
+
                     const resultsDiv = document.getElementById('quiz-results');
                     resultsDiv.innerHTML = feedback;
                     resultsDiv.classList.remove('hidden');
                 });
             }
         });
-        
+
         // MathJax configuration
         window.MathJax = {
             tex: {
@@ -796,5 +836,8 @@
         };
     </script>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 </html>

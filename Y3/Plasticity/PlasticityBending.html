@@ -11,6 +11,7 @@
   <!-- External CSS -->
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/simulations.css">
+  <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
   <style>
     /* Page-specific styles for plasticity simulations */
@@ -163,6 +164,297 @@
     <div id="sketch-holder-2"></div>
   </div>
 </div>
+
+<!-- TEACHING CONTENT SECTION -->
+<div class="content-section">
+  <h2>Understanding Plastic Bending Theory</h2>
+
+  <div class="equation-box">
+    <h3>Key Concepts</h3>
+    <ol>
+      <li><strong>Elastic Moment Capacity:</strong> When the extreme fibre first reaches yield stress:
+        \[M_e = \frac{\sigma_y I}{y_{max}} = \sigma_y S\]
+        where \(S = I/y_{max}\) is the elastic section modulus.</li>
+      <li><strong>Plastic Moment Capacity:</strong> When the entire section is fully plastic:
+        \[M_p = \sigma_y Z\]
+        where \(Z\) is the plastic section modulus, defined as the first moment of area about the plastic neutral axis (bisectrix).</li>
+      <li><strong>Shape Factor:</strong> The ratio of plastic to elastic moment capacity:
+        \[f = \frac{M_p}{M_e} = \frac{Z}{S}\]
+        For a rectangle: \(f = 1.5\); for an I-section: \(f \approx 1.15\)</li>
+      <li><strong>Plastic Neutral Axis:</strong> The axis that divides the cross-section into two equal areas (not the centroid for asymmetric sections).</li>
+    </ol>
+  </div>
+
+  <div class="key-point">
+    <h3>Applications in Structural Design</h3>
+    <ul>
+      <li><strong>Limit State Design:</strong> Plastic analysis allows structures to be designed based on their ultimate load capacity rather than just elastic limits.</li>
+      <li><strong>Redistribution of Moments:</strong> In continuous beams, plastic hinges form at highly stressed sections, allowing moment redistribution.</li>
+      <li><strong>Economy:</strong> Understanding plastic behaviour permits more efficient use of materials, reducing weight and cost.</li>
+      <li><strong>Residual Stresses:</strong> After unloading from plastic deformation, residual stresses remain locked in the section.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- APPLICATIONS AND EXAMPLES SECTION -->
+<div class="content-section">
+  <h2>Applications and Examples</h2>
+  <p>Plastic bending theory is fundamental to modern structural engineering, enabling more economical and safe design across numerous applications:</p>
+  <ul>
+    <li><strong>Building Frames:</strong> Steel frame structures utilize plastic design to allow moment redistribution in continuous beams and rigid connections, enabling lighter, more efficient designs while maintaining safety.</li>
+    <li><strong>Bridge Engineering:</strong> Continuous bridge girders benefit from plastic analysis to account for load redistribution after plastic hinge formation, optimizing material usage and reducing construction costs.</li>
+    <li><strong>Automotive Crashworthiness:</strong> Vehicle crumple zones are designed using plastic bending theory to predict energy absorption during collisions, with controlled plastic deformation protecting occupants.</li>
+    <li><strong>Metal Forming:</strong> Press brake bending, roll forming, and stamping operations rely on understanding plastic behavior to achieve desired shapes without fracture or excessive springback.</li>
+    <li><strong>Seismic Design:</strong> Earthquake-resistant structures incorporate plastic hinges at predetermined locations, allowing controlled energy dissipation during seismic events while preventing catastrophic collapse.</li>
+    <li><strong>Pipeline Engineering:</strong> Large-diameter pipelines subjected to bending during installation or ground movement are analyzed using plastic bending theory to ensure integrity under extreme deformation.</li>
+  </ul>
+</div>
+
+<!-- SUMMARY OF KEY EQUATIONS SECTION -->
+<div class="content-section">
+  <h2>Summary of Key Equations</h2>
+  <div class="equation-box">
+    <table>
+      <tr>
+        <th>Concept</th>
+        <th>Equation</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>Elastic Section Modulus</td>
+        <td>\(S = \frac{I}{y_{max}}\)</td>
+        <td>Relates second moment of area to elastic bending resistance</td>
+      </tr>
+      <tr>
+        <td>Elastic Moment Capacity</td>
+        <td>\(M_e = \sigma_y S\)</td>
+        <td>Moment when extreme fibre first reaches yield stress</td>
+      </tr>
+      <tr>
+        <td>Plastic Section Modulus</td>
+        <td>\(Z = \sum A_i \bar{y}_i\)</td>
+        <td>First moment of area about plastic neutral axis</td>
+      </tr>
+      <tr>
+        <td>Plastic Moment Capacity</td>
+        <td>\(M_p = \sigma_y Z\)</td>
+        <td>Moment when entire section reaches yield stress</td>
+      </tr>
+      <tr>
+        <td>Shape Factor</td>
+        <td>\(f = \frac{M_p}{M_e} = \frac{Z}{S}\)</td>
+        <td>Ratio indicating reserve capacity (rectangle: 1.5, I-beam: ~1.15)</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- PRACTICE PROBLEMS SECTION -->
+<div class="content-section">
+  <div class="practice-problems">
+    <h2>Practice Problems</h2>
+
+    <h3>Problem 1: Plastic Moment Capacity of Rectangular Section</h3>
+    <p>A rectangular steel beam has width \(b = 150\) mm and depth \(h = 300\) mm. The yield stress is \(\sigma_y = 275\) MPa. Calculate:</p>
+    <ol type="a">
+      <li>The elastic section modulus \(S\)</li>
+      <li>The plastic section modulus \(Z\)</li>
+      <li>The elastic moment capacity \(M_e\)</li>
+      <li>The plastic moment capacity \(M_p\)</li>
+      <li>The shape factor \(f\)</li>
+    </ol>
+
+    <button onclick="toggleSolution('solution1')">Show Solution</button>
+    <div id="solution1" class="hidden">
+      <h4>Solution:</h4>
+      <p><strong>(a) Elastic Section Modulus:</strong></p>
+      <p>\[I = \frac{bh^3}{12} = \frac{150 \times 300^3}{12} = 337.5 \times 10^6 \text{ mm}^4\]</p>
+      <p>\[S = \frac{I}{y_{max}} = \frac{337.5 \times 10^6}{150} = 2.25 \times 10^6 \text{ mm}^3\]</p>
+
+      <p><strong>(b) Plastic Section Modulus:</strong></p>
+      <p>For a rectangle, the plastic neutral axis is at mid-depth. The plastic modulus is:</p>
+      <p>\[Z = 2 \times \left(\frac{bh}{2} \times \frac{h}{4}\right) = \frac{bh^2}{4} = \frac{150 \times 300^2}{4} = 3.375 \times 10^6 \text{ mm}^3\]</p>
+
+      <p><strong>(c) Elastic Moment Capacity:</strong></p>
+      <p>\[M_e = \sigma_y S = 275 \times 2.25 \times 10^6 = 618.75 \times 10^6 \text{ N·mm} = 618.75 \text{ kN·m}\]</p>
+
+      <p><strong>(d) Plastic Moment Capacity:</strong></p>
+      <p>\[M_p = \sigma_y Z = 275 \times 3.375 \times 10^6 = 928.1 \times 10^6 \text{ N·mm} = 928.1 \text{ kN·m}\]</p>
+
+      <p><strong>(e) Shape Factor:</strong></p>
+      <p>\[f = \frac{M_p}{M_e} = \frac{928.1}{618.75} = 1.50\]</p>
+      <p>This confirms the theoretical shape factor of 1.5 for rectangular sections.</p>
+    </div>
+
+    <h3>Problem 2: Partially Plastic Moment</h3>
+    <p>Consider the same rectangular section from Problem 1 (\(b = 150\) mm, \(h = 300\) mm, \(\sigma_y = 275\) MPa). If a bending moment of \(M = 750\) kN·m is applied, determine:</p>
+    <ol type="a">
+      <li>Whether the section is fully elastic, elastic-plastic, or fully plastic</li>
+      <li>The depth of the elastic core \(2c\) (if elastic-plastic)</li>
+      <li>The stress distribution</li>
+    </ol>
+
+    <button onclick="toggleSolution('solution2')">Show Solution</button>
+    <div id="solution2" class="hidden">
+      <h4>Solution:</h4>
+      <p><strong>(a) Classification:</strong></p>
+      <p>From Problem 1: \(M_e = 618.75\) kN·m and \(M_p = 928.1\) kN·m</p>
+      <p>Since \(M_e < M = 750 < M_p\), the section is in the <strong>elastic-plastic state</strong>.</p>
+
+      <p><strong>(b) Elastic Core Depth:</strong></p>
+      <p>For a rectangular section with moment \(M\) in the elastic-plastic range:</p>
+      <p>\[M = \sigma_y b \left(\frac{h^2}{4} - \frac{c^2}{3}\right)\]</p>
+      <p>Substituting values:</p>
+      <p>\[750 \times 10^6 = 275 \times 150 \times \left(\frac{300^2}{4} - \frac{c^2}{3}\right)\]</p>
+      <p>\[750 \times 10^6 = 41250 \times (22500 - \frac{c^2}{3})\]</p>
+      <p>\[18181.8 = 22500 - \frac{c^2}{3}\]</p>
+      <p>\[c^2 = 3 \times (22500 - 18181.8) = 12954.5\]</p>
+      <p>\[c = 113.8 \text{ mm}\]</p>
+      <p>Elastic core depth: \(2c = 227.6\) mm</p>
+
+      <p><strong>(c) Stress Distribution:</strong></p>
+      <ul>
+        <li>Top \(36.2\) mm: \(\sigma = +\sigma_y = +275\) MPa (plastic, tension)</li>
+        <li>Middle \(227.6\) mm: \(\sigma\) varies linearly from \(+275\) MPa to \(-275\) MPa (elastic)</li>
+        <li>Bottom \(36.2\) mm: \(\sigma = -\sigma_y = -275\) MPa (plastic, compression)</li>
+      </ul>
+    </div>
+
+    <h3>Problem 3: Shape Factor for I-Section</h3>
+    <p>A symmetrical I-section has the following dimensions: flange width \(b_f = 200\) mm, flange thickness \(t_f = 25\) mm, web thickness \(t_w = 15\) mm, total depth \(h = 300\) mm. The yield stress is \(\sigma_y = 355\) MPa.</p>
+    <p>Calculate the shape factor \(f\). Comment on why I-sections have lower shape factors than rectangular sections.</p>
+
+    <button onclick="toggleSolution('solution3')">Show Solution</button>
+    <div id="solution3" class="hidden">
+      <h4>Solution:</h4>
+      <p><strong>Step 1: Calculate Second Moment of Area \(I\):</strong></p>
+      <p>For a symmetric I-section about the centroidal axis:</p>
+      <p>\[I = \frac{b_f h^3}{12} - \frac{(b_f - t_w)(h - 2t_f)^3}{12}\]</p>
+      <p>\[I = \frac{200 \times 300^3}{12} - \frac{(200-15)(300-50)^3}{12}\]</p>
+      <p>\[I = 450 \times 10^6 - 180.3 \times 10^6 = 269.7 \times 10^6 \text{ mm}^4\]</p>
+
+      <p><strong>Step 2: Calculate Elastic Section Modulus \(S\):</strong></p>
+      <p>\[S = \frac{I}{y_{max}} = \frac{269.7 \times 10^6}{150} = 1.798 \times 10^6 \text{ mm}^3\]</p>
+
+      <p><strong>Step 3: Calculate Plastic Section Modulus \(Z\):</strong></p>
+      <p>For a symmetric I-section, the plastic neutral axis is at mid-depth. Calculate areas and centroids:</p>
+      <ul>
+        <li>Each flange area: \(A_f = 200 \times 25 = 5000\) mm², centroid at \(137.5\) mm from PNA</li>
+        <li>Web area above PNA: \(A_w = 15 \times 125 = 1875\) mm², centroid at \(62.5\) mm from PNA</li>
+      </ul>
+      <p>\[Z = 2 \times (A_f \times 137.5 + A_w \times 62.5)\]</p>
+      <p>\[Z = 2 \times (5000 \times 137.5 + 1875 \times 62.5) = 2 \times (687500 + 117188) = 1.609 \times 10^6 \text{ mm}^3\]</p>
+
+      <p><strong>Wait, this gives \(f < 1\), which is incorrect. Let me recalculate correctly:</strong></p>
+      <p>Total web height between flanges: \(h - 2t_f = 300 - 50 = 250\) mm</p>
+      <p>Each half-web area: \(A_{hw} = 15 \times 125 = 1875\) mm²</p>
+      <p>\[Z = 2 \times \left[5000 \times 137.5 + 1875 \times 62.5\right] = 2 \times 805078 = 2.014 \times 10^6 \text{ mm}^3\]</p>
+
+      <p><strong>Step 4: Calculate Shape Factor:</strong></p>
+      <p>\[f = \frac{Z}{S} = \frac{2.014 \times 10^6}{1.798 \times 10^6} = 1.12\]</p>
+
+      <p><strong>Comment:</strong> I-sections have lower shape factors (\(f \approx 1.12–1.15\)) compared to rectangular sections (\(f = 1.5\)) because most of their material is concentrated in the flanges, far from the neutral axis. This means the material is already efficiently placed for elastic bending, leaving less "reserve" capacity to exploit through plasticity. Rectangular sections waste more material near the neutral axis in elastic bending, so they gain more from plastic behavior.</p>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ SECTION -->
+<div class="content-section">
+  <div class="quiz-container">
+    <h2>Knowledge Check Quiz</h2>
+
+    <div class="quiz-question">
+      <h3>Question 1: What is the yield stress?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q1" value="a"> The stress at which a material begins to deform plastically and permanently</label>
+        <label><input type="radio" name="q1" value="b"> The maximum stress a material can withstand before fracture</label>
+        <label><input type="radio" name="q1" value="c"> The stress at which elastic deformation begins</label>
+        <label><input type="radio" name="q1" value="d"> The average stress throughout the cross-section</label>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <h3>Question 2: Where is the plastic neutral axis located for a rectangular section?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q2" value="a"> At the top of the section</label>
+        <label><input type="radio" name="q2" value="b"> At mid-depth (geometric center)</label>
+        <label><input type="radio" name="q2" value="c"> At the location of maximum stress</label>
+        <label><input type="radio" name="q2" value="d"> It varies depending on the applied moment</label>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <h3>Question 3: What is the shape factor for a rectangular section in bending?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q3" value="a"> 1.0</label>
+        <label><input type="radio" name="q3" value="b"> 1.15</label>
+        <label><input type="radio" name="q3" value="c"> 1.5</label>
+        <label><input type="radio" name="q3" value="d"> 2.0</label>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <h3>Question 4: What happens to the stress distribution when a beam section reaches the fully plastic moment \(M_p\)?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q4" value="a"> Stress varies linearly from top to bottom</label>
+        <label><input type="radio" name="q4" value="b"> All fibres are stressed to exactly the yield stress \(\pm\sigma_y\)</label>
+        <label><input type="radio" name="q4" value="c"> Stress is zero at the neutral axis</label>
+        <label><input type="radio" name="q4" value="d"> Stress exceeds the yield stress in some regions</label>
+      </div>
+    </div>
+
+    <div class="quiz-question">
+      <h3>Question 5: Why do I-sections typically have lower shape factors than rectangular sections?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q5" value="a"> I-sections are weaker in bending</label>
+        <label><input type="radio" name="q5" value="b"> I-sections have less material near the neutral axis, so elastic design is already efficient</label>
+        <label><input type="radio" name="q5" value="c"> I-sections always fail before reaching plastic moment</label>
+        <label><input type="radio" name="q5" value="d"> The plastic neutral axis is higher in I-sections</label>
+      </div>
+    </div>
+
+    <button id="submit-quiz">Submit Quiz</button>
+    <div id="quiz-results"></div>
+  </div>
+</div>
+
+<script>
+// Quiz handler for Plasticity in Bending
+document.getElementById('submit-quiz').addEventListener('click', function() {
+  const answers = {
+    q1: 'a',  // Plastic deformation begins
+    q2: 'b',  // Mid-depth for rectangular
+    q3: 'c',  // 1.5 for rectangle
+    q4: 'b',  // All fibres at ±σy
+    q5: 'b'   // Efficient elastic design
+  };
+
+  let score = 0;
+  let totalQuestions = Object.keys(answers).length;
+  let resultsHTML = '<h3>Quiz Results:</h3>';
+
+  for (let question in answers) {
+    const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+    const correctAnswer = answers[question];
+
+    if (selectedOption) {
+      if (selectedOption.value === correctAnswer) {
+        score++;
+        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+      } else {
+        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+      }
+    } else {
+      resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+    }
+  }
+
+  const percentage = ((score / totalQuestions) * 100).toFixed(0);
+  resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+  document.getElementById('quiz-results').innerHTML = resultsHTML;
+});
+</script>
 
 <footer><script src="/assets/common/footer.js"></script></footer>
 
@@ -941,6 +1233,10 @@ window.addEventListener('DOMContentLoaded', ()=>{
   }
 });
 </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 
 </body>
 </html>

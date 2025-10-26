@@ -11,6 +11,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Simulation Scripts -->
     <script src="billiards-simulation.js"></script>
     <script src="angular-momentum-simulation.js"></script>
@@ -391,6 +392,17 @@
             <p>Precession rate: \(\Omega = \frac{\tau}{L} = \frac{\tau}{I\omega}\)</p>
         </div>
 
+        <h2>Applications and Examples</h2>
+        <p>Impulse and momentum principles are crucial in analyzing impact scenarios and motion in various engineering applications:</p>
+        <ul>
+            <li><strong>Vehicle Safety:</strong> Airbags and crumple zones increase collision duration, reducing impact forces on occupants. Crash test analysis relies heavily on impulse-momentum calculations.</li>
+            <li><strong>Sports Equipment:</strong> Tennis rackets, golf clubs, and baseball bats are designed to maximize momentum transfer. The "sweet spot" concept minimizes vibration while optimizing energy transfer.</li>
+            <li><strong>Aerospace:</strong> Rocket propulsion works by expelling mass at high velocity, conserving momentum to accelerate the vehicle. Orbital mechanics and spacecraft maneuvering use momentum principles.</li>
+            <li><strong>Impact Engineering:</strong> Pile driving, forging, and stamping operations use controlled impulse to shape materials or drive foundations into ground.</li>
+            <li><strong>Ballistics:</strong> Analyzing projectile motion, recoil in firearms, and penetration mechanics all rely on momentum conservation and impulse analysis.</li>
+            <li><strong>Rotating Machinery:</strong> Gyroscopes, flywheels, and angular momentum in turbines are essential for stabilization, energy storage, and power generation.</li>
+        </ul>
+
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -438,7 +450,7 @@
             </div>
         </div>
 
-        <h2>Summary</h2>
+        <h2>Summary of Key Equations</h2>
         <div class="key-point">
             <h3>Key Takeaways</h3>
             <ol>
@@ -451,32 +463,121 @@
         </div>
     </div>
 
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: A 1000 kg car travelling at 20 m/s collides with a stationary 1500 kg car. They stick together after collision. What is their final velocity?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 8.0 m/s</label>
+                    <label><input type="radio" name="q1" value="b"> b) 10.0 m/s</label>
+                    <label><input type="radio" name="q1" value="c"> c) 13.3 m/s</label>
+                    <label><input type="radio" name="q1" value="d"> d) 15.0 m/s</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: What is the coefficient of restitution for a perfectly elastic collision?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 0</label>
+                    <label><input type="radio" name="q2" value="b"> b) 0.5</label>
+                    <label><input type="radio" name="q2" value="c"> c) 1</label>
+                    <label><input type="radio" name="q2" value="d"> d) Infinity</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A tennis ball is struck by a racket, changing its velocity from 30 m/s to the right to 40 m/s to the left in 0.01 s. If the ball mass is 0.06 kg, what is the average force on the ball?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 60 N</label>
+                    <label><input type="radio" name="q3" value="b"> b) 180 N</label>
+                    <label><input type="radio" name="q3" value="c"> c) 420 N</label>
+                    <label><input type="radio" name="q3" value="d"> d) 700 N</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: A figure skater reduces their moment of inertia from 4 kg·m² to 1 kg·m² while spinning. If their initial angular velocity is 2 rad/s, what is their final angular velocity?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) 0.5 rad/s</label>
+                    <label><input type="radio" name="q4" value="b"> b) 2 rad/s</label>
+                    <label><input type="radio" name="q4" value="c"> c) 4 rad/s</label>
+                    <label><input type="radio" name="q4" value="d"> d) 8 rad/s</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: In a collision, which quantity is ALWAYS conserved in an isolated system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Kinetic energy</label>
+                    <label><input type="radio" name="q5" value="b"> b) Momentum</label>
+                    <label><input type="radio" name="q5" value="c"> c) Velocity</label>
+                    <label><input type="radio" name="q5" value="d"> d) Temperature</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
+        // Page-specific JavaScript
+        // toggleSolution function now loaded from /assets/common/problems.js
 
         // Initialize simulations
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize billiards simulation
             initializeBilliardsSimulation();
-            
+
             // Initialize angular momentum simulation
             initializeAngularSimulation();
+        });
+
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'a', // 8.0 m/s (1000*20)/(1000+1500)
+                        q2: 'c', // e = 1 for perfectly elastic
+                        q3: 'c', // F = m*delta_v/t = 0.06*70/0.01 = 420 N
+                        q4: 'd', // 8 rad/s (conservation: I1*w1 = I2*w2)
+                        q5: 'b'  // Momentum is always conserved
+                    };
+
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+
+                    feedback += `<p>Your score: ${score}/5</p>`;
+
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
         });
     </script>
 </body>

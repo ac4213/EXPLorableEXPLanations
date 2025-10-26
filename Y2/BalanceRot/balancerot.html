@@ -12,6 +12,7 @@
 <!-- External CSS -->
 <link href="/assets/css/main.css" rel="stylesheet"/>
 <link href="/assets/css/simulations.css" rel="stylesheet"/>
+<link rel="stylesheet" href="/assets/css/uicontrols.css">
 <!-- JavaScript for simulations -->
 <script defer="" src="balancerot.js"></script>
 <style>
@@ -551,8 +552,358 @@
             });
         });
     </script>
+
+    <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Rotor balancing and rotational dynamics are critical in numerous mechanical systems:</p>
+        <ul>
+            <li><strong>Turbomachinery:</strong> Gas turbines, steam turbines, and jet engines require precise balancing to prevent vibration and catastrophic failure at high speeds.</li>
+            <li><strong>Automotive:</strong> Engine crankshafts, drive shafts, and wheels must be balanced to ensure smooth operation and extend component life.</li>
+            <li><strong>Power Generation:</strong> Generator rotors in power plants operate at high speeds and require meticulous balancing to maintain reliability.</li>
+            <li><strong>Machine Tools:</strong> Grinding wheels, milling cutters, and spindles need balancing for precision and safety.</li>
+            <li><strong>Aerospace:</strong> Helicopter rotor blades, propellers, and turbine engines all rely on careful balancing for safe operation.</li>
+            <li><strong>HVAC Systems:</strong> Fans and blowers require balancing to minimize noise and vibration in buildings.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Single Plane Balancing of a Rotor</h3>
+            <p>A rotating shaft has three unbalanced masses:</p>
+            <ul>
+                <li>Mass 1: 50 g at 80 mm radius, 0 degrees</li>
+                <li>Mass 2: 40 g at 60 mm radius, 90 degrees</li>
+                <li>Mass 3: 30 g at 70 mm radius, 180 degrees</li>
+            </ul>
+            <p>All masses are in the same plane. Calculate the magnitude and angle of the balance mass required at a radius of 75 mm.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Step 1: Calculate MR (mass times radius) for each mass</strong></p>
+                <p>Mass 1: \(MR_1 = 50 \times 80 = 4000 \text{ g·mm}\) at 0°</p>
+                <p>Mass 2: \(MR_2 = 40 \times 60 = 2400 \text{ g·mm}\) at 90°</p>
+                <p>Mass 3: \(MR_3 = 30 \times 70 = 2100 \text{ g·mm}\) at 180°</p>
+
+                <p><strong>Step 2: Resolve into x and y components</strong></p>
+                <p>\(MR_{1x} = 4000 \cos(0°) = 4000 \text{ g·mm}\), \(MR_{1y} = 4000 \sin(0°) = 0 \text{ g·mm}\)</p>
+                <p>\(MR_{2x} = 2400 \cos(90°) = 0 \text{ g·mm}\), \(MR_{2y} = 2400 \sin(90°) = 2400 \text{ g·mm}\)</p>
+                <p>\(MR_{3x} = 2100 \cos(180°) = -2100 \text{ g·mm}\), \(MR_{3y} = 2100 \sin(180°) = 0 \text{ g·mm}\)</p>
+
+                <p><strong>Step 3: Sum the components</strong></p>
+                <p>\(\sum MR_x = 4000 + 0 - 2100 = 1900 \text{ g·mm}\)</p>
+                <p>\(\sum MR_y = 0 + 2400 + 0 = 2400 \text{ g·mm}\)</p>
+
+                <p><strong>Step 4: Calculate resultant unbalance</strong></p>
+                <p>\(MR_{resultant} = \sqrt{1900^2 + 2400^2} = \sqrt{3,610,000 + 5,760,000} = 3063 \text{ g·mm}\)</p>
+                <p>\(\theta = \tan^{-1}\left(\frac{2400}{1900}\right) = 51.6°\)</p>
+
+                <p><strong>Step 5: Balance mass (opposite direction: 180° + 51.6° = 231.6°)</strong></p>
+                <p>\(m_b = \frac{MR_{resultant}}{r_b} = \frac{3063}{75} = 40.8 \text{ g}\) at 231.6°</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Two-Plane Balancing</h3>
+            <p>A shaft 600 mm long has two unbalanced masses:</p>
+            <ul>
+                <li>Mass A: 60 g at 70 mm radius, 0°, located 150 mm from left bearing</li>
+                <li>Mass B: 50 g at 80 mm radius, 120°, located 450 mm from left bearing</li>
+            </ul>
+            <p>Calculate the balance masses required in correction planes at the bearings (0 mm and 600 mm from left) at a radius of 65 mm.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Step 1: Calculate MR values</strong></p>
+                <p>\(MR_A = 60 \times 70 = 4200 \text{ g·mm}\) at 0°, position L = 150 mm</p>
+                <p>\(MR_B = 50 \times 80 = 4000 \text{ g·mm}\) at 120°, position L = 450 mm</p>
+
+                <p><strong>Step 2: Resolve into components</strong></p>
+                <p>Mass A: \(x = 4200\), \(y = 0\)</p>
+                <p>Mass B: \(x = 4000 \cos(120°) = -2000\), \(y = 4000 \sin(120°) = 3464\)</p>
+
+                <p><strong>Step 3: Force balance equations</strong></p>
+                <p>\(\sum MR_x = 0: (MR_L)_x + (MR_R)_x + 4200 - 2000 = 0\)</p>
+                <p>\(\sum MR_y = 0: (MR_L)_y + (MR_R)_y + 0 + 3464 = 0\)</p>
+
+                <p><strong>Step 4: Moment balance about left bearing</strong></p>
+                <p>\(\sum (MR \cdot L)_x = 0: (MR_R)_x \times 600 + 4200 \times 150 - 2000 \times 450 = 0\)</p>
+                <p>\((MR_R)_x = \frac{900,000 - 630,000}{600} = 450 \text{ g·mm}\)</p>
+                <p>\((MR_R)_y = \frac{3464 \times 450}{600} = 2598 \text{ g·mm}\)</p>
+
+                <p><strong>Step 5: Calculate balance masses</strong></p>
+                <p>Right plane: \(MR_R = \sqrt{450^2 + 2598^2} = 2637 \text{ g·mm}\), \(\theta_R = \tan^{-1}(2598/450) = 80.2°\)</p>
+                <p>Balance mass at right: \(m_R = 2637/65 = 40.6 \text{ g}\) at (180° + 80.2°) = 260.2°</p>
+                <p>Left plane: From force balance, \((MR_L)_x = -2650\), \((MR_L)_y = -866\)</p>
+                <p>Balance mass at left: \(m_L = 2787/65 = 42.9 \text{ g}\) at 198.1°</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Centrifugal Force Calculation</h3>
+            <p>A rotor has an unbalance of 80 g at a radius of 100 mm. The rotor operates at 1800 RPM. Calculate:</p>
+            <ol>
+                <li>The centrifugal force generated</li>
+                <li>The force if the speed is doubled to 3600 RPM</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong> \(m = 0.08 \text{ kg}\), \(r = 0.1 \text{ m}\), \(\omega = \frac{2\pi N}{60}\)</p>
+
+                <p><strong>Part 1: At 1800 RPM</strong></p>
+                <p>\(\omega = \frac{2\pi \times 1800}{60} = 188.5 \text{ rad/s}\)</p>
+                <p>\(F = m \cdot r \cdot \omega^2 = 0.08 \times 0.1 \times (188.5)^2 = 283.5 \text{ N}\)</p>
+
+                <p><strong>Part 2: At 3600 RPM</strong></p>
+                <p>\(\omega = \frac{2\pi \times 3600}{60} = 377.0 \text{ rad/s}\)</p>
+                <p>\(F = 0.08 \times 0.1 \times (377.0)^2 = 1134 \text{ N}\)</p>
+
+                <p><strong>Conclusion:</strong> Doubling the rotational speed quadruples the centrifugal force! This demonstrates why rotor balancing becomes increasingly critical at higher speeds.</p>
+            </div>
+        </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Static Balance</td>
+                    <td>\(\sum m_i r_i = 0\)</td>
+                    <td>Sum of mass-radius products equals zero</td>
+                </tr>
+                <tr>
+                    <td>Dynamic Balance</td>
+                    <td>\(\sum m_i r_i = 0\) in all planes</td>
+                    <td>Balance in multiple planes</td>
+                </tr>
+                <tr>
+                    <td>Centrifugal Force</td>
+                    <td>\(F = m r \omega^2\)</td>
+                    <td>Outward force on rotating mass</td>
+                </tr>
+                <tr>
+                    <td>Balancing Mass</td>
+                    <td>\(m_b r_b = \sqrt{(\sum m_i r_i \cos\theta_i)^2 + (\sum m_i r_i \sin\theta_i)^2}\)</td>
+                    <td>Required balancing mass-radius product</td>
+                </tr>
+                <tr>
+                    <td>Balancing Angle</td>
+                    <td>\(\theta_b = \arctan\left(\frac{\sum m_i r_i \sin\theta_i}{\sum m_i r_i \cos\theta_i}\right)\)</td>
+                    <td>Angular position of balancing mass</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: What is the difference between static and dynamic unbalance?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Static unbalance occurs at rest, dynamic only when rotating</label>
+                    <label><input type="radio" name="q1" value="b"> b) Static can be corrected in one plane, dynamic requires two planes</label>
+                    <label><input type="radio" name="q1" value="c"> c) Static is less serious than dynamic unbalance</label>
+                    <label><input type="radio" name="q1" value="d"> d) There is no difference between them</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The centrifugal force generated by an unbalanced mass is given by \(F = mr\omega^2\). If you double the rotational speed, the force increases by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 2 times</label>
+                    <label><input type="radio" name="q2" value="b"> b) 3 times</label>
+                    <label><input type="radio" name="q2" value="c"> c) 4 times</label>
+                    <label><input type="radio" name="q2" value="d"> d) 8 times</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: In two-plane balancing, which conditions must be satisfied?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Only force balance</label>
+                    <label><input type="radio" name="q3" value="b"> b) Only moment balance</label>
+                    <label><input type="radio" name="q3" value="c"> c) Both force balance and moment balance</label>
+                    <label><input type="radio" name="q3" value="d"> d) Neither force nor moment balance is required</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: A balance mass should be placed at what angle relative to the resultant unbalance vector?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Same angle (0 degrees offset)</label>
+                    <label><input type="radio" name="q4" value="b"> b) 90 degrees offset</label>
+                    <label><input type="radio" name="q4" value="c"> c) 180 degrees opposite</label>
+                    <label><input type="radio" name="q4" value="d"> d) 270 degrees offset</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Why is rotor balancing especially critical in high-speed machinery?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Centrifugal forces increase linearly with speed</label>
+                    <label><input type="radio" name="q5" value="b"> b) Centrifugal forces increase with the square of speed</label>
+                    <label><input type="radio" name="q5" value="c"> c) Static unbalance becomes more important</label>
+                    <label><input type="radio" name="q5" value="d"> d) Balance masses become heavier at high speeds</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Calculating Centrifugal Force</h3>
+            <p>A rotor has an unbalanced mass of 0.5 kg located at a radius of 150 mm from the axis of rotation. If the rotor operates at 3000 RPM, calculate the centrifugal force generated.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Unbalance mass: \(m = 0.5\) kg</li>
+                    <li>Radius: \(r = 150\) mm = 0.15 m</li>
+                    <li>Speed: \(N = 3000\) RPM</li>
+                </ul>
+
+                <p><strong>Step 1:</strong> Convert RPM to rad/s</p>
+                <p>\(\omega = \frac{2\pi N}{60} = \frac{2\pi \times 3000}{60} = 314.16\) rad/s</p>
+
+                <p><strong>Step 2:</strong> Calculate centrifugal force</p>
+                <p>\(F = m \cdot r \cdot \omega^2\)</p>
+                <p>\(F = 0.5 \times 0.15 \times (314.16)^2\)</p>
+                <p>\(F = 0.5 \times 0.15 \times 98696.4\)</p>
+                <p>\(F = 7402.23\) N = 7.4 kN</p>
+
+                <p><strong>Answer:</strong> The centrifugal force is 7.4 kN, which is a significant force that must be balanced to prevent excessive vibration and bearing wear.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Single Plane Balancing</h3>
+            <p>A rotating disc has an unbalanced mass of 200 g at 100 mm radius and 0° angular position. Calculate the balancing mass required at 150 mm radius to achieve static balance.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Unbalance mass: \(m_u = 200\) g = 0.2 kg</li>
+                    <li>Unbalance radius: \(r_u = 100\) mm = 0.1 m</li>
+                    <li>Balance radius: \(r_b = 150\) mm = 0.15 m</li>
+                </ul>
+
+                <p><strong>For static balance, the mass-radius products must be equal:</strong></p>
+                <p>\(m_u \cdot r_u = m_b \cdot r_b\)</p>
+
+                <p><strong>Solving for balance mass:</strong></p>
+                <p>\(m_b = \frac{m_u \cdot r_u}{r_b} = \frac{0.2 \times 0.1}{0.15}\)</p>
+                <p>\(m_b = \frac{0.02}{0.15} = 0.133\) kg = 133.3 g</p>
+
+                <p><strong>Angular position:</strong></p>
+                <p>The balance mass must be placed at 180° (opposite) to the unbalance mass</p>
+
+                <p><strong>Answer:</strong> Add 133.3 g at 150 mm radius and 180° from the unbalance position.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Two-Plane Balancing</h3>
+            <p>A shaft has two unbalanced masses:</p>
+            <ul>
+                <li>Plane A: 0.3 kg at radius 80 mm, angle 45°</li>
+                <li>Plane B: 0.4 kg at radius 100 mm, angle 135°</li>
+            </ul>
+            <p>The planes are 500 mm apart. Calculate the resultant force unbalance.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Plane A: \(m_A = 0.3\) kg, \(r_A = 0.08\) m, \(\theta_A = 45°\)</li>
+                    <li>Plane B: \(m_B = 0.4\) kg, \(r_B = 0.1\) m, \(\theta_B = 135°\)</li>
+                </ul>
+
+                <p><strong>Step 1:</strong> Calculate mass-radius products</p>
+                <p>\(MR_A = 0.3 \times 0.08 = 0.024\) kg·m</p>
+                <p>\(MR_B = 0.4 \times 0.1 = 0.04\) kg·m</p>
+
+                <p><strong>Step 2:</strong> Resolve into x and y components</p>
+                <p><strong>Plane A:</strong></p>
+                <p>\(MR_{Ax} = 0.024 \cos(45°) = 0.024 \times 0.707 = 0.01697\) kg·m</p>
+                <p>\(MR_{Ay} = 0.024 \sin(45°) = 0.024 \times 0.707 = 0.01697\) kg·m</p>
+
+                <p><strong>Plane B:</strong></p>
+                <p>\(MR_{Bx} = 0.04 \cos(135°) = 0.04 \times (-0.707) = -0.02828\) kg·m</p>
+                <p>\(MR_{By} = 0.04 \sin(135°) = 0.04 \times 0.707 = 0.02828\) kg·m</p>
+
+                <p><strong>Step 3:</strong> Sum components</p>
+                <p>\(MR_x = 0.01697 + (-0.02828) = -0.01131\) kg·m</p>
+                <p>\(MR_y = 0.01697 + 0.02828 = 0.04525\) kg·m</p>
+
+                <p><strong>Step 4:</strong> Calculate resultant</p>
+                <p>\(MR_{resultant} = \sqrt{(-0.01131)^2 + (0.04525)^2} = \sqrt{0.000128 + 0.002048} = 0.0466\) kg·m</p>
+
+                <p><strong>Answer:</strong> The resultant force unbalance is 0.0466 kg·m. At high speeds, this will cause significant vibration requiring two-plane correction.</p>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Static in one plane, dynamic in two planes
+                        q2: 'c', // 4 times (square of speed)
+                        q3: 'c', // Both force and moment balance
+                        q4: 'c', // 180 degrees opposite
+                        q5: 'b'  // Forces increase with square of speed
+                    };
+
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct!</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}.</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected.</p>`;
+                        }
+                    }
+
+                    feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
+
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

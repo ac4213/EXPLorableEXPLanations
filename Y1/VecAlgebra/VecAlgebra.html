@@ -11,6 +11,7 @@
   <script src="sketchMulti2.js"></script>
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/simulations.css">
+  <link rel="stylesheet" href="/assets/css/uicontrols.css">
   <meta charset="utf-8" />
   <style>
     /* Center all p5.js canvases */
@@ -154,6 +155,19 @@
     </div>
 
     <div class="content-section">
+      <h2>Applications and Examples</h2>
+      <p>Vector algebra is fundamental in numerous engineering and physics applications:</p>
+      <ul>
+        <li><strong>Structural Analysis:</strong> Forces in trusses, cables, and beams are represented as vectors. Equilibrium requires vector sums to equal zero.</li>
+        <li><strong>Navigation:</strong> GPS systems use vector addition to determine positions and velocities. Aircraft and marine navigation rely on vector calculations for course plotting.</li>
+        <li><strong>Electromagnetism:</strong> Electric and magnetic fields are vector quantities. Force calculations on charged particles require vector operations.</li>
+        <li><strong>Robotics:</strong> Robot arm positions and velocities are described using vectors. Path planning involves vector transformations and additions.</li>
+        <li><strong>Computer Graphics:</strong> 3D rendering, lighting calculations, and camera movements all use extensive vector algebra.</li>
+        <li><strong>Fluid Mechanics:</strong> Velocity fields in fluids are vector fields. Flow analysis requires vector differentiation and integration.</li>
+      </ul>
+    </div>
+
+    <div class="content-section">
       <h2>Practice Problems</h2>
 
       <div class="practice-problems">
@@ -217,7 +231,50 @@
     </div>
 
     <div class="content-section">
-      <h2>Interactive Quiz</h2>
+      <h2>Summary of Key Equations</h2>
+      <div class="equation-box">
+        <table>
+          <tr>
+            <th>Concept</th>
+            <th>Equation</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>Vector Magnitude</td>
+            <td>\(|\mathbf{V}| = \sqrt{V_x^2 + V_y^2}\)</td>
+            <td>Length of vector in 2D</td>
+          </tr>
+          <tr>
+            <td>Unit Vector</td>
+            <td>\(\hat{u} = \frac{\mathbf{V}}{|\mathbf{V}|}\)</td>
+            <td>Vector with magnitude 1</td>
+          </tr>
+          <tr>
+            <td>Vector Addition</td>
+            <td>\(\mathbf{R} = \mathbf{A} + \mathbf{B}\)</td>
+            <td>Component-wise addition</td>
+          </tr>
+          <tr>
+            <td>Scalar Multiplication</td>
+            <td>\(\mathbf{V}' = k\mathbf{V}\)</td>
+            <td>Scales magnitude by k</td>
+          </tr>
+          <tr>
+            <td>Dot Product</td>
+            <td>\(\mathbf{A} \cdot \mathbf{B} = |\mathbf{A}||\mathbf{B}|\cos\theta\)</td>
+            <td>Scalar result, measures alignment</td>
+          </tr>
+          <tr>
+            <td>Cartesian Form</td>
+            <td>\(\mathbf{V} = V_x\mathbf{i} + V_y\mathbf{j}\)</td>
+            <td>Component representation</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2>Knowledge Check Quiz</h2>
 
       <div class="quiz-container">
         <div class="quiz-question">
@@ -260,36 +317,42 @@
           </div>
         </div>
 
+        <div class="quiz-question">
+          <h3>Question 5: What is a unit vector?</h3>
+          <div class="quiz-options">
+            <label><input type="radio" name="q5" value="a"> a) A vector with magnitude equal to 1</label>
+            <label><input type="radio" name="q5" value="b"> b) A vector with components equal to 1</label>
+            <label><input type="radio" name="q5" value="c"> c) A vector pointing in the positive x-direction</label>
+            <label><input type="radio" name="q5" value="d"> d) A vector with only one non-zero component</label>
+          </div>
+        </div>
+
         <button id="submit-quiz">Submit Quiz</button>
         <div id="quiz-results" class="hidden"></div>
       </div>
     </div>
+
+  <!-- Common JavaScript functions -->
+  <script src="/assets/common/problems.js"></script>
+  <script src="/assets/common/quizzes.js"></script>
 
   <script>
     new p5(sketch1, 'VectorRepresentation');
     new p5(sketch2, 'VectorScaling');
     new p5(sketch3, 'Vector2Sum');
     new p5(sketch4, 'VectorTriangleRule');
-    
-    // Toggle solution function
-    function toggleSolution(id) {
-      const solution = document.getElementById(id);
-      if (solution.classList.contains('hidden')) {
-        solution.classList.remove('hidden');
-        solution.previousElementSibling.textContent = 'Hide Solution';
-      } else {
-        solution.classList.add('hidden');
-        solution.previousElementSibling.textContent = 'Show Solution';
-      }
-    }
 
+    // toggleSolution function now loaded from /assets/common/problems.js
+
+    // checkAnswer function now loaded from /assets/common/quizzes.js
     // Quiz submission
     document.getElementById('submit-quiz').addEventListener('click', function() {
       const answers = {
-        q1: 'c',
-        q2: 'a',
-        q3: 'a',
-        q4: 'b'
+        q1: 'c',  // Magnitude of sum ≠ sum of magnitudes
+        q2: 'a',  // (3-2)i + (4+5)j = i + 9j
+        q3: 'a',  // cos(60°)=0.5, sin(60°)=√3/2
+        q4: 'b',  // Magnitude becomes 12, direction+180°=210°
+        q5: 'a'   // Unit vector has magnitude 1
       };
 
       let score = 0;
@@ -309,7 +372,7 @@
         }
       }
 
-      feedback += `<p><strong>Your score: ${score}/4</strong></p>`;
+      feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
 
       const resultsDiv = document.getElementById('quiz-results');
       resultsDiv.innerHTML = feedback;

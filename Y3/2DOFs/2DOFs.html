@@ -5,6 +5,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
         /* Page-specific styles for 2DOFs visualization layout */
@@ -376,6 +377,376 @@
             pop();
         }
     </script>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Natural Frequencies of a 2-DOF System</h3>
+            <p>A two-degree-of-freedom system has two masses \(m_1 = 2 \text{ kg}\) and \(m_2 = 3 \text{ kg}\) connected by springs with stiffnesses \(k_1 = 500 \text{ N/m}\) and \(k_2 = 800 \text{ N/m}\). Calculate the two natural frequencies of the system.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Step 1: Set up the mass and stiffness matrices</strong></p>
+                <p>\([M] = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}\), \([K] = \begin{bmatrix} 1300 & -800 \\ -800 & 800 \end{bmatrix}\)</p>
+
+                <p><strong>Step 2: Formulate eigenvalue problem</strong></p>
+                <p>The natural frequencies are found from: \(\det([K] - \omega^2[M]) = 0\)</p>
+                <p>\(\det \begin{bmatrix} 1300-2\omega^2 & -800 \\ -800 & 800-3\omega^2 \end{bmatrix} = 0\)</p>
+
+                <p><strong>Step 3: Expand the determinant</strong></p>
+                <p>\((1300-2\omega^2)(800-3\omega^2) - (-800)^2 = 0\)</p>
+                <p>\(1,040,000 - 3900\omega^2 - 1600\omega^2 + 6\omega^4 - 640,000 = 0\)</p>
+                <p>\(6\omega^4 - 5500\omega^2 + 400,000 = 0\)</p>
+
+                <p><strong>Step 4: Solve the quadratic in \(\omega^2\)</strong></p>
+                <p>Let \(x = \omega^2\): \(6x^2 - 5500x + 400,000 = 0\)</p>
+                <p>\(x = \frac{5500 \pm \sqrt{5500^2 - 4(6)(400,000)}}{12} = \frac{5500 \pm \sqrt{20,650,000}}{12}\)</p>
+                <p>\(\omega_1^2 = 92.5 \text{ rad}^2/\text{s}^2\), \(\omega_2^2 = 824.2 \text{ rad}^2/\text{s}^2\)</p>
+
+                <p><strong>Natural frequencies:</strong></p>
+                <p>\(\omega_1 = 9.62 \text{ rad/s} = 1.53 \text{ Hz}\)</p>
+                <p>\(\omega_2 = 28.71 \text{ rad/s} = 4.57 \text{ Hz}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Mode Shapes and Modal Analysis</h3>
+            <p>For a 2-DOF system with equal masses \(m_1 = m_2 = 1 \text{ kg}\) and spring constants \(k_1 = k_2 = k = 1000 \text{ N/m}\), determine:</p>
+            <ol>
+                <li>The natural frequencies</li>
+                <li>The mode shapes</li>
+                <li>Describe the physical motion in each mode</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Step 1: Natural frequencies</strong></p>
+                <p>\([M] = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}\), \([K] = \begin{bmatrix} 2k & -k \\ -k & k \end{bmatrix} = \begin{bmatrix} 2000 & -1000 \\ -1000 & 1000 \end{bmatrix}\)</p>
+
+                <p>Solving \(\det([K] - \omega^2[M]) = 0\):</p>
+                <p>\(\omega_1 = \sqrt{1000} = 31.62 \text{ rad/s}\) (lower frequency)</p>
+                <p>\(\omega_2 = \sqrt{2000} = 44.72 \text{ rad/s}\) (higher frequency)</p>
+
+                <p><strong>Step 2: Mode shapes</strong></p>
+                <p><strong>Mode 1:</strong> Substitute \(\omega_1^2 = 1000\) into \(([K] - \omega^2[M])\{X\} = 0\)</p>
+                <p>\(\begin{bmatrix} 1000 & -1000 \\ -1000 & 0 \end{bmatrix} \begin{bmatrix} X_1 \\ X_2 \end{bmatrix} = 0\)</p>
+                <p>Mode shape: \(\{X_1\} = \begin{bmatrix} 1 \\ 1 \end{bmatrix}\) (normalized)</p>
+
+                <p><strong>Mode 2:</strong> Substitute \(\omega_2^2 = 2000\)</p>
+                <p>Mode shape: \(\{X_2\} = \begin{bmatrix} 1 \\ -1 \end{bmatrix}\) (normalized)</p>
+
+                <p><strong>Step 3: Physical interpretation</strong></p>
+                <p><strong>Mode 1 (in-phase):</strong> Both masses move in the same direction with equal amplitude. The middle spring experiences no deformation.</p>
+                <p><strong>Mode 2 (out-of-phase):</strong> Masses move in opposite directions with equal amplitude. The middle spring experiences maximum deformation.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Free Vibration Response</h3>
+            <p>A 2-DOF system has natural frequencies \(\omega_1 = 10 \text{ rad/s}\) and \(\omega_2 = 30 \text{ rad/s}\) with mode shapes \(\{X_1\} = [1, 1]^T\) and \(\{X_2\} = [1, -1]^T\). If the system is released from rest with initial displacements \(x_1(0) = 0\) and \(x_2(0) = 2 \text{ cm}\), determine the response equations for both masses.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Step 1: Transform initial conditions to modal coordinates</strong></p>
+                <p>Modal matrix: \([X] = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}\)</p>
+                <p>Initial modal displacements: \(\{q(0)\} = [X]^{-1}\{x(0)\} = \frac{1}{2}\begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}\begin{bmatrix} 0 \\ 2 \end{bmatrix} = \begin{bmatrix} 1 \\ -1 \end{bmatrix}\) cm</p>
+                <p>Initial modal velocities: \(\{\dot{q}(0)\} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}\) (released from rest)</p>
+
+                <p><strong>Step 2: Modal responses</strong></p>
+                <p>\(q_1(t) = 1 \cos(10t)\) cm</p>
+                <p>\(q_2(t) = -1 \cos(30t)\) cm</p>
+
+                <p><strong>Step 3: Physical coordinates</strong></p>
+                <p>\(\{x(t)\} = [X]\{q(t)\} = \begin{bmatrix} 1 & 1 \\ 1 & -1 \end{bmatrix}\begin{bmatrix} \cos(10t) \\ -\cos(30t) \end{bmatrix}\)</p>
+
+                <p><strong>Final response equations:</strong></p>
+                <p>\(x_1(t) = \cos(10t) - \cos(30t)\) cm</p>
+                <p>\(x_2(t) = \cos(10t) + \cos(30t)\) cm</p>
+
+                <p><strong>Note:</strong> The response is a superposition of both natural modes, creating a beating phenomenon.</p>
+            </div>
+        </div>
+
+    <div class="content-section">
+        <h2>Understanding Two Degrees of Freedom (2DOF) Systems</h2>
+
+        <h3>What are 2DOF Systems?</h3>
+        <p>A two-degree-of-freedom (2DOF) system requires two independent coordinates to completely describe its motion. These systems are fundamental in structural dynamics and mechanical vibrations, representing the next level of complexity after single degree of freedom systems.</p>
+
+        <div class="key-point">
+            <p><strong>Key Characteristics:</strong></p>
+            <ul>
+                <li>Two independent displacement coordinates (x₁, x₂)</li>
+                <li>Two natural frequencies (ω₁, ω₂)</li>
+                <li>Two mode shapes describing independent vibration patterns</li>
+                <li>Coupling between masses through springs or dampers</li>
+            </ul>
+        </div>
+
+        <h3>Equations of Motion</h3>
+        <div class="equation-box">
+            <p>For a 2DOF undamped system with two masses connected by springs:</p>
+            <p>\([M]\{\ddot{x}\} + [K]\{x\} = \{0\}\)</p>
+            <p>Where:</p>
+            <ul style="list-style: none;">
+                <li>\([M]\) = Mass matrix = \(\begin{bmatrix} m_1 & 0 \\ 0 & m_2 \end{bmatrix}\)</li>
+                <li>\([K]\) = Stiffness matrix = \(\begin{bmatrix} k_1+k_2 & -k_2 \\ -k_2 & k_2 \end{bmatrix}\)</li>
+                <li>\(\{x\}\) = Displacement vector = \(\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)</li>
+            </ul>
+        </div>
+
+        <h3>Natural Frequencies and Mode Shapes</h3>
+        <p>The natural frequencies are found by solving the eigenvalue problem:</p>
+        <div class="equation-box">
+            <p>\(\det([K] - \omega^2[M]) = 0\)</p>
+            <p>This yields two natural frequencies: \(\omega_1\) and \(\omega_2\) where \(\omega_1 < \omega_2\)</p>
+            <p>Each natural frequency has an associated mode shape that describes the relative motion of the two masses.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Mode Shapes:</strong> Each mode shape represents a pattern of motion where all parts of the system oscillate at the same frequency and pass through equilibrium simultaneously. The two masses move in-phase for the first mode and out-of-phase for the second mode.</p>
+        </div>
+
+        <h3>Applications</h3>
+        <ul>
+            <li><strong>Vehicle Suspensions:</strong> Modeling car body and wheel masses</li>
+            <li><strong>Building Structures:</strong> Two-story building analysis</li>
+            <li><strong>Machine Foundations:</strong> Equipment mounted on flexible structures</li>
+            <li><strong>Mechanical Systems:</strong> Coupled oscillators in machinery</li>
+        </ul>
+
+    <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Two degree of freedom systems are fundamental models in structural dynamics and mechanical engineering:</p>
+        <ul>
+            <li><strong>Building Structures:</strong> Two-story buildings can be modeled as 2DOF systems to predict earthquake response and design damping systems.</li>
+            <li><strong>Vehicle Dynamics:</strong> Pitch and bounce motion of vehicles on suspension systems are analyzed using 2DOF models for ride comfort optimization.</li>
+            <li><strong>Coupled Oscillators:</strong> Vibration absorbers and tuned mass dampers use 2DOF analysis to suppress structural vibrations.</li>
+            <li><strong>Molecular Physics:</strong> Diatomic molecules and coupled pendulums exhibit 2DOF behavior with normal modes.</li>
+            <li><strong>Rotating Machinery:</strong> Rotor-bearing systems with two degrees of freedom (horizontal and vertical) require 2DOF analysis for stability.</li>
+            <li><strong>Control Systems:</strong> Multi-input multi-output (MIMO) controllers for coupled systems use 2DOF models for analysis and design.</li>
+        </ul>
+    </div>
+
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Natural Frequencies of a 2DOF System</h3>
+            <p>Two masses m₁ = 2 kg and m₂ = 3 kg are connected by springs with stiffnesses k₁ = 1000 N/m and k₂ = 1500 N/m. Calculate the two natural frequencies of the system.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong> m₁ = 2 kg, m₂ = 3 kg, k₁ = 1000 N/m, k₂ = 1500 N/m</p>
+
+                <p><strong>Step 1:</strong> Form the mass and stiffness matrices</p>
+                <p>\([M] = \begin{bmatrix} 2 & 0 \\ 0 & 3 \end{bmatrix}\)</p>
+                <p>\([K] = \begin{bmatrix} 2500 & -1500 \\ -1500 & 1500 \end{bmatrix}\)</p>
+
+                <p><strong>Step 2:</strong> Solve eigenvalue problem \(\det([K] - \omega^2[M]) = 0\)</p>
+                <p>\(\det\begin{bmatrix} 2500-2\omega^2 & -1500 \\ -1500 & 1500-3\omega^2 \end{bmatrix} = 0\)</p>
+
+                <p><strong>Step 3:</strong> Expand determinant</p>
+                <p>\((2500-2\omega^2)(1500-3\omega^2) - (-1500)^2 = 0\)</p>
+                <p>\(6\omega^4 - 10500\omega^2 + 1500000 = 0\)</p>
+
+                <p><strong>Step 4:</strong> Solve quadratic in ω²</p>
+                <p>\(\omega^2 = \frac{10500 \pm \sqrt{10500^2 - 4(6)(1500000)}}{12}\)</p>
+                <p>\(\omega_1 = 15.81\) rad/s, \(\omega_2 = 32.40\) rad/s</p>
+
+                <p><strong>Answer:</strong> The two natural frequencies are 15.81 rad/s and 32.40 rad/s.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Mode Shape Analysis</h3>
+            <p>For the system in Problem 1, determine the mode shape for the first natural frequency.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>From Problem 1:</strong> ω₁ = 15.81 rad/s, ω₁² = 250 rad²/s²</p>
+
+                <p><strong>Substitute into:</strong> \(([K] - \omega_1^2[M])\{X\} = \{0\}\)</p>
+                <p>\(\begin{bmatrix} 2500-500 & -1500 \\ -1500 & 1500-750 \end{bmatrix}\begin{bmatrix} X_1 \\ X_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}\)</p>
+
+                <p>\(\begin{bmatrix} 2000 & -1500 \\ -1500 & 750 \end{bmatrix}\begin{bmatrix} X_1 \\ X_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}\)</p>
+
+                <p><strong>From first equation:</strong> 2000X₁ - 1500X₂ = 0</p>
+                <p>Therefore: X₂/X₁ = 2000/1500 = 4/3</p>
+
+                <p><strong>Normalizing with X₁ = 1:</strong></p>
+                <p>First mode shape: \(\{X_1\} = \begin{bmatrix} 1.0 \\ 1.33 \end{bmatrix}\)</p>
+
+                <p><strong>Answer:</strong> In the first mode, both masses move in the same direction with mass 2 having amplitude ratio of 1:1.33.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Free Vibration Response</h3>
+            <p>A 2DOF system has natural frequencies ω₁ = 10 rad/s and ω₂ = 30 rad/s. If mass 1 is given an initial displacement of 0.05 m and released from rest, and mass 2 starts at rest, determine the frequency content of the motion.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong> ω₁ = 10 rad/s, ω₂ = 30 rad/s, x₁(0) = 0.05 m, x₂(0) = 0, all velocities = 0</p>
+
+                <p><strong>General solution:</strong></p>
+                <p>\(x_1(t) = A_1\cos(\omega_1 t) + A_2\cos(\omega_2 t)\)</p>
+                <p>\(x_2(t) = r_1A_1\cos(\omega_1 t) + r_2A_2\cos(\omega_2 t)\)</p>
+
+                <p>Where r₁ and r₂ are modal amplitude ratios.</p>
+
+                <p><strong>The motion will contain both frequencies:</strong></p>
+                <ul>
+                    <li>Primary frequency component at 10 rad/s (1.59 Hz)</li>
+                    <li>Secondary frequency component at 30 rad/s (4.77 Hz)</li>
+                </ul>
+
+                <p><strong>Beat phenomenon:</strong> When initial conditions excite both modes, the response shows beating behavior with a beat frequency of (ω₂ - ω₁)/2π = 3.18 Hz.</p>
+
+                <p><strong>Answer:</strong> The motion contains two frequency components (10 and 30 rad/s) and will exhibit beating behavior where the amplitude varies periodically.</p>
+            </div>
+        </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Equations of Motion</td>
+                    <td>\(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\)</td>
+                    <td>Matrix form for 2DOF system</td>
+                </tr>
+                <tr>
+                    <td>Eigenvalue Problem</td>
+                    <td>\((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</td>
+                    <td>Solve for natural frequencies</td>
+                </tr>
+                <tr>
+                    <td>Natural Frequencies</td>
+                    <td>\(\omega_1, \omega_2\)</td>
+                    <td>Two distinct natural frequencies</td>
+                </tr>
+                <tr>
+                    <td>Mode Shapes</td>
+                    <td>\(\mathbf{\Phi}_1, \mathbf{\Phi}_2\)</td>
+                    <td>Relative motion patterns</td>
+                </tr>
+                <tr>
+                    <td>General Solution</td>
+                    <td>\(\mathbf{x}(t) = C_1\mathbf{\Phi}_1\cos(\omega_1 t) + C_2\mathbf{\Phi}_2\cos(\omega_2 t)\)</td>
+                    <td>Free vibration response</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: How many natural frequencies does a 2DOF system have?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) One</label>
+                    <label><input type="radio" name="q1" value="b"> b) Two</label>
+                    <label><input type="radio" name="q1" value="c"> c) Three</label>
+                    <label><input type="radio" name="q1" value="d"> d) Infinite</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In a 2DOF system, what is the relationship between the two natural frequencies?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) They are always equal</label>
+                    <label><input type="radio" name="q2" value="b"> b) The second is always higher than the first (ω₂ > ω₁)</label>
+                    <label><input type="radio" name="q2" value="c"> c) The second is always lower than the first</label>
+                    <label><input type="radio" name="q2" value="d"> d) There is no fixed relationship</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: What characterizes a mode shape in a 2DOF system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Only one mass moves</label>
+                    <label><input type="radio" name="q3" value="b"> b) The relative amplitudes and phase relationship between the two masses</label>
+                    <label><input type="radio" name="q3" value="c"> c) The color of the masses</label>
+                    <label><input type="radio" name="q3" value="d"> d) The material properties only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: What happens when both modes of a 2DOF system are excited simultaneously?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) The system cannot vibrate</label>
+                    <label><input type="radio" name="q4" value="b"> b) Only the first mode appears</label>
+                    <label><input type="radio" name="q4" value="c"> c) The response shows beating behavior with both frequencies present</label>
+                    <label><input type="radio" name="q4" value="d"> d) The system vibrates at a single average frequency</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The eigenvalue problem for finding natural frequencies is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) det([M] + [K]) = 0</label>
+                    <label><input type="radio" name="q5" value="b"> b) det([K] - ω²[M]) = 0</label>
+                    <label><input type="radio" name="q5" value="c"> c) [M][K] = 0</label>
+                    <label><input type="radio" name="q5" value="d"> d) ω² = k/m</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Two natural frequencies
+                        q2: 'b', // Second is always higher
+                        q3: 'b', // Relative amplitudes and phase
+                        q4: 'c', // Beating behavior
+                        q5: 'b'  // det([K] - ω²[M]) = 0
+                    };
+
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p style="color: #28a745;">Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p style="color: #dc3545;">Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p style="color: #666;">Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+
+                    feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
+
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
+
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

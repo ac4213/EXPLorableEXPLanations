@@ -14,6 +14,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 </head>
 <body>
     <header>
@@ -204,7 +205,7 @@
     </div>
 
     <div class="content-section">
-        <h2>Real-World Applications</h2>
+        <h2>Applications and Examples</h2>
         
         <h3>Transport Engineering</h3>
         <ul>
@@ -304,7 +305,45 @@
     </div>
 
     <div class="content-section">
-        <h2>Interactive Quiz</h2>
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Velocity</td>
+                    <td>\(v = u + at\)</td>
+                    <td>Final velocity from initial velocity and acceleration</td>
+                </tr>
+                <tr>
+                    <td>Displacement (time)</td>
+                    <td>\(s = ut + \frac{1}{2}at^2\)</td>
+                    <td>Displacement as function of time</td>
+                </tr>
+                <tr>
+                    <td>Displacement (velocity)</td>
+                    <td>\(v^2 = u^2 + 2as\)</td>
+                    <td>Velocity-displacement relationship</td>
+                </tr>
+                <tr>
+                    <td>Average Velocity</td>
+                    <td>\(v_{avg} = \frac{u + v}{2}\)</td>
+                    <td>Average velocity under constant acceleration</td>
+                </tr>
+                <tr>
+                    <td>Displacement (average)</td>
+                    <td>\(s = v_{avg} \cdot t\)</td>
+                    <td>Displacement from average velocity</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container">
             <div class="quiz-question">
                 <h3>Question 1: Which of the following is NOT a vector quantity?</h3>
@@ -345,7 +384,17 @@
                     <label><input type="radio" name="q4" value="d"> d) \(s = \frac{(u + v)t}{2}\)</label>
                 </div>
             </div>
-            
+
+            <div class="quiz-question">
+                <h3>Question 5: A ball is thrown vertically upward with an initial velocity of 20 m/s. What is its velocity at the highest point? (Ignore air resistance, g = 9.8 m/s²)</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 20 m/s upward</label>
+                    <label><input type="radio" name="q5" value="b"> b) 10 m/s upward</label>
+                    <label><input type="radio" name="q5" value="c"> c) 0 m/s</label>
+                    <label><input type="radio" name="q5" value="d"> d) 9.8 m/s downward</label>
+                </div>
+            </div>
+
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results" class="hidden"></div>
         </div>
@@ -354,6 +403,10 @@
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 
     <!-- p5.js sketches -->
     <script>
@@ -799,7 +852,8 @@
                     q1: 'c', // Distance is scalar
                     q2: 'b', // -6.25 m/s²
                     q3: 'c', // Speeding up in negative direction
-                    q4: 'd'  // s = (u+v)t/2
+                    q4: 'd', // s = (u+v)t/2
+                    q5: 'c'  // Velocity at highest point is 0
                 };
                 
                 let score = 0;
@@ -826,18 +880,8 @@
                 resultsDiv.classList.remove('hidden');
             });
         });
-        
-        // Toggle solution function
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                solution.previousElementSibling.textContent = 'Hide Solution';
-            } else {
-                solution.classList.add('hidden');
-                solution.previousElementSibling.textContent = 'Show Solution';
-            }
-        }
+
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
 </body>
 </html>

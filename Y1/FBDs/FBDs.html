@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Your script goes here -->
     <script src="FBDsfixed.js"></script>
 </head>
@@ -219,6 +221,17 @@
             <li><strong>Cable compression:</strong> Cables can only be in tension</li>
         </ul>
 
+        <h2>Applications and Examples</h2>
+        <p>Free body diagrams are fundamental tools used across all branches of engineering and physics:</p>
+        <ul>
+            <li><strong>Structural Engineering:</strong> Analyzing forces in buildings, bridges, and trusses to ensure safe design and determine member sizes. FBDs help identify critical load paths and potential failure modes.</li>
+            <li><strong>Mechanical Engineering:</strong> Designing machine components like gears, linkages, and bearings. FBDs are essential for calculating required strengths and selecting appropriate materials.</li>
+            <li><strong>Aerospace Engineering:</strong> Analyzing aircraft components during flight, landing gear design, and wing loading. FBDs help engineers understand complex force distributions in three dimensions.</li>
+            <li><strong>Biomechanics:</strong> Studying forces in human joints, muscles, and bones. Medical devices like prosthetics and orthopedic implants are designed using FBD analysis.</li>
+            <li><strong>Vehicle Dynamics:</strong> Analyzing suspension systems, braking forces, and cornering behavior. FBDs help optimize handling, safety, and comfort.</li>
+            <li><strong>Robotics:</strong> Determining actuator requirements and joint forces in robotic arms and mobile robots. FBDs ensure robots can perform required tasks safely.</li>
+        </ul>
+
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -309,7 +322,7 @@
             </div>
         </div>
 
-        <h2>Interactive Quiz</h2>
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
                 <h3>Question 1: How many unknown reactions does a pin support provide in 2D?</h3>
@@ -399,7 +412,7 @@
             <p>If DSI < 0: Mechanism (unstable structure)</p>
         </div>
 
-        <h2>Summary</h2>
+        <h2>Summary of Key Equations</h2>
         <div class="key-point">
             <h3>Key Takeaways</h3>
             <ol>
@@ -415,22 +428,14 @@
 
 
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
-        
-        // Quiz functionality
+        // Page-specific JavaScript
+
+        // Quiz functionality (custom for this page)
         document.addEventListener('DOMContentLoaded', function() {
             const quizBtn = document.getElementById('submit-quiz');
             if (quizBtn) {

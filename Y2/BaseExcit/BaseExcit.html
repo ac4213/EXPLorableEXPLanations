@@ -21,6 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 </head>
 <body>
     <header>
@@ -738,28 +739,196 @@
             }
         });
         
-        // Toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution) {
-                if (solution.classList.contains('hidden')) {
-                    solution.classList.remove('hidden');
-                    const toggleElement = document.querySelector(`[onclick="toggleSolution('${id}')"]`);
-                    if (toggleElement) {
-                        toggleElement.textContent = 'Hide Solution';
-                    }
-                } else {
-                    solution.classList.add('hidden');
-                    const toggleElement = document.querySelector(`[onclick="toggleSolution('${id}')"]`);
-                    if (toggleElement) {
-                        toggleElement.textContent = 'Show Solution';
-                    }
-                }
-            }
-        }
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
+
+<!-- ADDITIONAL PRACTICE PROBLEM -->
+<div class="content-section">
+    <div class="practice-problems">
+        <h3>Practice Problem 3: Seismic Isolation System</h3>
+        <p>A building with mass 200,000 kg is equipped with a seismic isolation system. During an earthquake, the ground experiences harmonic motion with amplitude 100 mm and frequency 2 Hz. The isolation system has:</p>
+        <ul>
+            <li>Total stiffness: k = 8 MN/m</li>
+            <li>Damping coefficient: c = 400 kNs/m</li>
+        </ul>
+        <p>Calculate:</p>
+        <ol type="a">
+            <li>The natural frequency \(\omega_n\) and frequency ratio \(r\)</li>
+            <li>The damping ratio \(\zeta\)</li>
+            <li>The transmissibility \(T_d\)</li>
+            <li>The absolute displacement amplitude of the building</li>
+            <li>Whether this isolation system is effective</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Natural frequency and frequency ratio:</strong></p>
+            <p>\[\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{8 \times 10^6}{200,000}} = \sqrt{40} = 6.32 \text{ rad/s}\]</p>
+            <p>\[f_n = \frac{\omega_n}{2\pi} = \frac{6.32}{2\pi} = 1.01 \text{ Hz}\]</p>
+            <p>Excitation frequency: \(\omega = 2\pi f = 2\pi \times 2 = 12.57 \text{ rad/s}\)</p>
+            <p>\[r = \frac{\omega}{\omega_n} = \frac{12.57}{6.32} = 1.99\]</p>
+
+            <p><strong>(b) Damping ratio:</strong></p>
+            <p>\[\zeta = \frac{c}{2\sqrt{km}} = \frac{400,000}{2\sqrt{8 \times 10^6 \times 200,000}} = \frac{400,000}{2 \times 1,264,911} = 0.158\]</p>
+
+            <p><strong>(c) Transmissibility:</strong></p>
+            <p>\[T_d = \sqrt{\frac{1 + (2\zeta r)^2}{(1 - r^2)^2 + (2\zeta r)^2}}\]</p>
+            <p>\[T_d = \sqrt{\frac{1 + (2 \times 0.158 \times 1.99)^2}{(1 - 1.99^2)^2 + (2 \times 0.158 \times 1.99)^2}}\]</p>
+            <p>\[T_d = \sqrt{\frac{1 + 0.396}{(1 - 3.96)^2 + 0.396}} = \sqrt{\frac{1.396}{8.76 + 0.396}} = \sqrt{\frac{1.396}{9.16}} = 0.390\]</p>
+
+            <p><strong>(d) Absolute displacement amplitude of building:</strong></p>
+            <p>\[X = Y \times T_d = 100 \text{ mm} \times 0.390 = 39.0 \text{ mm}\]</p>
+
+            <p><strong>(e) Effectiveness assessment:</strong></p>
+            <p>The isolation system reduces ground motion to 39% of its original amplitude (61% reduction). Since \(r = 1.99 \approx 2\), the system operates near the resonance region boundary. For \(T_d < 1\) (isolation), we need \(r > \sqrt{2} = 1.414\), which is satisfied. The system is <strong>effective</strong>, reducing building motion by 61% compared to the ground motion. However, for better isolation (e.g., \(T_d < 0.2\)), a softer spring system or higher frequency ratio would be needed.</p>
+        </div>
+    </div>
+</div>
+
+<!-- SUMMARY SECTION -->
+<div class="content-section">
+    <h2>Summary of Key Equations</h2>
+    <div class="equation-box">
+        <table>
+            <tr>
+                <th>Concept</th>
+                <th>Equation</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Transmissibility</td>
+                <td>\(T_d = \frac{F_t}{k Y} = \frac{\sqrt{1+(2\zeta r)^2}}{\sqrt{(1-r^2)^2+(2\zeta r)^2}}\)</td>
+                <td>Force transmitted to base</td>
+            </tr>
+            <tr>
+                <td>Frequency Ratio</td>
+                <td>\(r = \frac{\omega}{\omega_n}\)</td>
+                <td>Excitation to natural frequency ratio</td>
+            </tr>
+            <tr>
+                <td>Absolute Response</td>
+                <td>\(X = Y \cdot T_d\)</td>
+                <td>Mass displacement amplitude</td>
+            </tr>
+            <tr>
+                <td>Relative Response</td>
+                <td>\(Z = Y\cdot\frac{r^2}{\sqrt{(1-r^2)^2+(2\zeta r)^2}}\)</td>
+                <td>Displacement relative to base</td>
+            </tr>
+            <tr>
+                <td>Isolation Criterion</td>
+                <td>\(T_d < 1\) when \(r > \sqrt{2}\)</td>
+                <td>Condition for vibration isolation</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- QUIZ SECTION -->
+<div class="content-section">
+    <div class="quiz-container">
+        <h2>Knowledge Check Quiz</h2>
+
+        <div class="quiz-question">
+            <h3>Question 1: What is base excitation in vibration analysis?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> Exciting a system by applying a direct force to the mass</label>
+                <label><input type="radio" name="q1" value="b"> Exciting a system through motion of its support or foundation</label>
+                <label><input type="radio" name="q1" value="c"> The initial displacement given to a mass</label>
+                <label><input type="radio" name="q1" value="d"> The natural oscillation of an undamped system</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 2: For effective vibration isolation, the frequency ratio \(r = \omega/\omega_n\) should be:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> Less than 1</label>
+                <label><input type="radio" name="q2" value="b"> Equal to 1</label>
+                <label><input type="radio" name="q2" value="c"> Greater than \(\sqrt{2}\)</label>
+                <label><input type="radio" name="q2" value="d"> Between 0.5 and 1.5</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 3: What is transmissibility \(T_d\)?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> The ratio of excitation frequency to natural frequency</label>
+                <label><input type="radio" name="q3" value="b"> The ratio of damping coefficient to critical damping</label>
+                <label><input type="radio" name="q3" value="c"> The ratio of transmitted force (or displacement) to excitation force (or displacement)</label>
+                <label><input type="radio" name="q3" value="d"> The ratio of stiffness to mass</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 4: At resonance (\(r = 1\)), which factor most significantly affects the amplitude response?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> Mass of the system</label>
+                <label><input type="radio" name="q4" value="b"> Stiffness of the spring</label>
+                <label><input type="radio" name="q4" value="c"> Damping ratio \(\zeta\)</label>
+                <label><input type="radio" name="q4" value="d"> Excitation amplitude</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 5: Why are tall buildings more vulnerable to earthquakes than low-rise buildings?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> They have higher mass</label>
+                <label><input type="radio" name="q5" value="b"> They have lower natural frequencies that can match earthquake frequency ranges</label>
+                <label><input type="radio" name="q5" value="c"> They have less damping</label>
+                <label><input type="radio" name="q5" value="d"> They experience higher ground accelerations</label>
+            </div>
+        </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
+    </div>
+</div>
+
+<script>
+// Quiz handler for Base Excitation
+document.getElementById('submit-quiz').addEventListener('click', function() {
+    const answers = {
+        q1: 'b',  // Motion of support
+        q2: 'c',  // r > sqrt(2) for isolation
+        q3: 'c',  // Ratio of transmitted to excitation
+        q4: 'c',  // Damping ratio controls resonance amplitude
+        q5: 'b'   // Low natural frequency matches earthquake frequency
+    };
+
+    let score = 0;
+    let totalQuestions = Object.keys(answers).length;
+    let resultsHTML = '<h3>Quiz Results:</h3>';
+
+    for (let question in answers) {
+        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+        const correctAnswer = answers[question];
+
+        if (selectedOption) {
+            if (selectedOption.value === correctAnswer) {
+                score++;
+                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+            } else {
+                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+            }
+        } else {
+            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+        }
+    }
+
+    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+    document.getElementById('quiz-results').innerHTML = resultsHTML;
+});
+</script>
+
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>
   </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </html>

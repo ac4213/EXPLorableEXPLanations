@@ -30,6 +30,7 @@
 
 <link rel="stylesheet" href="/assets/css/main.css">
 <link rel="stylesheet" href="/assets/css/simulations.css">
+<link rel="stylesheet" href="/assets/css/uicontrols.css">
 <style>
     /* Page-specific styles for beam simulation containers */
     #FBD_SimplySupported, #FBD_Cantilever, #INTF_SimplySupported, #INTF_Cantilever {
@@ -222,22 +223,31 @@
 </section>
 
 <section class="theory-container">
-    <h2>Practical Applications</h2>
-    
+    <h2>Applications and Examples</h2>
+    <p>Understanding internal loads and their analysis is fundamental across structural and mechanical engineering:</p>
+    <ul>
+        <li><strong>Building Design:</strong> Beams in floors, roofs, and frameworks must be sized to safely carry loads from occupants, equipment, and environmental forces like wind and snow.</li>
+        <li><strong>Bridge Engineering:</strong> Analyzing shear forces and bending moments in bridge girders ensures safe passage of vehicles and trains. Critical sections are identified for detailed design.</li>
+        <li><strong>Mechanical Components:</strong> Shafts, axles, and machine frames experience bending and shear during operation. Understanding internal loads prevents fatigue failures.</li>
+        <li><strong>Aircraft Structures:</strong> Wings and fuselages are essentially beams subjected to complex loading. Shear and moment diagrams guide the placement of stringers and ribs.</li>
+        <li><strong>Crane Design:</strong> Boom arms experience significant bending moments when lifting loads. Proper analysis ensures structural integrity and prevents catastrophic failure.</li>
+        <li><strong>Automotive Engineering:</strong> Chassis frames act as beams supporting vehicle weight and road loads. Internal load analysis optimizes material usage while maintaining safety.</li>
+    </ul>
+
     <div class="example">
         <h3>Design Considerations</h3>
-        <p>Understanding internal loads is crucial for beam design:</p>
+        <p>Key factors in beam design based on internal load analysis:</p>
         <ul>
-            <li><strong>Maximum Shear Force:</strong> Determines the required shear capacity of the beam</li>
-            <li><strong>Maximum Bending Moment:</strong> Determines the required flexural capacity of the beam</li>
-            <li><strong>Deflection Analysis:</strong> Based on the bending moment distribution</li>
-            <li><strong>Material Selection:</strong> Based on the maximum stress values</li>
+            <li><strong>Maximum Shear Force:</strong> Determines the required shear capacity and web design of the beam</li>
+            <li><strong>Maximum Bending Moment:</strong> Determines the required flexural capacity and flange dimensions</li>
+            <li><strong>Deflection Analysis:</strong> Based on the bending moment distribution to ensure serviceability</li>
+            <li><strong>Material Selection:</strong> Chosen based on maximum stress values and fatigue considerations</li>
         </ul>
     </div>
 </section>
 
 <section class="intro">
-    <h2>Summary</h2>
+    <h2>Summary of Key Equations</h2>
     <ul>
         <li>Beam analysis starts with identifying support conditions and applied loads</li>
         <li>Static equilibrium equations help determine the reaction forces</li>
@@ -307,9 +317,110 @@
     </div>
 </section>
 
+<!-- PRACTICE PROBLEMS SECTION -->
 <section class="theory-container">
-    <h2>Self-Assessment Quiz</h2>
-    
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+        <h3>Problem 1: Simply Supported Beam with Point Load</h3>
+        <p>A simply supported beam of length L = 6 m has a point load P = 12 kN applied 2 m from the left support. Calculate:</p>
+        <ol type="a">
+            <li>The reaction forces at both supports</li>
+            <li>The shear force immediately to the left and right of the point load</li>
+            <li>The maximum bending moment and its location</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div id="solution1" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Reaction forces:</strong></p>
+            <p>Taking moments about the left support (A):</p>
+            <p>\[\sum M_A = 0: R_B \times 6 - 12 \times 2 = 0\]</p>
+            <p>\[R_B = \frac{24}{6} = 4 \text{ kN}\]</p>
+            <p>Vertical equilibrium:</p>
+            <p>\[\sum F_y = 0: R_A + R_B - 12 = 0\]</p>
+            <p>\[R_A = 12 - 4 = 8 \text{ kN}\]</p>
+
+            <p><strong>(b) Shear force at point load:</strong></p>
+            <p>Immediately to the left of P: \(V = R_A = 8 \text{ kN}\) (positive)</p>
+            <p>Immediately to the right of P: \(V = R_A - P = 8 - 12 = -4 \text{ kN}\) (negative)</p>
+            <p>The shear force has a step change of 12 kN at the load location.</p>
+
+            <p><strong>(c) Maximum bending moment:</strong></p>
+            <p>The maximum bending moment occurs where V = 0, which is at x = 2 m (at the load):</p>
+            <p>\[M_{max} = R_A \times 2 = 8 \times 2 = 16 \text{ kN·m}\]</p>
+            <p>Alternative calculation: \(M_{max} = R_B \times 4 = 4 \times 4 = 16 \text{ kN·m}\)</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 2: Cantilever Beam with Distributed Load</h3>
+        <p>A cantilever beam of length L = 4 m is subjected to a uniformly distributed load w = 5 kN/m over its entire length. Determine:</p>
+        <ol type="a">
+            <li>The reaction force and moment at the fixed support</li>
+            <li>The shear force at x = 1 m from the fixed end</li>
+            <li>The bending moment at the fixed end</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div id="solution2" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Reactions at fixed support:</strong></p>
+            <p>Total load: \(W = w \times L = 5 \times 4 = 20 \text{ kN}\)</p>
+            <p>Vertical reaction: \(R_A = W = 20 \text{ kN}\) (upward)</p>
+            <p>Moment reaction: \(M_A = W \times \frac{L}{2} = 20 \times 2 = 40 \text{ kN·m}\) (counterclockwise)</p>
+
+            <p><strong>(b) Shear force at x = 1 m:</strong></p>
+            <p>For a cantilever with UDL, measuring x from the free end:</p>
+            <p>\[V(x) = -w \times x = -5 \times (4-1) = -15 \text{ kN}\]</p>
+            <p>Or measuring from fixed end: \(V = R_A - w \times 1 = 20 - 5 = 15 \text{ kN}\)</p>
+
+            <p><strong>(c) Bending moment at fixed end:</strong></p>
+            <p>\[M_{fixed} = -\frac{wL^2}{2} = -\frac{5 \times 4^2}{2} = -40 \text{ kN·m}\]</p>
+            <p>The negative sign indicates the moment creates tension on the top fibers (hogging moment).</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 3: Combined Loading - Point Load and UDL</h3>
+        <p>A simply supported beam of length L = 5 m is subjected to:</p>
+        <ul>
+            <li>A point load P = 10 kN at midspan (2.5 m from left support)</li>
+            <li>A uniformly distributed load w = 4 kN/m over the entire length</li>
+        </ul>
+        <p>Calculate:</p>
+        <ol type="a">
+            <li>The reaction forces at both supports</li>
+            <li>The maximum shear force</li>
+            <li>The maximum bending moment</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Reaction forces:</strong></p>
+            <p>Total UDL: \(W = 4 \times 5 = 20 \text{ kN}\) acting at center (2.5 m)</p>
+            <p>By symmetry, both loads (P and W) act at midspan, so:</p>
+            <p>\[R_A = R_B = \frac{P + W}{2} = \frac{10 + 20}{2} = 15 \text{ kN}\]</p>
+
+            <p><strong>(b) Maximum shear force:</strong></p>
+            <p>Shear force diagram starts at \(V = R_A = 15 \text{ kN}\)</p>
+            <p>Just before midspan: \(V = 15 - 4 \times 2.5 = 15 - 10 = 5 \text{ kN}\)</p>
+            <p>Just after midspan: \(V = 5 - 10 = -5 \text{ kN}\)</p>
+            <p>Maximum shear force: \(|V_{max}| = 15 \text{ kN}\) (at supports)</p>
+
+            <p><strong>(c) Maximum bending moment:</strong></p>
+            <p>Maximum moment occurs at midspan where V = 0:</p>
+            <p>\[M_{max} = R_A \times 2.5 - \frac{w \times 2.5^2}{2}\]</p>
+            <p>\[M_{max} = 15 \times 2.5 - \frac{4 \times 6.25}{2} = 37.5 - 12.5 = 25 \text{ kN·m}\]</p>
+            <p>Alternative: \(M_{max} = \frac{PL}{4} + \frac{wL^2}{8} = \frac{10 \times 5}{4} + \frac{4 \times 25}{8} = 12.5 + 12.5 = 25 \text{ kN·m}\)</p>
+        </div>
+    </div>
+</section>
+
+<section class="theory-container">
+    <h2>Knowledge Check Quiz</h2>
+
     <div class="quiz-container">
         <div class="quiz-question">
             <p><strong>Question 1:</strong> In a simply supported beam, which of the following is true about the reaction forces when a central point load is applied?</p>
@@ -352,7 +463,35 @@
                 <p>A concentrated force causes a sudden jump in the shear force diagram equal to the magnitude of the force.</p>
             </div>
         </div>
-        
+
+        <div class="quiz-question">
+            <p><strong>Question 4:</strong> For a simply supported beam with a uniformly distributed load (UDL) over its entire length, where does the maximum bending moment occur?</p>
+            <form id="q4">
+                <input type="radio" name="q4" value="a"> a) At the left support<br>
+                <input type="radio" name="q4" value="b"> b) At the right support<br>
+                <input type="radio" name="q4" value="c"> c) At the midspan<br>
+                <input type="radio" name="q4" value="d"> d) At quarter points from each support<br>
+            </form>
+            <div class="quiz-feedback q4-feedback" style="display:none;">
+                <p>Correct answer: c) At the midspan</p>
+                <p>For a simply supported beam with UDL, the bending moment is parabolic with its maximum value at the center of the span, where M = wL²/8.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 5:</strong> What is the relationship between shear force (V) and bending moment (M) in a beam?</p>
+            <form id="q5">
+                <input type="radio" name="q5" value="a"> a) M = dV/dx (moment is the derivative of shear)<br>
+                <input type="radio" name="q5" value="b"> b) V = dM/dx (shear is the derivative of moment)<br>
+                <input type="radio" name="q5" value="c"> c) M = ∫V dx (moment is the integral of shear)<br>
+                <input type="radio" name="q5" value="d"> d) They are independent of each other<br>
+            </form>
+            <div class="quiz-feedback q5-feedback" style="display:none;">
+                <p>Correct answer: b) and c) are both correct (V = dM/dx and M = ∫V dx)</p>
+                <p>The shear force is the derivative of the bending moment with respect to position along the beam. Equivalently, the bending moment is the integral of the shear force. This fundamental relationship helps construct bending moment diagrams from shear force diagrams.</p>
+            </div>
+        </div>
+
         <button id="check-answers">Check Answers</button>
     </div>
 </section>
@@ -414,6 +553,10 @@
 <footer>
     <script src="/assets/common/footer.js"></script>
 </footer>
-  
+
+<!-- Common JavaScript functions -->
+<script src="/assets/common/problems.js"></script>
+<script src="/assets/common/quizzes.js"></script>
+
 </body>
 </html>

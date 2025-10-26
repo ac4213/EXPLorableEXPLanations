@@ -11,65 +11,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
-
-    <style>
-        /* Page-specific styles for work and energy simulations */
-        .sim-holder {
-            width: 100%;
-            min-height: 400px;
-            position: relative;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .energy-bars {
-            display: flex;
-            gap: 15px;
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #f0f8ff;
-            border-radius: 5px;
-        }
-        
-        .energy-bar-container {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .energy-bar-label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        .energy-bar-wrapper {
-            height: 150px;
-            width: 40px;
-            background-color: #e0e0e0;
-            border: 2px solid #333;
-            border-radius: 3px;
-            margin: 0 auto;
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-        }
-        
-        .energy-bar {
-            width: 100%;
-            background: linear-gradient(to top, #4CAF50, #8BC34A);
-            border-radius: 0 0 3px 3px;
-            transition: height 0.3s ease;
-        }
-        
-        .energy-value {
-            margin-top: 5px;
-            font-size: 0.85em;
-            color: #555;
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 </head>
 <body>
     <header>
@@ -270,7 +212,7 @@
     </div>
 
     <div class="content-section">
-        <h2>Applications of Work-Energy Principle</h2>
+        <h2>Applications and Examples</h2>
         
         <h3>Engineering Applications</h3>
         <ul>
@@ -320,17 +262,17 @@
         <div class="practice-problems">
             <h3>Problem 2: Rolling Cylinder</h3>
             <p>A solid cylinder of mass 10 kg and radius 0.2 m rolls without slipping down a 45° incline. If it starts from rest and rolls 3 metres along the incline, find its final linear velocity.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
             <div id="solution2" class="hidden">
                 <p>Given: \(m = 10\) kg, \(R = 0.2\) m, \(\theta = 45°\), \(s = 3\) m</p>
-                
+
                 <p>For a solid cylinder: \(I = \frac{1}{2}mR^2\)</p>
-                
+
                 <p>Height change: \(h = s\sin\theta = 3\sin 45° = 2.12\) m</p>
-                
+
                 <p>For rolling without slipping: \(v = R\omega\)</p>
-                
+
                 <p>Energy equation:</p>
                 <p>\(mgh = \frac{1}{2}mv^2 + \frac{1}{2}I\omega^2\)</p>
                 <p>\(mgh = \frac{1}{2}mv^2 + \frac{1}{2} \times \frac{1}{2}mR^2 \times \frac{v^2}{R^2}\)</p>
@@ -339,7 +281,85 @@
             </div>
         </div>
 
-        <h2>Summary</h2>
+        <div class="practice-problems">
+            <h3>Problem 3: Spring-Mass System with Friction</h3>
+            <p>A 2 kg mass is attached to a horizontal spring with stiffness k = 400 N/m. The mass is pulled 0.15 m from equilibrium and released on a surface with coefficient of kinetic friction μ = 0.2. How far does the mass travel before coming to rest?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: \(m = 2\) kg, \(k = 400\) N/m, \(x_0 = 0.15\) m, \(\mu_k = 0.2\)</p>
+
+                <p>Initial energy (all elastic PE): \(E_0 = \frac{1}{2}kx_0^2 = \frac{1}{2} \times 400 \times 0.15^2 = 4.5\) J</p>
+
+                <p>Friction force: \(F_f = \mu_k mg = 0.2 \times 2 \times 9.81 = 3.92\) N</p>
+
+                <p>Let total distance travelled = d. Work done by friction: \(W_f = -F_f \times d = -3.92d\)</p>
+
+                <p>Using work-energy theorem: \(E_0 + W_f = 0\) (final KE and PE both zero)</p>
+                <p>\(4.5 - 3.92d = 0\)</p>
+                <p>\(d = \frac{4.5}{3.92} = 1.15\) m</p>
+
+                <p>Note: The mass will oscillate with decreasing amplitude. The spring will compress and extend multiple times, with the total distance travelled being 1.15 m before stopping.</p>
+            </div>
+        </div>
+
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: A 3 kg object falls from a height of 10 m. Neglecting air resistance, what is its kinetic energy just before hitting the ground?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 30 J</label>
+                    <label><input type="radio" name="q1" value="b"> b) 147 J</label>
+                    <label><input type="radio" name="q1" value="c"> c) 294 J</label>
+                    <label><input type="radio" name="q1" value="d"> d) 441 J</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: Which force does NO work on a system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Friction force opposing motion</label>
+                    <label><input type="radio" name="q2" value="b"> b) Normal force perpendicular to motion</label>
+                    <label><input type="radio" name="q2" value="c"> c) Gravitational force on a falling object</label>
+                    <label><input type="radio" name="q2" value="d"> d) Spring force during compression</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A spring with stiffness 200 N/m is compressed by 0.1 m. How much elastic potential energy is stored?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 1 J</label>
+                    <label><input type="radio" name="q3" value="b"> b) 2 J</label>
+                    <label><input type="radio" name="q3" value="c"> c) 10 J</label>
+                    <label><input type="radio" name="q3" value="d"> d) 20 J</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: In a system with conservative forces only, which statement is TRUE?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Kinetic energy is constant</label>
+                    <label><input type="radio" name="q4" value="b"> b) Potential energy is constant</label>
+                    <label><input type="radio" name="q4" value="c"> c) Total mechanical energy is constant</label>
+                    <label><input type="radio" name="q4" value="d"> d) Work done depends on the path taken</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: A solid sphere and a hollow sphere of equal mass and radius roll down the same incline. Which reaches the bottom first?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Hollow sphere</label>
+                    <label><input type="radio" name="q5" value="b"> b) Solid sphere</label>
+                    <label><input type="radio" name="q5" value="c"> c) Both reach at the same time</label>
+                    <label><input type="radio" name="q5" value="d"> d) Cannot be determined without knowing the incline angle</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
+        </div>
+
+        <h2>Summary of Key Equations</h2>
         <div class="key-point">
             <h3>Key Takeaways</h3>
             <ol>
@@ -406,18 +426,12 @@
         <script src="/assets/common/footer.js"></script>
     </footer>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <script>
-        // Toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                solution.previousElementSibling.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                solution.previousElementSibling.textContent = "Show Solution";
-            }
-        }
+        // Page-specific JavaScript for simulations
 
 // Simulation 1: U-shaped slide (vertical – semicircle – vertical)
 // Physics in SI units (m, s, N, J). Rendering converts to pixels.
@@ -1264,6 +1278,45 @@ let slideSketch = function(p) {
         new p5(slideSketch);
         new p5(inclineSketch);
         new p5(raceSketch);
+
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'c', // 294 J (3*9.81*10)
+                        q2: 'b', // Normal force perpendicular to motion
+                        q3: 'a', // 1 J (0.5*200*0.1^2)
+                        q4: 'c', // Total mechanical energy constant
+                        q5: 'b'  // Solid sphere (lower moment of inertia)
+                    };
+
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+
+                    feedback += `<p>Your score: ${score}/5</p>`;
+
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
+            }
+        });
     </script>
 </body>
 </html>

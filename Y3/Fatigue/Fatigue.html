@@ -20,6 +20,7 @@
     <!-- Common styles -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
         /* Page-specific styles for fatigue module */
@@ -467,7 +468,58 @@
             </ul>
         </div>
     </div>
-    
+
+    <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Fatigue analysis is essential across diverse engineering disciplines where components experience cyclic loading:</p>
+        <ul>
+            <li><strong>Aerospace:</strong> Aircraft fuselages, wing attachments, and turbine blades undergo millions of load cycles during service, making fatigue the primary design consideration for structural integrity.</li>
+            <li><strong>Automotive:</strong> Suspension components, crankshafts, and connecting rods experience repeated loading cycles, requiring careful fatigue analysis to prevent catastrophic failures.</li>
+            <li><strong>Civil Infrastructure:</strong> Bridges, railway tracks, and offshore platforms subjected to traffic and environmental loads must be designed against fatigue to ensure decades of safe operation.</li>
+            <li><strong>Power Generation:</strong> Steam and gas turbine rotors, generator shafts, and pressure vessel components operate under cyclic thermal and mechanical stresses requiring comprehensive fatigue assessment.</li>
+            <li><strong>Medical Devices:</strong> Orthopaedic implants, stents, and prosthetic devices must withstand millions of loading cycles within the human body without fatigue failure.</li>
+            <li><strong>Marine Engineering:</strong> Ship propeller shafts, mooring lines, and offshore drilling equipment face variable amplitude loading from waves and operational cycles, demanding robust fatigue design.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Stress Amplitude</td>
+                    <td>\(\sigma_a = \frac{\sigma_{max} - \sigma_{min}}{2}\)</td>
+                    <td>Half the stress range in cyclic loading</td>
+                </tr>
+                <tr>
+                    <td>Mean Stress</td>
+                    <td>\(\sigma_m = \frac{\sigma_{max} + \sigma_{min}}{2}\)</td>
+                    <td>Average stress during cycle</td>
+                </tr>
+                <tr>
+                    <td>Basquin's Equation</td>
+                    <td>\(\sigma_a = \sigma'_f (2N_f)^b\)</td>
+                    <td>S-N curve relationship for fatigue life</td>
+                </tr>
+                <tr>
+                    <td>Goodman Criterion</td>
+                    <td>\(\frac{\sigma_a}{S_e} + \frac{\sigma_m}{S_{ut}} = \frac{1}{SF}\)</td>
+                    <td>Mean stress correction for fatigue design</td>
+                </tr>
+                <tr>
+                    <td>Palmgren-Miner Rule</td>
+                    <td>\(D = \sum_{i=1}^{k} \frac{n_i}{N_i}\)</td>
+                    <td>Cumulative damage assessment (failure at D ≥ 1)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
     <div class="content-section">
         <h2 id="problems">Practice Problems</h2>
         
@@ -519,7 +571,7 @@
     </div>
     
     <div class="content-section">
-        <h2 id="quiz">Interactive Quiz</h2>
+        <h2 id="quiz">Knowledge Check Quiz</h2>
         
         <div class="quiz-container">
             <div class="quiz-question">
@@ -576,11 +628,15 @@
             <div id="quiz-results" class="hidden"></div>
         </div>
     </div>
-    
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
-    
+
 
 </body>
 </html>

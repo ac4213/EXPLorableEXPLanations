@@ -7,6 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
         /* Page-specific styles for 3DOFs layout - matching 2DOFs style */
@@ -991,6 +992,19 @@
 </div> <!-- End container -->
 
 <div class="content-section">
+    <h2>Applications and Examples</h2>
+    <p>Three degree of freedom modal analysis is essential for complex structural and mechanical systems:</p>
+    <ul>
+        <li><strong>Multi-Story Buildings:</strong> Three-story buildings require 3DOF analysis for seismic design and understanding floor-to-floor interaction during earthquakes.</li>
+        <li><strong>Vehicle Dynamics:</strong> Advanced vehicle models include pitch, bounce, and roll using 3DOF systems for comprehensive ride and handling analysis.</li>
+        <li><strong>Aircraft Structures:</strong> Wing flutter and control surface dynamics often require 3DOF models to capture coupled bending-torsion modes.</li>
+        <li><strong>Rotating Machinery:</strong> Turbine-generator-foundation systems use 3DOF models to predict critical speeds and avoid resonance.</li>
+        <li><strong>Offshore Platforms:</strong> Wave-induced vibrations in three-legged jacket structures require 3DOF modal analysis for fatigue assessment.</li>
+        <li><strong>Satellite Dynamics:</strong> Attitude control and momentum wheel vibrations use 3DOF models for stability analysis.</li>
+    </ul>
+</div>
+
+<div class="content-section">
     <h2>Practice Problems</h2>
 
     <div class="practice-problems">
@@ -1097,7 +1111,7 @@
 </div>
 
 <div class="content-section">
-    <h2>Self-Assessment Quiz</h2>
+    <h2>Knowledge Check Quiz</h2>
 
     <div class="quiz-container">
         <div class="quiz-question">
@@ -1183,7 +1197,7 @@
 </div>
 
 <div class="content-section">
-    <h2>Summary</h2>
+    <h2>Summary of Key Equations</h2>
     <div class="key-point">
         <h3>Key Takeaways</h3>
         <ol>
@@ -1201,41 +1215,13 @@
 </div>
 
 <script>
-// Toggle solution visibility
-function toggleSolution(id) {
-    const solution = document.getElementById(id);
-    if (solution.classList.contains('hidden')) {
-        solution.classList.remove('hidden');
-        solution.previousElementSibling.textContent = "Hide Solution";
-    } else {
-        solution.classList.add('hidden');
-        solution.previousElementSibling.textContent = "Show Solution";
-    }
-}
-
-// Function to check quiz answers
-function checkAnswer(questionId, correctAnswer) {
-    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-    const feedbackElement = document.getElementById(`${questionId}-feedback`);
-
-    if (!selectedOption) {
-        feedbackElement.innerHTML = "Please select an answer.";
-        feedbackElement.className = "feedback";
-        return;
-    }
-
-    if (selectedOption.value === correctAnswer) {
-        feedbackElement.innerHTML = "✓ Correct! Well done.";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "green";
-    } else {
-        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "red";
-    }
-}
+// toggleSolution function now loaded from /assets/common/problems.js
+// checkAnswer function now loaded from /assets/common/quizzes.js
 </script>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

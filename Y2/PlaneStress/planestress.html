@@ -14,6 +14,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <!-- Single JavaScript for both simulations -->
     <script defer src="planestress.js"></script>
@@ -334,6 +335,19 @@
     </div>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Plane stress and principal stress analysis are fundamental in structural and mechanical design:</p>
+        <ul>
+            <li><strong>Pressure Vessels:</strong> Thin-walled cylinders and spheres experience biaxial stress states. Principal stress analysis determines required wall thickness.</li>
+            <li><strong>Aircraft Structures:</strong> Fuselage skin panels undergo complex stress states from pressurization, bending, and torsion. Mohr's circle helps identify critical failure planes.</li>
+            <li><strong>Mechanical Components:</strong> Shafts under combined bending and torsion, brackets with oblique loads all require principal stress analysis for safe design.</li>
+            <li><strong>Geological Engineering:</strong> Rock and soil mechanics use principal stress to predict failure planes in slopes and foundations.</li>
+            <li><strong>Materials Testing:</strong> Yield criteria like von Mises and Tresca are based on principal stresses to predict material failure.</li>
+            <li><strong>Fracture Mechanics:</strong> Crack propagation direction is perpendicular to maximum principal tensile stress.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -381,7 +395,7 @@
     </div>
 
     <div class="content-section">
-        <h2>Summary</h2>
+        <h2>Summary of Key Equations</h2>
         <div class="key-point">
             <h3>Key Takeaways</h3>
             <ol>
@@ -408,32 +422,181 @@
         // Tab functionality
         function openTab(evt, tabName) {
             var i, tabContent, tabButtons;
-            
+
             tabContent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabContent.length; i++) {
                 tabContent[i].classList.remove("active");
             }
-            
+
             tabButtons = document.getElementsByClassName("tab-button");
             for (i = 0; i < tabButtons.length; i++) {
                 tabButtons[i].classList.remove("active");
             }
-            
+
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
-        
-        // Solution toggle
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                solution.previousElementSibling.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                solution.previousElementSibling.textContent = "Show Solution";
-            }
-        }
+
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
+
+<!-- ADDITIONAL PRACTICE PROBLEM -->
+<div class="content-section">
+    <div class="practice-problems">
+        <h3>Problem 3: Mohr's Circle Construction and Analysis</h3>
+        <p>A stress element is subjected to the following stresses:</p>
+        <ul>
+            <li>σ<sub>xx</sub> = 100 MPa (tension)</li>
+            <li>σ<sub>yy</sub> = 40 MPa (tension)</li>
+            <li>τ<sub>xy</sub> = -50 MPa (negative shear)</li>
+        </ul>
+        <p>Using Mohr's Circle principles, determine:</p>
+        <ol type="a">
+            <li>The center and radius of Mohr's Circle</li>
+            <li>The principal stresses σ₁ and σ₂</li>
+            <li>The principal angle θ<sub>p</sub></li>
+            <li>The maximum in-plane shear stress and its orientation</li>
+            <li>The stress components on a plane at θ = 30° counterclockwise from the x-axis</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Center and radius of Mohr's Circle:</strong></p>
+            <p>\[C = \frac{\sigma_{xx} + \sigma_{yy}}{2} = \frac{100 + 40}{2} = 70 \text{ MPa}\]</p>
+            <p>\[R = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\]</p>
+            <p>\[R = \sqrt{\left(\frac{100 - 40}{2}\right)^2 + (-50)^2} = \sqrt{30^2 + 50^2} = \sqrt{900 + 2500} = 58.31 \text{ MPa}\]</p>
+
+            <p><strong>(b) Principal stresses:</strong></p>
+            <p>\[\sigma_1 = C + R = 70 + 58.31 = 128.31 \text{ MPa}\]</p>
+            <p>\[\sigma_2 = C - R = 70 - 58.31 = 11.69 \text{ MPa}\]</p>
+
+            <p><strong>(c) Principal angle:</strong></p>
+            <p>\[\tan(2\theta_p) = \frac{2\tau_{xy}}{\sigma_{xx} - \sigma_{yy}} = \frac{2(-50)}{100 - 40} = \frac{-100}{60} = -1.667\]</p>
+            <p>\[2\theta_p = \arctan(-1.667) = -59.04°\]</p>
+            <p>\[\theta_p = -29.52° \text{ (or } 60.48° \text{ from the other solution)}\]</p>
+
+            <p><strong>(d) Maximum in-plane shear stress:</strong></p>
+            <p>\[\tau_{max} = R = 58.31 \text{ MPa}\]</p>
+            <p>This occurs at planes 45° from the principal planes:</p>
+            <p>\[\theta_s = \theta_p + 45° = -29.52° + 45° = 15.48°\]</p>
+
+            <p><strong>(e) Stress components at θ = 30°:</strong></p>
+            <p>Using stress transformation equations (or Mohr's Circle with 2θ = 60°):</p>
+            <p>\[\sigma_{x'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} + \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) + \tau_{xy}\sin(2\theta)\]</p>
+            <p>\[\sigma_{x'} = 70 + 30\cos(60°) + (-50)\sin(60°)\]</p>
+            <p>\[\sigma_{x'} = 70 + 30(0.5) + (-50)(0.866) = 70 + 15 - 43.3 = 41.7 \text{ MPa}\]</p>
+
+            <p>\[\sigma_{y'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} - \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) - \tau_{xy}\sin(2\theta)\]</p>
+            <p>\[\sigma_{y'} = 70 - 15 + 43.3 = 98.3 \text{ MPa}\]</p>
+
+            <p>\[\tau_{x'y'} = -\frac{\sigma_{xx} - \sigma_{yy}}{2}\sin(2\theta) + \tau_{xy}\cos(2\theta)\]</p>
+            <p>\[\tau_{x'y'} = -30\sin(60°) + (-50)\cos(60°) = -30(0.866) + (-50)(0.5)\]</p>
+            <p>\[\tau_{x'y'} = -26.0 - 25.0 = -51.0 \text{ MPa}\]</p>
+        </div>
+    </div>
+</div>
+
+<!-- QUIZ SECTION -->
+<div class="content-section">
+    <div class="quiz-container">
+        <h2>Knowledge Check Quiz</h2>
+
+        <div class="quiz-question">
+            <h3>Question 1: What are principal stresses?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> The stresses acting on the x and y coordinate axes</label>
+                <label><input type="radio" name="q1" value="b"> The maximum and minimum normal stresses at a point, where shear stress is zero</label>
+                <label><input type="radio" name="q1" value="c"> The shear stresses on planes 45° from the coordinate axes</label>
+                <label><input type="radio" name="q1" value="d"> The average of all normal stresses at a point</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 2: In Mohr's Circle, what does the horizontal axis represent?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> Shear stress only</label>
+                <label><input type="radio" name="q2" value="b"> Normal stress only</label>
+                <label><input type="radio" name="q2" value="c"> The angle of rotation</label>
+                <label><input type="radio" name="q2" value="d"> Principal stress direction</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 3: The Von Mises failure criterion is most suitable for:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> Brittle materials under tension</label>
+                <label><input type="radio" name="q3" value="b"> Ductile materials under complex loading</label>
+                <label><input type="radio" name="q3" value="c"> Ceramics under compression</label>
+                <label><input type="radio" name="q3" value="d"> Materials at high temperatures only</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 4: What is the relationship between a rotation angle θ in physical space and the corresponding angle on Mohr's Circle?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> The same angle θ</label>
+                <label><input type="radio" name="q4" value="b"> Half the angle θ/2</label>
+                <label><input type="radio" name="q4" value="c"> Double the angle 2θ</label>
+                <label><input type="radio" name="q4" value="d"> The complement 90° - θ</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 5: The Tresca (maximum shear stress) criterion predicts failure when:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> The maximum normal stress reaches the yield strength</label>
+                <label><input type="radio" name="q5" value="b"> The maximum shear stress equals half the yield strength in shear</label>
+                <label><input type="radio" name="q5" value="c"> The Von Mises stress exceeds the yield strength</label>
+                <label><input type="radio" name="q5" value="d"> All stress components are equal</label>
+            </div>
+        </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
+    </div>
+</div>
+
+<script>
+// Quiz handler for Plane Stress
+document.getElementById('submit-quiz').addEventListener('click', function() {
+    const answers = {
+        q1: 'b',  // Max/min normal stresses with zero shear
+        q2: 'b',  // Normal stress on horizontal axis
+        q3: 'b',  // Von Mises for ductile materials
+        q4: 'c',  // Physical angle θ → 2θ on Mohr's Circle
+        q5: 'b'   // Tresca: τ_max = σ_y/2
+    };
+
+    let score = 0;
+    let totalQuestions = Object.keys(answers).length;
+    let resultsHTML = '<h3>Quiz Results:</h3>';
+
+    for (let question in answers) {
+        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+        const correctAnswer = answers[question];
+
+        if (selectedOption) {
+            if (selectedOption.value === correctAnswer) {
+                score++;
+                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+            } else {
+                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+            }
+        } else {
+            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+        }
+    }
+
+    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+    document.getElementById('quiz-results').innerHTML = resultsHTML;
+});
+</script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 </html>

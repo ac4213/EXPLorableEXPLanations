@@ -19,6 +19,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <!-- Main script for the simulation -->
     <script src="SDOFvib.js"></script>
@@ -253,7 +254,20 @@
             <li>Creates a phase shift that varies from 0° at low frequencies to -180° at high frequencies, passing through -90° at resonance</li>
         </ol>
     </div>
-    
+
+    <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Single degree of freedom vibration analysis is crucial across mechanical and structural engineering:</p>
+        <ul>
+            <li><strong>Earthquake Engineering:</strong> Buildings and bridges are modeled as SDOF systems to predict their response to seismic excitation and design damping systems.</li>
+            <li><strong>Vehicle Suspension:</strong> Quarter-car models use SDOF analysis to optimize spring stiffness and damping for ride comfort and handling.</li>
+            <li><strong>Vibration Isolation:</strong> Sensitive equipment like electron microscopes and precision machine tools require isolation mounts designed using SDOF principles.</li>
+            <li><strong>Mechanical Systems:</strong> Pumps, motors, and rotating machinery foundations are analyzed as SDOF systems to prevent resonance and excessive vibration.</li>
+            <li><strong>Aerospace:</strong> Aircraft landing gear, control surfaces, and engine mounts use SDOF modeling for dynamic analysis.</li>
+            <li><strong>Manufacturing:</strong> Impact hammers, drop forges, and stamping presses are modeled as SDOF systems to predict forces and deflections.</li>
+        </ul>
+    </div>
+
     <div class="content-section">
         <h2>Practice Problems</h2>
 
@@ -341,9 +355,52 @@
             </div>
         </div>
     </div>
-    
+
     <div class="content-section">
-        <h2>Self-Assessment Quiz</h2>
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Natural Frequency</td>
+                    <td>\(\omega_n = \sqrt{\frac{k}{m}}\)</td>
+                    <td>Undamped natural frequency</td>
+                </tr>
+                <tr>
+                    <td>Damping Ratio</td>
+                    <td>\(\zeta = \frac{c}{c_c} = \frac{c}{2\sqrt{km}}\)</td>
+                    <td>Fraction of critical damping</td>
+                </tr>
+                <tr>
+                    <td>Damped Frequency</td>
+                    <td>\(\omega_d = \omega_n\sqrt{1-\zeta^2}\)</td>
+                    <td>Frequency with damping</td>
+                </tr>
+                <tr>
+                    <td>Free Response</td>
+                    <td>\(x(t) = Xe^{-\zeta\omega_n t}\cos(\omega_d t - \phi)\)</td>
+                    <td>Underdamped free vibration</td>
+                </tr>
+                <tr>
+                    <td>Forced Response</td>
+                    <td>\(X = \frac{F_0/k}{\sqrt{(1-r^2)^2+(2\zeta r)^2}}\)</td>
+                    <td>Steady-state amplitude</td>
+                </tr>
+                <tr>
+                    <td>Frequency Ratio</td>
+                    <td>\(r = \frac{\omega}{\omega_n}\)</td>
+                    <td>Excitation to natural frequency</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
         
         <div class="quiz-container">
             <div class="quiz-question">
@@ -507,40 +564,9 @@
     </footer>
 
     <script>
-// Toggle solution visibility
-function toggleSolution(id) {
-    const solution = document.getElementById(id);
-    if (solution.classList.contains('hidden')) {
-        solution.classList.remove('hidden');
-        solution.previousElementSibling.textContent = "Hide Solution";
-    } else {
-        solution.classList.add('hidden');
-        solution.previousElementSibling.textContent = "Show Solution";
-    }
-}
-        
-// Function to check quiz answers
-function checkAnswer(questionId, correctAnswer) {
-    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-    const feedbackElement = document.getElementById(`${questionId}-feedback`);
+// toggleSolution function now loaded from /assets/common/problems.js
+// checkAnswer function now loaded from /assets/common/quizzes.js
 
-    if (!selectedOption) {
-        feedbackElement.innerHTML = "Please select an answer.";
-        feedbackElement.className = "feedback";
-        return;
-    }
-
-    if (selectedOption.value === correctAnswer) {
-        feedbackElement.innerHTML = "✓ Correct! Well done.";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "green";
-    } else {
-        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "red";
-    }
-}
-        
         // Create a new instance of the simulation when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Update parameter display values when sliders are moved
@@ -614,5 +640,9 @@ function checkAnswer(questionId, correctAnswer) {
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 </html>

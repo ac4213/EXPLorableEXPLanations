@@ -8,6 +8,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
   <link rel="stylesheet" href="/assets/css/main.css">
   <link rel="stylesheet" href="/assets/css/simulations.css">
+  <link rel="stylesheet" href="/assets/css/uicontrols.css">
   <style>
     :root { --primary: #ffd700; --secondary:#ffb300; --bg:#fffbeb; --text:#222; }
     *{box-sizing:border-box}
@@ -610,7 +611,20 @@ function titleText(){
 </div>
 
 <div class="content-section">
-  <h2>Self-Assessment Quiz</h2>
+  <h2>Applications and Examples</h2>
+  <p>Macaulay's method is an essential tool in structural beam analysis:</p>
+  <ul>
+    <li><strong>Building Design:</strong> Analyzing floor beams with multiple point loads from columns, walls, and distributed loads from occupants and equipment.</li>
+    <li><strong>Bridge Engineering:</strong> Calculating deflections in bridge girders subjected to concentrated wheel loads and distributed traffic loads.</li>
+    <li><strong>Crane Design:</strong> Determining deflections in crane beams under moving loads to ensure safe operation and prevent excessive sway.</li>
+    <li><strong>Aircraft Structures:</strong> Analyzing wing spars with discrete attachment points and distributed aerodynamic loads.</li>
+    <li><strong>Machine Frames:</strong> Evaluating deflections in machine beds and frames supporting concentrated equipment loads.</li>
+    <li><strong>Formwork Design:</strong> Calculating temporary support beam deflections under construction loads with multiple support points.</li>
+  </ul>
+</div>
+
+<div class="content-section">
+  <h2>Knowledge Check Quiz</h2>
 
   <div class="quiz-container">
     <div class="quiz-question">
@@ -696,7 +710,7 @@ function titleText(){
 </div>
 
 <div class="content-section">
-  <h2>Summary</h2>
+  <h2>Summary of Key Equations</h2>
   <div class="key-point">
     <h3>Key Takeaways</h3>
     <ol>
@@ -710,43 +724,16 @@ function titleText(){
 </div>
 
 <script>
-// Toggle solution visibility
-function toggleSolution(id) {
-  const solution = document.getElementById(id);
-  if (solution.classList.contains('hidden')) {
-    solution.classList.remove('hidden');
-    solution.previousElementSibling.textContent = "Hide Solution";
-  } else {
-    solution.classList.add('hidden');
-    solution.previousElementSibling.textContent = "Show Solution";
-  }
-}
-
-// Function to check quiz answers
-function checkAnswer(questionId, correctAnswer) {
-  const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-  const feedbackElement = document.getElementById(`${questionId}-feedback`);
-
-  if (!selectedOption) {
-    feedbackElement.innerHTML = "Please select an answer.";
-    feedbackElement.className = "feedback";
-    return;
-  }
-
-  if (selectedOption.value === correctAnswer) {
-    feedbackElement.innerHTML = "✓ Correct! Well done.";
-    feedbackElement.className = "feedback";
-    feedbackElement.style.color = "green";
-  } else {
-    feedbackElement.innerHTML = "✗ Incorrect. Try again!";
-    feedbackElement.className = "feedback";
-    feedbackElement.style.color = "red";
-  }
-}
+// toggleSolution function now loaded from /assets/common/problems.js
+// checkAnswer function now loaded from /assets/common/quizzes.js
 </script>
 
 <footer>
   <script src="/assets/common/footer.js"></script>
 </footer>
+
+<!-- Common JavaScript functions -->
+<script src="/assets/common/problems.js"></script>
+<script src="/assets/common/quizzes.js"></script>
 </body>
 </html>

@@ -12,6 +12,7 @@
   <!-- External CSS -->
   <link rel="stylesheet" href="/assets/css/main.css" />
   <link rel="stylesheet" href="/assets/css/simulations.css" />
+  <link rel="stylesheet" href="/assets/css/uicontrols.css" />
 </head>
 
 <body>
@@ -327,6 +328,19 @@
   </div>
 
   <div class="content-section">
+    <h2>Applications and Examples</h2>
+    <p>Friction plays a crucial role in countless engineering applications and everyday phenomena:</p>
+    <ul>
+      <li><strong>Transportation:</strong> Vehicle braking systems rely on friction between brake pads and rotors to decelerate safely. Tire-road friction enables acceleration, cornering, and stopping - modern anti-lock braking systems (ABS) optimize this interaction.</li>
+      <li><strong>Mechanical Power Transmission:</strong> Belt drives, clutches, and brakes all depend on controlled friction to transfer power or motion between components.</li>
+      <li><strong>Fasteners:</strong> Bolts, screws, and threaded connections use friction to prevent loosening under vibration. Thread-locking compounds increase friction to enhance security.</li>
+      <li><strong>Manufacturing:</strong> Metalworking processes like rolling, drawing, and extrusion must carefully manage friction to control surface finish and energy consumption.</li>
+      <li><strong>Sports Equipment:</strong> Rock climbing shoes use high-friction rubber compounds; curling involves deliberately reducing ice friction; bowling relies on controlled friction between ball and lane.</li>
+      <li><strong>Safety Applications:</strong> Non-slip surfaces, emergency brakes, and friction dampers in earthquake-resistant buildings all exploit friction for protection.</li>
+    </ul>
+  </div>
+
+  <div class="content-section">
     <h2>Practice Problems</h2>
 
     <div class="practice-problems">
@@ -406,7 +420,50 @@
   </div>
 
   <div class="content-section">
-    <h2>Interactive Quiz</h2>
+    <h2>Summary of Key Equations</h2>
+    <div class="equation-box">
+      <table>
+        <tr>
+          <th>Concept</th>
+          <th>Equation</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>Friction Force</td>
+          <td>\(F_f \leq \mu_s N\)</td>
+          <td>Maximum static friction before sliding</td>
+        </tr>
+        <tr>
+          <td>Kinetic Friction</td>
+          <td>\(F_k = \mu_k N\)</td>
+          <td>Friction force during sliding motion</td>
+        </tr>
+        <tr>
+          <td>Normal Force</td>
+          <td>\(N\)</td>
+          <td>Perpendicular contact force between surfaces</td>
+        </tr>
+        <tr>
+          <td>Angle of Repose</td>
+          <td>\(\theta_{max} = \arctan(\mu_s)\)</td>
+          <td>Maximum incline angle before sliding begins</td>
+        </tr>
+        <tr>
+          <td>Rolling Resistance</td>
+          <td>\(F_{rr} = C_{rr} N\)</td>
+          <td>Resistance force for rolling objects</td>
+        </tr>
+        <tr>
+          <td>Power Dissipation</td>
+          <td>\(P = F_{rr} \cdot v\)</td>
+          <td>Power lost to rolling resistance</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
     <div class="quiz-container">
       <div class="quiz-question">
         <h3>Question 1: Why is the coefficient of static friction typically greater than kinetic friction?</h3>
@@ -467,7 +524,12 @@
     <script src="/assets/common/footer.js"></script>
   </footer>
 
+  <!-- Common JavaScript functions -->
+  <script src="/assets/common/problems.js"></script>
+  <script src="/assets/common/quizzes.js"></script>
+
   <script>
+// Page-specific JavaScript
 // ------------------------------
 // Globals & constants
 // ------------------------------
@@ -1055,20 +1117,7 @@ function updateFrictionData(normalForce, maxStaticFriction, kineticFriction, cur
   statusEl.style.fontWeight = 'bold';
 }
 
-// Toggle solution visibility
-function toggleSolution(id) {
-  const solution = document.getElementById(id);
-  if (!solution) return;
-  if (solution.classList.contains('hidden')) {
-    solution.classList.remove('hidden');
-    const toggleElement = solution.previousElementSibling;
-    if (toggleElement) toggleElement.textContent = 'Hide Solution';
-  } else {
-    solution.classList.add('hidden');
-    const toggleElement = solution.previousElementSibling;
-    if (toggleElement) toggleElement.textContent = 'Show Solution';
-  }
-}
+// toggleSolution function now loaded from /assets/common/problems.js
 
 // MathJax configuration (kept simple)
 window.MathJax = window.MathJax || {

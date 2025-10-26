@@ -11,6 +11,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Page-specific styles -->
     <style>
         #sketch-holder {
@@ -186,6 +187,19 @@
     </div>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Circular motion principles are fundamental to many real-world applications and engineering systems:</p>
+        <ul>
+            <li><strong>Transportation:</strong> Cars navigating curved roads require centripetal force from friction; banked curves allow higher speeds safely by utilizing normal force components.</li>
+            <li><strong>Amusement Parks:</strong> Roller coasters and Ferris wheels rely on circular motion dynamics to create thrilling yet safe experiences. Loop-the-loops maintain contact through proper speed management.</li>
+            <li><strong>Rotating Machinery:</strong> Turbines, centrifuges, and washing machines use circular motion. Centrifuges separate materials based on density differences using high-speed rotation.</li>
+            <li><strong>Planetary Motion:</strong> Satellites and planets move in approximately circular orbits, with gravitational force providing the necessary centripetal acceleration.</li>
+            <li><strong>Sports:</strong> Athletes throwing discus or hammer utilize circular motion to maximize throwing distance. The hammer throw can reach speeds over 30 m/s before release.</li>
+            <li><strong>Safety Systems:</strong> Governors in engines use centrifugal effects to regulate speed automatically, preventing over-revving and potential damage.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -198,7 +212,7 @@
             </ol>
             
             <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="solution" style="display: none;">
+            <div id="solution1" class="hidden">
                 <p><strong>Given:</strong> \(m = 0.05\) kg, \(r = 0.8\) m, \(\omega = 5\) rad/s</p>
                 <p><strong>a) Linear speed:</strong><br>
                 \(v = r\omega = 0.8 \times 5 = 4\) m/s</p>
@@ -219,7 +233,7 @@
             </ol>
             
             <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="solution" style="display: none;">
+            <div id="solution2" class="hidden">
                 <p><strong>Given:</strong> \(\omega_0 = 0\), \(\omega = 120\) rpm \(= 120 \times \frac{2\pi}{60} = 4\pi\) rad/s, \(t = 4\) s, \(r = 0.3\) m</p>
                 <p><strong>a) Angular acceleration:</strong><br>
                 \(\alpha = \frac{\omega - \omega_0}{t} = \frac{4\pi}{4} = \pi\) rad/s² \(\approx 3.14\) rad/s²</p>
@@ -241,7 +255,7 @@
             </ol>
             
             <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="solution" style="display: none;">
+            <div id="solution3" class="hidden">
                 <p><strong>Given:</strong> \(r = 2\) m, \(\omega_0 = 2\) rad/s, \(\omega = 6\) rad/s, \(\theta = 4\pi\) rad</p>
                 <p><strong>a) Angular acceleration:</strong><br>
                 Using \(\omega^2 = \omega_0^2 + 2\alpha\theta\)<br>
@@ -261,8 +275,51 @@
     </div>
 
     <div class="content-section">
-        <h2>Quick Quiz</h2>
-        
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Linear-Angular Relationship</td>
+                    <td>\(v = r\omega\)</td>
+                    <td>Linear speed from angular velocity</td>
+                </tr>
+                <tr>
+                    <td>Centripetal Acceleration</td>
+                    <td>\(a_c = \frac{v^2}{r} = \omega^2 r\)</td>
+                    <td>Acceleration toward center of circle</td>
+                </tr>
+                <tr>
+                    <td>Centripetal Force</td>
+                    <td>\(F_c = \frac{mv^2}{r} = m\omega^2 r\)</td>
+                    <td>Force required for circular motion</td>
+                </tr>
+                <tr>
+                    <td>Tangential Acceleration</td>
+                    <td>\(a_t = r\alpha\)</td>
+                    <td>Tangential component (non-uniform motion)</td>
+                </tr>
+                <tr>
+                    <td>Total Acceleration</td>
+                    <td>\(a = \sqrt{a_c^2 + a_t^2}\)</td>
+                    <td>Magnitude of resultant acceleration</td>
+                </tr>
+                <tr>
+                    <td>Angular Kinematics</td>
+                    <td>\(\omega = \omega_0 + \alpha t\)<br>\(\theta = \omega_0 t + \frac{1}{2}\alpha t^2\)<br>\(\omega^2 = \omega_0^2 + 2\alpha\theta\)</td>
+                    <td>Equations for angular motion (analogous to linear)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+
         <div class="quiz-container">
             <div class="quiz-question">
                 <h3>Question 1</h3>
@@ -335,7 +392,12 @@
         <script src="/assets/common/footer.js"></script>
     </footer>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <script>
+        // Page-specific JavaScript
         // p5.js sketch for circular motion simulation
         let sketch = function(p) {
             let angle = 0;
@@ -572,39 +634,8 @@
         document.getElementById('stringLength').addEventListener('input', function(e) {
             document.getElementById('lengthValue').textContent = e.target.value;
         });
-        
-        // Toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            const toggleText = solution.previousElementSibling;
-            if (solution.style.display === "block") {
-                solution.style.display = "none";
-                toggleText.textContent = "Show Solution";
-            } else {
-                solution.style.display = "block";
-                toggleText.textContent = "Hide Solution";
-            }
-        }
-        
-        // Check quiz answers
-        function checkAnswer(questionName, correctAnswer, feedbackId) {
-            const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-            const feedbackElement = document.getElementById(feedbackId);
-            
-            if (!selectedOption) {
-                feedbackElement.textContent = "Please select an answer.";
-                feedbackElement.className = "feedback";
-                return;
-            }
-            
-            if (selectedOption.value === correctAnswer) {
-                feedbackElement.textContent = "Correct! Well done.";
-                feedbackElement.className = "feedback correct";
-            } else {
-                feedbackElement.textContent = "Incorrect. Try again!";
-                feedbackElement.className = "feedback incorrect";
-            }
-        }
+
+        // toggleSolution and checkAnswer functions now loaded from /assets/common/problems.js and /assets/common/quizzes.js
     </script>
 </body>
 </html>

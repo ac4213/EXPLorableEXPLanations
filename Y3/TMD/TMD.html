@@ -6,6 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
         /* Page-specific styles for TMD layout */
@@ -485,6 +486,19 @@
 </div> <!-- End simulation-container -->
 
 <div class="content-section">
+    <h2>Applications and Examples</h2>
+    <p>Tuned Mass Dampers are passive vibration control devices with wide-ranging applications across civil, mechanical, and aerospace engineering:</p>
+    <ul>
+        <li><strong>Tall Buildings:</strong> Iconic structures like Taipei 101 (660-ton TMD), Shanghai Tower, Tokyo Skytree, and Burj Khalifa use TMDs to reduce wind-induced sway and improve occupant comfort during high winds or seismic events.</li>
+        <li><strong>Bridges:</strong> The London Millennium Bridge was retrofitted with TMDs to eliminate lateral vibrations caused by pedestrian footfall synchronization, while many long-span suspension bridges use TMDs to control wind-induced oscillations.</li>
+        <li><strong>Industrial Rotating Machinery:</strong> Large turbines, compressors, and centrifuges incorporate TMDs to suppress resonant vibrations at critical operating speeds, extending equipment life and reducing noise.</li>
+        <li><strong>Wind Turbines:</strong> TMDs installed in nacelles and tower structures dampen vibrations from blade rotation and wind gusts, preventing fatigue damage and improving power generation efficiency.</li>
+        <li><strong>Aerospace Structures:</strong> Helicopter rotor systems and aircraft control surfaces use TMDs to reduce flutter and vibration, enhancing pilot control and passenger comfort.</li>
+        <li><strong>Automotive Engineering:</strong> Engine mounts and exhaust systems employ TMD principles to isolate vibrations and reduce cabin noise, particularly at specific RPM ranges.</li>
+    </ul>
+</div>
+
+<div class="content-section">
     <h2>Practice Problems</h2>
 
     <div class="practice-problems">
@@ -535,10 +549,81 @@
             <p><strong>Note:</strong> This is the theoretical maximum effectiveness. Real systems may achieve 70-85% reduction due to practical constraints.</p>
         </div>
     </div>
+
+    <div class="practice-problems">
+        <h3>Problem 3: Tuning Frequency Optimization</h3>
+        <p>A building has a mass of 5,000,000 kg and a natural frequency of 0.5 Hz. A TMD with mass 50,000 kg is to be installed. Calculate:</p>
+        <ol type="a">
+            <li>The mass ratio μ</li>
+            <li>The optimal tuning frequency of the TMD using Den Hartog's formula: \(f_{opt} = \frac{f_n}{1 + \mu}\)</li>
+            <li>The required stiffness for the TMD</li>
+            <li>If the TMD's stroke is limited to 1 m, estimate the damping coefficient needed</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <h4>Solution:</h4>
+            <p><strong>(a) Mass ratio:</strong></p>
+            <p>\[\mu = \frac{m_{TMD}}{m_{structure}} = \frac{50,000}{5,000,000} = 0.01 = 1\%\]</p>
+
+            <p><strong>(b) Optimal tuning frequency:</strong></p>
+            <p>\[f_{opt} = \frac{f_n}{1 + \mu} = \frac{0.5}{1 + 0.01} = \frac{0.5}{1.01} = 0.495 \text{ Hz}\]</p>
+            <p>\[\omega_{opt} = 2\pi f_{opt} = 2\pi \times 0.495 = 3.11 \text{ rad/s}\]</p>
+
+            <p><strong>(c) Required stiffness:</strong></p>
+            <p>\[k_{TMD} = m_{TMD} \omega_{opt}^2 = 50,000 \times (3.11)^2 = 50,000 \times 9.67 = 483,500 \text{ N/m} = 483.5 \text{ kN/m}\]</p>
+
+            <p><strong>(d) Damping coefficient estimate:</strong></p>
+            <p>For optimal performance, the damping ratio \(\zeta_{opt}\) is approximately:</p>
+            <p>\[\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}} = \sqrt{\frac{3 \times 0.01}{8(1.01)^3}} = \sqrt{\frac{0.03}{8.24}} = \sqrt{0.00364} = 0.060\]</p>
+            <p>\[c_{cr} = 2\sqrt{k_{TMD} \times m_{TMD}} = 2\sqrt{483,500 \times 50,000} = 2 \times 4,917 = 9,834 \text{ Ns/m}\]</p>
+            <p>\[c_{TMD} = \zeta_{opt} \times c_{cr} = 0.060 \times 9,834 = 590 \text{ Ns/m}\]</p>
+
+            <p><strong>Verification:</strong> With a 1 m stroke limit and building frequency of 0.5 Hz, the maximum velocity is approximately \(v_{max} = 2\pi f \times A = 2\pi \times 0.5 \times 1 = 3.14\) m/s. The damping force would be \(F_d = c \times v = 590 \times 3.14 = 1,853\) N, which is reasonable for this system.</p>
+        </div>
+    </div>
 </div>
 
 <div class="content-section">
-    <h2>Self-Assessment Quiz</h2>
+    <h2>Summary of Key Equations</h2>
+    <div class="equation-box">
+        <table>
+            <tr>
+                <th>Concept</th>
+                <th>Equation</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Mass Ratio</td>
+                <td>\(\mu = \frac{m_{TMD}}{m_{structure}}\)</td>
+                <td>Ratio of TMD mass to primary structure mass (typically 1-5%)</td>
+            </tr>
+            <tr>
+                <td>Optimal Frequency Ratio</td>
+                <td>\(f_{opt} = \frac{1}{1 + \mu}\)</td>
+                <td>Ratio of TMD frequency to structure frequency for optimal tuning</td>
+            </tr>
+            <tr>
+                <td>Optimal Damping Ratio</td>
+                <td>\(\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}}\)</td>
+                <td>Damping ratio that minimizes peak response</td>
+            </tr>
+            <tr>
+                <td>TMD Natural Frequency</td>
+                <td>\(\omega_{TMD} = \sqrt{\frac{k_{TMD}}{m_{TMD}}}\)</td>
+                <td>Natural frequency of the TMD subsystem</td>
+            </tr>
+            <tr>
+                <td>Vibration Reduction</td>
+                <td>\(\text{Reduction} \approx \frac{\mu}{1 + \mu}\)</td>
+                <td>Approximate amplitude reduction at resonance (up to 90% possible)</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
 
     <div class="quiz-container">
         <div class="quiz-question">
@@ -588,59 +673,49 @@
             </form>
             <div id="q3-feedback" class="feedback"></div>
         </div>
-    </div>
-</div>
 
-<div class="content-section">
-    <h2>Summary</h2>
-    <div class="key-point">
-        <h3>Key Takeaways</h3>
-        <ol>
-            <li>TMDs are passive vibration control devices that absorb energy from primary structures</li>
-            <li>Optimal tuning requires matching the TMD frequency to the structure's natural frequency</li>
-            <li>A small mass ratio (1-5%) can provide significant vibration reduction (up to 90%)</li>
-            <li>The TMD creates two fixed points in the frequency response, ensuring robust performance</li>
-            <li>Real-world applications include skyscrapers, bridges, and rotating machinery</li>
-            <li>Proper damping is crucial for TMD effectiveness across a range of frequencies</li>
-        </ol>
+        <div class="quiz-question">
+            <p><strong>Question 4:</strong> What happens if a TMD is tuned slightly off the structural frequency?</p>
+            <form id="q4">
+                <input type="radio" id="q4a" name="q4" value="a">
+                <label for="q4a">a) It becomes completely ineffective</label><br>
+                <input type="radio" id="q4b" name="q4" value="b">
+                <label for="q4b">b) It can still provide some vibration reduction but at reduced efficiency</label><br>
+                <input type="radio" id="q4c" name="q4" value="c">
+                <label for="q4c">c) It amplifies structural vibrations</label><br>
+                <input type="radio" id="q4d" name="q4" value="d">
+                <label for="q4d">d) It has no effect whatsoever</label><br>
+                <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
+            </form>
+            <div id="q4-feedback" class="feedback"></div>
+        </div>
+
+        <div class="quiz-question">
+            <p><strong>Question 5:</strong> In the frequency response curve of a structure with a TMD, what characteristic feature indicates successful tuning?</p>
+            <form id="q5">
+                <input type="radio" id="q5a" name="q5" value="a">
+                <label for="q5a">a) A single sharp resonance peak</label><br>
+                <input type="radio" id="q5b" name="q5" value="b">
+                <label for="q5b">b) Two smaller peaks with a valley between them (fixed points)</label><br>
+                <input type="radio" id="q5c" name="q5" value="c">
+                <label for="q5c">c) Complete elimination of all peaks</label><br>
+                <input type="radio" id="q5d" name="q5" value="d">
+                <label for="q5d">d) A shift of the peak to a higher frequency</label><br>
+                <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
+            </form>
+            <div id="q5-feedback" class="feedback"></div>
+        </div>
     </div>
 </div>
 
 <script>
-// Toggle solution visibility
-function toggleSolution(id) {
-    const solution = document.getElementById(id);
-    if (solution.classList.contains('hidden')) {
-        solution.classList.remove('hidden');
-        solution.previousElementSibling.textContent = "Hide Solution";
-    } else {
-        solution.classList.add('hidden');
-        solution.previousElementSibling.textContent = "Show Solution";
-    }
-}
-
-// Function to check quiz answers
-function checkAnswer(questionId, correctAnswer) {
-    const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
-    const feedbackElement = document.getElementById(`${questionId}-feedback`);
-
-    if (!selectedOption) {
-        feedbackElement.innerHTML = "Please select an answer.";
-        feedbackElement.className = "feedback";
-        return;
-    }
-
-    if (selectedOption.value === correctAnswer) {
-        feedbackElement.innerHTML = "✓ Correct! Well done.";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "green";
-    } else {
-        feedbackElement.innerHTML = "✗ Incorrect. Try again!";
-        feedbackElement.className = "feedback";
-        feedbackElement.style.color = "red";
-    }
-}
+// toggleSolution function now loaded from /assets/common/problems.js
+// checkAnswer function now loaded from /assets/common/quizzes.js
 </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 
 </body>
 <footer>

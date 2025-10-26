@@ -14,6 +14,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
         /* Page-specific styles for relative motion simulation */
@@ -149,7 +150,7 @@
     </div>
 
     <div class="content-section">
-        <h2>Applications in Engineering</h2>
+        <h2>Applications and Examples</h2>
         
         <h3>Navigation and Transport</h3>
         <ul>
@@ -317,21 +318,108 @@
     </div>
 
     <div class="content-section">
-        <h2>Key Takeaways</h2>
-        <div class="key-point">
-            <ol>
-                <li><strong>Frame of Reference:</strong> Motion appears different from different viewpoints</li>
-                <li><strong>Vector Subtraction:</strong> Relative velocity is found by vector subtraction</li>
-                <li><strong>Reciprocity:</strong> \(\vec{v}_{B/A} = -\vec{v}_{A/B}\)</li>
-                <li><strong>Addition Rule:</strong> Velocities add when changing reference frames</li>
-                <li><strong>Engineering Applications:</strong> Critical for navigation, mechanism design, and fluid dynamics</li>
-            </ol>
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Relative Position</td>
+                    <td>\(\vec{r}_{B/A} = \vec{r}_B - \vec{r}_A\)</td>
+                    <td>Position of B relative to A</td>
+                </tr>
+                <tr>
+                    <td>Relative Velocity</td>
+                    <td>\(\vec{v}_{B/A} = \vec{v}_B - \vec{v}_A\)</td>
+                    <td>Velocity of B relative to A</td>
+                </tr>
+                <tr>
+                    <td>Reciprocity</td>
+                    <td>\(\vec{v}_{B/A} = -\vec{v}_{A/B}\)</td>
+                    <td>Relative velocities are opposite</td>
+                </tr>
+                <tr>
+                    <td>Velocity Addition</td>
+                    <td>\(\vec{v}_{C/A} = \vec{v}_{C/B} + \vec{v}_{B/A}\)</td>
+                    <td>Chain rule for reference frames</td>
+                </tr>
+                <tr>
+                    <td>Component Form</td>
+                    <td>\(\vec{v}_{B/A} = (v_{Bx} - v_{Ax})\hat{i} + (v_{By} - v_{Ay})\hat{j}\)</td>
+                    <td>2D relative velocity components</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container" id="quiz">
+            <div class="quiz-question">
+                <h3>Question 1: Two cars approach an intersection. Car A travels north at 15 m/s, and Car B travels east at 20 m/s. What is the magnitude of Car B's velocity relative to Car A?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 5 m/s</label>
+                    <label><input type="radio" name="q1" value="b"> b) 17.5 m/s</label>
+                    <label><input type="radio" name="q1" value="c"> c) 25 m/s</label>
+                    <label><input type="radio" name="q1" value="d"> d) 35 m/s</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A boat can travel at 8 m/s in still water. It needs to cross a river flowing at 3 m/s. What is the minimum time required to cross a 120 m wide river?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 15 s</label>
+                    <label><input type="radio" name="q2" value="b"> b) 17.2 s</label>
+                    <label><input type="radio" name="q2" value="c"> c) 20 s</label>
+                    <label><input type="radio" name="q2" value="d"> d) 40 s</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: If the velocity of object B relative to A is \(\vec{v}_{B/A} = 10\hat{i} + 5\hat{j}\) m/s, what is \(\vec{v}_{A/B}\)?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) \(10\hat{i} + 5\hat{j}\) m/s</label>
+                    <label><input type="radio" name="q3" value="b"> b) \(-10\hat{i} - 5\hat{j}\) m/s</label>
+                    <label><input type="radio" name="q3" value="c"> c) \(5\hat{i} + 10\hat{j}\) m/s</label>
+                    <label><input type="radio" name="q3" value="d"> d) \(-5\hat{i} - 10\hat{j}\) m/s</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: An aircraft flies at 250 m/s relative to the air. A wind blows from west to east at 40 m/s. If the pilot wants to fly northeast (45° from north), which statement is correct?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) The aircraft should point exactly northeast</label>
+                    <label><input type="radio" name="q4" value="b"> b) The aircraft should point slightly west of northeast</label>
+                    <label><input type="radio" name="q4" value="c"> c) The ground speed will be exactly 250 m/s</label>
+                    <label><input type="radio" name="q4" value="d"> d) The wind has no effect on the heading</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Which equation represents the velocity addition rule for three reference frames (A, B, and ground G)?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) \(\vec{v}_{A/G} = \vec{v}_{B/A} + \vec{v}_{B/G}\)</label>
+                    <label><input type="radio" name="q5" value="b"> b) \(\vec{v}_{B/G} = \vec{v}_{B/A} + \vec{v}_{A/G}\)</label>
+                    <label><input type="radio" name="q5" value="c"> c) \(\vec{v}_{B/A} = \vec{v}_{B/G} - \vec{v}_{A/G}\)</label>
+                    <label><input type="radio" name="q5" value="d"> d) \(\vec{v}_{A/B} = \vec{v}_{A/G} + \vec{v}_{B/G}\)</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results" class="hidden"></div>
         </div>
     </div>
 
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 
     <script>
         // p5.js sketch for relative motion simulation
@@ -749,20 +837,47 @@
             document.getElementById('vel-rel-ab').textContent = `${vABMag.toFixed(2)} m/s`;
             document.getElementById('vel-rel-ab-comp').textContent = `(${vABx.toFixed(2)}, ${vABy.toFixed(2)}) m/s`;
         }
-        
-        // Solution toggle function
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
+
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'c', // 25 m/s (sqrt(15^2 + 20^2))
+                        q2: 'a', // 15 s (120/8, heading straight across)
+                        q3: 'b', // negative of both components
+                        q4: 'b', // must compensate for wind from the west
+                        q5: 'b'  // velocity addition formula
+                    };
+
+                    let score = 0;
+                    let feedback = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        if (selectedOption) {
+                            if (selectedOption.value === answers[question]) {
+                                score++;
+                                feedback += `<p>Question ${question.substring(1)}: Correct! ✓</p>`;
+                            } else {
+                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}. ✗</p>`;
+                            }
+                        } else {
+                            feedback += `<p>Question ${question.substring(1)}: No answer selected. ✗</p>`;
+                        }
+                    }
+
+                    feedback += `<p>Your score: ${score}/5</p>`;
+
+                    const resultsDiv = document.getElementById('quiz-results');
+                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.classList.remove('hidden');
+                });
             }
-        }
+        });
+
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
 </body>
 </html>

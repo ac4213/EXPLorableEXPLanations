@@ -17,6 +17,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Your script goes here -->
     <script src="ParabolicM.js"></script>
 </head>
@@ -181,9 +182,20 @@
             <p>Time of flight: \(t_{flight} = \frac{v_0\sin\theta + \sqrt{(v_0\sin\theta)^2 + 2gh}}{g}\)</p>
             <p>Range: \(R = v_0\cos\theta \cdot t_{flight}\)</p>
         </div>
-        
-        <h2>Applications & Practice Problems</h2>
-        
+
+        <h2>Applications and Examples</h2>
+        <p>Projectile motion analysis has numerous real-world applications across engineering and physics:</p>
+        <ul>
+            <li><strong>Sports Engineering:</strong> Optimizing trajectories in basketball, soccer, golf, and javelin throw. Understanding projectile motion helps athletes improve performance and equipment designers create better gear.</li>
+            <li><strong>Ballistics:</strong> Military and law enforcement applications for firearms, artillery, and missile systems. Precise trajectory calculations are critical for accuracy.</li>
+            <li><strong>Aerospace:</strong> Launch trajectories for rockets and satellites, as well as aircraft bombing runs and payload drops. Atmospheric effects must also be considered.</li>
+            <li><strong>Civil Engineering:</strong> Designing water fountains, sprinkler systems, and understanding debris trajectories in demolition.</li>
+            <li><strong>Safety Analysis:</strong> Predicting landing zones for emergency egress systems, ejection seats, and avalanche debris.</li>
+            <li><strong>Entertainment:</strong> Special effects in movies, fireworks displays, and amusement park rides all use projectile motion calculations.</li>
+        </ul>
+
+        <h2>Practice Problems</h2>
+
         <div class="practice-problems">
             <h3>Problem 1: Calculating Range</h3>
             <p>A ball is thrown with an initial velocity of 15 m/s at an angle of 30° with the horizontal. Calculate:</p>
@@ -249,7 +261,7 @@
             </div>
         </div>
         
-        <h2>Interactive Quiz</h2>
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
                 <h3>Question 1: A projectile is launched with an initial velocity of 40 m/s at an angle of 30° to the horizontal. What is its maximum height?</h3>
@@ -307,7 +319,7 @@
     </div>
     
     <div class="content-section">
-        <h2>Summary: Key Equations Reference</h2>
+        <h2>Summary of Key Equations</h2>
         
         <div class="equation-table">
             <table>
@@ -381,20 +393,12 @@
         <script src="/assets/common/footer.js"></script>
     </footer>
 
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
+        // toggleSolution function now loaded from /assets/common/problems.js
         
         // Function to render the React component
         document.addEventListener('DOMContentLoaded', function() {

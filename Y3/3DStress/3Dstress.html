@@ -16,6 +16,7 @@
     <!-- Import custom CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Custom script -->
     <script src="3d-stress-strain.js"></script>
 
@@ -293,7 +294,20 @@
                 </div>
             </section>
         </div>
-        
+
+        <div class="content-section">
+            <h2>Applications and Examples</h2>
+            <p>Three-dimensional stress analysis is critical for complex structural and mechanical components:</p>
+            <ul>
+                <li><strong>Pressure Vessels:</strong> Thick-walled cylinders and spheres require 3D stress analysis to ensure safety under internal pressure.</li>
+                <li><strong>Aerospace Components:</strong> Turbine blades, landing gear, and fuselage joints experience complex 3D stress states requiring full tensor analysis.</li>
+                <li><strong>Geotechnical Engineering:</strong> Soil and rock mechanics use 3D stress analysis for foundation design and slope stability.</li>
+                <li><strong>Nuclear Engineering:</strong> Reactor vessels and piping systems under thermal and pressure loads require 3D stress evaluation.</li>
+                <li><strong>Manufacturing:</strong> Metal forming processes like forging and extrusion involve 3D stress states that govern material flow and failure.</li>
+                <li><strong>Biomechanics:</strong> Bone and joint analysis requires 3D stress tensor calculations to understand load distribution and injury mechanisms.</li>
+            </ul>
+        </div>
+
         <div class="practice-section">
             <h2>Practice Problems</h2>
             
@@ -308,7 +322,7 @@
                     \end{bmatrix} \text{ MPa}\]
                 </div>
                 <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
-                <div class="solution" id="solution1">
+                <div class="solution hidden" id="solution1">
                     <p>To find the principal stresses, we need to solve the characteristic equation:</p>
                     <p>\(\det(\boldsymbol{\lambda} - \lambda \mathbf{I}) = 0\)</p>
                     <p>This gives us:</p>
@@ -342,7 +356,7 @@
                     <li>Von Mises Criterion</li>
                 </ol>
                 <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
-                <div class="solution" id="solution2">
+                <div class="solution hidden" id="solution2">
                     <p>First, let's calculate the principal stresses by finding the eigenvalues of the stress tensor.</p>
                     <p>After solving the characteristic equation, we get:</p>
                     <p>σ₁ = 185.2 MPa, σ₂ = 85.5 MPa, σ₃ = 29.3 MPa</p>
@@ -363,9 +377,177 @@
                 </div>
             </div>
         </div>
-        
+
+        <!-- PRACTICE PROBLEMS SECTION -->
+        <div class="content-section">
+            <h2>Practice Problems</h2>
+
+            <div class="practice-problems">
+                <h3>Problem 1: Principal Stress Analysis in 3D</h3>
+                <p>A stress state at a point in a material is given by the following stress tensor:</p>
+                <p>\[[\sigma] = \begin{bmatrix} 60 & 20 & 0 \\ 20 & 40 & 0 \\ 0 & 0 & 30 \end{bmatrix} \text{ MPa}\]</p>
+                <p>Determine:</p>
+                <ol type="a">
+                    <li>The three principal stresses σ₁, σ₂, and σ₃</li>
+                    <li>The maximum shear stress</li>
+                    <li>The hydrostatic (mean) stress</li>
+                </ol>
+
+                <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+                <div id="solution1" class="hidden">
+                    <h4>Solution:</h4>
+                    <p><strong>(a) Principal stresses:</strong></p>
+                    <p>For the given stress tensor, since σ₃₃ = 30 MPa has no coupling with the other components (σ₁₃ = σ₂₃ = 0), one principal stress is σ₃ = 30 MPa.</p>
+
+                    <p>For the remaining 2×2 submatrix in the xy-plane:</p>
+                    <p>\[\begin{bmatrix} 60 & 20 \\ 20 & 40 \end{bmatrix}\]</p>
+
+                    <p>Average stress: \(\sigma_{avg} = \frac{60 + 40}{2} = 50\) MPa</p>
+                    <p>Radius: \(R = \sqrt{(60-40)^2/4 + 20^2} = \sqrt{100 + 400} = \sqrt{500} = 22.36\) MPa</p>
+
+                    <p>\[\sigma_1 = 50 + 22.36 = 72.36 \text{ MPa}\]</p>
+                    <p>\[\sigma_2 = 50 - 22.36 = 27.64 \text{ MPa}\]</p>
+                    <p>\[\sigma_3 = 30 \text{ MPa}\]</p>
+
+                    <p>Ordered: σ₁ = 72.36 MPa, σ₂ = 30 MPa, σ₃ = 27.64 MPa</p>
+
+                    <p><strong>(b) Maximum shear stress:</strong></p>
+                    <p>\[\tau_{max} = \frac{\sigma_1 - \sigma_3}{2} = \frac{72.36 - 27.64}{2} = 22.36 \text{ MPa}\]</p>
+
+                    <p><strong>(c) Hydrostatic stress:</strong></p>
+                    <p>\[\sigma_m = \frac{\sigma_1 + \sigma_2 + \sigma_3}{3} = \frac{72.36 + 30 + 27.64}{3} = \frac{130}{3} = 43.33 \text{ MPa}\]</p>
+                </div>
+            </div>
+
+            <div class="practice-problems">
+                <h3>Problem 2: Stress Invariants and Deviatoric Stress</h3>
+                <p>Given the stress tensor from Problem 1, calculate:</p>
+                <ol type="a">
+                    <li>The three stress invariants I₁, I₂, and I₃</li>
+                    <li>The deviatoric stress tensor</li>
+                    <li>The von Mises equivalent stress</li>
+                </ol>
+
+                <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+                <div id="solution2" class="hidden">
+                    <h4>Solution:</h4>
+                    <p><strong>(a) Stress invariants:</strong></p>
+                    <p>First invariant (trace):</p>
+                    <p>\[I_1 = \sigma_{11} + \sigma_{22} + \sigma_{33} = 60 + 40 + 30 = 130 \text{ MPa}\]</p>
+
+                    <p>Using principal stresses (easier): \(I_1 = 72.36 + 30 + 27.64 = 130\) MPa ✓</p>
+
+                    <p>Second invariant:</p>
+                    <p>\[I_2 = \sigma_1\sigma_2 + \sigma_2\sigma_3 + \sigma_3\sigma_1 = 72.36 \times 30 + 30 \times 27.64 + 27.64 \times 72.36\]</p>
+                    <p>\[I_2 = 2170.8 + 829.2 + 2000 = 5000 \text{ MPa}^2\]</p>
+
+                    <p>Third invariant (determinant):</p>
+                    <p>\[I_3 = \sigma_1\sigma_2\sigma_3 = 72.36 \times 30 \times 27.64 = 60,000 \text{ MPa}^3\]</p>
+
+                    <p><strong>(b) Deviatoric stress tensor:</strong></p>
+                    <p>Hydrostatic component: \(\sigma_m = I_1/3 = 43.33\) MPa</p>
+                    <p>\[[s] = [\sigma] - \sigma_m[I] = \begin{bmatrix} 60-43.33 & 20 & 0 \\ 20 & 40-43.33 & 0 \\ 0 & 0 & 30-43.33 \end{bmatrix}\]</p>
+                    <p>\[[s] = \begin{bmatrix} 16.67 & 20 & 0 \\ 20 & -3.33 & 0 \\ 0 & 0 & -13.33 \end{bmatrix} \text{ MPa}\]</p>
+
+                    <p><strong>(c) Von Mises equivalent stress:</strong></p>
+                    <p>\[\sigma_{VM} = \sqrt{\frac{1}{2}[(\sigma_1-\sigma_2)^2 + (\sigma_2-\sigma_3)^2 + (\sigma_3-\sigma_1)^2]}\]</p>
+                    <p>\[\sigma_{VM} = \sqrt{\frac{1}{2}[(72.36-30)^2 + (30-27.64)^2 + (27.64-72.36)^2]}\]</p>
+                    <p>\[\sigma_{VM} = \sqrt{\frac{1}{2}[1794.5 + 5.57 + 1999.7]} = \sqrt{1899.9} = 43.59 \text{ MPa}\]</p>
+                </div>
+            </div>
+
+            <div class="practice-problems">
+                <h3>Problem 3: 3D Mohr's Circle Analysis</h3>
+                <p>A material is subjected to the following principal stresses:</p>
+                <ul>
+                    <li>σ₁ = 100 MPa (maximum)</li>
+                    <li>σ₂ = 40 MPa (intermediate)</li>
+                    <li>σ₃ = -20 MPa (minimum, compression)</li>
+                </ul>
+                <p>Using the concept of 3D Mohr's circles, determine:</p>
+                <ol type="a">
+                    <li>The radii of the three Mohr's circles</li>
+                    <li>The absolute maximum shear stress</li>
+                    <li>The minimum normal stress on any plane</li>
+                    <li>If the material has a yield strength of 200 MPa, calculate the factor of safety using the Tresca and von Mises criteria</li>
+                </ol>
+
+                <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+                <div id="solution3" class="hidden">
+                    <h4>Solution:</h4>
+                    <p><strong>(a) Radii of three Mohr's circles:</strong></p>
+                    <p>Circle 1 (largest, between σ₁ and σ₃):</p>
+                    <p>\[R_1 = \frac{\sigma_1 - \sigma_3}{2} = \frac{100 - (-20)}{2} = 60 \text{ MPa}\]</p>
+
+                    <p>Circle 2 (between σ₁ and σ₂):</p>
+                    <p>\[R_2 = \frac{\sigma_1 - \sigma_2}{2} = \frac{100 - 40}{2} = 30 \text{ MPa}\]</p>
+
+                    <p>Circle 3 (between σ₂ and σ₃):</p>
+                    <p>\[R_3 = \frac{\sigma_2 - \sigma_3}{2} = \frac{40 - (-20)}{2} = 30 \text{ MPa}\]</p>
+
+                    <p><strong>(b) Absolute maximum shear stress:</strong></p>
+                    <p>\[\tau_{max} = R_1 = 60 \text{ MPa}\]</p>
+                    <p>This occurs on planes at 45° to the σ₁ and σ₃ principal directions.</p>
+
+                    <p><strong>(c) Minimum normal stress:</strong></p>
+                    <p>The minimum normal stress on any plane is the smallest principal stress:</p>
+                    <p>\[\sigma_{min} = \sigma_3 = -20 \text{ MPa (compression)}\]</p>
+
+                    <p><strong>(d) Factor of safety:</strong></p>
+                    <p><em>Tresca (Maximum Shear Stress) Criterion:</em></p>
+                    <p>\[\sigma_{eq,Tresca} = \sigma_1 - \sigma_3 = 100 - (-20) = 120 \text{ MPa}\]</p>
+                    <p>\[FS_{Tresca} = \frac{\sigma_y}{\sigma_{eq}} = \frac{200}{120} = 1.67\]</p>
+
+                    <p><em>Von Mises Criterion:</em></p>
+                    <p>\[\sigma_{VM} = \sqrt{\frac{1}{2}[(100-40)^2 + (40-(-20))^2 + ((-20)-100)^2]}\]</p>
+                    <p>\[\sigma_{VM} = \sqrt{\frac{1}{2}[3600 + 3600 + 14400]} = \sqrt{10800} = 103.92 \text{ MPa}\]</p>
+                    <p>\[FS_{vonMises} = \frac{200}{103.92} = 1.92\]</p>
+
+                    <p><strong>Interpretation:</strong> The von Mises criterion predicts a higher factor of safety (1.92 vs 1.67) because it accounts for all stress components more accurately. The Tresca criterion is more conservative.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Summary of Key Equations</h2>
+            <div class="equation-box">
+                <table>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>Stress Tensor</td>
+                        <td>\(\boldsymbol{\sigma} = \begin{bmatrix} \sigma_{xx} & \tau_{xy} & \tau_{xz} \\ \tau_{yx} & \sigma_{yy} & \tau_{yz} \\ \tau_{zx} & \tau_{zy} & \sigma_{zz} \end{bmatrix}\)</td>
+                        <td>3D stress state</td>
+                    </tr>
+                    <tr>
+                        <td>Principal Stresses</td>
+                        <td>\(\det(\boldsymbol{\sigma} - \sigma\mathbf{I}) = 0\)</td>
+                        <td>Eigenvalue problem</td>
+                    </tr>
+                    <tr>
+                        <td>Hydrostatic Stress</td>
+                        <td>\(\sigma_m = \frac{\sigma_1 + \sigma_2 + \sigma_3}{3}\)</td>
+                        <td>Mean normal stress</td>
+                    </tr>
+                    <tr>
+                        <td>Von Mises Stress</td>
+                        <td>\(\sigma_{VM} = \sqrt{\frac{1}{2}[(\sigma_1-\sigma_2)^2+(\sigma_2-\sigma_3)^2+(\sigma_3-\sigma_1)^2]}\)</td>
+                        <td>Equivalent stress</td>
+                    </tr>
+                    <tr>
+                        <td>Octahedral Shear</td>
+                        <td>\(\tau_{oct} = \frac{1}{3}\sqrt{(\sigma_1-\sigma_2)^2+(\sigma_2-\sigma_3)^2+(\sigma_3-\sigma_1)^2}\)</td>
+                        <td>Shear stress on octahedral plane</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
         <div class="quiz-section">
-            <h2>Self-Assessment Quiz</h2>
+            <h2>Knowledge Check Quiz</h2>
             
             <div class="quiz-container">
                 <div class="quiz-question">
@@ -422,7 +604,15 @@
                 <div id="quiz-results" class="hidden"></div>
             </div>
         </div>
-    </div> 
+    </div>
+
+    <script>
+        // toggleSolution function now loaded from /assets/common/problems.js
+    </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

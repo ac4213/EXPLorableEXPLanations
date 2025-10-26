@@ -11,6 +11,7 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <style>
         /* Page-specific styles */
         .gear-controls {
@@ -412,6 +413,19 @@
     </div>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Gear trains are ubiquitous in mechanical power transmission systems:</p>
+        <ul>
+            <li><strong>Automotive:</strong> Manual and automatic transmissions use complex gear trains to provide multiple speed ratios. Differentials use bevel gears to distribute power to wheels.</li>
+            <li><strong>Industrial Machinery:</strong> Gearboxes in manufacturing equipment, conveyor systems, and machine tools provide precise speed and torque control.</li>
+            <li><strong>Robotics:</strong> Harmonic drives and planetary gearboxes provide high reduction ratios in compact spaces for robot joints.</li>
+            <li><strong>Wind Turbines:</strong> Gearboxes step up low rotor speeds to high generator speeds, though some modern designs use direct drive.</li>
+            <li><strong>Clocks and Watches:</strong> Gear trains divide time intervals precisely, connecting the escapement to display hands.</li>
+            <li><strong>Power Tools:</strong> Drills, grinders, and saws use gear reduction to optimize speed and torque for different applications.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -452,26 +466,192 @@
                 <p>Root diameter: d_f = 4(25 - 2.5) = 90 mm</p>
             </div>
         </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Compound Gear Train Analysis</h3>
+            <p>A compound gear train consists of four gears arranged as follows:</p>
+            <ul>
+                <li>Gear 1 (driver): 20 teeth, 1500 RPM</li>
+                <li>Gear 2 (driven by Gear 1, drives Gear 3): 60 teeth</li>
+                <li>Gear 3 (on same shaft as Gear 2): 15 teeth</li>
+                <li>Gear 4 (output gear): 45 teeth</li>
+            </ul>
+            <p>Calculate:</p>
+            <ol type="a">
+                <li>The overall gear ratio</li>
+                <li>The output speed of Gear 4</li>
+                <li>If the input torque is 50 N·m, what is the output torque (assuming 100% efficiency)?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <h4>Solution:</h4>
+                <p><strong>(a) Overall gear ratio:</strong></p>
+                <p>For a compound gear train, the overall ratio is the product of individual ratios:</p>
+                <p>\[i_{total} = \frac{N_2}{N_1} \times \frac{N_4}{N_3} = \frac{60}{20} \times \frac{45}{15} = 3 \times 3 = 9\]</p>
+                <p>The overall gear ratio is 9:1 (reduction)</p>
+
+                <p><strong>(b) Output speed:</strong></p>
+                <p>\[\omega_4 = \frac{\omega_1}{i_{total}} = \frac{1500}{9} = 166.67 \text{ RPM}\]</p>
+                <p>The output speed is 166.67 RPM</p>
+
+                <p><strong>(c) Output torque:</strong></p>
+                <p>For 100% efficiency, power is conserved: \(P_{in} = P_{out}\)</p>
+                <p>\[T_1 \omega_1 = T_4 \omega_4\]</p>
+                <p>\[T_4 = T_1 \times \frac{\omega_1}{\omega_4} = T_1 \times i_{total} = 50 \times 9 = 450 \text{ N·m}\]</p>
+                <p>The output torque is 450 N·m</p>
+
+                <p><strong>Key insight:</strong> Compound gear trains multiply torque by the overall ratio. This is why gearboxes are used to convert high-speed, low-torque inputs into low-speed, high-torque outputs for heavy loads.</p>
+            </div>
+        </div>
     </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Gear Ratio</td>
+                    <td>\(GR = \frac{N_{out}}{N_{in}} = \frac{z_{driven}}{z_{driver}}\)</td>
+                    <td>Speed ratio between gears</td>
+                </tr>
+                <tr>
+                    <td>Pitch Diameter</td>
+                    <td>\(d = mz\)</td>
+                    <td>Diameter at tooth pitch circle</td>
+                </tr>
+                <tr>
+                    <td>Center Distance</td>
+                    <td>\(C = \frac{d_1 + d_2}{2} = \frac{m(z_1 + z_2)}{2}\)</td>
+                    <td>Distance between gear centers</td>
+                </tr>
+                <tr>
+                    <td>Velocity Ratio</td>
+                    <td>\(VR = \frac{\omega_{out}}{\omega_{in}} = \frac{z_{in}}{z_{out}}\)</td>
+                    <td>Angular velocity ratio</td>
+                </tr>
+                <tr>
+                    <td>Torque Ratio</td>
+                    <td>\(TR = \frac{T_{out}}{T_{in}} = \frac{z_{out}}{z_{in}}\)</td>
+                    <td>Torque multiplication ratio</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- QUIZ SECTION -->
+    <div class="content-section">
+        <div class="quiz-container">
+            <h2>Knowledge Check Quiz</h2>
+
+            <div class="quiz-question">
+                <h3>Question 1: What is the module (m) of a gear?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> The number of teeth on the gear</label>
+                    <label><input type="radio" name="q1" value="b"> The ratio of pitch diameter to number of teeth</label>
+                    <label><input type="radio" name="q1" value="c"> The distance between gear centers</label>
+                    <label><input type="radio" name="q1" value="d"> The pressure angle of the gear teeth</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: For two meshing gears, the velocity ratio is equal to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> The ratio of their masses</label>
+                    <label><input type="radio" name="q2" value="b"> The ratio of their number of teeth</label>
+                    <label><input type="radio" name="q2" value="c"> The ratio of their modules</label>
+                    <label><input type="radio" name="q2" value="d"> The ratio of their pressure angles</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: What is the main advantage of a compound gear train over a simple gear train?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> Lower cost</label>
+                    <label><input type="radio" name="q3" value="b"> Simpler design</label>
+                    <label><input type="radio" name="q3" value="c"> Achieves larger gear ratios in a more compact space</label>
+                    <label><input type="radio" name="q3" value="d"> Requires no lubrication</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The base circle diameter of a gear is calculated as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> \(d_b = d \times \sin(\alpha)\)</label>
+                    <label><input type="radio" name="q4" value="b"> \(d_b = d \times \cos(\alpha)\)</label>
+                    <label><input type="radio" name="q4" value="c"> \(d_b = d \times \tan(\alpha)\)</label>
+                    <label><input type="radio" name="q4" value="d"> \(d_b = d / \cos(\alpha)\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: If a gear train has an overall ratio of 8:1 and the input torque is 20 N·m, what is the theoretical output torque (assuming 100% efficiency)?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> 2.5 N·m</label>
+                    <label><input type="radio" name="q5" value="b"> 20 N·m</label>
+                    <label><input type="radio" name="q5" value="c"> 40 N·m</label>
+                    <label><input type="radio" name="q5" value="d"> 160 N·m</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+    // Quiz handler for Gear Trains
+    document.getElementById('submit-quiz').addEventListener('click', function() {
+        const answers = {
+            q1: 'b',  // Module = pitch diameter / number of teeth
+            q2: 'b',  // Velocity ratio = ratio of teeth numbers
+            q3: 'c',  // Larger ratios in compact space
+            q4: 'b',  // Base circle = d × cos(α)
+            q5: 'd'   // Output torque = input × ratio = 20 × 8 = 160
+        };
+
+        let score = 0;
+        let totalQuestions = Object.keys(answers).length;
+        let resultsHTML = '<h3>Quiz Results:</h3>';
+
+        for (let question in answers) {
+            const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+            const correctAnswer = answers[question];
+
+            if (selectedOption) {
+                if (selectedOption.value === correctAnswer) {
+                    score++;
+                    resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                } else {
+                    resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+                }
+            } else {
+                resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+            }
+        }
+
+        const percentage = ((score / totalQuestions) * 100).toFixed(0);
+        resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+        document.getElementById('quiz-results').innerHTML = resultsHTML;
+    });
+    </script>
 
     <footer>
         <script src="/assets/common/footer.js"></script>
     </footer>
 
     <script>
-        // Function to toggle solution visibility
-        function toggleSolution(id) {
-            const solution = document.getElementById(id);
-            if (solution.classList.contains('hidden')) {
-                solution.classList.remove('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Hide Solution";
-            } else {
-                solution.classList.add('hidden');
-                const toggleElement = solution.previousElementSibling;
-                toggleElement.textContent = "Show Solution";
-            }
-        }
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
 </body>
 </html>
