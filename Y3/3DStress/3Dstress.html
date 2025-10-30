@@ -15,6 +15,8 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <!-- Import custom CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Custom script -->
@@ -96,7 +98,7 @@
         .result-panel h3 {
             margin-top: 0;
             margin-bottom: 10px;
-            color: #cc9900;
+            color: #b38600;
         }
 
         .matrix {
@@ -222,8 +224,8 @@
                     <div id="principal-directions" class="matrix" style="font-size: 12px;"></div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 15px;">
-                    <div class="result-panel" style="background-color: #fff3cd; border-left: 4px solid #ffc107;">
-                        <h3 style="color: #b38600; margin-top: 0;">Equivalent Failure Stresses (σ_Y=110 MPa)</h3>
+                    <div class="result-panel" style="background-color: #e6f7ff; border-left: 4px solid #1890ff;">
+                        <h3 style="color: #1890ff; margin-top: 0;">Equivalent Failure Stresses (σ_Y=110 MPa)</h3>
                         <div id="failure-criteria" style="font-size: 13px;"></div>
                     </div>
                     <div class="plot-container" style="flex-grow: 1;">
@@ -306,76 +308,6 @@
                 <li><strong>Manufacturing:</strong> Metal forming processes like forging and extrusion involve 3D stress states that govern material flow and failure.</li>
                 <li><strong>Biomechanics:</strong> Bone and joint analysis requires 3D stress tensor calculations to understand load distribution and injury mechanisms.</li>
             </ul>
-        </div>
-
-        <div class="practice-section">
-            <h2>Practice Problems</h2>
-            
-            <div class="problem">
-                <h3>Problem 1: Principal Stresses</h3>
-                <p>For the stress tensor below, calculate the principal stresses and their directions:</p>
-                <div class="equation-box">
-                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
-                    80 & 25 & 0 \\
-                    25 & 40 & 0 \\
-                    0 & 0 & 20
-                    \end{bmatrix} \text{ MPa}\]
-                </div>
-                <div class="solution-toggle" onclick="toggleSolution('solution1')">Show Solution</div>
-                <div class="solution hidden" id="solution1">
-                    <p>To find the principal stresses, we need to solve the characteristic equation:</p>
-                    <p>\(\det(\boldsymbol{\lambda} - \lambda \mathbf{I}) = 0\)</p>
-                    <p>This gives us:</p>
-                    <p>\((\lambda - 20)[(\lambda - 80)(\lambda - 40) - 25^2] = 0\)</p>
-                    <p>\((\lambda - 20)[\lambda^2 - 120\lambda + 3200 - 625] = 0\)</p>
-                    <p>\((\lambda - 20)(\lambda^2 - 120\lambda + 2575) = 0\)</p>
-                    <p>Solving this equation:</p>
-                    <p>\(\lambda_1 = 20 \text{ MPa}\)</p>
-                    <p>\(\lambda_{2,3} = \frac{120 \pm \sqrt{120^2 - 4 \times 2575}}{2} = \frac{120 \pm \sqrt{14400 - 10300}}{2} = \frac{120 \pm \sqrt{4100}}{2} = \frac{120 \pm 64}{2}\)</p>
-                    <p>\(\lambda_2 = 92 \text{ MPa}\)</p>
-                    <p>\(\lambda_3 = 28 \text{ MPa}\)</p>
-                    <p>Thus giving \(\sigma_1 = 92 \text{ MPa}, \quad \sigma_2 = 28 \text{ MPa}, \quad \sigma_3 = 20 \text{ MPa}\)</p>
-                    <p>The principal directions can be found by substituting each principal stress back into \((\boldsymbol{\sigma} - \sigma_i \mathbf{I})\mathbf{v_i} = \mathbf{0}\) and solving for the eigenvector \(\mathbf{v_i}\), where \(i=1,2,3\).</p>
-                </div>
-            </div>
-            
-            <div class="problem">
-                <h3>Problem 2: Failure Analysis</h3>
-                <p>A component made of steel (yield strength σ<sub>y</sub> = 250 MPa) is subjected to the following stress state:</p>
-                <div class="equation-box">
-                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
-                    150 & 50 & 30 \\
-                    50 & 100 & 20 \\
-                    30 & 20 & 50
-                    \end{bmatrix} \text{ MPa}\]
-                </div>
-                <p>Determine whether the component will fail according to:</p>
-                <ol type="a">
-                    <li>Maximum Principal Stress Theory (Rankine)</li>
-                    <li>Maximum Shear Stress Theory (Tresca)</li>
-                    <li>Von Mises Criterion</li>
-                </ol>
-                <div class="solution-toggle" onclick="toggleSolution('solution2')">Show Solution</div>
-                <div class="solution hidden" id="solution2">
-                    <p>First, let's calculate the principal stresses by finding the eigenvalues of the stress tensor.</p>
-                    <p>After solving the characteristic equation, we get:</p>
-                    <p>σ₁ = 185.2 MPa, σ₂ = 85.5 MPa, σ₃ = 29.3 MPa</p>
-                    
-                    <p><strong>a) Rankine Criterion:</strong></p>
-                    <p>Failure if σ₁ ≥ σ<sub>y</sub></p>
-                    <p>185.2 MPa < 250 MPa → <strong>Safe</strong></p>
-                    
-                    <p><strong>b) Tresca Criterion:</strong></p>
-                    <p>τ<sub>max</sub> = (σ₁ - σ₃)/2 = (185.2 - 29.3)/2 = 78 MPa</p>
-                    <p>Failure if τ<sub>max</sub> ≥ σ<sub>y</sub>/2 = 125 MPa</p>
-                    <p>78 MPa < 125 MPa → <strong>Safe</strong></p>
-                    
-                    <p><strong>c) Von Mises Criterion:</strong></p>
-                    <p>σ<sub>VM</sub> = √{½[(185.2-85.5)² + (85.5-29.3)² + (29.3-185.2)²]}</p>
-                    <p>σ<sub>VM</sub> = √{½[9940 + 3158 + 24336]} = √18717 = 136.8 MPa</p>
-                    <p>136.8 MPa < 250 MPa → <strong>Safe</strong></p>
-                </div>
-            </div>
         </div>
 
         <!-- PRACTICE PROBLEMS SECTION -->

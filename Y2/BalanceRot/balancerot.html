@@ -11,6 +11,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 <!-- External CSS -->
 <link href="/assets/css/main.css" rel="stylesheet"/>
+<link href="/assets/css/problems.css" rel="stylesheet"/>
+<link href="/assets/css/quizzes.css" rel="stylesheet"/>
 <link href="/assets/css/simulations.css" rel="stylesheet"/>
 <link rel="stylesheet" href="/assets/css/uicontrols.css">
 <!-- JavaScript for simulations -->
@@ -756,104 +758,6 @@
 
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results" class="hidden"></div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Practice Problems</h2>
-
-        <div class="practice-problems">
-            <h3>Problem 1: Calculating Centrifugal Force</h3>
-            <p>A rotor has an unbalanced mass of 0.5 kg located at a radius of 150 mm from the axis of rotation. If the rotor operates at 3000 RPM, calculate the centrifugal force generated.</p>
-
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p><strong>Given:</strong></p>
-                <ul>
-                    <li>Unbalance mass: \(m = 0.5\) kg</li>
-                    <li>Radius: \(r = 150\) mm = 0.15 m</li>
-                    <li>Speed: \(N = 3000\) RPM</li>
-                </ul>
-
-                <p><strong>Step 1:</strong> Convert RPM to rad/s</p>
-                <p>\(\omega = \frac{2\pi N}{60} = \frac{2\pi \times 3000}{60} = 314.16\) rad/s</p>
-
-                <p><strong>Step 2:</strong> Calculate centrifugal force</p>
-                <p>\(F = m \cdot r \cdot \omega^2\)</p>
-                <p>\(F = 0.5 \times 0.15 \times (314.16)^2\)</p>
-                <p>\(F = 0.5 \times 0.15 \times 98696.4\)</p>
-                <p>\(F = 7402.23\) N = 7.4 kN</p>
-
-                <p><strong>Answer:</strong> The centrifugal force is 7.4 kN, which is a significant force that must be balanced to prevent excessive vibration and bearing wear.</p>
-            </div>
-        </div>
-
-        <div class="practice-problems">
-            <h3>Problem 2: Single Plane Balancing</h3>
-            <p>A rotating disc has an unbalanced mass of 200 g at 100 mm radius and 0° angular position. Calculate the balancing mass required at 150 mm radius to achieve static balance.</p>
-
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p><strong>Given:</strong></p>
-                <ul>
-                    <li>Unbalance mass: \(m_u = 200\) g = 0.2 kg</li>
-                    <li>Unbalance radius: \(r_u = 100\) mm = 0.1 m</li>
-                    <li>Balance radius: \(r_b = 150\) mm = 0.15 m</li>
-                </ul>
-
-                <p><strong>For static balance, the mass-radius products must be equal:</strong></p>
-                <p>\(m_u \cdot r_u = m_b \cdot r_b\)</p>
-
-                <p><strong>Solving for balance mass:</strong></p>
-                <p>\(m_b = \frac{m_u \cdot r_u}{r_b} = \frac{0.2 \times 0.1}{0.15}\)</p>
-                <p>\(m_b = \frac{0.02}{0.15} = 0.133\) kg = 133.3 g</p>
-
-                <p><strong>Angular position:</strong></p>
-                <p>The balance mass must be placed at 180° (opposite) to the unbalance mass</p>
-
-                <p><strong>Answer:</strong> Add 133.3 g at 150 mm radius and 180° from the unbalance position.</p>
-            </div>
-        </div>
-
-        <div class="practice-problems">
-            <h3>Problem 3: Two-Plane Balancing</h3>
-            <p>A shaft has two unbalanced masses:</p>
-            <ul>
-                <li>Plane A: 0.3 kg at radius 80 mm, angle 45°</li>
-                <li>Plane B: 0.4 kg at radius 100 mm, angle 135°</li>
-            </ul>
-            <p>The planes are 500 mm apart. Calculate the resultant force unbalance.</p>
-
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p><strong>Given:</strong></p>
-                <ul>
-                    <li>Plane A: \(m_A = 0.3\) kg, \(r_A = 0.08\) m, \(\theta_A = 45°\)</li>
-                    <li>Plane B: \(m_B = 0.4\) kg, \(r_B = 0.1\) m, \(\theta_B = 135°\)</li>
-                </ul>
-
-                <p><strong>Step 1:</strong> Calculate mass-radius products</p>
-                <p>\(MR_A = 0.3 \times 0.08 = 0.024\) kg·m</p>
-                <p>\(MR_B = 0.4 \times 0.1 = 0.04\) kg·m</p>
-
-                <p><strong>Step 2:</strong> Resolve into x and y components</p>
-                <p><strong>Plane A:</strong></p>
-                <p>\(MR_{Ax} = 0.024 \cos(45°) = 0.024 \times 0.707 = 0.01697\) kg·m</p>
-                <p>\(MR_{Ay} = 0.024 \sin(45°) = 0.024 \times 0.707 = 0.01697\) kg·m</p>
-
-                <p><strong>Plane B:</strong></p>
-                <p>\(MR_{Bx} = 0.04 \cos(135°) = 0.04 \times (-0.707) = -0.02828\) kg·m</p>
-                <p>\(MR_{By} = 0.04 \sin(135°) = 0.04 \times 0.707 = 0.02828\) kg·m</p>
-
-                <p><strong>Step 3:</strong> Sum components</p>
-                <p>\(MR_x = 0.01697 + (-0.02828) = -0.01131\) kg·m</p>
-                <p>\(MR_y = 0.01697 + 0.02828 = 0.04525\) kg·m</p>
-
-                <p><strong>Step 4:</strong> Calculate resultant</p>
-                <p>\(MR_{resultant} = \sqrt{(-0.01131)^2 + (0.04525)^2} = \sqrt{0.000128 + 0.002048} = 0.0466\) kg·m</p>
-
-                <p><strong>Answer:</strong> The resultant force unbalance is 0.0466 kg·m. At high speeds, this will cause significant vibration requiring two-plane correction.</p>
-            </div>
         </div>
     </div>
 

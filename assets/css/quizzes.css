@@ -1,0 +1,126 @@
+/* ============================================
+   Knowledge Check Quiz Styles
+   Green color scheme for quiz sections
+   ============================================ */
+
+/* Quiz Container */
+.quiz-container {
+    background-color: #e6ffe6;
+    border-left: 4px solid #52c41a;
+    border-radius: 0 8px 8px 0;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.quiz-container h2 {
+    color: #237804;
+    border-bottom: 2px solid #52c41a;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Quiz Questions */
+.quiz-question {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #b7eb8f;
+}
+
+.quiz-question:last-of-type {
+    border-bottom: none;
+}
+
+.quiz-question h3 {
+    color: #237804;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+/* Quiz Options */
+.quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quiz-options label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.quiz-options label:hover {
+    background-color: #d9f7be;
+}
+
+.quiz-options input {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Submit Button */
+#submit-quiz {
+    background-color: #52c41a;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin-top: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+#submit-quiz:hover {
+    background-color: #389e0d;
+}
+
+#submit-quiz:active {
+    transform: scale(0.98);
+}
+
+/* Quiz Results */
+#quiz-results {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f6ffed;
+    border-radius: 8px;
+    border-left: 4px solid #52c41a;
+}
+
+#quiz-results h3 {
+    color: #237804;
+    margin-bottom: 15px;
+}
+
+#quiz-results p {
+    margin: 5px 0;
+}
+
+/* Feedback Colors */
+.quiz-correct {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.quiz-incorrect {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Score Display */
+.quiz-score {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #237804;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #d9f7be;
+    border-radius: 4px;
+    text-align: center;
+}

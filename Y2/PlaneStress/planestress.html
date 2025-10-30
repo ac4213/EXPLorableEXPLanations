@@ -13,6 +13,8 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
@@ -581,7 +583,7 @@ document.getElementById('submit-quiz').addEventListener('click', function() {
                 score++;
                 resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
             } else {
-                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
             }
         } else {
             resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;

@@ -1,0 +1,70 @@
+/* ============================================
+   Practice Problems Styles
+   Blue color scheme for practice problem sections
+   ============================================ */
+
+/* Practice Problems Section */
+.practice-problems {
+    background-color: #e6f7ff;
+    border-left: 4px solid #1890ff;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+}
+
+.practice-problems h3 {
+    color: #1890ff;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.practice-problems ol, .practice-problems li {
+    padding-left: 25px;
+    margin-left: 15px;
+    margin-bottom: 8px;
+}
+
+/* Toggle Sections for Solutions */
+.toggle-section {
+    cursor: pointer;
+    color: #1890ff;
+    font-weight: bold;
+    transition: color 0.3s;
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: rgba(24, 144, 255, 0.1);
+    border-radius: 4px;
+}
+
+.toggle-section:hover {
+    text-decoration: underline;
+    color: #096dd9;
+    background-color: rgba(24, 144, 255, 0.2);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Solution boxes */
+.practice-problems .hidden {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+    border: 1px solid #b3d9ff;
+}
+
+.practice-problems .hidden h4 {
+    color: #1890ff;
+    margin-bottom: 10px;
+}
+
+.practice-problems .hidden p {
+    margin: 10px 0;
+}
+
+.practice-problems .hidden ul {
+    margin-left: 20px;
+}

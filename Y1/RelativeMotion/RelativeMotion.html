@@ -13,6 +13,8 @@
     
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
@@ -27,21 +29,21 @@
         
         .pov-button {
             padding: 10px 20px;
-            background-color: #ffb300;
+            background-color: var(--secondary-color);
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
         }
-        
+
         .pov-button.active {
-            background-color: #ffd700;
+            background-color: var(--primary-color);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        
+
         .pov-button:hover {
-            background-color: #ffd700;
+            background-color: var(--primary-color);
         }
         
         .velocity-info {
@@ -55,7 +57,7 @@
             background-color: white;
             padding: 10px;
             border-radius: 5px;
-            border-left: 4px solid #ffd700;
+            border-left: 4px solid var(--primary-color);
         }
         
         .velocity-card h4 {

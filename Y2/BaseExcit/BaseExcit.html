@@ -20,6 +20,8 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS_HTML"></script>
     <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/problems.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/quizzes.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 </head>
@@ -215,54 +217,7 @@
                 <li>Low-rise, stiff buildings have high natural frequencies and generally move with the ground</li>
                 <li>Tall, flexible buildings have low natural frequencies and can experience amplified motion if their natural frequency matches the predominant earthquake frequency</li>
             </ul>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem: Vibration Isolation Design</h3>
-                <p>A sensitive electronic device with mass 5 kg needs to be isolated from a base that vibrates with a frequency of 50 Hz. What should be the stiffness of the isolator to ensure the transmissibility is less than 0.1?</p>
-                
-                <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-                <div id="solution1" class="hidden">
-                    <p>For transmissibility to be less than 0.1:</p>
-                    <p>$T_d = \frac{1}{r^2} < 0.1$ (assuming high frequency, where $r \gg 1$)</p>
-                    <p>$r^2 > 10$</p>
-                    <p>$r > 3.16$</p>
-                    <p>Since $r = \frac{\omega}{\omega_n} = \frac{2\pi \times 50}{\sqrt{k/m}}$, we need:</p>
-                    <p>$2\pi \times 50 > 3.16 \times \sqrt{k/5}$</p>
-                    <p>$k < \frac{(2\pi \times 50)^2 \times 5}{3.16^2} = 12,411 \text{ N/m}$</p>
-                    <p>To ensure transmissibility less than 0.1, the stiffness should be less than 12,411 N/m.</p>
-                </div>
-            </div>
-            
-            <div class="practice-problems">
-                <h3>Practice Problem: Base Excitation Response</h3>
-                <p>A machine with mass 100 kg is mounted on a platform using springs with total stiffness 40,000 N/m and dampers with damping coefficient 1,000 Ns/m. If the platform undergoes harmonic motion with amplitude 5 mm and frequency 10 Hz, calculate:</p>
-                <ol>
-                    <li>The natural frequency of the system</li>
-                    <li>The steady-state amplitude of the machine's motion relative to the platform</li>
-                    <li>The transmissibility ratio</li>
-                </ol>
-                
-                <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-                <div id="solution2" class="hidden">
-                    <p>a) Natural frequency:</p>
-                    <p>$\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{40,000}{100}} = 20 \text{ rad/s}$</p>
-                    <p>$f_n = \frac{\omega_n}{2\pi} = \frac{20}{2\pi} = 3.18 \text{ Hz}$</p>
-                    
-                    <p>b) Frequency ratio and damping ratio:</p>
-                    <p>$r = \frac{\omega}{\omega_n} = \frac{2\pi \times 10}{20} = 3.14$</p>
-                    <p>$\zeta = \frac{c}{2\sqrt{km}} = \frac{1,000}{2\sqrt{40,000 \times 100}} = 0.25$</p>
-                    
-                    <p>c) Relative displacement amplitude:</p>
-                    <p>$Z = Y\cdot\frac{r^2}{\sqrt{(1-r^2)^2+(2\zeta r)^2}} = 0.005 \cdot \frac{3.14^2}{\sqrt{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
-                    <p>$Z = 0.005 \cdot \frac{9.86}{\sqrt{83.27}} = 0.005 \cdot \frac{9.86}{9.13} = 0.0054 \text{ m} = 5.4 \text{ mm}$</p>
-                    
-                    <p>d) Transmissibility:</p>
-                    <p>$T_d = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}} = \sqrt{\frac{1+(2 \times 0.25 \times 3.14)^2}{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
-                    <p>$T_d = \sqrt{\frac{1+2.46}{83.27}} = \sqrt{\frac{3.46}{83.27}} = 0.204$</p>
-                    <p>The transmissibility ratio is 0.204, meaning the motion is attenuated to approximately 20.4% of the base motion.</p>
-                </div>
-            </div>
-            
+
             <h2>Summary: Key Equations Reference</h2>
             
             <div class="equation-box">
@@ -742,8 +697,57 @@
         // toggleSolution function now loaded from /assets/common/problems.js
     </script>
 
-<!-- ADDITIONAL PRACTICE PROBLEM -->
+<!-- PRACTICE PROBLEMS SECTION -->
 <div class="content-section">
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+        <h3>Practice Problem 1: Vibration Isolation Design</h3>
+        <p>A sensitive electronic device with mass 5 kg needs to be isolated from a base that vibrates with a frequency of 50 Hz. What should be the stiffness of the isolator to ensure the transmissibility is less than 0.1?</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div id="solution1" class="hidden">
+            <p>For transmissibility to be less than 0.1:</p>
+            <p>$T_d = \frac{1}{r^2} < 0.1$ (assuming high frequency, where $r \gg 1$)</p>
+            <p>$r^2 > 10$</p>
+            <p>$r > 3.16$</p>
+            <p>Since $r = \frac{\omega}{\omega_n} = \frac{2\pi \times 50}{\sqrt{k/m}}$, we need:</p>
+            <p>$2\pi \times 50 > 3.16 \times \sqrt{k/5}$</p>
+            <p>$k < \frac{(2\pi \times 50)^2 \times 5}{3.16^2} = 12,411 \text{ N/m}$</p>
+            <p>To ensure transmissibility less than 0.1, the stiffness should be less than 12,411 N/m.</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Practice Problem 2: Base Excitation Response</h3>
+        <p>A machine with mass 100 kg is mounted on a platform using springs with total stiffness 40,000 N/m and dampers with damping coefficient 1,000 Ns/m. If the platform undergoes harmonic motion with amplitude 5 mm and frequency 10 Hz, calculate:</p>
+        <ol>
+            <li>The natural frequency of the system</li>
+            <li>The steady-state amplitude of the machine's motion relative to the platform</li>
+            <li>The transmissibility ratio</li>
+        </ol>
+
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div id="solution2" class="hidden">
+            <p>a) Natural frequency:</p>
+            <p>$\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{40,000}{100}} = 20 \text{ rad/s}$</p>
+            <p>$f_n = \frac{\omega_n}{2\pi} = \frac{20}{2\pi} = 3.18 \text{ Hz}$</p>
+
+            <p>b) Frequency ratio and damping ratio:</p>
+            <p>$r = \frac{\omega}{\omega_n} = \frac{2\pi \times 10}{20} = 3.14$</p>
+            <p>$\zeta = \frac{c}{2\sqrt{km}} = \frac{1,000}{2\sqrt{40,000 \times 100}} = 0.25$</p>
+
+            <p>c) Relative displacement amplitude:</p>
+            <p>$Z = Y\cdot\frac{r^2}{\sqrt{(1-r^2)^2+(2\zeta r)^2}} = 0.005 \cdot \frac{3.14^2}{\sqrt{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
+            <p>$Z = 0.005 \cdot \frac{9.86}{\sqrt{83.27}} = 0.005 \cdot \frac{9.86}{9.13} = 0.0054 \text{ m} = 5.4 \text{ mm}$</p>
+
+            <p>d) Transmissibility:</p>
+            <p>$T_d = \sqrt{\frac{1+(2\zeta r)^2}{(1-r^2)^2+(2\zeta r)^2}} = \sqrt{\frac{1+(2 \times 0.25 \times 3.14)^2}{(1-3.14^2)^2+(2 \times 0.25 \times 3.14)^2}}$</p>
+            <p>$T_d = \sqrt{\frac{1+2.46}{83.27}} = \sqrt{\frac{3.46}{83.27}} = 0.204$</p>
+            <p>The transmissibility ratio is 0.204, meaning the motion is attenuated to approximately 20.4% of the base motion.</p>
+        </div>
+    </div>
+
     <div class="practice-problems">
         <h3>Practice Problem 3: Seismic Isolation System</h3>
         <p>A building with mass 200,000 kg is equipped with a seismic isolation system. During an earthquake, the ground experiences harmonic motion with amplitude 100 mm and frequency 2 Hz. The isolation system has:</p>
@@ -909,7 +913,7 @@ document.getElementById('submit-quiz').addEventListener('click', function() {
                 score++;
                 resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
             } else {
-                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect. Your answer: ${selectedOption.value.toUpperCase()}, Correct answer: ${correctAnswer.toUpperCase()}</p>`;
+                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
             }
         } else {
             resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;

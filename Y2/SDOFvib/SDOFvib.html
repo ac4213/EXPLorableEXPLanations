@@ -18,6 +18,8 @@
 
     <!-- External CSS -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
@@ -203,48 +205,48 @@
     </div>
 
     <div class="content-section">
-        <h2>Engineering Applications</h2>
-        
-        <p>SDOF vibration models are used extensively in engineering to analyze and design various systems:</p>
-        
+        <h2>Applications and Examples</h2>
+        <p>Single degree of freedom vibration analysis is crucial across mechanical and structural engineering. SDOF models are used extensively to analyze and design various systems:</p>
+
         <h3>Structural Engineering</h3>
         <ul>
-            <li>Simplified building analysis for earthquakes</li>
-            <li>Vibration isolation platforms</li>
-            <li>Damping system design</li>
+            <li><strong>Earthquake Engineering:</strong> Buildings and bridges are modeled as SDOF systems to predict their response to seismic excitation and design damping systems.</li>
+            <li><strong>Vibration Isolation Platforms:</strong> Sensitive equipment like electron microscopes and precision machine tools require isolation mounts designed using SDOF principles.</li>
+            <li><strong>Damping System Design:</strong> The Taipei 101 skyscraper employs a 660-ton tuned mass damper (TMD) that acts as a SDOF system, absorbing vibrational energy and significantly reducing building motion during strong winds and earthquakes.</li>
         </ul>
-        
+
         <h3>Mechanical Engineering</h3>
         <ul>
-            <li>Vehicle suspension systems</li>
-            <li>Engine mounts</li>
-            <li>Vibration absorbers</li>
-            <li>Machine foundation design</li>
+            <li><strong>Vehicle Suspension:</strong> Quarter-car models use SDOF analysis to optimize spring stiffness and damping for ride comfort and handling.</li>
+            <li><strong>Engine Mounts:</strong> Designed using SDOF principles to isolate vibration from powertrains.</li>
+            <li><strong>Vibration Absorbers:</strong> Tuned mass dampers and dynamic vibration absorbers use SDOF theory to suppress unwanted oscillations.</li>
+            <li><strong>Machine Foundation Design:</strong> Pumps, motors, and rotating machinery foundations are analyzed as SDOF systems to prevent resonance and excessive vibration.</li>
         </ul>
-        
+
         <h3>Aerospace Engineering</h3>
         <ul>
-            <li>Flutter analysis</li>
-            <li>Landing gear design</li>
-            <li>Satellite appendage modeling</li>
+            <li><strong>Flutter Analysis:</strong> Wing and control surface vibrations are initially analyzed using SDOF models.</li>
+            <li><strong>Landing Gear Design:</strong> Aircraft landing gear uses SDOF modeling for dynamic analysis and shock absorption.</li>
+            <li><strong>Satellite Appendage Modeling:</strong> Solar panels and antennas are modeled as SDOF systems for deployment analysis.</li>
         </ul>
-        
-        <div class="key-point">
-            <p><strong>Real-world Example:</strong> The Taipei 101 skyscraper in Taiwan employs a 660-ton tuned mass damper (TMD) to reduce wind-induced oscillations. The TMD acts as a SDOF system that absorbs vibrational energy and significantly reduces the building's motion during strong winds and earthquakes.</p>
-        </div>
-        
+
+        <h3>Manufacturing</h3>
+        <ul>
+            <li><strong>Impact Operations:</strong> Impact hammers, drop forges, and stamping presses are modeled as SDOF systems to predict forces and deflections.</li>
+        </ul>
+
         <h3>Frequency Response Function (FRF)</h3>
         <p>The Frequency Response Function is a fundamental tool in vibration analysis that shows how a system responds to different forcing frequencies:</p>
         <div class="equation-box">
             <p>\[H(\omega) = \frac{X(\omega)}{F(\omega)} = \frac{1/k}{[1-(\omega/\omega_n)^2]^2 + [2\zeta(\omega/\omega_n)]^2}\]</p>
         </div>
-        
+
         <p>The FRF has two components:</p>
         <ul>
             <li><strong>Amplitude ratio:</strong> Shows how the amplitude of response varies with frequency</li>
             <li><strong>Phase angle:</strong> Shows the phase shift between the input force and output displacement</li>
         </ul>
-        
+
         <h3>Effects of Damping on System Response</h3>
         <p>Damping has several important effects on SDOF systems:</p>
         <ol>
@@ -253,19 +255,6 @@
             <li>Limits the maximum amplitude ratio to \(1/(2\zeta)\) at resonance</li>
             <li>Creates a phase shift that varies from 0° at low frequencies to -180° at high frequencies, passing through -90° at resonance</li>
         </ol>
-    </div>
-
-    <div class="content-section">
-        <h2>Applications and Examples</h2>
-        <p>Single degree of freedom vibration analysis is crucial across mechanical and structural engineering:</p>
-        <ul>
-            <li><strong>Earthquake Engineering:</strong> Buildings and bridges are modeled as SDOF systems to predict their response to seismic excitation and design damping systems.</li>
-            <li><strong>Vehicle Suspension:</strong> Quarter-car models use SDOF analysis to optimize spring stiffness and damping for ride comfort and handling.</li>
-            <li><strong>Vibration Isolation:</strong> Sensitive equipment like electron microscopes and precision machine tools require isolation mounts designed using SDOF principles.</li>
-            <li><strong>Mechanical Systems:</strong> Pumps, motors, and rotating machinery foundations are analyzed as SDOF systems to prevent resonance and excessive vibration.</li>
-            <li><strong>Aerospace:</strong> Aircraft landing gear, control surfaces, and engine mounts use SDOF modeling for dynamic analysis.</li>
-            <li><strong>Manufacturing:</strong> Impact hammers, drop forges, and stamping presses are modeled as SDOF systems to predict forces and deflections.</li>
-        </ul>
     </div>
 
     <div class="content-section">

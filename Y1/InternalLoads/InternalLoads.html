@@ -29,6 +29,8 @@
 <!-- simulation script will be loaded at the end of the body -->
 
 <link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="/assets/css/problems.css">
+<link rel="stylesheet" href="/assets/css/quizzes.css">
 <link rel="stylesheet" href="/assets/css/simulations.css">
 <link rel="stylesheet" href="/assets/css/uicontrols.css">
 <style>
@@ -257,63 +259,6 @@
     
     <div class="note">
         <p>Experiment with the interactive simulations to develop an intuitive understanding of beam behaviour under various loading conditions.</p>
-    </div>
-</section>
-
-<section class="theory-container">
-    <h2>Practice Problems</h2>
-    
-    <div class="example">
-        <h3>Problem 1: Simply Supported Beam</h3>
-        <p>A simply supported beam of length 4m carries a point load of 10 kN at a distance of 1m from the left support. Calculate:</p>
-        <ol>
-            <li>The reaction forces at the supports</li>
-            <li>The maximum bending moment in the beam</li>
-            <li>The position where the maximum bending moment occurs</li>
-        </ol>
-        
-        <details>
-            <summary>View Solution</summary>
-            <p><strong>Step 1:</strong> Calculate the reaction forces using equilibrium equations.</p>
-            <p>Taking moments about the left support:</p>
-            <p>\[\sum M_A = 0: B_y \times 4 - 10 \times 1 = 0\]</p>
-            <p>\[B_y = \frac{10 \times 1}{4} = 2.5 \text{ kN}\]</p>
-            
-            <p>Vertical equilibrium:</p>
-            <p>\[\sum F_y = 0: A_y + B_y - 10 = 0\]</p>
-            <p>\[A_y = 10 - 2.5 = 7.5 \text{ kN}\]</p>
-            
-            <p><strong>Step 2:</strong> The maximum bending moment occurs under the point load.</p>
-            <p>\[M_{max} = A_y \times 1 = 7.5 \times 1 = 7.5 \text{ kNm}\]</p>
-            
-            <p><strong>Step 3:</strong> The position where maximum bending moment occurs is at 1m from the left support.</p>
-        </details>
-    </div>
-    
-    <div class="example">
-        <h3>Problem 2: Cantilever Beam</h3>
-        <p>A cantilever beam of length 2m has a uniformly distributed load of 5 kN/m along its entire length. Calculate:</p>
-        <ol>
-            <li>The reaction force and moment at the fixed end</li>
-            <li>The maximum bending moment in the beam</li>
-        </ol>
-        
-        <details>
-            <summary>View Solution</summary>
-            <p><strong>Step 1:</strong> Calculate the reaction force and moment.</p>
-            <p>Total distributed load = 5 kN/m × 2m = 10 kN</p>
-            <p>This acts at the center of the beam, i.e., at 1m from the fixed end.</p>
-            
-            <p>Vertical equilibrium:</p>
-            <p>\[\sum F_y = 0: A_y - 10 = 0\]</p>
-            <p>\[A_y = 10 \text{ kN}\]</p>
-            
-            <p>Moment equilibrium about the fixed end:</p>
-            <p>\[\sum M_A = 0: M_A - 10 \times 1 = 0\]</p>
-            <p>\[M_A = 10 \text{ kNm}\]</p>
-            
-            <p><strong>Step 2:</strong> The maximum bending moment occurs at the fixed end and equals 10 kNm.</p>
-        </details>
     </div>
 </section>
 
