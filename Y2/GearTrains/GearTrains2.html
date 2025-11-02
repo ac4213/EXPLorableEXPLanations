@@ -30,18 +30,6 @@
             background-color: #f5f5f5;
         }
 
-        .info-display {
-            background-color: #e6f7ff;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            font-family: monospace;
-        }
-
-        .info-display p {
-            margin: 5px 0;
-        }
-
         .gear-type-selector {
             display: flex;
             gap: 10px;
@@ -75,7 +63,7 @@
             position: relative;
         }
 
-        /* Canvas container with info box overlay */
+        /* Canvas container */
         #involute-simulation,
         #simple-gear-simulation,
         #compound-gear-simulation,
@@ -85,69 +73,6 @@
             justify-content: center;
             align-items: center;
             margin: 20px 0;
-        }
-
-        /* Info display positioned at top-left of canvas */
-        .simulation-section .info-display {
-            position: absolute;
-            top: 30px;
-            left: 10px;
-            z-index: 5;
-            min-width: 220px;
-            max-width: 280px;
-            font-size: 11px;
-            line-height: 1.4;
-        }
-
-        .simulation-section .info-display p {
-            margin: 3px 0;
-        }
-
-        /* Compact controls - pack horizontally */
-        .gear-controls {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            padding: 12px;
-        }
-
-        .gear-controls .control-row {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .gear-controls label {
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
-
-        .gear-controls input[type="range"] {
-            width: 100%;
-        }
-
-        .gear-controls select {
-            padding: 5px;
-            font-size: 13px;
-        }
-
-        .gear-controls button {
-            padding: 8px 12px;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .gear-controls {
-                grid-template-columns: 1fr;
-            }
-
-            .simulation-section .info-display {
-                position: static;
-                margin: 10px 0;
-            }
         }
 
     </style>
@@ -269,13 +194,6 @@
                 <span id="input-speed-simple-value">50</span>
             </div>
         </div>
-        
-        <div class="info-display">
-            <p>Gear Ratio (Driven/Driver): <span id="gear-ratio-simple">2.00</span></p>
-            <p>Gear Ratio (Driver/Driven): <span id="gear-ratio-simple-unity">1:2.00</span></p>
-            <p>Output Speed: <span id="output-speed-simple">15.00 RPM</span></p>
-            <p>Output Direction: <span id="output-direction-simple">Counter-clockwise</span></p>
-        </div>
     </div>
 
     <div class="simulation-section">
@@ -310,17 +228,6 @@
                 <input type="range" id="input-speed-compound" min="10" max="100" value="50">
                 <span id="input-speed-compound-value">50</span>
             </div>
-        </div>
-        
-        <div class="info-display">
-            <p>Stage 1 Ratio (Driven/Driver): <span id="stage1-ratio"></span></p>
-            <p>Stage 1 Ratio (Driver/Driven): <span id="stage1-ratio-unity"></span></p>
-            <p>Stage 2 Ratio (Driven/Driver): <span id="stage2-ratio"></span></p>
-            <p>Stage 2 Ratio (Driver/Driven): <span id="stage2-ratio-unity"></span></p>
-            <p>Overall Ratio (Driven/Driver): <span id="overall-ratio"></span></p>
-            <p>Overall Ratio (Driver/Driven): <span id="overall-ratio-unity"></span></p>
-            <p>Intermediate Speed: <span id="intermediate-speed"></span></p>
-            <p>Output Speed: <span id="output-speed-compound"></span></p>
         </div>
 
         <div class="equation-box">
@@ -364,16 +271,6 @@
                 <input type="range" id="input-speed-epicyclic" min="10" max="100" value="30">
                 <span id="input-speed-epicyclic-value">30</span>
             </div>
-        </div>
-        
-        <div class="info-display">
-            <p>Ring Teeth: <span id="ring-teeth-value"></span></p>
-            <p>Input Component: <span id="input-component"></span></p>
-            <p>Sun Speed: <span id="sun-speed"></span></p>
-            <p>Carrier Speed: <span id="carrier-speed"></span></p>
-            <p>Ring Speed: <span id="ring-speed"></span></p>
-            <p>Gear Ratio (Output/Input): <span id="epicyclic-ratio"></span></p>
-            <p>Gear Ratio (Input/Output): <span id="epicyclic-ratio-unity"></span></p>
         </div>
 
         <div class="equation-box">

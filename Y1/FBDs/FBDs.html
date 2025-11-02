@@ -18,8 +18,10 @@
     <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
-    <!-- Your script goes here -->
-    <script src="FBDsfixed.js"></script>
+    <!-- Simulation scripts -->
+    <script src="ladderSimulation.js" defer></script>
+    <script src="pulleyBeamSimulation.js" defer></script>
+    <script src="trafficLightSimulation.js" defer></script>
 </head>
 
 <body>
@@ -141,52 +143,111 @@
             <p>Magnitude: \(T \geq 0\)</p>
             <p>For massless cables: tension is constant throughout</p>
         </div>
+
+        <div class="equation-box">
+            <h4>Spring Forces</h4>
+            <p><strong>Hooke's Law:</strong> \(F = k \Delta x\)</p>
+            <p>Where \(k\) is the spring constant (stiffness) and \(\Delta x\) is the extension/compression</p>
+            <p>Springs can both pull (tension) and push (compression)</p>
+            <p>Force is proportional to deformation from natural length</p>
+        </div>
     </div>
 
+    <!-- SIMULATION 1: Ladder Equilibrium -->
     <div class="simulation-section">
-        <h2>Interactive Free Body Diagram Builder</h2>
-        <p>Build your own free body diagram by selecting supports and adding loads. Click and drag to position elements.</p>
-        
-        <div id="sketch-holder">
-            <!-- Our sketch will go here! -->
-        </div>
-        
-        <div id="button-container">
-            <!-- Buttons will be added by p5.js -->
-        </div>
-        
+        <h2>Simulation 1: Ladder Equilibrium (Smooth and Rough Contact)</h2>
+        <p>This simulation demonstrates a classic equilibrium problem: a ladder leaning against a smooth (frictionless) wall, with its base on rough (friction) ground. A person stands on the ladder. Explore how friction at the ground prevents the ladder from slipping.</p>
+
+        <div id="ladder-sketch"></div>
+
         <div class="interactive-controls">
+            <h3>Controls</h3>
             <div class="control-group">
-                <label for="load-select">Add Load:</label>
-                <select id="load-select">
-                    <option value="point">Point Force</option>
-                    <option value="moment">Moment</option>
-                    <option value="distributed">Distributed Load</option>
-                </select>
+                <label>Ladder Angle (degrees from horizontal): <span id="angle-value">60</span></label>
+                <div id="ladder-controls"></div>
             </div>
-            
             <div class="control-group">
-                <label for="support-select">Add Support:</label>
-                <select id="support-select">
-                    <option value="roller">Roller</option>
-                    <option value="pin">Pin</option>
-                    <option value="fixed">Fixed</option>
-                </select>
+                <label>Coefficient of Friction at Ground (μ): <span id="mu-value">0.50</span></label>
             </div>
-            
             <div class="control-group">
-                <label for="show-reactions">Show Reactions:</label>
-                <input type="checkbox" id="show-reactions" checked>
+                <label>Person Mass (kg): <span id="person-mass-value">70</span></label>
+            </div>
+            <div class="control-group">
+                <label>Person Position (% from bottom): <span id="person-pos-value">70</span></label>
+            </div>
+            <div class="control-group">
+                <label>Select FBD to display:</label>
+                <div id="ladder-fbd-selector"></div>
             </div>
         </div>
 
-        <h3>Instructions</h3>
+        <h3>Key Concepts</h3>
         <ul>
-            <li>Select a beam type from the presets or build your own</li>
-            <li>Click to add forces and supports at different locations</li>
-            <li>Toggle "Show Reactions" to see the support reaction forces</li>
-            <li>Drag elements to reposition them</li>
-            <li>Click "Clear" to start over</li>
+            <li><strong>Smooth Contact (Wall):</strong> Provides only a normal force perpendicular to the surface. No friction.</li>
+            <li><strong>Rough Contact (Ground):</strong> Provides both a normal force and a friction force parallel to the surface.</li>
+            <li><strong>Friction Requirement:</strong> For equilibrium, the required friction force must not exceed \(f_{max} = \mu_s N\).</li>
+            <li><strong>Three Equilibrium Equations:</strong> \(\sum F_x = 0\), \(\sum F_y = 0\), and \(\sum M = 0\) must all be satisfied.</li>
+        </ul>
+    </div>
+
+    <!-- SIMULATION 2: Pulley and Beam with Distributed Load -->
+    <div class="simulation-section">
+        <h2>Simulation 2: Pulley System with Beam Weight</h2>
+        <p>This simulation shows a horizontal pinned beam with weight (distributed uniformly along its length), lifted by a cable that wraps around a pulley and goes horizontally to a wall. The cable force must equal half the beam weight to maintain equilibrium.</p>
+
+        <div id="pulley-sketch"></div>
+
+        <div class="interactive-controls">
+            <h3>Controls</h3>
+            <div class="control-group">
+                <label>Beam Weight (N): <span id="beam-weight-value">500</span></label>
+                <div id="pulley-controls"></div>
+            </div>
+            <div class="control-group">
+                <label>Select FBD to display:</label>
+                <div id="pulley-fbd-selector"></div>
+            </div>
+        </div>
+
+        <h3>Key Concepts</h3>
+        <ul>
+            <li><strong>Beam Weight as Distributed Load:</strong> The weight of a uniform beam acts as a uniformly distributed load (UDL) along its entire length.</li>
+            <li><strong>UDL Resultant:</strong> The resultant of a uniformly distributed load acts at the centroid (center) of the beam.</li>
+            <li><strong>Cable Forces:</strong> Cables can only pull (never push). The force is transmitted through the cable.</li>
+            <li><strong>Pulleys:</strong> Redirect the direction of cable forces. For massless, frictionless pulleys, the force magnitude remains constant throughout the cable.</li>
+            <li><strong>Pin Support:</strong> Provides two reaction force components but allows rotation.</li>
+            <li><strong>Moment Equilibrium:</strong> For a horizontal beam, taking moments about the pin: \(F \cdot L = W \cdot \frac{L}{2}\), which gives \(F = \frac{W}{2}\). The cable force equals half the beam weight.</li>
+            <li><strong>Force Equilibrium:</strong> The horizontal cable to the wall requires a horizontal pin reaction \(A_x = F\), while the vertical pin reaction is \(A_y = W - F = \frac{W}{2}\).</li>
+        </ul>
+    </div>
+
+    <!-- SIMULATION 3: Traffic Light with Springs -->
+    <div class="simulation-section">
+        <h2>Simulation 3: Traffic Light Suspended by Springs</h2>
+        <p>This simulation demonstrates a traffic light suspended by two springs at 45° angles. It shows how spring forces follow Hooke's Law and how the system reaches equilibrium based on spring stiffness and the weight of the traffic light.</p>
+
+        <div id="traffic-sketch"></div>
+
+        <div class="interactive-controls">
+            <h3>Controls</h3>
+            <div class="control-group">
+                <label>Spring 1 Stiffness k₁ (N/m): <span id="k1-value">1</span></label>
+                <div id="traffic-controls"></div>
+            </div>
+            <div class="control-group">
+                <label>Spring 2 Stiffness k₂ (N/m): <span id="k2-value">1</span></label>
+            </div>
+            <div class="control-group">
+                <label>Traffic Light Mass (kg): <span id="mass-value">20</span></label>
+            </div>
+        </div>
+
+        <h3>Key Concepts</h3>
+        <ul>
+            <li><strong>Spring Forces (Hooke's Law):</strong> Force is proportional to extension: \(F = k \Delta x\)</li>
+            <li><strong>Spring Stiffness (k):</strong> Measures how much force is needed to extend/compress a spring by unit length.</li>
+            <li><strong>Equilibrium Position:</strong> The traffic light settles at a height where the vertical components of spring tensions balance its weight.</li>
+            <li><strong>Force Resolution:</strong> Springs pull at angles, so forces must be resolved into components.</li>
         </ul>
     </div>
 
@@ -294,7 +355,7 @@
         <div class="practice-problems">
             <h3>Problem 3: Inclined Member with Friction</h3>
             <p>A 100 kg block rests on a 30° incline. The coefficient of static friction is 0.3. Draw the FBD and determine if the block will slide.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
             <div id="solution3" class="hidden">
                 <p><strong>Given:</strong></p>
@@ -303,25 +364,179 @@
                     <li>Angle: θ = 30°</li>
                     <li>μ_s = 0.3</li>
                 </ul>
-                
+
                 <p><strong>Forces on FBD:</strong></p>
                 <ul>
                     <li>Weight: W = 981 N (downward)</li>
                     <li>Normal force: N (perpendicular to incline)</li>
                     <li>Friction: f (up the incline)</li>
                 </ul>
-                
+
                 <p><strong>Force components:</strong></p>
                 <p>Perpendicular to incline: \(N = W \cos 30° = 981 \times 0.866 = 849.5 \text{ N}\)</p>
                 <p>Parallel to incline: \(W \sin 30° = 981 \times 0.5 = 490.5 \text{ N}\)</p>
-                
+
                 <p><strong>Maximum static friction:</strong></p>
                 <p>\(f_{max} = \mu_s N = 0.3 \times 849.5 = 254.9 \text{ N}\)</p>
-                
+
                 <p><strong>Conclusion:</strong></p>
                 <p>Since \(W \sin 30° = 490.5 \text{ N} > f_{max} = 254.9 \text{ N}\)</p>
                 <p>The block will slide down the incline.</p>
             </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Ladder Against a Smooth Wall</h3>
+            <p>A uniform 5-metre ladder of mass 20 kg leans against a smooth vertical wall at an angle of 60° from the horizontal ground. A person of mass 80 kg stands at 70% of the ladder's length from the bottom. If the coefficient of static friction at the ground is 0.4, will the ladder slip?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Ladder length: L = 5 m</li>
+                    <li>Ladder mass: m_L = 20 kg, person mass: m_P = 80 kg</li>
+                    <li>Angle: θ = 60° from horizontal</li>
+                    <li>Person position: 70% from bottom = 0.7L</li>
+                    <li>μ_s = 0.4 at ground</li>
+                </ul>
+
+                <p><strong>Forces on FBD:</strong></p>
+                <ul>
+                    <li>Weight of ladder: W_L = 20 × 9.81 = 196.2 N (at L/2 = 2.5 m)</li>
+                    <li>Weight of person: W_P = 80 × 9.81 = 784.8 N (at 0.7L = 3.5 m)</li>
+                    <li>Normal from wall: N_w (horizontal, at top of ladder)</li>
+                    <li>Normal from ground: N_g (vertical, at base)</li>
+                    <li>Friction from ground: f (horizontal, at base)</li>
+                </ul>
+
+                <p><strong>Equilibrium equations:</strong></p>
+                <p>Taking moments about the base (anticlockwise positive):</p>
+                <p>\(\sum M_{base} = 0\): \(N_w L \sin 60° - W_L \frac{L}{2} \cos 60° - W_P (0.7L) \cos 60° = 0\)</p>
+                <p>\(N_w \times 5 \times 0.866 - 196.2 \times 2.5 \times 0.5 - 784.8 \times 3.5 \times 0.5 = 0\)</p>
+                <p>\(4.33 N_w - 245.25 - 1373.4 = 0\)</p>
+                <p>\(N_w = \frac{1618.65}{4.33} = 373.9 \text{ N}\)</p>
+
+                <p>Horizontal equilibrium:</p>
+                <p>\(\sum F_x = 0\): \(f - N_w = 0\) → \(f = 373.9 \text{ N}\)</p>
+
+                <p>Vertical equilibrium:</p>
+                <p>\(\sum F_y = 0\): \(N_g - W_L - W_P = 0\) → \(N_g = 196.2 + 784.8 = 981 \text{ N}\)</p>
+
+                <p><strong>Check friction:</strong></p>
+                <p>\(f_{max} = \mu_s N_g = 0.4 \times 981 = 392.4 \text{ N}\)</p>
+                <p>Since \(f = 373.9 \text{ N} < f_{max} = 392.4 \text{ N}\)</p>
+
+                <p><strong>Conclusion:</strong></p>
+                <p>The ladder will NOT slip. The required friction force is less than the maximum available.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 5: Traffic Light Suspended by Cables</h3>
+            <p>A 25 kg traffic light is suspended by two cables attached at angles of 30° and 45° from the horizontal. Calculate the tension in each cable.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution5')">Show Solution</p>
+            <div id="solution5" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Mass: m = 25 kg</li>
+                    <li>Cable 1 angle: θ₁ = 30° from horizontal</li>
+                    <li>Cable 2 angle: θ₂ = 45° from horizontal</li>
+                    <li>Weight: W = 25 × 9.81 = 245.25 N</li>
+                </ul>
+
+                <p><strong>Forces on traffic light FBD:</strong></p>
+                <ul>
+                    <li>Tension T₁ in cable 1 (at 30° angle)</li>
+                    <li>Tension T₂ in cable 2 (at 45° angle)</li>
+                    <li>Weight W = 245.25 N (downward)</li>
+                </ul>
+
+                <p><strong>Equilibrium equations:</strong></p>
+                <p>Horizontal equilibrium:</p>
+                <p>\(\sum F_x = 0\): \(T_1 \cos 30° - T_2 \cos 45° = 0\)</p>
+                <p>\(0.866 T_1 = 0.707 T_2\) ... (1)</p>
+
+                <p>Vertical equilibrium:</p>
+                <p>\(\sum F_y = 0\): \(T_1 \sin 30° + T_2 \sin 45° - W = 0\)</p>
+                <p>\(0.5 T_1 + 0.707 T_2 = 245.25\) ... (2)</p>
+
+                <p>From equation (1): \(T_1 = \frac{0.707}{0.866} T_2 = 0.816 T_2\)</p>
+
+                <p>Substituting into equation (2):</p>
+                <p>\(0.5 \times 0.816 T_2 + 0.707 T_2 = 245.25\)</p>
+                <p>\(0.408 T_2 + 0.707 T_2 = 245.25\)</p>
+                <p>\(1.115 T_2 = 245.25\)</p>
+                <p>\(T_2 = 220.0 \text{ N}\)</p>
+
+                <p>Therefore: \(T_1 = 0.816 \times 220.0 = 179.5 \text{ N}\)</p>
+
+                <p><strong>Answer:</strong></p>
+                <p>Cable 1 tension: 179.5 N</p>
+                <p>Cable 2 tension: 220.0 N</p>
+            </div>
+        </div>
+
+        <h2>Summary</h2>
+        <div class="key-point">
+            <h3>Essential Concepts</h3>
+            <p>Free Body Diagrams are fundamental tools in engineering mechanics that allow us to systematically analyze forces and achieve equilibrium. Here are the key takeaways from this lecture:</p>
+
+            <h4>1. What is a Free Body Diagram?</h4>
+            <ul>
+                <li>A graphical representation showing a body isolated from its surroundings</li>
+                <li>Shows ALL external forces and moments acting on the body</li>
+                <li>Does NOT show internal forces, velocities, or accelerations</li>
+            </ul>
+
+            <h4>2. Types of Forces</h4>
+            <ul>
+                <li><strong>Active Forces:</strong> Externally applied loads (point forces, moments, distributed loads, weight)</li>
+                <li><strong>Reactive Forces:</strong> Forces from supports and constraints (normal forces, friction, support reactions)</li>
+                <li><strong>Special Forces:</strong> Cables (tension only), springs (Hooke's Law: F = kΔx), normal forces (perpendicular to surface)</li>
+            </ul>
+
+            <h4>3. Support Types (2D)</h4>
+            <ul>
+                <li><strong>Roller:</strong> 1 reaction (perpendicular to surface), allows translation and rotation</li>
+                <li><strong>Pin:</strong> 2 reactions (horizontal and vertical), allows rotation</li>
+                <li><strong>Fixed:</strong> 2 reactions + 1 moment, prevents all movement and rotation</li>
+                <li><strong>Collar:</strong> 1 reaction + 1 moment, allows translation along guide</li>
+            </ul>
+
+            <h4>4. Contact Conditions</h4>
+            <ul>
+                <li><strong>Smooth Contact:</strong> Frictionless surface providing only normal force perpendicular to surface</li>
+                <li><strong>Rough Contact:</strong> Surface with friction providing both normal and friction forces (f ≤ μN)</li>
+            </ul>
+
+            <h4>5. Equilibrium Conditions (2D)</h4>
+            <p>For a body in static equilibrium, three equations must be satisfied:</p>
+            <ul>
+                <li>\(\sum F_x = 0\) - Sum of horizontal forces equals zero</li>
+                <li>\(\sum F_y = 0\) - Sum of vertical forces equals zero</li>
+                <li>\(\sum M_O = 0\) - Sum of moments about any point O equals zero</li>
+            </ul>
+
+            <h4>6. Systematic FBD Drawing Procedure</h4>
+            <ol>
+                <li>Isolate the body of interest from its surroundings</li>
+                <li>Draw the body's outline or simplified representation</li>
+                <li>Add all active forces (applied loads, weight, moments)</li>
+                <li>Replace supports with their reaction forces/moments</li>
+                <li>Add coordinate system and label all forces clearly</li>
+                <li>Apply equilibrium equations to solve for unknowns</li>
+            </ol>
+
+            <h4>7. Key Principles to Remember</h4>
+            <ul>
+                <li>Distributed loads can be replaced by their resultant at the centroid</li>
+                <li>Massless cables have constant tension throughout</li>
+                <li>Pulleys redirect cable forces but maintain tension (if massless and frictionless)</li>
+                <li>Two-force members have equal, opposite, collinear forces</li>
+                <li>Three-force members have concurrent or parallel forces</li>
+                <li>Check static determinacy: compare unknowns vs. available equations</li>
+            </ul>
         </div>
 
         <h2>Knowledge Check Quiz</h2>
@@ -437,8 +652,79 @@
     <script>
         // Page-specific JavaScript
 
+        // Update slider value displays
+        function setupSliderValueDisplays() {
+            // Wait for p5.js to create sliders - try multiple times if needed
+            function trySetupLadderSliders(attempts = 0) {
+                const ladderControls = document.getElementById('ladder-controls');
+                if (ladderControls) {
+                    const sliders = ladderControls.querySelectorAll('input[type="range"]');
+                    if (sliders.length >= 4) {
+                        sliders[0].addEventListener('input', (e) => {
+                            const val = document.getElementById('angle-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                        sliders[1].addEventListener('input', (e) => {
+                            const val = document.getElementById('mu-value');
+                            if (val) val.textContent = parseFloat(e.target.value).toFixed(2);
+                        });
+                        sliders[2].addEventListener('input', (e) => {
+                            const val = document.getElementById('person-mass-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                        sliders[3].addEventListener('input', (e) => {
+                            const val = document.getElementById('person-pos-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                        console.log('Ladder sliders initialized');
+                    } else if (attempts < 10) {
+                        setTimeout(() => trySetupLadderSliders(attempts + 1), 200);
+                    }
+                }
+            }
+
+            setTimeout(() => trySetupLadderSliders(), 500);
+
+            // Pulley simulation sliders
+            setTimeout(() => {
+                const pulleyControls = document.getElementById('pulley-controls');
+                if (pulleyControls) {
+                    const sliders = pulleyControls.querySelectorAll('input[type="range"]');
+                    if (sliders.length >= 1) {
+                        sliders[0].addEventListener('input', (e) => {
+                            const val = document.getElementById('beam-weight-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                    }
+                }
+            }, 1000);
+
+            // Traffic light simulation sliders
+            setTimeout(() => {
+                const trafficControls = document.getElementById('traffic-controls');
+                if (trafficControls) {
+                    const sliders = trafficControls.querySelectorAll('input[type="range"]');
+                    if (sliders.length >= 3) {
+                        sliders[0].addEventListener('input', (e) => {
+                            const val = document.getElementById('k1-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                        sliders[1].addEventListener('input', (e) => {
+                            const val = document.getElementById('k2-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                        sliders[2].addEventListener('input', (e) => {
+                            const val = document.getElementById('mass-value');
+                            if (val) val.textContent = e.target.value;
+                        });
+                    }
+                }
+            }, 1000);
+        }
+
         // Quiz functionality (custom for this page)
         document.addEventListener('DOMContentLoaded', function() {
+            setupSliderValueDisplays();
             const quizBtn = document.getElementById('submit-quiz');
             if (quizBtn) {
                 quizBtn.addEventListener('click', function() {

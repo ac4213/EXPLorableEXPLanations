@@ -5,18 +5,89 @@
 
 /* ==================== CONTROL PANELS ==================== */
 
-/* Standard Controls Panel */
-.controls-panel {
+/* Standard Controls Panel - Compact Horizontal Layout */
+.controls-panel,
+.simulation-controls,
+.control-panel,
+.gear-controls {
     background-color: #f9f9f9;
     border-radius: 8px;
-    padding: 15px;
+    padding: 12px 15px;
     margin: 15px 0;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 15px 20px;
     align-items: center;
-    justify-content: center;
+}
+
+/* Control rows - inline horizontal layout */
+.controls-panel .control-row,
+.controls-panel .slider-row,
+.controls-panel .slider-container,
+.simulation-controls .control-row,
+.simulation-controls .slider-row,
+.simulation-controls .slider-container,
+.control-panel .control-row,
+.control-panel .slider-row,
+.control-panel .slider-container,
+.gear-controls .control-row,
+.gear-controls .slider-row,
+.gear-controls .slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+/* Labels inline with controls */
+.controls-panel label,
+.simulation-controls label,
+.control-panel label,
+.gear-controls label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Sliders with compact width */
+.controls-panel input[type="range"],
+.simulation-controls input[type="range"],
+.control-panel input[type="range"],
+.gear-controls input[type="range"] {
+    width: 120px;
+    flex-shrink: 0;
+}
+
+/* Value display spans */
+.controls-panel span,
+.simulation-controls span,
+.control-panel span,
+.gear-controls span {
+    font-size: 13px;
+    min-width: 30px;
+    text-align: center;
+    font-family: monospace;
+}
+
+/* Dropdowns compact */
+.controls-panel select,
+.simulation-controls select,
+.control-panel select,
+.gear-controls select {
+    max-width: 200px;
+}
+
+/* Buttons */
+.controls-panel button,
+.simulation-controls button,
+.control-panel button,
+.gear-controls button {
+    font-size: 13px;
 }
 
 /* ==================== SLIDERS ==================== */
@@ -78,21 +149,39 @@
 
 /* Slider Styling */
 input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: linear-gradient(to right, #e8e8e8, #ddd);
+    background: #e0e0e0;
+    border: 1px solid #d0d0d0;
     outline: none;
-    transition: background 0.3s;
     cursor: pointer;
+    /* Modern browsers accent color for native slider fill */
+    accent-color: var(--primary-color, #ffd700);
 }
 
 input[type="range"]:hover {
-    background: linear-gradient(to right, #d4d4d4, #c8c8c8);
+    background: #d0d0d0;
+    border: 1px solid #c0c0c0;
 }
 
 input[type="range"]:focus {
-    background: linear-gradient(to right, #ffe9a3, #ffd966);
+    background: #e0e0e0;
+    outline: none;
+}
+
+/* Disabled slider styling */
+input[type="range"]:disabled {
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    cursor: not-allowed;
+}
+
+input[type="range"]:disabled:hover {
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
 }
 
 /* Input Number Styling */
@@ -117,6 +206,26 @@ label {
     margin-bottom: 5px;
 }
 
+/* Slider Track - Webkit browsers (Chrome, Edge, Safari) */
+input[type="range"]::-webkit-slider-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #e0e0e0;
+    border: 1px solid #d0d0d0;
+}
+
+input[type="range"]:hover::-webkit-slider-track {
+    background: #d0d0d0;
+    border: 1px solid #c0c0c0;
+}
+
+/* Disabled slider track - Webkit */
+input[type="range"]:disabled::-webkit-slider-track {
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
+}
+
 /* Slider Thumb - Webkit browsers */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -129,12 +238,28 @@ input[type="range"]::-webkit-slider-thumb {
     border: 3px solid #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     transition: all 0.3s;
+    /* Center thumb on 6px track: (20 - 6) / 2 = 7px */
+    margin-top: -1px;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
     background: var(--secondary-color, #ffb300);
     transform: scale(1.1);
     box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+/* Disabled slider thumb - Webkit */
+input[type="range"]:disabled::-webkit-slider-thumb {
+    background: #bbb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb:hover {
+    background: #bbb;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* Slider Thumb - Firefox */
@@ -155,11 +280,32 @@ input[type="range"]::-moz-range-thumb:hover {
     box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 
+/* Disabled slider thumb - Firefox */
+input[type="range"]:disabled::-moz-range-thumb {
+    background: #bbb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+input[type="range"]:disabled::-moz-range-thumb:hover {
+    background: #bbb;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
 /* Slider Track - Firefox */
 input[type="range"]::-moz-range-track {
-    background: linear-gradient(to right, #e8e8e8, #ddd);
+    background: #e0e0e0;
     border-radius: 3px;
     height: 6px;
+    border: 1px solid #d0d0d0;
+}
+
+/* Disabled slider track - Firefox */
+input[type="range"]:disabled::-moz-range-track {
+    background: #f0f0f0;
+    border: 1px solid #e0e0e0;
 }
 
 /* ==================== CHECKBOXES ==================== */
@@ -210,14 +356,69 @@ label:has(input[type="checkbox"]) {
     margin: 5px 0;
 }
 
+/* ==================== DROPDOWNS / SELECT ==================== */
+
+/* Golden dropdown styling */
+select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+    color: var(--text-color, #333);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+select:hover {
+    border-color: var(--secondary-color, #ffb300);
+    background-color: #fffbeb;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--primary-color, #ffd700);
+    background-color: #fffbeb;
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
 /* ==================== BUTTONS ==================== */
 
-/* Ensure buttons are responsive */
+/* Golden button styling */
 button,
 .control-button {
     min-width: 80px;
-    padding: 8px 16px;
+    padding: 10px 16px;
+    background-color: var(--primary-color, #ffd700);
+    color: var(--text-color, #333);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s;
     white-space: nowrap;
+}
+
+button:hover,
+.control-button:hover {
+    background-color: var(--secondary-color, #ffb300);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+button:active,
+.control-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+button:disabled,
+.control-button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+    transform: none;
 }
 
 /* ==================== SIMULATION HOLDERS ==================== */
@@ -236,175 +437,64 @@ button,
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
-/* Large screens - desktop, laptop, tablets in landscape mode */
-/* Ensure consecutive sliders fit in a single row */
+/* Desktop/Laptop - maximize horizontal packing (≥1025px) */
 @media (min-width: 1025px) {
-    .simulation-controls,
     .controls-panel,
-    .control-panel {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px 15px;
-        align-items: center;
+    .simulation-controls,
+    .control-panel,
+    .gear-controls {
+        gap: 12px 25px;
     }
 
-    .slider-row {
-        flex: 1 1 auto;
-        flex-wrap: nowrap;
-        gap: 10px;
-        margin-bottom: 0;
-        min-width: 0; /* Allow shrinking */
-    }
-
-    .slider-label {
-        flex: 0 0 auto;
-        min-width: 60px;
-        max-width: 100px;
-        font-size: 0.9em;
-        margin-bottom: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .slider-row input[type="range"] {
-        flex: 1 1 auto;
-        min-width: 100px;
-        max-width: none;
-        margin-bottom: 0;
-    }
-
-    .slider-row input[type="number"] {
-        flex: 0 0 auto;
-        width: 65px;
-        max-width: 65px;
-    }
-
-    /* Dynamic width calculation for multiple consecutive sliders */
-    /* 2 sliders in a row */
-    .simulation-controls .slider-row:nth-child(2):nth-last-child(1),
-    .simulation-controls .slider-row:first-child:nth-last-child(2),
-    .controls-panel .slider-row:nth-child(2):nth-last-child(1),
-    .controls-panel .slider-row:first-child:nth-last-child(2),
-    .control-panel .slider-row:nth-child(2):nth-last-child(1),
-    .control-panel .slider-row:first-child:nth-last-child(2) {
-        flex: 0 1 calc(50% - 10px);
-    }
-
-    /* 3 sliders in a row */
-    .simulation-controls .slider-row:nth-child(3):nth-last-child(1),
-    .simulation-controls .slider-row:nth-child(2):nth-last-child(2),
-    .simulation-controls .slider-row:first-child:nth-last-child(3),
-    .controls-panel .slider-row:nth-child(3):nth-last-child(1),
-    .controls-panel .slider-row:nth-child(2):nth-last-child(2),
-    .controls-panel .slider-row:first-child:nth-last-child(3),
-    .control-panel .slider-row:nth-child(3):nth-last-child(1),
-    .control-panel .slider-row:nth-child(2):nth-last-child(2),
-    .control-panel .slider-row:first-child:nth-last-child(3) {
-        flex: 0 1 calc(33.333% - 10px);
-    }
-
-    /* 4 sliders in a row */
-    .simulation-controls .slider-row:nth-child(4):nth-last-child(1),
-    .simulation-controls .slider-row:nth-child(3):nth-last-child(2),
-    .simulation-controls .slider-row:nth-child(2):nth-last-child(3),
-    .simulation-controls .slider-row:first-child:nth-last-child(4),
-    .controls-panel .slider-row:nth-child(4):nth-last-child(1),
-    .controls-panel .slider-row:nth-child(3):nth-last-child(2),
-    .controls-panel .slider-row:nth-child(2):nth-last-child(3),
-    .controls-panel .slider-row:first-child:nth-last-child(4),
-    .control-panel .slider-row:nth-child(4):nth-last-child(1),
-    .control-panel .slider-row:nth-child(3):nth-last-child(2),
-    .control-panel .slider-row:nth-child(2):nth-last-child(3),
-    .control-panel .slider-row:first-child:nth-last-child(4) {
-        flex: 0 1 calc(25% - 12px);
-    }
-
-    /* 5 sliders in a row */
-    .simulation-controls .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5),
-    .controls-panel .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5),
-    .control-panel .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5) {
-        flex: 0 1 calc(20% - 12px);
-    }
-
-    /* 6+ sliders in a row */
-    .simulation-controls .slider-row:nth-child(n+6),
-    .controls-panel .slider-row:nth-child(n+6),
-    .control-panel .slider-row:nth-child(n+6) {
-        flex: 0 1 calc(16.666% - 13px);
+    .controls-panel input[type="range"],
+    .simulation-controls input[type="range"],
+    .control-panel input[type="range"],
+    .gear-controls input[type="range"] {
+        width: 150px;
     }
 }
 
-/* Tablets in landscape mode - compact side-by-side sliders */
-@media (min-width: 577px) and (max-width: 1024px) and (orientation: landscape) {
-    .simulation-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px 12px;
-        align-items: center;
-    }
-
-    .slider-row {
-        flex: 0 1 auto;
-        flex-wrap: nowrap;
-        gap: 5px;
-        margin-bottom: 0;
-    }
-
-    .slider-label {
-        flex: 0 0 auto;
-        min-width: 50px;
-        max-width: 75px;
-        font-size: 0.75em;
-        margin-bottom: 0;
-    }
-
-    .slider-row input[type="range"] {
-        flex: 0 0 70px;
-        width: 70px;
-        min-width: 70px;
-        margin-bottom: 0;
-    }
-
-    .slider-row input[type="number"] {
-        flex: 0 0 auto;
-        width: 50px;
-        max-width: 50px;
-        font-size: 0.75em;
-        padding: 3px;
+/* Tablets landscape - still compact (769px-1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .controls-panel input[type="range"],
+    .simulation-controls input[type="range"],
+    .control-panel input[type="range"],
+    .gear-controls input[type="range"] {
+        width: 130px;
     }
 }
 
+/* Tablets portrait and phones - allow more rows (≤768px) */
 @media (max-width: 768px) {
-    .controls-panel {
-        flex-direction: column;
+    .controls-panel,
+    .simulation-controls,
+    .control-panel,
+    .gear-controls {
+        gap: 10px 15px;
         padding: 12px;
     }
 
-    /* Keep sliders compact - label, slider, and number on same line for tablets */
-    .slider-row {
-        flex-wrap: nowrap;
-        gap: 8px;
-    }
-
-    .slider-label {
-        flex: 0 0 auto;
-        min-width: 70px;
-        max-width: 100px;
-        margin-bottom: 0;
-        font-size: 0.9em;
-    }
-
-    .slider-row input[type="range"] {
+    .controls-panel .control-row,
+    .controls-panel .slider-row,
+    .controls-panel .slider-container,
+    .simulation-controls .control-row,
+    .simulation-controls .slider-row,
+    .simulation-controls .slider-container,
+    .control-panel .control-row,
+    .control-panel .slider-row,
+    .control-panel .slider-container,
+    .gear-controls .control-row,
+    .gear-controls .slider-row,
+    .gear-controls .slider-container {
         flex: 1 1 auto;
-        min-width: 100px;
-        margin-bottom: 0;
+        min-width: 250px;
     }
 
-    .slider-row input[type="number"] {
-        flex: 0 0 auto;
-        width: 65px;
-        max-width: 65px;
+    .controls-panel input[type="range"],
+    .simulation-controls input[type="range"],
+    .control-panel input[type="range"],
+    .gear-controls input[type="range"] {
+        width: 100px;
     }
 
     .sim-holder {
@@ -412,32 +502,37 @@ button,
     }
 }
 
+/* Small phones - stack more (≤576px) */
 @media (max-width: 576px) {
-    .controls-panel {
+    .controls-panel,
+    .simulation-controls,
+    .control-panel,
+    .gear-controls {
         padding: 10px;
         gap: 10px;
     }
 
-    /* Compact sliders for small phones */
-    .slider-row {
-        gap: 6px;
+    .controls-panel .control-row,
+    .controls-panel .slider-row,
+    .controls-panel .slider-container,
+    .simulation-controls .control-row,
+    .simulation-controls .slider-row,
+    .simulation-controls .slider-container,
+    .control-panel .control-row,
+    .control-panel .slider-row,
+    .control-panel .slider-container,
+    .gear-controls .control-row,
+    .gear-controls .slider-row,
+    .gear-controls .slider-container {
+        flex: 1 1 100%;
     }
 
-    .slider-label {
-        font-size: 0.85em;
-        min-width: 60px;
-        max-width: 85px;
-    }
-
-    .slider-row input[type="range"] {
-        min-width: 80px;
-    }
-
-    .slider-row input[type="number"] {
-        width: 60px;
-        max-width: 60px;
-        font-size: 0.85em;
-        padding: 3px;
+    .controls-panel input[type="range"],
+    .simulation-controls input[type="range"],
+    .control-panel input[type="range"],
+    .gear-controls input[type="range"] {
+        flex: 1 1 auto;
+        width: auto;
     }
 
     .sim-holder {
@@ -445,27 +540,29 @@ button,
     }
 }
 
+/* Extra small phones (≤320px) */
 @media (max-width: 320px) {
-    /* Extra compact sliders for very small screens */
-    .slider-row {
-        gap: 4px;
+    .controls-panel,
+    .simulation-controls,
+    .control-panel,
+    .gear-controls {
+        gap: 8px;
+        padding: 8px;
     }
 
-    .slider-label {
-        min-width: 50px;
-        max-width: 70px;
-        font-size: 0.8em;
+    .controls-panel label,
+    .simulation-controls label,
+    .control-panel label,
+    .gear-controls label {
+        font-size: 12px;
     }
 
-    .slider-row input[type="range"] {
-        min-width: 60px;
-    }
-
-    .slider-row input[type="number"] {
-        width: 50px;
-        max-width: 50px;
-        font-size: 0.8em;
-        padding: 2px;
+    .controls-panel span,
+    .simulation-controls span,
+    .control-panel span,
+    .gear-controls span {
+        font-size: 12px;
+        min-width: 25px;
     }
 
     .sim-holder {

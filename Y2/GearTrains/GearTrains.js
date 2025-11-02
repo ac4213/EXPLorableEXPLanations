@@ -365,9 +365,32 @@ const simpleGearSimulation = function(p) {
             drawGear(p, idlerX, idlerY, idlerRadius, idlerTeeth, idlerAngle, p.color(100,200,100), "Idler");
         }
 
-        // Info
+        // Info panel on canvas (right side)
         const gearRatio = drivenTeeth / driverTeeth;
-        updateSimpleGearInfo(gearRatio, inputSpeed, includeIdler);
+        const outputSpeed = inputSpeed / gearRatio;
+        const outputDirection = includeIdler ? "Same as driver" : "Opposite to driver";
+
+        p.push();
+        p.fill(230, 247, 255);
+        p.stroke(100, 180, 220);
+        p.strokeWeight(2);
+        p.rect(p.width - 280, 50, 260, 160, 5);
+
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT);
+        p.textSize(12);
+        let yPos = 70;
+        p.text("Gear Ratio (Driven/Driver): " + gearRatio.toFixed(2), p.width - 270, yPos);
+        yPos += 20;
+        p.text("Gear Ratio (Driver/Driven): 1:" + gearRatio.toFixed(2), p.width - 270, yPos);
+        yPos += 20;
+        p.text("Output Speed: " + outputSpeed.toFixed(2) + " RPM", p.width - 270, yPos);
+        yPos += 20;
+        p.text("Output Direction:", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + outputDirection, p.width - 270, yPos);
+        p.pop();
 
         // Title
         p.fill(0);
@@ -494,14 +517,6 @@ const simpleGearSimulation = function(p) {
     }
 
 
-    function updateSimpleGearInfo(ratio, speed, hasIdler) {
-        document.getElementById('gear-ratio-simple').textContent = ratio.toFixed(2);
-        // Unity numerator format: 1:X
-        document.getElementById('gear-ratio-simple-unity').textContent = "1:" + ratio.toFixed(2);
-        document.getElementById('output-speed-simple').textContent = (speed / ratio).toFixed(2) + " RPM";
-        document.getElementById('output-direction-simple').textContent =
-            hasIdler ? "Same as driver" : "Opposite to driver";
-    }
 };
 
 
@@ -660,7 +675,7 @@ const compoundGearSimulation = function(p) {
         let shaftY = p.height / 2;
 
         // Dynamically position shafts so teeth mesh
-        let shaft1X = 180;
+        let shaft1X = 110;
         let shaft2X = shaft1X + r1 + r2; // mesh stage1
         let shaft3X = shaft2X + r3 + r4; // mesh stage2
 
@@ -699,20 +714,42 @@ const compoundGearSimulation = function(p) {
         p.text("Shaft 2", shaft2X, shaftY + 130);
         p.text("Shaft 3", shaft3X, shaftY + 130);
 
-        // Update info display
-        updateCompoundGearInfo(stage1Ratio, stage2Ratio, overallRatio, inputSpeed);
-    };
+        // Info panel on canvas (right side)
+        const intermediateSpeed = inputSpeed / stage1Ratio;
+        const outputSpeed = inputSpeed / overallRatio;
 
-    function updateCompoundGearInfo(ratio1, ratio2, overall, speed) {
-        document.getElementById('stage1-ratio').textContent = ratio1.toFixed(2);
-        document.getElementById('stage1-ratio-unity').textContent = "1:" + ratio1.toFixed(2);
-        document.getElementById('stage2-ratio').textContent = ratio2.toFixed(2);
-        document.getElementById('stage2-ratio-unity').textContent = "1:" + ratio2.toFixed(2);
-        document.getElementById('overall-ratio').textContent = overall.toFixed(2);
-        document.getElementById('overall-ratio-unity').textContent = "1:" + overall.toFixed(2);
-        document.getElementById('intermediate-speed').textContent = (speed / ratio1).toFixed(2) + " RPM";
-        document.getElementById('output-speed-compound').textContent = (speed / overall).toFixed(2) + " RPM";
-    }
+        p.push();
+        p.fill(230, 247, 255);
+        p.stroke(100, 180, 220);
+        p.strokeWeight(2);
+        p.rect(p.width - 280, 50, 260, 200, 5);
+
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT);
+        p.textSize(12);
+        let yPos = 70;
+        p.text("Stage 1 Ratio (Driven/Driver):", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + stage1Ratio.toFixed(2) + " (1:" + stage1Ratio.toFixed(2) + ")", p.width - 270, yPos);
+        yPos += 20;
+        p.text("Stage 2 Ratio (Driven/Driver):", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + stage2Ratio.toFixed(2) + " (1:" + stage2Ratio.toFixed(2) + ")", p.width - 270, yPos);
+        yPos += 20;
+        p.text("Overall Ratio (Driven/Driver):", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + overallRatio.toFixed(2) + " (1:" + overallRatio.toFixed(2) + ")", p.width - 270, yPos);
+        yPos += 20;
+        p.text("Intermediate Speed:", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + intermediateSpeed.toFixed(2) + " RPM", p.width - 270, yPos);
+        yPos += 20;
+        p.text("Output Speed:", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + outputSpeed.toFixed(2) + " RPM", p.width - 270, yPos);
+        p.pop();
+    };
 };
 
 
@@ -868,7 +905,6 @@ const epicyclicGearSimulation = function(p) {
 
         // Calculate ring teeth
         let ringTeeth = sunTeeth + 2 * planetTeeth;
-        document.getElementById('ring-teeth-value').textContent = ringTeeth;
 
         // Gear radii
         let moduleSize = 2;
@@ -878,7 +914,7 @@ const epicyclicGearSimulation = function(p) {
         let carrierRadius = sunRadius + planetRadius;
 
         // Centre
-        let cx = p.width / 2;
+        let cx = p.width / 2 - 100;
         let cy = p.height / 2;
 
         // Calculate speeds based on fixed component
@@ -948,21 +984,10 @@ const epicyclicGearSimulation = function(p) {
         p.fill(255, 0, 0);
         p.text("Fixed: " + fixedComponent.toUpperCase(), p.width / 2, 60);
 
-        // Update info display
-        updateEpicyclicInfo(sunSpeed, carrierSpeed, ringSpeed, ringTeeth);
-    };
-
-    function updateEpicyclicInfo(sunSpeed, carrierSpeed, ringSpeed, ringTeeth) {
+        // Calculate info for display
         let sunRPM = sunSpeed * 10;
         let carrierRPM = carrierSpeed * 10;
         let ringRPM = ringSpeed * 10;
-
-        document.getElementById('sun-speed').textContent =
-            fixedComponent === 'sun' ? "0.00 RPM (Fixed)" : sunRPM.toFixed(2) + " RPM";
-        document.getElementById('carrier-speed').textContent =
-            fixedComponent === 'carrier' ? "0.00 RPM (Fixed)" : carrierRPM.toFixed(2) + " RPM";
-        document.getElementById('ring-speed').textContent =
-            fixedComponent === 'ring' ? "0.00 RPM (Fixed)" : ringRPM.toFixed(2) + " RPM";
 
         // Determine input component and calculate gear ratio
         let ratio = 1;
@@ -983,10 +1008,40 @@ const epicyclicGearSimulation = function(p) {
             outputComponent = 'Ring';
         }
 
-        document.getElementById('input-component').textContent = inputComponent + ' → ' + outputComponent;
-        document.getElementById('epicyclic-ratio').textContent = Math.abs(ratio).toFixed(2);
-        document.getElementById('epicyclic-ratio-unity').textContent = "1:" + Math.abs(ratio).toFixed(2);
-    }
+        // Info panel on canvas (right side)
+        p.push();
+        p.fill(230, 247, 255);
+        p.stroke(100, 180, 220);
+        p.strokeWeight(2);
+        p.rect(p.width - 280, 90, 260, 200, 5);
+
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT);
+        p.textSize(12);
+        let yPos = 110;
+        p.text("Ring Teeth: " + ringTeeth, p.width - 270, yPos);
+        yPos += 20;
+        p.text("Input: " + inputComponent + " → " + outputComponent, p.width - 270, yPos);
+        yPos += 20;
+
+        let sunText = fixedComponent === 'sun' ? "0.00 RPM (Fixed)" : sunRPM.toFixed(2) + " RPM";
+        p.text("Sun Speed: " + sunText, p.width - 270, yPos);
+        yPos += 20;
+
+        let carrierText = fixedComponent === 'carrier' ? "0.00 RPM (Fixed)" : carrierRPM.toFixed(2) + " RPM";
+        p.text("Carrier Speed: " + carrierText, p.width - 270, yPos);
+        yPos += 20;
+
+        let ringText = fixedComponent === 'ring' ? "0.00 RPM (Fixed)" : ringRPM.toFixed(2) + " RPM";
+        p.text("Ring Speed: " + ringText, p.width - 270, yPos);
+        yPos += 20;
+
+        p.text("Gear Ratio (Output/Input):", p.width - 270, yPos);
+        yPos += 18;
+        p.text("  " + Math.abs(ratio).toFixed(2) + " (1:" + Math.abs(ratio).toFixed(2) + ")", p.width - 270, yPos);
+        p.pop();
+    };
 };
 
 

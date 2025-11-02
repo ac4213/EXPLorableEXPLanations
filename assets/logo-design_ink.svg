@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   viewBox="0 0 300 100"
+   viewBox="0 0 300 105"
    version="1.1"
    id="svg938"
    sodipodi:docname="logo-design_ink.svg"
@@ -32,7 +32,7 @@
   <!-- Background -->
   <rect
      width="300"
-     height="100"
+     height="105"
      rx="10"
      ry="10"
      fill="#fffbeb"
@@ -43,7 +43,7 @@
   <text
      x="92.290077"
      y="59.61832"
-     font-family="Arial, sans-serif"
+     font-family="'Permanent Marker', Arial, sans-serif"
      font-size="24px"
      font-weight="bold"
      text-anchor="middle"
@@ -51,7 +51,7 @@
      fill="#333333"
      id="text902"
      style="font-size:64px"><tspan
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333;fill-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Permanent Marker', Arial, sans-serif;-inkscape-font-specification:'Permanent Marker';fill:#333333;fill-opacity:1"
        id="tspan43117">EXPL</tspan></text>
   <!-- Interactive Element Icons -->
   <g
@@ -168,7 +168,7 @@
   <!-- Tagline -->
   <text
      x="150"
-     y="95"
+     y="98"
      font-family="Arial, sans-serif"
      font-size="12"
      text-anchor="middle"
@@ -180,7 +180,7 @@
   <!-- Golden Border -->
   <rect
      width="300"
-     height="100"
+     height="105"
      rx="10"
      ry="10"
      fill="none"
@@ -189,7 +189,7 @@
      id="rect936" />
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.2;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+     style="font-style:normal;font-weight:normal;font-size:24px;line-height:1.2;font-family:'Permanent Marker', sans-serif;fill:#000000;fill-opacity:1;stroke:none"
      x="177.87787"
      y="30.229008"
      id="text12000"><tspan
@@ -197,10 +197,10 @@
        id="tspan11998"
        x="177.87787"
        y="30.229008"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333">orable</tspan><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Permanent Marker', sans-serif;-inkscape-font-specification:'Permanent Marker';fill:#333333">orable</tspan><tspan
        sodipodi:role="line"
        x="177.87787"
        y="59.300266"
        id="tspan13370"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:24px;font-family:Chalkduster;-inkscape-font-specification:'Chalkduster Bold';fill:#333333">anations</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Permanent Marker', sans-serif;-inkscape-font-specification:'Permanent Marker';fill:#333333">anations</tspan></text>
 </svg>
