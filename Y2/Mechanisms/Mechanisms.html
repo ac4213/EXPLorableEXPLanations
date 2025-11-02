@@ -788,7 +788,7 @@
                     let vAy = omega * A.x;
 
                     drawArrow(p, A.x, A.y, A.x + vAx * 0.5 * SCALE, A.y + vAy * 0.5 * SCALE, [0,170,0]);
-                    
+
                     // Calculate velocity of B
                     let rAB = p.createVector(B.x - A.x, B.y - A.y);
                     let rB = p.createVector(B.x - O4.x, B.y - O4.y);
@@ -799,26 +799,27 @@
                     ];
                     let rhs = [-vAx, -vAy];
                     let det = M[0][0]*M[1][1] - M[0][1]*M[1][0];
-                    
+
                     if (Math.abs(det) > 0.001) {
                         let omega3 = (rhs[0]*M[1][1] - rhs[1]*M[0][1]) / det;
                         let omega4 = (M[0][0]*rhs[1] - M[1][0]*rhs[0]) / det;
-                        
+
                         let vBx = -omega4 * rB.y;
                         let vBy = omega4 * rB.x;
                         drawArrow(p, B.x, B.y, B.x + vBx * 0.5 * SCALE, B.y + vBy * 0.5 * SCALE, [0,170,0]);
                     }
+                }
 
-                    // Acceleration Analysis
-                    if (showAcceleration) {
-                        let aAtx = -alpha * A.y;
-                        let aAty = alpha * A.x;
-                        let aAcx = -omega * omega * A.x;
-                        let aAcy = -omega * omega * A.y;
-                        
-                        drawArrow(p, A.x, A.y, A.x + aAtx * 0.2 * SCALE, A.y + aAty * 0.2 * SCALE, [0,0,255]);
-                        drawArrow(p, A.x, A.y, A.x + aAcx * 0.2 * SCALE, A.y + aAcy * 0.2 * SCALE, [255,0,0]);
-                    }
+                // Acceleration Analysis
+                if (showAcceleration) {
+                    p.strokeWeight(2);
+                    let aAtx = -alpha * A.y;
+                    let aAty = alpha * A.x;
+                    let aAcx = -omega * omega * A.x;
+                    let aAcy = -omega * omega * A.y;
+
+                    drawArrow(p, A.x, A.y, A.x + aAtx * 0.2 * SCALE, A.y + aAty * 0.2 * SCALE, [0,0,255]);
+                    drawArrow(p, A.x, A.y, A.x + aAcx * 0.2 * SCALE, A.y + aAcy * 0.2 * SCALE, [255,0,0]);
                 }
 
                 // Display values
@@ -1089,12 +1090,18 @@ let slidercrankSketch = function(p) {
 // Whitworth Quick-Return Mechanism - refined (centered, graph fixed, QRR shown)
 let quickreturnSketch = function(p) {
     // Kinematic state
-    let omega = 1.0;    
-    let alpha = 0.0;    
-    let theta = 0.0;    
+    let omega = 1.0;
+    let alpha = 0.0;
+    let theta = 0.0;
 
     // UI
     let isPaused = false;
+    let showVelocity = false;
+    let showAcceleration = false;
+
+    // Vector scaling factors (adjust these to make arrows visible)
+    const VELOCITY_SCALE = 0.8;
+    const ACCELERATION_SCALE = 2.0;
 
     // Canvas sizing
     let canvasWidth = 600;
@@ -1223,6 +1230,56 @@ let quickreturnSketch = function(p) {
         p.ellipse(0, -6*SCALE, 6*SCALE, 6*SCALE);
         p.pop();
 
+        // --- Velocity Analysis ---
+        if (showVelocity) {
+            p.strokeWeight(2);
+
+            // Velocity of crank pin A
+            let vAx = -omega * R * p.sin(theta);
+            let vAy = omega * R * p.cos(theta);
+            drawArrow(p, Ax, Ay, Ax + vAx * VELOCITY_SCALE, Ay + vAy * VELOCITY_SCALE, [0, 170, 0]);
+
+            // Angular velocity of lever
+            let rAC = p.sqrt((Ax - pivotCx) * (Ax - pivotCx) + (Ay - pivotCy) * (Ay - pivotCy));
+            let omegaLever = (vAx * (Ay - pivotCy) - vAy * (Ax - pivotCx)) / (rAC * rAC);
+
+            // Velocity of slider (perpendicular component)
+            let vSx = vAx - omegaLever * (Ay - pivotCy);
+            let vSy = 0; // constrained to horizontal
+            drawArrow(p, Sx, Sy, Sx + vSx * VELOCITY_SCALE, Sy, [0, 170, 0]);
+        }
+
+        // --- Acceleration Analysis ---
+        if (showAcceleration) {
+            p.strokeWeight(2);
+
+            // Tangential acceleration of crank pin A
+            let aAtx = -alpha * R * p.sin(theta);
+            let aAty = alpha * R * p.cos(theta);
+
+            // Centripetal acceleration of crank pin A
+            let aAcx = -omega * omega * R * p.cos(theta);
+            let aAcy = -omega * omega * R * p.sin(theta);
+
+            // Total acceleration of A
+            let aAx = aAtx + aAcx;
+            let aAy = aAty + aAcy;
+            drawArrow(p, Ax, Ay, Ax + aAx * ACCELERATION_SCALE, Ay + aAy * ACCELERATION_SCALE, [255, 0, 0]);
+
+            // Angular velocity and acceleration of lever
+            let rAC = p.sqrt((Ax - pivotCx) * (Ax - pivotCx) + (Ay - pivotCy) * (Ay - pivotCy));
+            let vAx = -omega * R * p.sin(theta);
+            let vAy = omega * R * p.cos(theta);
+            let omegaLever = (vAx * (Ay - pivotCy) - vAy * (Ax - pivotCx)) / (rAC * rAC);
+
+            // Angular acceleration of lever (using time derivative)
+            let alphaLever = (aAx * (Ay - pivotCy) - aAy * (Ax - pivotCx) - 2 * omegaLever * (vAx * (Ay - pivotCy) - vAy * (Ax - pivotCx))) / (rAC * rAC);
+
+            // Slider acceleration (horizontal component)
+            let aSx = aAx - alphaLever * (Ay - pivotCy) - omegaLever * omegaLever * (Ax - pivotCx) - 2 * omegaLever * vAy;
+            drawArrow(p, Sx, Sy, Sx + aSx * ACCELERATION_SCALE, Sy, [255, 0, 0]);
+        }
+
         p.pop(); // restore origin
 
         // --- Graph (slider vs θ) ---
@@ -1292,17 +1349,12 @@ let quickreturnSketch = function(p) {
 
         // --- Info box at top left ---
         p.push();
-        p.translate(15, 15);
-        p.fill(230, 247, 255, 220);
-        p.stroke(100, 150, 200);
-        p.strokeWeight(1);
-        p.rect(0, 0, 180, 100, 5);
+        p.translate(15, 0);
 
         p.noStroke();
         p.fill(0);
         p.textAlign(p.LEFT, p.TOP);
         p.textSize(13);
-        p.text("Mechanism Info", 8, 8);
         p.textSize(12);
         p.text(`θ = ${(theta % (2*p.PI)).toFixed(2)} rad`, 8, 28);
         p.text(`ω = ${omega.toFixed(2)} rad/s`, 8, 45);
@@ -1310,6 +1362,18 @@ let quickreturnSketch = function(p) {
         p.text(`QRR ≈ ${QRR}`, 8, 79);
         p.pop();
     };
+
+    function drawArrow(p, x1, y1, x2, y2, col=[0,0,0]) {
+        p.stroke(col[0], col[1], col[2]);
+        p.line(x1, y1, x2, y2);
+        let angle = p.atan2(y2 - y1, x2 - x1);
+        p.push();
+        p.translate(x2, y2);
+        p.rotate(angle);
+        p.line(0, 0, -8, -4);
+        p.line(0, 0, -8, 4);
+        p.pop();
+    }
 
     // Controls (same IDs)
     const safeGet = id => document.getElementById(id);
@@ -1319,6 +1383,8 @@ let quickreturnSketch = function(p) {
     let eReset = safeGet('quickreturn-reset');
     let eOmegaDisp = safeGet('quickreturn-omega-display');
     let eAlphaDisp = safeGet('quickreturn-alpha-display');
+    let eShowVelocity = safeGet('quickreturn-show-velocity');
+    let eShowAcceleration = safeGet('quickreturn-show-acceleration');
 
     if (eOmega) {
         eOmega.addEventListener('input', function(e) {
@@ -1330,6 +1396,16 @@ let quickreturnSketch = function(p) {
         eAlpha.addEventListener('input', function(e) {
             alpha = parseFloat(e.target.value);
             if (eAlphaDisp) eAlphaDisp.textContent = alpha.toFixed(2) + ' rad/s²';
+        });
+    }
+    if (eShowVelocity) {
+        eShowVelocity.addEventListener('change', function(e) {
+            showVelocity = e.target.checked;
+        });
+    }
+    if (eShowAcceleration) {
+        eShowAcceleration.addEventListener('change', function(e) {
+            showAcceleration = e.target.checked;
         });
     }
     if (ePause) {
