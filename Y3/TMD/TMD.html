@@ -564,7 +564,7 @@
 
         <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
         <div id="solution3" class="hidden">
-            <h4>Solution:</h4>
+            
             <p><strong>(a) Mass ratio:</strong></p>
             <p>\[\mu = \frac{m_{TMD}}{m_{structure}} = \frac{50,000}{5,000,000} = 0.01 = 1\%\]</p>
 
@@ -625,99 +625,105 @@
 </div>
 
 <div class="content-section">
-    <h2>Knowledge Check Quiz</h2>
-
     <div class="quiz-container">
+        <h2>Knowledge Check Quiz</h2>
+
         <div class="quiz-question">
-            <p><strong>Question 1:</strong> What is the primary purpose of a Tuned Mass Damper?</p>
-            <form id="q1">
-                <input type="radio" id="q1a" name="q1" value="a">
-                <label for="q1a">a) To increase the natural frequency of a structure</label><br>
-                <input type="radio" id="q1b" name="q1" value="b">
-                <label for="q1b">b) To absorb vibrational energy and reduce motion</label><br>
-                <input type="radio" id="q1c" name="q1" value="c">
-                <label for="q1c">c) To amplify structural vibrations</label><br>
-                <input type="radio" id="q1d" name="q1" value="d">
-                <label for="q1d">d) To eliminate all vibrations completely</label><br>
-                <button type="button" onclick="checkAnswer('q1', 'b')">Check Answer</button>
-            </form>
-            <div id="q1-feedback" class="feedback"></div>
+            <h3>Question 1: What is the primary purpose of a Tuned Mass Damper?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> To increase the natural frequency of a structure</label>
+                <label><input type="radio" name="q1" value="b"> To absorb vibrational energy and reduce motion</label>
+                <label><input type="radio" name="q1" value="c"> To amplify structural vibrations</label>
+                <label><input type="radio" name="q1" value="d"> To eliminate all vibrations completely</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 2:</strong> For optimal TMD performance, what should the mass ratio μ typically be?</p>
-            <form id="q2">
-                <input type="radio" id="q2a" name="q2" value="a">
-                <label for="q2a">a) 0.5 to 1.0</label><br>
-                <input type="radio" id="q2b" name="q2" value="b">
-                <label for="q2b">b) 0.1 to 0.3</label><br>
-                <input type="radio" id="q2c" name="q2" value="c">
-                <label for="q2c">c) 0.01 to 0.05</label><br>
-                <input type="radio" id="q2d" name="q2" value="d">
-                <label for="q2d">d) Greater than 1.0</label><br>
-                <button type="button" onclick="checkAnswer('q2', 'c')">Check Answer</button>
-            </form>
-            <div id="q2-feedback" class="feedback"></div>
+            <h3>Question 2: For optimal TMD performance, what should the mass ratio μ typically be?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> 0.5 to 1.0</label>
+                <label><input type="radio" name="q2" value="b"> 0.1 to 0.3</label>
+                <label><input type="radio" name="q2" value="c"> 0.01 to 0.05</label>
+                <label><input type="radio" name="q2" value="d"> Greater than 1.0</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 3:</strong> How does a TMD reduce structural vibrations?</p>
-            <form id="q3">
-                <input type="radio" id="q3a" name="q3" value="a">
-                <label for="q3a">a) By moving in phase with the structure</label><br>
-                <input type="radio" id="q3b" name="q3" value="b">
-                <label for="q3b">b) By moving out of phase to create an opposing force</label><br>
-                <input type="radio" id="q3c" name="q3" value="c">
-                <label for="q3c">c) By increasing structural stiffness</label><br>
-                <input type="radio" id="q3d" name="q3" value="d">
-                <label for="q3d">d) By locking the structure in place</label><br>
-                <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
-            </form>
-            <div id="q3-feedback" class="feedback"></div>
+            <h3>Question 3: How does a TMD reduce structural vibrations?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> By moving in phase with the structure</label>
+                <label><input type="radio" name="q3" value="b"> By moving out of phase to create an opposing force</label>
+                <label><input type="radio" name="q3" value="c"> By increasing structural stiffness</label>
+                <label><input type="radio" name="q3" value="d"> By locking the structure in place</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 4:</strong> What happens if a TMD is tuned slightly off the structural frequency?</p>
-            <form id="q4">
-                <input type="radio" id="q4a" name="q4" value="a">
-                <label for="q4a">a) It becomes completely ineffective</label><br>
-                <input type="radio" id="q4b" name="q4" value="b">
-                <label for="q4b">b) It can still provide some vibration reduction but at reduced efficiency</label><br>
-                <input type="radio" id="q4c" name="q4" value="c">
-                <label for="q4c">c) It amplifies structural vibrations</label><br>
-                <input type="radio" id="q4d" name="q4" value="d">
-                <label for="q4d">d) It has no effect whatsoever</label><br>
-                <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-            </form>
-            <div id="q4-feedback" class="feedback"></div>
+            <h3>Question 4: What happens if a TMD is tuned slightly off the structural frequency?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> It becomes completely ineffective</label>
+                <label><input type="radio" name="q4" value="b"> It can still provide some vibration reduction but at reduced efficiency</label>
+                <label><input type="radio" name="q4" value="c"> It amplifies structural vibrations</label>
+                <label><input type="radio" name="q4" value="d"> It has no effect whatsoever</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 5:</strong> In the frequency response curve of a structure with a TMD, what characteristic feature indicates successful tuning?</p>
-            <form id="q5">
-                <input type="radio" id="q5a" name="q5" value="a">
-                <label for="q5a">a) A single sharp resonance peak</label><br>
-                <input type="radio" id="q5b" name="q5" value="b">
-                <label for="q5b">b) Two smaller peaks with a valley between them (fixed points)</label><br>
-                <input type="radio" id="q5c" name="q5" value="c">
-                <label for="q5c">c) Complete elimination of all peaks</label><br>
-                <input type="radio" id="q5d" name="q5" value="d">
-                <label for="q5d">d) A shift of the peak to a higher frequency</label><br>
-                <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
-            </form>
-            <div id="q5-feedback" class="feedback"></div>
+            <h3>Question 5: In the frequency response curve of a structure with a TMD, what characteristic feature indicates successful tuning?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> A single sharp resonance peak</label>
+                <label><input type="radio" name="q5" value="b"> Two smaller peaks with a valley between them (fixed points)</label>
+                <label><input type="radio" name="q5" value="c"> Complete elimination of all peaks</label>
+                <label><input type="radio" name="q5" value="d"> A shift of the peak to a higher frequency</label>
+            </div>
         </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
     </div>
 </div>
-
-<script>
-// toggleSolution function now loaded from /assets/common/problems.js
-// checkAnswer function now loaded from /assets/common/quizzes.js
-</script>
 
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz handler for TMD
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // To absorb vibrational energy and reduce motion
+                q2: 'c',  // 0.01 to 0.05
+                q3: 'b',  // By moving out of phase to create an opposing force
+                q4: 'b',  // It can still provide some vibration reduction but at reduced efficiency
+                q5: 'b'   // Two smaller peaks with a valley between them (fixed points)
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
 
 </body>
 <footer>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plasticity in Bending - Interactive Lecture (Monotone NA)</title>
+  <title>Plasticity in Bending - Interactive Lecture</title>
   <!-- p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
   <!-- MathJax -->
@@ -174,13 +174,13 @@
   <div class="equation-box">
     <h3>Key Concepts</h3>
     <ol>
-      <li><strong>Elastic Moment Capacity:</strong> When the extreme fibre first reaches yield stress:
+      <li><strong>Elastic Limit Load:</strong> When the extreme fibre first reaches yield stress:
         \[M_e = \frac{\sigma_y I}{y_{max}} = \sigma_y S\]
         where \(S = I/y_{max}\) is the elastic section modulus.</li>
-      <li><strong>Plastic Moment Capacity:</strong> When the entire section is fully plastic:
+      <li><strong>Plastic Limit Load:</strong> When the entire section is fully plastic:
         \[M_p = \sigma_y Z\]
         where \(Z\) is the plastic section modulus, defined as the first moment of area about the plastic neutral axis (bisectrix).</li>
-      <li><strong>Shape Factor:</strong> The ratio of plastic to elastic moment capacity:
+      <li><strong>Shape Factor:</strong> The ratio of plastic to Elastic Limit Load:
         \[f = \frac{M_p}{M_e} = \frac{Z}{S}\]
         For a rectangle: \(f = 1.5\); for an I-section: \(f \approx 1.15\)</li>
       <li><strong>Plastic Neutral Axis:</strong> The axis that divides the cross-section into two equal areas (not the centroid for asymmetric sections).</li>
@@ -228,7 +228,7 @@
         <td>Relates second moment of area to elastic bending resistance</td>
       </tr>
       <tr>
-        <td>Elastic Moment Capacity</td>
+        <td>Elastic Limit Load</td>
         <td>\(M_e = \sigma_y S\)</td>
         <td>Moment when extreme fibre first reaches yield stress</td>
       </tr>
@@ -238,7 +238,7 @@
         <td>First moment of area about plastic neutral axis</td>
       </tr>
       <tr>
-        <td>Plastic Moment Capacity</td>
+        <td>Plastic Limit Load</td>
         <td>\(M_p = \sigma_y Z\)</td>
         <td>Moment when entire section reaches yield stress</td>
       </tr>
@@ -253,22 +253,21 @@
 
 <!-- PRACTICE PROBLEMS SECTION -->
 <div class="content-section">
-  <div class="practice-problems">
-    <h2>Practice Problems</h2>
+  <h2>Practice Problems</h2>
 
-    <h3>Problem 1: Plastic Moment Capacity of Rectangular Section</h3>
+  <div class="practice-problems">
+    <h3>Problem 1: Plastic Limit Load of Rectangular Section</h3>
     <p>A rectangular steel beam has width \(b = 150\) mm and depth \(h = 300\) mm. The yield stress is \(\sigma_y = 275\) MPa. Calculate:</p>
     <ol type="a">
       <li>The elastic section modulus \(S\)</li>
       <li>The plastic section modulus \(Z\)</li>
-      <li>The elastic moment capacity \(M_e\)</li>
-      <li>The plastic moment capacity \(M_p\)</li>
+      <li>The Elastic Limit Load \(M_e\)</li>
+      <li>The Plastic Limit Load \(M_p\)</li>
       <li>The shape factor \(f\)</li>
     </ol>
 
-    <button onclick="toggleSolution('solution1')">Show Solution</button>
+    <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
     <div id="solution1" class="hidden">
-      <h4>Solution:</h4>
       <p><strong>(a) Elastic Section Modulus:</strong></p>
       <p>\[I = \frac{bh^3}{12} = \frac{150 \times 300^3}{12} = 337.5 \times 10^6 \text{ mm}^4\]</p>
       <p>\[S = \frac{I}{y_{max}} = \frac{337.5 \times 10^6}{150} = 2.25 \times 10^6 \text{ mm}^3\]</p>
@@ -277,17 +276,19 @@
       <p>For a rectangle, the plastic neutral axis is at mid-depth. The plastic modulus is:</p>
       <p>\[Z = 2 \times \left(\frac{bh}{2} \times \frac{h}{4}\right) = \frac{bh^2}{4} = \frac{150 \times 300^2}{4} = 3.375 \times 10^6 \text{ mm}^3\]</p>
 
-      <p><strong>(c) Elastic Moment Capacity:</strong></p>
+      <p><strong>(c) Elastic Limit Load:</strong></p>
       <p>\[M_e = \sigma_y S = 275 \times 2.25 \times 10^6 = 618.75 \times 10^6 \text{ N·mm} = 618.75 \text{ kN·m}\]</p>
 
-      <p><strong>(d) Plastic Moment Capacity:</strong></p>
+      <p><strong>(d) Plastic Limit Load:</strong></p>
       <p>\[M_p = \sigma_y Z = 275 \times 3.375 \times 10^6 = 928.1 \times 10^6 \text{ N·mm} = 928.1 \text{ kN·m}\]</p>
 
       <p><strong>(e) Shape Factor:</strong></p>
       <p>\[f = \frac{M_p}{M_e} = \frac{928.1}{618.75} = 1.50\]</p>
       <p>This confirms the theoretical shape factor of 1.5 for rectangular sections.</p>
     </div>
+  </div>
 
+  <div class="practice-problems">
     <h3>Problem 2: Partially Plastic Moment</h3>
     <p>Consider the same rectangular section from Problem 1 (\(b = 150\) mm, \(h = 300\) mm, \(\sigma_y = 275\) MPa). If a bending moment of \(M = 750\) kN·m is applied, determine:</p>
     <ol type="a">
@@ -296,9 +297,8 @@
       <li>The stress distribution</li>
     </ol>
 
-    <button onclick="toggleSolution('solution2')">Show Solution</button>
+    <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
     <div id="solution2" class="hidden">
-      <h4>Solution:</h4>
       <p><strong>(a) Classification:</strong></p>
       <p>From Problem 1: \(M_e = 618.75\) kN·m and \(M_p = 928.1\) kN·m</p>
       <p>Since \(M_e < M = 750 < M_p\), the section is in the <strong>elastic-plastic state</strong>.</p>
@@ -321,14 +321,15 @@
         <li>Bottom \(36.2\) mm: \(\sigma = -\sigma_y = -275\) MPa (plastic, compression)</li>
       </ul>
     </div>
+  </div>
 
+  <div class="practice-problems">
     <h3>Problem 3: Shape Factor for I-Section</h3>
     <p>A symmetrical I-section has the following dimensions: flange width \(b_f = 200\) mm, flange thickness \(t_f = 25\) mm, web thickness \(t_w = 15\) mm, total depth \(h = 300\) mm. The yield stress is \(\sigma_y = 355\) MPa.</p>
     <p>Calculate the shape factor \(f\). Comment on why I-sections have lower shape factors than rectangular sections.</p>
 
-    <button onclick="toggleSolution('solution3')">Show Solution</button>
+    <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
     <div id="solution3" class="hidden">
-      <h4>Solution:</h4>
       <p><strong>Step 1: Calculate Second Moment of Area \(I\):</strong></p>
       <p>For a symmetric I-section about the centroidal axis:</p>
       <p>\[I = \frac{b_f h^3}{12} - \frac{(b_f - t_w)(h - 2t_f)^3}{12}\]</p>
@@ -587,39 +588,47 @@ function createSimulation1(){
       return {F, M:MM/1e6};
     }
 
-    // Find NA for given c, constrained + monotone toward bisectrix
+    // Find NA for given c by force equilibrium
     function y0ForC_monotone(c, y0_hint){
       // Core must lie inside geometry
       const loPhys = Math.max(c, 1e-6);
       const hiPhys = Math.min(geom.H - c, geom.H - 1e-6);
 
-      // Allowed segment: strictly between yc and y_pna
-      let a = Math.min(geom.yc, geom.y_pna);
-      let b = Math.max(geom.yc, geom.y_pna);
-      a = Math.max(a, loPhys);
-      b = Math.min(b, hiPhys);
-
-      if(!(a < b)) return y0_prev;
-
-      let y0c = Math.max(a, Math.min((y0_hint ?? geom.yc), b));
+      if(loPhys >= hiPhys) return geom.yc;
 
       const F_at = (y0)=> computeFM(y0,c).F;
 
-      let lo=a, hi=b, Flo=F_at(lo), Fhi=F_at(hi);
-      if(Flo*Fhi > 0) return y0_prev;
+      // Search over the full physically valid range
+      let lo = loPhys;
+      let hi = hiPhys;
+      let Flo = F_at(lo);
+      let Fhi = F_at(hi);
 
-      let mid = y0c;
+      // If no sign change, return the elastic centroid as fallback
+      if(Flo * Fhi > 0) {
+        // Try to find a point closer to the hint
+        const y0c = Math.max(lo, Math.min(y0_hint ?? geom.yc, hi));
+        const Fc = F_at(y0c);
+        if(Math.abs(Fc) < 1e-3) return y0c;
+        return geom.yc;
+      }
+
+      // Bisection search for force equilibrium
+      let mid = y0_hint ?? geom.yc;
       for(let it=0; it<60; it++){
-        mid = 0.5*(lo+hi);
+        mid = 0.5*(lo + hi);
         const Fm = F_at(mid);
         if(Math.abs(Fm) < 1e-6) break;
-        if(Flo*Fm <= 0){ hi = mid; Fhi = Fm; } else { lo = mid; Flo = Fm; }
+        if(Flo * Fm <= 0){
+          hi = mid;
+          Fhi = Fm;
+        } else {
+          lo = mid;
+          Flo = Fm;
+        }
       }
-      let y0_root = mid;
 
-      // Return the calculated root directly to allow continuous shifting
-      // The root is already constrained to lie between yc and y_pna
-      return y0_root;
+      return mid;
     }
 
     function solveDistribution(){

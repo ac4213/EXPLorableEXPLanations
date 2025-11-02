@@ -1117,84 +1117,57 @@
 
     <div class="quiz-container">
         <div class="quiz-question">
-            <p><strong>Question 1:</strong> For a 3-DOF system, how many natural frequencies exist?</p>
-            <form id="q1">
-                <input type="radio" id="q1a" name="q1" value="a">
-                <label for="q1a">a) One</label><br>
-                <input type="radio" id="q1b" name="q1" value="b">
-                <label for="q1b">b) Two</label><br>
-                <input type="radio" id="q1c" name="q1" value="c">
-                <label for="q1c">c) Three</label><br>
-                <input type="radio" id="q1d" name="q1" value="d">
-                <label for="q1d">d) Infinite</label><br>
-                <button type="button" onclick="checkAnswer('q1', 'c')">Check Answer</button>
-            </form>
-            <div id="q1-feedback" class="feedback"></div>
+            <h3>Question 1: For a 3-DOF system, how many natural frequencies exist?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> One</label>
+                <label><input type="radio" name="q1" value="b"> Two</label>
+                <label><input type="radio" name="q1" value="c"> Three</label>
+                <label><input type="radio" name="q1" value="d"> Infinite</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 2:</strong> What is the main advantage of modal decomposition?</p>
-            <form id="q2">
-                <input type="radio" id="q2a" name="q2" value="a">
-                <label for="q2a">a) It reduces computational cost</label><br>
-                <input type="radio" id="q2b" name="q2" value="b">
-                <label for="q2b">b) It decouples the equations of motion</label><br>
-                <input type="radio" id="q2c" name="q2" value="c">
-                <label for="q2c">c) It eliminates damping</label><br>
-                <input type="radio" id="q2d" name="q2" value="d">
-                <label for="q2d">d) It increases system stiffness</label><br>
-                <button type="button" onclick="checkAnswer('q2', 'b')">Check Answer</button>
-            </form>
-            <div id="q2-feedback" class="feedback"></div>
+            <h3>Question 2: What is the main advantage of modal decomposition?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> It reduces computational cost</label>
+                <label><input type="radio" name="q2" value="b"> It decouples the equations of motion</label>
+                <label><input type="radio" name="q2" value="c"> It eliminates damping</label>
+                <label><input type="radio" name="q2" value="d"> It increases system stiffness</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 3:</strong> Which mode typically has the lowest natural frequency?</p>
-            <form id="q3">
-                <input type="radio" id="q3a" name="q3" value="a">
-                <label for="q3a">a) The mode with the most sign changes</label><br>
-                <input type="radio" id="q3b" name="q3" value="b">
-                <label for="q3b">b) The mode where all masses move in phase</label><br>
-                <input type="radio" id="q3c" name="q3" value="c">
-                <label for="q3c">c) The mode with highest amplitude</label><br>
-                <input type="radio" id="q3d" name="q3" value="d">
-                <label for="q3d">d) The mode with zero displacement</label><br>
-                <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
-            </form>
-            <div id="q3-feedback" class="feedback"></div>
+            <h3>Question 3: Which mode typically has the lowest natural frequency?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> The mode with the most sign changes</label>
+                <label><input type="radio" name="q3" value="b"> The mode where all masses move in phase</label>
+                <label><input type="radio" name="q3" value="c"> The mode with highest amplitude</label>
+                <label><input type="radio" name="q3" value="d"> The mode with zero displacement</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 4:</strong> What is the key property of proportional (Rayleigh) damping?</p>
-            <form id="q4">
-                <input type="radio" id="q4a" name="q4" value="a">
-                <label for="q4a">a) It eliminates all damping effects</label><br>
-                <input type="radio" id="q4b" name="q4" value="b">
-                <label for="q4b">b) It couples all modal equations together</label><br>
-                <input type="radio" id="q4c" name="q4" value="c">
-                <label for="q4c">c) It allows modal equations to remain decoupled</label><br>
-                <input type="radio" id="q4d" name="q4" value="d">
-                <label for="q4d">d) It increases system stiffness proportionally</label><br>
-                <button type="button" onclick="checkAnswer('q4', 'c')">Check Answer</button>
-            </form>
-            <div id="q4-feedback" class="feedback"></div>
+            <h3>Question 4: What is the key property of proportional (Rayleigh) damping?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> It eliminates all damping effects</label>
+                <label><input type="radio" name="q4" value="b"> It couples all modal equations together</label>
+                <label><input type="radio" name="q4" value="c"> It allows modal equations to remain decoupled</label>
+                <label><input type="radio" name="q4" value="d"> It increases system stiffness proportionally</label>
+            </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 5:</strong> In a forced vibration of an MDOF system, resonance occurs when:</p>
-            <form id="q5">
-                <input type="radio" id="q5a" name="q5" value="a">
-                <label for="q5a">a) The forcing frequency equals zero</label><br>
-                <input type="radio" id="q5b" name="q5" value="b">
-                <label for="q5b">b) The forcing frequency approaches one of the natural frequencies</label><br>
-                <input type="radio" id="q5c" name="q5" value="c">
-                <label for="q5c">c) All masses vibrate with the same amplitude</label><br>
-                <input type="radio" id="q5d" name="q5" value="d">
-                <label for="q5d">d) The damping ratio exceeds unity</label><br>
-                <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
-            </form>
-            <div id="q5-feedback" class="feedback"></div>
+            <h3>Question 5: In a forced vibration of an MDOF system, resonance occurs when:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> The forcing frequency equals zero</label>
+                <label><input type="radio" name="q5" value="b"> The forcing frequency approaches one of the natural frequencies</label>
+                <label><input type="radio" name="q5" value="c"> All masses vibrate with the same amplitude</label>
+                <label><input type="radio" name="q5" value="d"> The damping ratio exceeds unity</label>
+            </div>
         </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
     </div>
 </div>
 
@@ -1216,14 +1189,47 @@
     </div>
 </div>
 
-<script>
-// toggleSolution function now loaded from /assets/common/problems.js
-// checkAnswer function now loaded from /assets/common/quizzes.js
-</script>
-
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz handler for 3DOFs
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Three natural frequencies
+                q2: 'b',  // Decouples the equations of motion
+                q3: 'b',  // Mode where all masses move in phase
+                q4: 'c',  // Allows modal equations to remain decoupled
+                q5: 'b'   // Forcing frequency approaches natural frequency
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
 </body>
 <footer>
     <script src="/assets/common/footer.js"></script>

@@ -277,7 +277,7 @@
 
         <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
         <div id="solution1" class="hidden">
-            <h4>Solution:</h4>
+            
             <p><strong>(a) Reaction forces:</strong></p>
             <p>Taking moments about the left support (A):</p>
             <p>\[\sum M_A = 0: R_B \times 6 - 12 \times 2 = 0\]</p>
@@ -309,7 +309,7 @@
 
         <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
         <div id="solution2" class="hidden">
-            <h4>Solution:</h4>
+            
             <p><strong>(a) Reactions at fixed support:</strong></p>
             <p>Total load: \(W = w \times L = 5 \times 4 = 20 \text{ kN}\)</p>
             <p>Vertical reaction: \(R_A = W = 20 \text{ kN}\) (upward)</p>
@@ -342,7 +342,7 @@
 
         <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
         <div id="solution3" class="hidden">
-            <h4>Solution:</h4>
+            
             <p><strong>(a) Reaction forces:</strong></p>
             <p>Total UDL: \(W = 4 \times 5 = 20 \text{ kN}\) acting at center (2.5 m)</p>
             <p>By symmetry, both loads (P and W) act at midspan, so:</p>
@@ -363,81 +363,63 @@
     </div>
 </section>
 
+<!-- QUIZ SECTION -->
 <section class="theory-container">
-    <h2>Knowledge Check Quiz</h2>
-
     <div class="quiz-container">
+        <h2>Knowledge Check Quiz</h2>
+
         <div class="quiz-question">
-            <p><strong>Question 1:</strong> In a simply supported beam, which of the following is true about the reaction forces when a central point load is applied?</p>
-            <form id="q1">
-                <input type="radio" name="q1" value="a"> a) The left reaction is greater than the right reaction<br>
-                <input type="radio" name="q1" value="b"> b) The right reaction is greater than the left reaction<br>
-                <input type="radio" name="q1" value="c"> c) Both reactions are equal<br>
-                <input type="radio" name="q1" value="d"> d) The sum of reactions equals zero<br>
-            </form>
-            <div class="quiz-feedback q1-feedback" style="display:none;">
-                <p>Correct answer: c) Both reactions are equal</p>
-                <p>When a load is applied at the center of a simply supported beam, by symmetry, each support bears half of the total load.</p>
-            </div>
-        </div>
-        
-        <div class="quiz-question">
-            <p><strong>Question 2:</strong> Where is the maximum bending moment located in a cantilever beam with a point load at its free end?</p>
-            <form id="q2">
-                <input type="radio" name="q2" value="a"> a) At the free end<br>
-                <input type="radio" name="q2" value="b"> b) At the fixed end<br>
-                <input type="radio" name="q2" value="c"> c) At the middle of the beam<br>
-                <input type="radio" name="q2" value="d"> d) It varies depending on the magnitude of the load<br>
-            </form>
-            <div class="quiz-feedback q2-feedback" style="display:none;">
-                <p>Correct answer: b) At the fixed end</p>
-                <p>The bending moment in a cantilever beam with a point load at the free end increases linearly from zero at the free end to its maximum value at the fixed end.</p>
-            </div>
-        </div>
-        
-        <div class="quiz-question">
-            <p><strong>Question 3:</strong> What happens to the shear force diagram at the location of a point load?</p>
-            <form id="q3">
-                <input type="radio" name="q3" value="a"> a) It remains constant<br>
-                <input type="radio" name="q3" value="b"> b) It changes sign<br>
-                <input type="radio" name="q3" value="c"> c) It has a step change equal to the magnitude of the point load<br>
-                <input type="radio" name="q3" value="d"> d) It becomes zero<br>
-            </form>
-            <div class="quiz-feedback q3-feedback" style="display:none;">
-                <p>Correct answer: c) It has a step change equal to the magnitude of the point load</p>
-                <p>A concentrated force causes a sudden jump in the shear force diagram equal to the magnitude of the force.</p>
+            <h3>Question 1: In a simply supported beam, which of the following is true about the reaction forces when a central point load is applied?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> The left reaction is greater than the right reaction</label>
+                <label><input type="radio" name="q1" value="b"> The right reaction is greater than the left reaction</label>
+                <label><input type="radio" name="q1" value="c"> Both reactions are equal</label>
+                <label><input type="radio" name="q1" value="d"> The sum of reactions equals zero</label>
             </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 4:</strong> For a simply supported beam with a uniformly distributed load (UDL) over its entire length, where does the maximum bending moment occur?</p>
-            <form id="q4">
-                <input type="radio" name="q4" value="a"> a) At the left support<br>
-                <input type="radio" name="q4" value="b"> b) At the right support<br>
-                <input type="radio" name="q4" value="c"> c) At the midspan<br>
-                <input type="radio" name="q4" value="d"> d) At quarter points from each support<br>
-            </form>
-            <div class="quiz-feedback q4-feedback" style="display:none;">
-                <p>Correct answer: c) At the midspan</p>
-                <p>For a simply supported beam with UDL, the bending moment is parabolic with its maximum value at the center of the span, where M = wL²/8.</p>
+            <h3>Question 2: Where is the maximum bending moment located in a cantilever beam with a point load at its free end?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> At the free end</label>
+                <label><input type="radio" name="q2" value="b"> At the fixed end</label>
+                <label><input type="radio" name="q2" value="c"> At the middle of the beam</label>
+                <label><input type="radio" name="q2" value="d"> It varies depending on the magnitude of the load</label>
             </div>
         </div>
 
         <div class="quiz-question">
-            <p><strong>Question 5:</strong> What is the relationship between shear force (V) and bending moment (M) in a beam?</p>
-            <form id="q5">
-                <input type="radio" name="q5" value="a"> a) M = dV/dx (moment is the derivative of shear)<br>
-                <input type="radio" name="q5" value="b"> b) V = dM/dx (shear is the derivative of moment)<br>
-                <input type="radio" name="q5" value="c"> c) M = ∫V dx (moment is the integral of shear)<br>
-                <input type="radio" name="q5" value="d"> d) They are independent of each other<br>
-            </form>
-            <div class="quiz-feedback q5-feedback" style="display:none;">
-                <p>Correct answer: b) and c) are both correct (V = dM/dx and M = ∫V dx)</p>
-                <p>The shear force is the derivative of the bending moment with respect to position along the beam. Equivalently, the bending moment is the integral of the shear force. This fundamental relationship helps construct bending moment diagrams from shear force diagrams.</p>
+            <h3>Question 3: What happens to the shear force diagram at the location of a point load?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> It remains constant</label>
+                <label><input type="radio" name="q3" value="b"> It changes sign</label>
+                <label><input type="radio" name="q3" value="c"> It has a step change equal to the magnitude of the point load</label>
+                <label><input type="radio" name="q3" value="d"> It becomes zero</label>
             </div>
         </div>
 
-        <button id="check-answers">Check Answers</button>
+        <div class="quiz-question">
+            <h3>Question 4: For a simply supported beam with a uniformly distributed load (UDL) over its entire length, where does the maximum bending moment occur?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> At the left support</label>
+                <label><input type="radio" name="q4" value="b"> At the right support</label>
+                <label><input type="radio" name="q4" value="c"> At the midspan</label>
+                <label><input type="radio" name="q4" value="d"> At quarter points from each support</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 5: What is the relationship between shear force (V) and bending moment (M) in a beam?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> M = dV/dx (moment is the derivative of shear)</label>
+                <label><input type="radio" name="q5" value="b"> V = dM/dx (shear is the derivative of moment)</label>
+                <label><input type="radio" name="q5" value="c"> M = ∫V dx (moment is the integral of shear)</label>
+                <label><input type="radio" name="q5" value="d"> They are independent of each other</label>
+            </div>
+        </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
     </div>
 </section>
 
@@ -453,43 +435,43 @@
         new p5(sketch4, 'INTF_Cantilever');
     };
     
-    // Add quiz functionality
+    // Quiz handler for Internal Loads
     document.addEventListener('DOMContentLoaded', function() {
-        const checkAnswersBtn = document.getElementById('check-answers');
-        if (checkAnswersBtn) {
-            checkAnswersBtn.addEventListener('click', function() {
-                // Check question 1
-                const q1 = document.querySelector('input[name="q1"]:checked');
-                if (q1) {
-                    document.querySelector('.q1-feedback').style.display = 'block';
-                    if (q1.value === 'c') {
-                        q1.parentElement.style.backgroundColor = '#e6ffe6';
+        const submitBtn = document.getElementById('submit-quiz');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', function() {
+                const answers = {
+                    q1: 'c',  // Both reactions are equal
+                    q2: 'b',  // At the fixed end
+                    q3: 'c',  // Step change equal to point load
+                    q4: 'c',  // At the midspan
+                    q5: 'b'   // V = dM/dx (also c is correct, but b is the primary answer)
+                };
+
+                let score = 0;
+                let totalQuestions = Object.keys(answers).length;
+                let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                for (let question in answers) {
+                    const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                    const correctAnswer = answers[question];
+
+                    if (selectedOption) {
+                        if (selectedOption.value === correctAnswer) {
+                            score++;
+                            resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                        } else {
+                            resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                        }
                     } else {
-                        q1.parentElement.style.backgroundColor = '#ffe6e6';
+                        resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
                     }
                 }
-                
-                // Check question 2
-                const q2 = document.querySelector('input[name="q2"]:checked');
-                if (q2) {
-                    document.querySelector('.q2-feedback').style.display = 'block';
-                    if (q2.value === 'b') {
-                        q2.parentElement.style.backgroundColor = '#e6ffe6';
-                    } else {
-                        q2.parentElement.style.backgroundColor = '#ffe6e6';
-                    }
-                }
-                
-                // Check question 3
-                const q3 = document.querySelector('input[name="q3"]:checked');
-                if (q3) {
-                    document.querySelector('.q3-feedback').style.display = 'block';
-                    if (q3.value === 'c') {
-                        q3.parentElement.style.backgroundColor = '#e6ffe6';
-                    } else {
-                        q3.parentElement.style.backgroundColor = '#ffe6e6';
-                    }
-                }
+
+                const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                document.getElementById('quiz-results').innerHTML = resultsHTML;
             });
         }
     });

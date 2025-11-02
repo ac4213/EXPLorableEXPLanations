@@ -12,13 +12,13 @@ function Mass(x, y, wdth, hght) {
             this.y = this.baseY;
             this.display();
         } else {
-            // Hardcoded deflection scaling factor for consistent visualization
-            // This scale factor ensures the mass movement is visible but stays on screen
-            const DEFLECTION_SCALE = 150;
-            let normalizedY = y * DEFLECTION_SCALE;
+            // Fixed scaling factor for dramatic effect
+            // When at resonance, the mass can fly off screen!
+            const FIXED_SCALE = 150;
+            let normalizedY = y * FIXED_SCALE;
 
-            // Clamp the displacement to keep mass on screen
-            this.y = constrain(this.baseY - normalizedY, 50, height - 50);
+            // Position the mass (no clamping - let it fly off screen at resonance!)
+            this.y = this.baseY - normalizedY;
             this.display();
         }
     };
@@ -169,13 +169,44 @@ function Mass(x, y, wdth, hght) {
 // Function to draw static elements on the canvas
 function drawStaticElements() {
     push();
-    fill(0);
-    textSize(16);
-    textAlign(CENTER);
-    text("SDOF System", width/2, 30);
-    
-    // Draw system type
-    textSize(12);
+
+    // Draw equilibrium/zero reference line
+    stroke(255, 0, 0); // Red color for visibility
+    strokeWeight(2);
+    drawingContext.setLineDash([10, 5]); // Dashed line
+    line(10, yMass, width - 10, yMass);
+    drawingContext.setLineDash([]); // Reset to solid line
+
+    // Add label for the zero line
+    fill(255, 0, 0);
+    textSize(10);
+    textAlign(LEFT, CENTER);
+    text("x = 0", 5, yMass);
+
+    // Draw info box at top left
+    const boxX = 5;
+    const boxY = 5;
+    const boxWidth = width - 10;
+    const boxPadding = 5;
+    const lineHeight = 14;
+
+    // Calculate number of lines needed
+    const numLines = forcingEnabled ? 5 : 4;
+    const boxHeight = boxPadding * 2 + lineHeight * numLines;
+
+    // Semi-transparent white background
+    fill(255, 255, 255, 220);
+    stroke(100);
+    strokeWeight(1);
+    rect(boxX, boxY, boxWidth, boxHeight, 3); // Rounded corners
+
+    // Get system info
+    const fn = document.getElementById('natural-freq').textContent;
+    const fd = document.getElementById('damped-freq').textContent;
+    const zeta = document.getElementById('damping-ratio').textContent;
+    const systemType = document.getElementById('system-type').textContent;
+
+    // Determine system type color
     let systemTypeColor;
     if (UNDERDAMPED) {
         systemTypeColor = color(0, 0, 255); // Blue for underdamped
@@ -184,10 +215,46 @@ function drawStaticElements() {
     } else {
         systemTypeColor = color(255, 0, 0); // Red for overdamped
     }
-    
+
+    // Draw text content
+    textAlign(LEFT, TOP);
+    textSize(9);
+
+    let yPos = boxY + boxPadding;
+
+    // System type (colored)
     fill(systemTypeColor);
-    text(document.getElementById('system-type').textContent, width/2, 50);
-    
+    text(systemType, boxX + boxPadding, yPos);
+    yPos += lineHeight;
+
+    // Natural frequency
+    fill(0);
+    text("fn: " + fn + " Hz", boxX + boxPadding, yPos);
+    yPos += lineHeight;
+
+    // Damped natural frequency
+    text("fd: " + fd + " Hz", boxX + boxPadding, yPos);
+    yPos += lineHeight;
+
+    // Damping ratio
+    text("ζ: " + zeta, boxX + boxPadding, yPos);
+    yPos += lineHeight;
+
+    // Resonance frequency (only show when forcing is enabled)
+    if (forcingEnabled) {
+        // Calculate resonance frequency: fr = fn * sqrt(1 - 2*zeta^2)
+        const zetaVal = parseFloat(zeta);
+        const fnVal = parseFloat(fn);
+        let fr;
+        if (zetaVal < 1 / Math.sqrt(2)) {
+            // Resonance exists only when zeta < 1/sqrt(2) ≈ 0.707
+            fr = fnVal * Math.sqrt(1 - 2 * Math.pow(zetaVal, 2));
+            text("fr: " + fr.toFixed(2) + " Hz", boxX + boxPadding, yPos);
+        } else {
+            text("fr: N/A (ζ > 0.707)", boxX + boxPadding, yPos);
+        }
+    }
+
     pop();
 }// Global variables
 var cnv, cnvx, cnvy; // Canvas variables
@@ -248,21 +315,24 @@ function setup() {
 // Draw function - called repeatedly to animate the simulation
 function draw() {
     // Reset the counter if we've reached the end of the results
-    if (counter === results.Y.length - 1) {
+    if (counter >= results.Y.length - 1) {
         counter = 0;
         results = calculateSystem();
         themass.move(0, true); // Reset the mass position
     }
-    
+
     // Clear the background and redraw
     background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);
-    
+
     // Draw static elements (ground line)
     drawStaticElements();
-    
-    // Move the mass to the next position
+
+    // Move the mass to the next position with fixed scaling
     themass.move(results.Y[counter], false);
-    
+
+    // Update the scanning line on the time history plot
+    updateScanningLine(results.t[counter]);
+
     // Increment the counter
     counter++;
 }
@@ -286,6 +356,22 @@ function connectUIControls() {
     if (forcingToggle) {
         forcingToggle.addEventListener('change', function() {
             forcingEnabled = this.checked;
+
+            // Enable or disable frequency controls
+            if (freqSlider) {
+                freqSlider.disabled = !this.checked;
+            }
+            const frequencyValue = document.getElementById('frequency-value');
+            if (frequencyValue) {
+                frequencyValue.disabled = !this.checked;
+            }
+
+            // Update FRF charts visibility
+            const frfCharts = document.querySelectorAll('#FRFamp, #FRFphase');
+            frfCharts.forEach(chart => {
+                chart.style.display = this.checked ? 'block' : 'none';
+            });
+
             updateParameters();
         });
     }
@@ -476,19 +562,23 @@ function calculateSystem() {
         }
     } else if (OVERDAMPED) {
         // Overdamped system response
+        // Characteristic equation roots: m*r^2 + c*r + k = 0
         const r1 = (-c + Math.sqrt(Math.pow(c, 2) - 4 * m * k)) / (2 * m);
         const r2 = (-c - Math.sqrt(Math.pow(c, 2) - 4 * m * k)) / (2 * m);
-        
-        // Constants for overdamped solution with initial condition x(0) = A, x'(0) = 0
-        const C1 = (A * r2) / (r2 - r1);
-        const C2 = (A * r1) / (r1 - r2);
-        
+
+        // Constants for overdamped solution with initial conditions: x(0) = A, x'(0) = 0
+        // x(t) = C1*e^(r1*t) + C2*e^(r2*t)
+        // x(0) = C1 + C2 = A
+        // x'(0) = C1*r1 + C2*r2 = 0
+        const C1 = -A * r2 / (r1 - r2);
+        const C2 = A * r1 / (r1 - r2);
+
         while (t[t.length - 1] < Ttot) {
             tt = ii * dt;
-            
+
             // Transient response for overdamped system
             YYn = C1 * Math.exp(r1 * tt) + C2 * Math.exp(r2 * tt);
-            
+
             // Steady-state response for forced vibration
             let YYp = 0;
             if (F0 > 0) {
@@ -496,22 +586,30 @@ function calculateSystem() {
                 const phase = Math.atan2(2 * zeta * wf/wn, 1 - Math.pow(wf/wn, 2));
                 YYp = amp * Math.cos(wf * tt - phase);
             }
-            
+
             t.push(tt);
             Y.push(YYn + YYp);
-            
+
             ii++;
         }
     } else {
         // Critically damped system response
-        const r = -c / (2 * m); // Equal roots for characteristic equation
-        
+        // For critical damping: c = 2*sqrt(k*m), so c/(2*m) = sqrt(k/m) = wn
+        const r = -wn; // Equal roots for characteristic equation
+
+        // For initial conditions x(0) = A, x'(0) = 0:
+        // x(t) = e^(r*t) * (C1 + C2*t)
+        // x(0) = C1 = A
+        // x'(0) = r*C1 + C2 = 0, so C2 = -r*C1 = -r*A
+        const C1 = A;
+        const C2 = -r * A;
+
         while (t[t.length - 1] < Ttot) {
             tt = ii * dt;
-            
+
             // Transient response for critically damped with initial displacement A and zero velocity
-            YYn = A * Math.exp(r * tt) * (1 - r * tt);
-            
+            YYn = Math.exp(r * tt) * (C1 + C2 * tt);
+
             // Steady-state response for forced vibration
             let YYp = 0;
             if (F0 > 0) {
@@ -519,10 +617,10 @@ function calculateSystem() {
                 const phase = Math.atan2(2 * zeta * wf/wn, 1 - Math.pow(wf/wn, 2));
                 YYp = amp * Math.cos(wf * tt - phase);
             }
-            
+
             t.push(tt);
             Y.push(YYn + YYp);
-            
+
             ii++;
         }
     }
@@ -559,7 +657,10 @@ function calculateSystem() {
     r = ff > 0 ? wn / (2 * Math.PI * ff) : 999;
     thisAMP = 1 / k / Math.sqrt(Math.pow(1 - Math.pow(r, 2), 2) + Math.pow(2 * zeta * r, 2));
     thisPHASE = Math.atan2((2 * zeta * r), (1 - Math.pow(r, 2))) * 180 / Math.PI - 180;
-    
+
+    // Calculate maximum absolute displacement for dynamic scaling
+    const maxY = Math.max(...Y.map(Math.abs));
+
     // Compile results
     const res = {
         ccrit: ccrit,
@@ -576,6 +677,7 @@ function calculateSystem() {
         B: B,
         t: t,
         Y: Y,
+        maxY: maxY,
         perY: perY,
         env: envelope.length > 1 ? envelope : [],
         farr: farr,
@@ -625,12 +727,14 @@ function calculateSystem() {
         });
     }
     
-    // Create array of tick values for time history
-    const tvals = Array.from({length: Ncycles}, (_, i) => i * T);
-    
+    // Create array of tick values for time history (max 10 ticks)
+    const numTicks = Math.min(10, Math.max(2, Math.floor(Ttot / T)));
+    const tickInterval = Ttot / numTicks;
+    const tvals = Array.from({length: numTicks + 1}, (_, i) => i * tickInterval);
+
     // Set chart height - taller when in free vibration
     const theheight = forcingEnabled ? 150 : 400;
-    
+
     // Chart layout for time history
     const THlayout = {
         height: theheight,
@@ -647,7 +751,7 @@ function calculateSystem() {
         },
         yaxis: {
             title: 'Displacement [m]',
-            // No fixed range - will auto-scale to show entire plot
+            range: [-5, 5],  // Fixed range
             hoverformat: ".3f"
         },
         margin: {
@@ -665,6 +769,19 @@ function calculateSystem() {
         displayModeBar: false
     };
     
+    // Add scanning line shape to layout
+    THlayout.shapes = [{
+        type: 'line',
+        x0: 0,
+        y0: -5,
+        x1: 0,
+        y1: 5,
+        line: {
+            color: 'red',
+            width: 2
+        }
+    }];
+
     // Create time history plot
     Plotly.newPlot(TIMEHISTORY, THdata, THlayout, plotopts);
     
@@ -705,8 +822,8 @@ function calculateSystem() {
             },
             yaxis: {
                 title: 'Amplitude [m/N]',
-                // No fixed range - will auto-scale to show entire plot
-                tickformat: ".3e",
+                range: [0, 0.003],  // Fixed range
+                tickformat: ".0e",  // Scientific notation with integer format (e.g., 2e-3)
                 hoverformat: ".3e"
             },
             margin: {
@@ -753,11 +870,11 @@ function calculateSystem() {
             },
             yaxis: {
                 title: 'Phase [deg]',
-                // No fixed range - will auto-scale to show entire plot
+                range: [-180, 0],  // Fixed range
                 tickmode: "array",
                 tickvals: [0, -45, -90, -135, -180],
-                tickformat: "f",
-                hoverformat: ".2f"
+                tickformat: "d",  // Integer format (no decimal points)
+                hoverformat: ".0f"
             },
             margin: {
                 l: 50,
@@ -776,6 +893,51 @@ function calculateSystem() {
         Plotly.purge(FRFAMP);
         Plotly.purge(FRFPHASE);
     }
-    
+
     return res;
+}
+
+// Update the scanning line position on the time history plot
+function updateScanningLine(currentTime) {
+    // Update the shape to move the scanning line
+    const update = {
+        shapes: [{
+            type: 'line',
+            x0: currentTime,
+            y0: -5,
+            x1: currentTime,
+            y1: 5,
+            line: {
+                color: 'red',
+                width: 2
+            }
+        }]
+    };
+
+    Plotly.relayout(TIMEHISTORY, update);
+}
+
+// Handle window resize to make simulation responsive
+function windowResized() {
+    // Get the sketch holder dimensions
+    let holder = document.getElementById('sketch-holder');
+    if (holder) {
+        let newWidth = holder.offsetWidth;
+        let newHeight = holder.offsetHeight;
+
+        // Only resize if dimensions are reasonable
+        if (newWidth > 0 && newHeight > 0) {
+            resizeCanvas(newWidth, newHeight);
+            background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);
+        }
+    }
+
+    // Redraw Plotly charts to fit new container size
+    setTimeout(function() {
+        Plotly.Plots.resize('TimeHistory');
+        if (mypars.F0 > 0) {
+            Plotly.Plots.resize('FRFamp');
+            Plotly.Plots.resize('FRFphase');
+        }
+    }, 100);
 }

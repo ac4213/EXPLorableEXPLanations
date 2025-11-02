@@ -31,18 +31,20 @@
         .sim-container {
             display: flex;
             gap: 20px;
-            align-items: flex-start;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
 
         #sketch-holder {
             flex: 0 0 200px;
-            height: 500px;
+            min-height: 500px;
             margin: 0;
         }
 
         #chart-container {
-            flex: 1;
-            min-width: 0;
+            flex: 1 1 auto;
+            min-width: 300px;
         }
 
         #TimeHistory, #FRFamp, #FRFphase {
@@ -50,10 +52,40 @@
             margin-bottom: 10px;
         }
 
-        .parameter-value {
-            display: inline-block;
-            width: 50px;
-            text-align: right;
+        /* Fix for overlapping sliders on large screens */
+        @media (min-width: 1025px) {
+            .simulation-controls {
+                max-width: 100%;
+            }
+
+            .simulation-controls .slider-row {
+                flex: 1 1 300px;
+                max-width: calc(33.333% - 10px);
+                min-width: 280px;
+            }
+        }
+
+        /* Responsive adjustments - keep side by side always */
+        @media (max-width: 900px) {
+            #sketch-holder {
+                flex: 0 0 150px;
+                min-height: 400px;
+            }
+
+            #chart-container {
+                min-width: 250px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            #sketch-holder {
+                flex: 0 0 120px;
+                min-height: 300px;
+            }
+
+            #chart-container {
+                min-width: 200px;
+            }
         }
     </style>
 </head>
@@ -137,36 +169,38 @@
             <h2>Interactive Simulation</h2>
             <p>Experiment with different parameters to see how they affect the behavior of a SDOF system:</p>
             
-            <div class="parameter-controls">
-                <div class="control-group">
-                    <label for="mass-slider">Mass (m) [kg]: <span id="mass-value" class="parameter-value">1.0</span></label>
+            <div class="simulation-controls">
+                <div class="slider-row">
+                    <label for="mass-slider" class="slider-label">Mass (m) [kg]:</label>
                     <input type="range" id="mass-slider" min="1" max="10" step="0.1" value="1.0">
+                    <input type="number" id="mass-value" min="1" max="10" step="0.1" value="1.0">
                 </div>
-                
-                <div class="control-group">
-                    <label for="stiffness-slider">Stiffness (k) [N/m]: <span id="stiffness-value" class="parameter-value">5000</span></label>
+
+                <div class="slider-row">
+                    <label for="stiffness-slider" class="slider-label">Stiffness (k) [N/m]:</label>
                     <input type="range" id="stiffness-slider" min="1000" max="10000" step="100" value="5000">
+                    <input type="number" id="stiffness-value" min="1000" max="10000" step="100" value="5000">
                 </div>
-                
-                <div class="control-group">
-                    <label for="damping-slider">Damping (c) [Ns/m]: <span id="damping-value" class="parameter-value">10.0</span></label>
-                    <div class="damping-slider-container">
-                        <input type="range" id="damping-slider" min="0" max="100" step="0.5" value="10.0" class="underdamped">
-                        <div id="critical-damping-marker" class="critical-marker"></div>
-                    </div>
+
+                <div class="slider-row">
+                    <label for="damping-slider" class="slider-label">Damping (c) [Ns/m]:</label>
+                    <input type="range" id="damping-slider" min="0" max="100" step="0.5" value="10.0" class="underdamped">
+                    <input type="number" id="damping-value" min="0" max="100" step="0.5" value="10.0">
                 </div>
-                
-                <div class="control-group">
-                    <label for="forcing-toggle">Forced Vibration:</label>
-                    <div class="toggle-switch">
+            </div>
+
+            <div class="simulation-controls">
+                <div class="slider-row">
+                    <label for="forcing-toggle">
                         <input type="checkbox" id="forcing-toggle">
-                        <span class="toggle-slider"></span>
-                    </div>
+                        Forced Vibration
+                    </label>
                 </div>
-                
-                <div class="control-group">
-                    <label for="frequency-slider">Forcing Frequency (f) [Hz]: <span id="frequency-value" class="parameter-value">5.0</span></label>
-                    <input type="range" id="frequency-slider" min="0" max="20" step="0.01" value="5.0">
+
+                <div class="slider-row" id="frequency-control">
+                    <label for="frequency-slider" class="slider-label">Forcing Freq (f) [Hz]:</label>
+                    <input type="range" id="frequency-slider" min="0" max="20" step="0.01" value="5.0" disabled>
+                    <input type="number" id="frequency-value" min="0" max="20" step="0.01" value="5.0" disabled>
                 </div>
             </div>
             
@@ -185,15 +219,15 @@
             </div>
             </div>
 
-            <h3>System Response Characteristics</h3>
-            <div id="system-info">
+            <!-- Hidden system info - displayed in canvas overlay -->
+            <div id="system-info" style="display: none;">
                 <p><strong>Natural Frequency (fn):</strong> <span id="natural-freq">3.56</span> Hz</p>
                 <p><strong>Damped Natural Frequency (fd):</strong> <span id="damped-freq">3.53</span> Hz</p>
                 <p><strong>Damping Ratio (ζ):</strong> <span id="damping-ratio">0.21</span></p>
                 <p><strong>Critical Damping (cc):</strong> <span id="critical-damping">44.72</span> Ns/m</p>
                 <p><strong>System Type:</strong> <span id="system-type">Underdamped</span></p>
             </div>
-            
+
             <h3>Observations:</h3>
             <ul>
                 <li>In free vibration (\(F_0 = 0)\), the system oscillates at its damped natural frequency</li>
@@ -389,88 +423,61 @@
     </div>
 
     <div class="content-section">
-        <h2>Knowledge Check Quiz</h2>
-        
         <div class="quiz-container">
+            <h2>Knowledge Check Quiz</h2>
+
             <div class="quiz-question">
-                <p><strong>Question 1:</strong> What happens to the natural frequency of a SDOF system if the mass is doubled while keeping the spring stiffness constant?</p>
-                <form id="q1">
-                    <input type="radio" id="q1a" name="q1" value="a">
-                    <label for="q1a">a) The natural frequency doubles</label><br>
-                    <input type="radio" id="q1b" name="q1" value="b">
-                    <label for="q1b">b) The natural frequency decreases by a factor of √2</label><br>
-                    <input type="radio" id="q1c" name="q1" value="c">
-                    <label for="q1c">c) The natural frequency remains unchanged</label><br>
-                    <input type="radio" id="q1d" name="q1" value="d">
-                    <label for="q1d">d) The natural frequency increases by a factor of √2</label><br>
-                    <button type="button" onclick="checkAnswer('q1', 'b')">Check Answer</button>
-                </form>
-                <div id="q1-feedback" class="feedback"></div>
+                <h3>Question 1: What happens to the natural frequency of a SDOF system if the mass is doubled while keeping the spring stiffness constant?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> The natural frequency doubles</label>
+                    <label><input type="radio" name="q1" value="b"> The natural frequency decreases by a factor of √2</label>
+                    <label><input type="radio" name="q1" value="c"> The natural frequency remains unchanged</label>
+                    <label><input type="radio" name="q1" value="d"> The natural frequency increases by a factor of √2</label>
+                </div>
             </div>
-            
+
             <div class="quiz-question">
-                <p><strong>Question 2:</strong> A system with damping ratio ζ = 0.05 is best described as:</p>
-                <form id="q2">
-                    <input type="radio" id="q2a" name="q2" value="a">
-                    <label for="q2a">a) Overdamped</label><br>
-                    <input type="radio" id="q2b" name="q2" value="b">
-                    <label for="q2b">b) Critically damped</label><br>
-                    <input type="radio" id="q2c" name="q2" value="c">
-                    <label for="q2c">c) Underdamped</label><br>
-                    <input type="radio" id="q2d" name="q2" value="d">
-                    <label for="q2d">d) Undamped</label><br>
-                    <button type="button" onclick="checkAnswer('q2', 'c')">Check Answer</button>
-                </form>
-                <div id="q2-feedback" class="feedback"></div>
+                <h3>Question 2: A system with damping ratio ζ = 0.05 is best described as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> Overdamped</label>
+                    <label><input type="radio" name="q2" value="b"> Critically damped</label>
+                    <label><input type="radio" name="q2" value="c"> Underdamped</label>
+                    <label><input type="radio" name="q2" value="d"> Undamped</label>
+                </div>
             </div>
-            
+
             <div class="quiz-question">
-                <p><strong>Question 3:</strong> What is the phase angle between the forcing function and the displacement response at resonance for an underdamped system?</p>
-                <form id="q3">
-                    <input type="radio" id="q3a" name="q3" value="a">
-                    <label for="q3a">a) 0°</label><br>
-                    <input type="radio" id="q3b" name="q3" value="b">
-                    <label for="q3b">b) 90°</label><br>
-                    <input type="radio" id="q3c" name="q3" value="c">
-                    <label for="q3c">c) 180°</label><br>
-                    <input type="radio" id="q3d" name="q3" value="d">
-                    <label for="q3d">d) 45°</label><br>
-                    <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
-                </form>
-                <div id="q3-feedback" class="feedback"></div>
+                <h3>Question 3: What is the phase angle between the forcing function and the displacement response at resonance for an underdamped system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> 0°</label>
+                    <label><input type="radio" name="q3" value="b"> 90°</label>
+                    <label><input type="radio" name="q3" value="c"> 180°</label>
+                    <label><input type="radio" name="q3" value="d"> 45°</label>
+                </div>
             </div>
-            
+
             <div class="quiz-question">
-                <p><strong>Question 4:</strong> If a SDOF system has a natural frequency of 8 Hz and a damping ratio of 0.2, what is its damped natural frequency?</p>
-                <form id="q4">
-                    <input type="radio" id="q4a" name="q4" value="a">
-                    <label for="q4a">a) 8 Hz</label><br>
-                    <input type="radio" id="q4b" name="q4" value="b">
-                    <label for="q4b">b) 7.84 Hz</label><br>
-                    <input type="radio" id="q4c" name="q4" value="c">
-                    <label for="q4c">c) 6.4 Hz</label><br>
-                    <input type="radio" id="q4d" name="q4" value="d">
-                    <label for="q4d">d) 10 Hz</label><br>
-                    <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-                </form>
-                <div id="q4-feedback" class="feedback"></div>
+                <h3>Question 4: If a SDOF system has a natural frequency of 8 Hz and a damping ratio of 0.2, what is its damped natural frequency?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> 8 Hz</label>
+                    <label><input type="radio" name="q4" value="b"> 7.84 Hz</label>
+                    <label><input type="radio" name="q4" value="c"> 6.4 Hz</label>
+                    <label><input type="radio" name="q4" value="d"> 10 Hz</label>
+                </div>
             </div>
-            
+
             <div class="quiz-question">
-                <p><strong>Question 5:</strong> Which of the following statements about resonance is TRUE?</p>
-                <form id="q5">
-                    <input type="radio" id="q5a" name="q5" value="a">
-                    <label for="q5a">a) Resonance occurs when the forcing frequency equals twice the natural frequency</label><br>
-                    <input type="radio" id="q5b" name="q5" value="b">
-                    <label for="q5b">b) At resonance, the amplitude of vibration is minimum</label><br>
-                    <input type="radio" id="q5c" name="q5" value="c">
-                    <label for="q5c">c) Increasing damping increases the peak amplitude at resonance</label><br>
-                    <input type="radio" id="q5d" name="q5" value="d">
-                    <label for="q5d">d) For an underdamped system, the amplitude at resonance is inversely proportional to the damping ratio</label><br>
-                    <button type="button" onclick="checkAnswer('q5', 'd')">Check Answer</button>
-                </form>
-                <div id="q5-feedback" class="feedback"></div>
+                <h3>Question 5: Which of the following statements about resonance is TRUE?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> Resonance occurs when the forcing frequency equals twice the natural frequency</label>
+                    <label><input type="radio" name="q5" value="b"> At resonance, the amplitude of vibration is minimum</label>
+                    <label><input type="radio" name="q5" value="c"> Increasing damping increases the peak amplitude at resonance</label>
+                    <label><input type="radio" name="q5" value="d"> For an underdamped system, the amplitude at resonance is inversely proportional to the damping ratio</label>
+                </div>
             </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
         </div>
     </div>
     
@@ -554,34 +561,92 @@
 
     <script>
 // toggleSolution function now loaded from /assets/common/problems.js
-// checkAnswer function now loaded from /assets/common/quizzes.js
+
+        // Quiz handler for SDOF Vibration
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Natural frequency decreases by √2 when mass doubles
+                q2: 'c',  // ζ = 0.05 < 1, so underdamped
+                q3: 'b',  // Phase angle at resonance is 90°
+                q4: 'b',  // fd = fn√(1-ζ²) = 8√(1-0.04) = 7.84 Hz
+                q5: 'd'   // Amplitude at resonance is inversely proportional to damping ratio
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
 
         // Create a new instance of the simulation when the page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Update parameter display values when sliders are moved
             const massSlider = document.getElementById('mass-slider');
+            const massValue = document.getElementById('mass-value');
             const stiffnessSlider = document.getElementById('stiffness-slider');
+            const stiffnessValue = document.getElementById('stiffness-value');
             const dampingSlider = document.getElementById('damping-slider');
+            const dampingValue = document.getElementById('damping-value');
             const frequencySlider = document.getElementById('frequency-slider');
+            const frequencyValue = document.getElementById('frequency-value');
             const forcingToggle = document.getElementById('forcing-toggle');
-            
-            // Update display values
+
+            // Sync slider to number input
             massSlider.addEventListener('input', function() {
-                document.getElementById('mass-value').textContent = parseFloat(this.value).toFixed(1);
+                massValue.value = parseFloat(this.value).toFixed(1);
                 updateCriticalDampingMarker();
             });
-            
+
+            // Sync number input to slider
+            massValue.addEventListener('input', function() {
+                massSlider.value = this.value;
+                updateCriticalDampingMarker();
+            });
+
             stiffnessSlider.addEventListener('input', function() {
-                document.getElementById('stiffness-value').textContent = this.value;
+                stiffnessValue.value = this.value;
                 updateCriticalDampingMarker();
             });
-            
-            dampingSlider.addEventListener('input', function() {
-                document.getElementById('damping-value').textContent = parseFloat(this.value).toFixed(1);
+
+            stiffnessValue.addEventListener('input', function() {
+                stiffnessSlider.value = this.value;
+                updateCriticalDampingMarker();
             });
-            
+
+            dampingSlider.addEventListener('input', function() {
+                dampingValue.value = parseFloat(this.value).toFixed(1);
+            });
+
+            dampingValue.addEventListener('input', function() {
+                dampingSlider.value = this.value;
+            });
+
             frequencySlider.addEventListener('input', function() {
-                document.getElementById('frequency-value').textContent = parseFloat(this.value).toFixed(2);
+                frequencyValue.value = parseFloat(this.value).toFixed(2);
+            });
+
+            frequencyValue.addEventListener('input', function() {
+                frequencySlider.value = this.value;
             });
             
             // Function to update the critical damping marker position
@@ -608,22 +673,6 @@
             
             // Initialize marker position
             updateCriticalDampingMarker();
-            
-            // Update frequency display when forcing is toggled
-            forcingToggle.addEventListener('change', function() {
-                // Show or hide frequency controls based on toggle state
-                const frequencyGroup = frequencySlider.closest('.control-group');
-                frequencyGroup.style.display = this.checked ? 'block' : 'none';
-                
-                // Update FRF charts visibility
-                const frfCharts = document.querySelectorAll('#FRFamp, #FRFphase');
-                frfCharts.forEach(chart => {
-                    chart.style.display = this.checked ? 'block' : 'none';
-                });
-            });
-            
-            // Initialize frequency controls visibility
-            frequencySlider.closest('.control-group').style.display = 'none';
         });
     </script>
     <footer>

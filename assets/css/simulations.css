@@ -3,12 +3,19 @@
    Styles for interactive simulations and controls
    ============================================ */
 
-/* Simulation Controls Container */
+/* Simulation Controls Container - Alias for .controls-panel */
+/* Main styles defined in uicontrols.css */
 .simulation-controls {
     background-color: #f9f9f9;
-    padding: 15px;
     border-radius: 8px;
-    margin: 10px 0;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
 }
 
 .interactive-controls {
@@ -20,12 +27,15 @@
 }
 
 /* Control Rows and Columns */
+/* .control-row is for layout containers with multiple control groups */
+/* .slider-row (in uicontrols.css) is for individual slider controls */
 .control-row {
     display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: space-between;
-    margin: 10px 0;
-    gap: 20px;
 }
 
 .control-column {
@@ -41,125 +51,12 @@
     max-width: 100%;
 }
 
-/* Slider Containers - Responsive Design */
-.slider-container {
-    margin: 10px 0;
-}
-
-.slider-container label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.slider-container input[type="range"] {
-    width: 100%;
-    max-width: 100%;
-    margin: 5px 0;
-}
-
-.slider-value {
-    display: inline-block;
-    min-width: 60px;
-    text-align: right;
-    font-family: monospace;
-}
-
-/* Slider Row Layout - Fixed for responsive */
-.slider-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.slider-label {
-    flex: 0 0 auto;
-    min-width: 80px;
-    max-width: 120px;
-    font-size: 0.95em;
-}
-
-.slider-row input[type="range"] {
-    flex: 1 1 auto;
-    min-width: 80px;
-    max-width: 100%;
-}
-
-.slider-row input[type="number"] {
-    width: 70px;
-    max-width: 70px;
-    padding: 4px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    flex-shrink: 0;
-}
-
-/* Input Controls */
-input[type="range"] {
-    width: 100%;
-    max-width: 100%;
-    cursor: pointer;
-}
-
-input[type="number"] {
-    width: 70px;
-    padding: 4px 2px;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    font-size: 0.9em;
-}
-
-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
 /* Special Control Sections */
-.car-controls {
-    border: 2px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 5px 0;
-}
-
-.car1-controls {
-    border-color: #ff6b6b;
-    background-color: #fff5f5;
-}
-
-.car2-controls {
-    border-color: #4dabf7;
-    background-color: #f0f8ff;
-}
-
-/* Race Stats Display */
-.race-stats {
-    display: flex;
-    justify-content: space-around;
-    background-color: #f0f0f0;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
 .stat-box {
     text-align: center;
     padding: 5px;
     min-width: 120px;
     flex: 1 1 auto;
-}
-
-.winner-announcement {
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: bold;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
 }
 
 /* Simulation Container (for multi-view layouts) */
@@ -201,12 +98,19 @@ label {
     z-index: 10;
 }
 
-/* Control Panel */
+/* Control Panel - Similar to .controls-panel but with white background */
+/* Used by BalanceRot and a few other pages with special nested styling */
 .control-panel {
     background-color: white;
     border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
+    padding: 15px;
+    margin: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
 }
 
 .control-panel .control-group {
@@ -224,21 +128,6 @@ label {
     font-size: 1.1em;
     border-bottom: 2px solid var(--primary-color, #ffd700);
     padding-bottom: 5px;
-}
-
-/* Button Rows */
-.button-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.button-row .control-button {
-    flex: 1 1 auto;
-    min-width: 120px;
-    max-width: 200px;
 }
 
 /* Tab Navigation */
@@ -317,9 +206,7 @@ label {
 /* Apply to all divs that contain p5.js canvases */
 div[id*="sketch"],
 div[id*="view"],
-div[id*="canvas"],
-#sketch-holder-drag-race,
-#sketch-holder-acc-demo {
+div[id*="canvas"] {
     width: 100%;
     max-width: 100%;
     position: relative;
@@ -350,24 +237,11 @@ div[id*="canvas"] canvas {
     object-fit: contain;
 }
 
-/* Specific sizing for drag race and acceleration demo */
-#sketch-holder-drag-race, #sketch-holder-acc-demo {
-    height: 400px;
-}
-
 /* Simulation Wrappers - Ensure they don't overflow */
 .simulation-wrapper,
 .simulation-section {
     max-width: 100%;
     overflow-x: hidden;
-}
-
-/* Ensure buttons are responsive */
-button,
-.control-button {
-    min-width: 80px;
-    padding: 8px 16px;
-    white-space: nowrap;
 }
 
 /* Global Responsive Rules - Prevent Overflow */
@@ -409,36 +283,6 @@ img, svg, video, canvas, audio, iframe, embed, object {
         flex-direction: column;
     }
 
-    /* Keep sliders compact - label, slider, and number on same line for tablets */
-    .slider-row {
-        flex-wrap: nowrap;
-        gap: 8px;
-    }
-
-    .slider-label {
-        flex: 0 0 auto;
-        min-width: 70px;
-        max-width: 100px;
-        margin-bottom: 0;
-        font-size: 0.9em;
-    }
-
-    .slider-row input[type="range"] {
-        flex: 1 1 auto;
-        min-width: 100px;
-        margin-bottom: 0;
-    }
-
-    .slider-row input[type="number"] {
-        flex: 0 0 auto;
-        width: 65px;
-        max-width: 65px;
-    }
-
-    #sketch-holder-drag-race, #sketch-holder-acc-demo {
-        height: 300px;
-    }
-
     .simulation-controls {
         padding: 10px;
     }
@@ -449,19 +293,6 @@ img, svg, video, canvas, audio, iframe, embed, object {
 
     .simulation-wrapper {
         padding: 15px;
-    }
-
-    .winner-announcement {
-        font-size: 1.2em;
-    }
-
-    .button-row {
-        flex-direction: column;
-    }
-
-    .button-row .control-button {
-        max-width: 100%;
-        width: 100%;
     }
 
     .status-grid {
@@ -481,32 +312,6 @@ img, svg, video, canvas, audio, iframe, embed, object {
 }
 
 @media (max-width: 576px) {
-    /* Compact sliders for small phones */
-    .slider-row {
-        gap: 6px;
-    }
-
-    .slider-label {
-        font-size: 0.85em;
-        min-width: 60px;
-        max-width: 85px;
-    }
-
-    .slider-row input[type="range"] {
-        min-width: 80px;
-    }
-
-    .slider-row input[type="number"] {
-        width: 60px;
-        max-width: 60px;
-        font-size: 0.85em;
-        padding: 3px;
-    }
-
-    #sketch-holder-drag-race, #sketch-holder-acc-demo {
-        height: 250px;
-    }
-
     /* Reduce canvas container heights */
     div[id*="sketch"],
     div[id*="view"],
@@ -548,12 +353,6 @@ img, svg, video, canvas, audio, iframe, embed, object {
         min-width: 100px;
         font-size: 0.9em;
     }
-
-    /* Make race stats more compact */
-    .race-stats {
-        gap: 8px;
-        padding: 8px;
-    }
 }
 
 @media (max-width: 320px) {
@@ -565,32 +364,6 @@ img, svg, video, canvas, audio, iframe, embed, object {
     .simulation-wrapper,
     .simulation-container {
         padding: 10px;
-    }
-
-    #sketch-holder-drag-race, #sketch-holder-acc-demo {
-        height: 180px;
-    }
-
-    /* Extra compact sliders for very small screens */
-    .slider-row {
-        gap: 4px;
-    }
-
-    .slider-label {
-        min-width: 50px;
-        max-width: 70px;
-        font-size: 0.8em;
-    }
-
-    .slider-row input[type="range"] {
-        min-width: 60px;
-    }
-
-    .slider-row input[type="number"] {
-        width: 50px;
-        max-width: 50px;
-        font-size: 0.8em;
-        padding: 2px;
     }
 
     /* Scale down canvas containers */

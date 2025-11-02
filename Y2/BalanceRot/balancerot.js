@@ -113,9 +113,9 @@ const singleParams = {
   balanceRadius_mm: 80,               // Balance mass radius (mm)
   balanceAngle: Math.PI,              // Balance mass angle (rad)
   masses: [                           // Unbalanced masses
-    { m_g: 50, r_mm: 60, phase: deg2rad(0),   posPct: 50, colour: 'red' },
-    { m_g: 30, r_mm: 80, phase: deg2rad(60),  posPct: 50, colour: 'blue' },
-    { m_g: 40, r_mm: 50, phase: deg2rad(120), posPct: 50, colour: 'orange' },
+    { m_g: 60, r_mm: 60, phase: deg2rad(0),   posPct: 50, colour: 'red' },
+    { m_g: 80, r_mm: 80, phase: deg2rad(60),  posPct: 50, colour: 'blue' },
+    { m_g: 50, r_mm: 50, phase: deg2rad(120), posPct: 50, colour: 'orange' },
   ],
 };
 
@@ -143,9 +143,9 @@ const multiParams = {
   rotorRadius_mm: 120,               // Rotor disc radius (mm)
   isBalanced: false,                 // Balance applied flag
   masses: [                          // Unbalanced masses at various axial positions
-    { id: 1, m_g: 50, r_mm: 60, posPct: 25, colour: colours.red,    phase: 0 },
-    { id: 2, m_g: 30, r_mm: 80, posPct: 50, colour: colours.blue,   phase: Math.PI/3 },
-    { id: 3, m_g: 40, r_mm: 50, posPct: 75, colour: colours.orange, phase: 2*Math.PI/3 },
+    { id: 1, m_g: 60, r_mm: 60, posPct: 25, colour: colours.red,    phase: 0 },
+    { id: 2, m_g: 80, r_mm: 80, posPct: 50, colour: colours.blue,   phase: Math.PI/3 },
+    { id: 3, m_g: 50, r_mm: 50, posPct: 75, colour: colours.orange, phase: 2*Math.PI/3 },
   ],
   // Correction planes at 10% (L) and 90% (M) along shaft
   balanceMasses: [
@@ -496,9 +496,9 @@ function resetSingle() {
   singleParams.isBalanced = SINGLE_DEFAULTS.isBalanced;
 
   const DEF = [
-    { m_g: 50, r_mm: 60, phase: 0,   posPct: 50 },
-    { m_g: 30, r_mm: 80, phase: 60,  posPct: 50 },
-    { m_g: 40, r_mm: 50, phase: 120, posPct: 50 },
+    { m_g: 60, r_mm: 60, phase: 0,   posPct: 50 },
+    { m_g: 80, r_mm: 80, phase: 60,  posPct: 50 },
+    { m_g: 50, r_mm: 50, phase: 120, posPct: 50 },
   ];
 
   singleParams.masses.forEach((m, i) => {
@@ -796,10 +796,11 @@ const singleFrontSketch = (p) => {
       p.strokeWeight(2);
       p.line(0, 0, x, y);
 
-      // Mass circle
+      // Mass circle (size proportional to mass)
+      const dotSize = m.m_g * 24 / 150;
       p.noStroke();
       p.fill(...col);
-      p.circle(x, y, 10);
+      if (dotSize > 0) p.circle(x, y, dotSize);
     });
 
     // Draw balance mass if applied
@@ -811,9 +812,11 @@ const singleFrontSketch = (p) => {
       p.strokeWeight(2);
       p.line(0, 0, bx, by);
 
+      // Balance mass circle (size proportional to mass)
+      const dotSize = singleParams.balanceMass_g * 24 / 150;
       p.noStroke();
       p.fill(...colours.green);
-      p.circle(bx, by, 10);
+      if (dotSize > 0) p.circle(bx, by, dotSize);
     }
 
     // Draw radial spokes
@@ -938,9 +941,11 @@ const singleSideSketch = (p) => {
       p.strokeWeight(3);
       p.line(centerX, midY + vibrationY, centerX, midY + vibrationY + ymm * s_side);
 
+      // Mass circle (size proportional to mass)
+      const dotSize = m.m_g * 24 / 150;
       p.noStroke();
       p.fill(...col);
-      p.circle(centerX, midY + vibrationY + ymm * s_side, 10);
+      if (dotSize > 0) p.circle(centerX, midY + vibrationY + ymm * s_side, dotSize);
     }
 
     // Draw balance mass if applied
@@ -949,9 +954,12 @@ const singleSideSketch = (p) => {
       p.stroke(...colours.green);
       p.strokeWeight(3);
       p.line(centerX, midY, centerX, midY - by);
+
+      // Balance mass circle (size proportional to mass)
+      const dotSize = singleParams.balanceMass_g * 24 / 150;
       p.noStroke();
       p.fill(...colours.green);
-      p.circle(centerX, midY - by, 8);
+      if (dotSize > 0) p.circle(centerX, midY - by, dotSize);
     }
 
     // Label
@@ -1298,9 +1306,11 @@ const multiFrontSketch = (p) => {
       p.strokeWeight(2);
       p.line(0, 0, x, y);
 
+      // Mass circle (size proportional to mass)
+      const dotSize = m.m_g * 24 / 150;
       p.noStroke();
       p.fill(...m.colour);
-      p.circle(x, y, 12);
+      if (dotSize > 0) p.circle(x, y, dotSize);
     }
 
     // Draw balance masses if applied
@@ -1315,9 +1325,11 @@ const multiFrontSketch = (p) => {
         p.strokeWeight(2);
         p.line(0, 0, x, y);
 
+        // Balance mass circle (size proportional to mass)
+        const dotSize = bm.m_g * 24 / 150;
         p.noStroke();
         p.fill(...colours.green);
-        p.circle(x, y, 10);
+        if (dotSize > 0) p.circle(x, y, dotSize);
       }
     }
 
@@ -1454,9 +1466,11 @@ const multiSideSketch = (p) => {
       p.line(X(zmm), Y(0) + vibrationY * Math.sin(theta),
              X(zmm), Y(ymm) + vibrationY * Math.sin(theta));
 
+      // Mass circle (size proportional to mass)
+      const dotSize = m.m_g * 24 / 150;
       p.noStroke();
       p.fill(...m.colour);
-      p.circle(X(zmm), Y(ymm) + vibrationY * Math.sin(theta), 10);
+      if (dotSize > 0) p.circle(X(zmm), Y(ymm) + vibrationY * Math.sin(theta), dotSize);
     }
 
     // Draw balance masses if applied
@@ -1469,9 +1483,11 @@ const multiSideSketch = (p) => {
         p.strokeWeight(2);
         p.line(X(zmm), Y(0), X(zmm), Y(ymm));
 
+        // Balance mass circle (size proportional to mass)
+        const dotSize = bm.m_g * 24 / 150;
         p.noStroke();
         p.fill(...colours.green);
-        p.circle(X(zmm), Y(ymm), 8);
+        if (dotSize > 0) p.circle(X(zmm), Y(ymm), dotSize);
       }
     }
 

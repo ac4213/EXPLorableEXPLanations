@@ -630,84 +630,57 @@ function titleText(){
 
   <div class="quiz-container">
     <div class="quiz-question">
-      <p><strong>Question 1:</strong> What is the key advantage of Macaulay's method over traditional integration methods?</p>
-      <form id="q1">
-        <input type="radio" id="q1a" name="q1" value="a">
-        <label for="q1a">a) It is computationally faster</label><br>
-        <input type="radio" id="q1b" name="q1" value="b">
-        <label for="q1b">b) It allows writing a single equation valid for the entire beam length</label><br>
-        <input type="radio" id="q1c" name="q1" value="c">
-        <label for="q1c">c) It only works for determinate beams</label><br>
-        <input type="radio" id="q1d" name="q1" value="d">
-        <label for="q1d">d) It eliminates the need for boundary conditions</label><br>
-        <button type="button" onclick="checkAnswer('q1', 'b')">Check Answer</button>
-      </form>
-      <div id="q1-feedback" class="feedback"></div>
+      <h3>Question 1: What is the key advantage of Macaulay's method over traditional integration methods?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q1" value="a"> It is computationally faster</label>
+        <label><input type="radio" name="q1" value="b"> It allows writing a single equation valid for the entire beam length</label>
+        <label><input type="radio" name="q1" value="c"> It only works for determinate beams</label>
+        <label><input type="radio" name="q1" value="d"> It eliminates the need for boundary conditions</label>
+      </div>
     </div>
 
     <div class="quiz-question">
-      <p><strong>Question 2:</strong> For a point load P at position 'a', how is it represented in Macaulay notation?</p>
-      <form id="q2">
-        <input type="radio" id="q2a" name="q2" value="a">
-        <label for="q2a">a) \(P(x - a)\)</label><br>
-        <input type="radio" id="q2b" name="q2" value="b">
-        <label for="q2b">b) \(P\langle x - a \rangle^0\)</label><br>
-        <input type="radio" id="q2c" name="q2" value="c">
-        <label for="q2c">c) \(P\langle x - a \rangle^1\)</label><br>
-        <input type="radio" id="q2d" name="q2" value="d">
-        <label for="q2d">d) \(P\langle x - a \rangle^2\)</label><br>
-        <button type="button" onclick="checkAnswer('q2', 'b')">Check Answer</button>
-      </form>
-      <div id="q2-feedback" class="feedback"></div>
+      <h3>Question 2: For a point load P at position 'a', how is it represented in Macaulay notation?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q2" value="a"> \(P(x - a)\)</label>
+        <label><input type="radio" name="q2" value="b"> \(P\langle x - a \rangle^0\)</label>
+        <label><input type="radio" name="q2" value="c"> \(P\langle x - a \rangle^1\)</label>
+        <label><input type="radio" name="q2" value="d"> \(P\langle x - a \rangle^2\)</label>
+      </div>
     </div>
 
     <div class="quiz-question">
-      <p><strong>Question 3:</strong> What happens to a Macaulay bracket \(\langle x - a \rangle^n\) when \(x < a\)?</p>
-      <form id="q3">
-        <input type="radio" id="q3a" name="q3" value="a">
-        <label for="q3a">a) It equals \((x-a)^n\)</label><br>
-        <input type="radio" id="q3b" name="q3" value="b">
-        <label for="q3b">b) It equals zero</label><br>
-        <input type="radio" id="q3c" name="q3" value="c">
-        <label for="q3c">c) It equals \(a^n\)</label><br>
-        <input type="radio" id="q3d" name="q3" value="d">
-        <label for="q3d">d) It is undefined</label><br>
-        <button type="button" onclick="checkAnswer('q3', 'b')">Check Answer</button>
-      </form>
-      <div id="q3-feedback" class="feedback"></div>
+      <h3>Question 3: What happens to a Macaulay bracket \(\langle x - a \rangle^n\) when \(x < a\)?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q3" value="a"> It equals \((x-a)^n\)</label>
+        <label><input type="radio" name="q3" value="b"> It equals zero</label>
+        <label><input type="radio" name="q3" value="c"> It equals \(a^n\)</label>
+        <label><input type="radio" name="q3" value="d"> It is undefined</label>
+      </div>
     </div>
 
     <div class="quiz-question">
-      <p><strong>Question 4:</strong> In Macaulay's method for calculating bending moment M(x), what exponent is used for a concentrated moment \(M_0\) at position a?</p>
-      <form id="q4">
-        <input type="radio" id="q4a" name="q4" value="a">
-        <label for="q4a">a) Exponent = -1</label><br>
-        <input type="radio" id="q4b" name="q4" value="b">
-        <label for="q4b">b) Exponent = 0</label><br>
-        <input type="radio" id="q4c" name="q4" value="c">
-        <label for="q4c">c) Exponent = 1</label><br>
-        <input type="radio" id="q4d" name="q4" value="d">
-        <label for="q4d">d) Exponent = 2</label><br>
-        <button type="button" onclick="checkAnswer('q4', 'b')">Check Answer</button>
-      </form>
-      <div id="q4-feedback" class="feedback"></div>
+      <h3>Question 4: In Macaulay's method for calculating bending moment M(x), what exponent is used for a concentrated moment \(M_0\) at position a?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q4" value="a"> Exponent = -1</label>
+        <label><input type="radio" name="q4" value="b"> Exponent = 0</label>
+        <label><input type="radio" name="q4" value="c"> Exponent = 1</label>
+        <label><input type="radio" name="q4" value="d"> Exponent = 2</label>
+      </div>
     </div>
 
     <div class="quiz-question">
-      <p><strong>Question 5:</strong> A UDL of magnitude w starts at x = a and ends at x = b (where b < L). How is this represented in the bending moment equation M(x)?</p>
-      <form id="q5">
-        <input type="radio" id="q5a" name="q5" value="a">
-        <label for="q5a">a) \(M(x) = -\frac{w}{2}\langle x - a \rangle^2\)</label><br>
-        <input type="radio" id="q5b" name="q5" value="b">
-        <label for="q5b">b) \(M(x) = -\frac{w}{2}\langle x - a \rangle^2 + \frac{w}{2}\langle x - b \rangle^2\)</label><br>
-        <input type="radio" id="q5c" name="q5" value="c">
-        <label for="q5c">c) \(M(x) = -\frac{w}{2}\langle x - b \rangle^2\)</label><br>
-        <input type="radio" id="q5d" name="q5" value="d">
-        <label for="q5d">d) \(M(x) = -w\langle x - a \rangle^1 + w\langle x - b \rangle^1\)</label><br>
-        <button type="button" onclick="checkAnswer('q5', 'b')">Check Answer</button>
-      </form>
-      <div id="q5-feedback" class="feedback"></div>
+      <h3>Question 5: A UDL of magnitude w starts at x = a and ends at x = b (where b < L). How is this represented in the bending moment equation M(x)?</h3>
+      <div class="quiz-options">
+        <label><input type="radio" name="q5" value="a"> \(M(x) = -\frac{w}{2}\langle x - a \rangle^2\)</label>
+        <label><input type="radio" name="q5" value="b"> \(M(x) = -\frac{w}{2}\langle x - a \rangle^2 + \frac{w}{2}\langle x - b \rangle^2\)</label>
+        <label><input type="radio" name="q5" value="c"> \(M(x) = -\frac{w}{2}\langle x - b \rangle^2\)</label>
+        <label><input type="radio" name="q5" value="d"> \(M(x) = -w\langle x - a \rangle^1 + w\langle x - b \rangle^1\)</label>
+      </div>
     </div>
+
+    <button id="submit-quiz">Submit Quiz</button>
+    <div id="quiz-results"></div>
   </div>
 </div>
 
@@ -725,11 +698,6 @@ function titleText(){
   </div>
 </div>
 
-<script>
-// toggleSolution function now loaded from /assets/common/problems.js
-// checkAnswer function now loaded from /assets/common/quizzes.js
-</script>
-
 <footer>
   <script src="/assets/common/footer.js"></script>
 </footer>
@@ -737,5 +705,43 @@ function titleText(){
 <!-- Common JavaScript functions -->
 <script src="/assets/common/problems.js"></script>
 <script src="/assets/common/quizzes.js"></script>
+
+<script>
+// Quiz handler for Macaulay's Method
+document.getElementById('submit-quiz').addEventListener('click', function() {
+  const answers = {
+    q1: 'b',  // Allows writing a single equation valid for the entire beam length
+    q2: 'c',  // P<x - a>^1 (point load contribution to M(x) has exponent 1)
+    q3: 'b',  // It equals zero
+    q4: 'b',  // Exponent = 0 for concentrated moment
+    q5: 'b'   // -w/2<x - a>^2 + w/2<x - b>^2
+  };
+
+  let score = 0;
+  let totalQuestions = Object.keys(answers).length;
+  let resultsHTML = '<h3>Quiz Results:</h3>';
+
+  for (let question in answers) {
+    const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+    const correctAnswer = answers[question];
+
+    if (selectedOption) {
+      if (selectedOption.value === correctAnswer) {
+        score++;
+        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+      } else {
+        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+      }
+    } else {
+      resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+    }
+  }
+
+  const percentage = ((score / totalQuestions) * 100).toFixed(0);
+  resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+  document.getElementById('quiz-results').innerHTML = resultsHTML;
+});
+</script>
 </body>
 </html>

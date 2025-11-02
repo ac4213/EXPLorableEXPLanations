@@ -52,6 +52,35 @@
             background-color: rgba(0, 100, 220, 0.9);
         }
 
+        /* Floating restore button - only visible when panel is hidden */
+        .restore-controls-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: rgba(0, 123, 255, 0.7);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .restore-controls-btn:hover {
+            background-color: rgba(0, 123, 255, 0.9);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        .restore-controls-btn.visible {
+            display: block;
+        }
+
         /* Small screens: floating, semi-transparent, concealable */
         @media (max-width: 768px) {
             .control-panel {
@@ -68,6 +97,7 @@
                 transition: transform 0.3s ease, opacity 0.3s ease;
                 max-height: 60vh;
                 overflow-y: auto;
+                z-index: 100;
             }
 
             .control-panel.hidden {
@@ -148,18 +178,24 @@
 
             .control-panel {
                 grid-column: 2;
-                grid-row: 1;
+                grid-row: 1 / span 2;
                 background-color: #f9f9f9;
                 padding: 15px;
                 border-radius: 8px;
-                max-height: 650px;
+                max-height: calc(100vh - 100px);
                 overflow-y: auto;
                 position: sticky;
                 top: 20px;
+                align-self: start;
             }
 
             .status-display {
-                grid-column: 1 / -1;
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .control-toggle {
+                display: none !important;
             }
 
             .control-row {
@@ -264,8 +300,8 @@
 <h4>Mass 1 (Red)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="single-mass1" max="150" min="0" step="5" type="range" value="50"/>
-<input id="single-mass1-value" max="150" min="0" type="number" value="50"/>
+<input id="single-mass1" max="150" min="0" step="5" type="range" value="60"/>
+<input id="single-mass1-value" max="150" min="0" type="number" value="60"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -282,8 +318,8 @@
 <h4>Mass 2 (Blue)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="single-mass2" max="150" min="0" step="5" type="range" value="30"/>
-<input id="single-mass2-value" max="150" min="0" type="number" value="30"/>
+<input id="single-mass2" max="150" min="0" step="5" type="range" value="80"/>
+<input id="single-mass2-value" max="150" min="0" type="number" value="80"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -300,8 +336,8 @@
 <h4>Mass 3 (Orange)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="single-mass3" max="150" min="0" step="5" type="range" value="40"/>
-<input id="single-mass3-value" max="150" min="0" type="number" value="40"/>
+<input id="single-mass3" max="150" min="0" step="5" type="range" value="50"/>
+<input id="single-mass3-value" max="150" min="0" type="number" value="50"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -333,7 +369,7 @@
 <div class="status-value" id="single-force">0 N</div>
 </div>
 <div class="status-item">
-<div class="status-label">Balance Mass Required</div>
+<div class="status-label">Balance Mass Required at 80 mm</div>
 <div class="status-value" id="single-balance-mass">-- g</div>
 </div>
 <div class="status-item">
@@ -380,8 +416,8 @@
 <h4>Mass 1 (Red)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="multi-mass1" max="150" min="0" step="5" type="range" value="50"/>
-<input id="multi-mass1-value" max="150" min="0" type="number" value="50"/>
+<input id="multi-mass1" max="150" min="0" step="5" type="range" value="60"/>
+<input id="multi-mass1-value" max="150" min="0" type="number" value="60"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -403,8 +439,8 @@
 <h4>Mass 2 (Blue)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="multi-mass2" max="150" min="0" step="5" type="range" value="30"/>
-<input id="multi-mass2-value" max="150" min="0" type="number" value="30"/>
+<input id="multi-mass2" max="150" min="0" step="5" type="range" value="80"/>
+<input id="multi-mass2-value" max="150" min="0" type="number" value="80"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -426,8 +462,8 @@
 <h4>Mass 3 (Orange)</h4>
 <div class="slider-row">
 <span class="slider-label">Mass (g):</span>
-<input id="multi-mass3" max="150" min="0" step="5" type="range" value="40"/>
-<input id="multi-mass3-value" max="150" min="0" type="number" value="40"/>
+<input id="multi-mass3" max="150" min="0" step="5" type="range" value="50"/>
+<input id="multi-mass3-value" max="150" min="0" type="number" value="50"/>
 </div>
 <div class="slider-row">
 <span class="slider-label">Radius (mm):</span>
@@ -468,11 +504,11 @@
 <div class="status-value" id="multi-moment">0 Nm</div>
 </div>
 <div class="status-item">
-<div class="status-label">Plane L Balance</div>
+<div class="status-label">Plane L Balance at 80 mm</div>
 <div class="status-value" id="multi-balance-a">L: -- g @ -- °</div>
 </div>
 <div class="status-item">
-<div class="status-label">Plane M Balance</div>
+<div class="status-label">Plane M Balance at 80 mm</div>
 <div class="status-value" id="multi-balance-b">M: -- g @ -- °</div>
 </div>
 </div>
@@ -524,28 +560,43 @@
             const controlPanels = document.querySelectorAll('.control-panel');
 
             controlPanels.forEach(function(panel) {
-                // Create toggle button
+                // Create toggle button (inside panel)
                 const toggleBtn = document.createElement('button');
                 toggleBtn.className = 'control-toggle';
                 toggleBtn.textContent = 'Hide Controls';
                 toggleBtn.setAttribute('aria-label', 'Toggle controls visibility');
 
-                // Insert button at the beginning of panel
+                // Create floating restore button (outside panel)
+                const restoreBtn = document.createElement('button');
+                restoreBtn.className = 'restore-controls-btn';
+                restoreBtn.textContent = '⚙️ Show Controls';
+                restoreBtn.setAttribute('aria-label', 'Show controls panel');
+                document.body.appendChild(restoreBtn);
+
+                // Insert toggle button at the beginning of panel
                 panel.insertBefore(toggleBtn, panel.firstChild);
 
-                // Add click handler
+                // Add click handler for toggle button
                 toggleBtn.addEventListener('click', function() {
-                    panel.classList.toggle('hidden');
-                    toggleBtn.textContent = panel.classList.contains('hidden') ? 'Show Controls' : 'Hide Controls';
+                    panel.classList.add('hidden');
+                    restoreBtn.classList.add('visible');
+                });
+
+                // Add click handler for restore button
+                restoreBtn.addEventListener('click', function() {
+                    panel.classList.remove('hidden');
+                    restoreBtn.classList.remove('visible');
                 });
 
                 // Only show toggle button on small screens
                 function updateToggleVisibility() {
                     if (window.innerWidth <= 768) {
                         toggleBtn.style.display = 'block';
+                        // Keep restore button state as is
                     } else {
                         toggleBtn.style.display = 'none';
                         panel.classList.remove('hidden');
+                        restoreBtn.classList.remove('visible');
                     }
                 }
 
@@ -757,7 +808,7 @@
             </div>
 
             <button id="submit-quiz">Submit Quiz</button>
-            <div id="quiz-results" class="hidden"></div>
+            <div id="quiz-results"></div>
         </div>
     </div>
 
@@ -784,26 +835,30 @@
                     };
 
                     let score = 0;
-                    let feedback = '<h3>Quiz Results:</h3>';
+                    let totalQuestions = Object.keys(answers).length;
+                    let resultsHTML = '<h3>Quiz Results:</h3>';
 
                     for (let question in answers) {
                         const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        const correctAnswer = answers[question];
+
                         if (selectedOption) {
-                            if (selectedOption.value === answers[question]) {
+                            if (selectedOption.value === correctAnswer) {
                                 score++;
-                                feedback += `<p>Question ${question.substring(1)}: Correct!</p>`;
+                                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
                             } else {
-                                feedback += `<p>Question ${question.substring(1)}: Incorrect. The correct answer was ${answers[question]}.</p>`;
+                                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
                             }
                         } else {
-                            feedback += `<p>Question ${question.substring(1)}: No answer selected.</p>`;
+                            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
                         }
                     }
 
-                    feedback += `<p><strong>Your score: ${score}/5</strong></p>`;
+                    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
 
                     const resultsDiv = document.getElementById('quiz-results');
-                    resultsDiv.innerHTML = feedback;
+                    resultsDiv.innerHTML = resultsHTML;
                     resultsDiv.classList.remove('hidden');
                 });
             }

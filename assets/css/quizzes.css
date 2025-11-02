@@ -93,6 +93,13 @@
     border-left: 4px solid #52c41a;
 }
 
+/* Hide quiz results when empty */
+#quiz-results:empty {
+    display: none;
+    margin: 0;
+    padding: 0;
+}
+
 #quiz-results h3 {
     color: #237804;
     margin-bottom: 15px;

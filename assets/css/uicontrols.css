@@ -19,179 +19,205 @@
     justify-content: center;
 }
 
-/* Control Items (for individual control groups within panels) */
-.control-item {
-    flex: 1 1 200px;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+/* ==================== SLIDERS ==================== */
+
+/* Slider Containers - Responsive Design */
+.slider-container {
+    margin: 10px 0;
 }
 
-.control-item label {
+.slider-container label {
+    display: block;
+    margin-bottom: 5px;
     font-weight: bold;
-    font-size: 0.95em;
-    color: #333;
 }
 
-/* Control Value Display */
-.control-value {
-    font-size: 0.9em;
-    color: #555;
-    margin-top: 3px;
+.slider-container input[type="range"] {
+    width: 100%;
+    max-width: 100%;
+    margin: 5px 0;
 }
 
-.control-value span {
-    font-weight: bold;
-    color: #333;
-}
-
-/* Parameter Value Display (inline with sliders) */
-.parameter-value {
+.slider-value {
     display: inline-block;
-    min-width: 50px;
+    min-width: 60px;
     text-align: right;
     font-family: monospace;
-    font-weight: bold;
-    color: #333;
 }
 
-/* ==================== SLIDERS ==================== */
+/* Slider Row Layout */
+.slider-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.slider-label {
+    flex: 0 0 auto;
+    min-width: 80px;
+    max-width: 120px;
+    font-size: 0.95em;
+}
+
+.slider-row input[type="range"] {
+    flex: 1 1 auto;
+    min-width: 80px;
+    max-width: 100%;
+}
+
+.slider-row input[type="number"] {
+    width: 70px;
+    max-width: 70px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
 
 /* Slider Styling */
 input[type="range"] {
-    -webkit-appearance: none;
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: #ddd;
+    background: linear-gradient(to right, #e8e8e8, #ddd);
     outline: none;
     transition: background 0.3s;
+    cursor: pointer;
 }
 
 input[type="range"]:hover {
-    background: #ccc;
+    background: linear-gradient(to right, #d4d4d4, #c8c8c8);
+}
+
+input[type="range"]:focus {
+    background: linear-gradient(to right, #ffe9a3, #ffd966);
+}
+
+/* Input Number Styling */
+input[type="number"] {
+    width: 70px;
+    padding: 4px 2px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 0.9em;
+    transition: border-color 0.3s;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-color, #ffd700);
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+}
+
+/* Label Styling */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 /* Slider Thumb - Webkit browsers */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: var(--secondary-color, #ffb300);
+    background: var(--primary-color, #ffd700);
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 3px solid #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     transition: all 0.3s;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-    background: var(--primary-color, #ffd700);
+    background: var(--secondary-color, #ffb300);
     transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 
 /* Slider Thumb - Firefox */
 input[type="range"]::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: var(--secondary-color, #ffb300);
+    background: var(--primary-color, #ffd700);
     cursor: pointer;
-    border: 2px solid #fff;
+    border: 3px solid #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     transition: all 0.3s;
 }
 
 input[type="range"]::-moz-range-thumb:hover {
-    background: var(--primary-color, #ffd700);
+    background: var(--secondary-color, #ffb300);
     transform: scale(1.1);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3);
 }
 
 /* Slider Track - Firefox */
 input[type="range"]::-moz-range-track {
-    background: #ddd;
+    background: linear-gradient(to right, #e8e8e8, #ddd);
     border-radius: 3px;
     height: 6px;
 }
 
-/* ==================== ENERGY BARS & VISUALIZATIONS ==================== */
+/* ==================== CHECKBOXES ==================== */
 
-/* Energy Bars Container */
-.energy-bars {
-    display: flex;
-    gap: 15px;
-    margin: 15px 0;
-    padding: 10px;
-    background-color: #f0f8ff;
-    border-radius: 5px;
-    justify-content: center;
-}
-
-/* Individual Energy Bar Container */
-.energy-bar-container {
-    flex: 1;
-    text-align: center;
-    max-width: 100px;
-}
-
-/* Energy Bar Label */
-.energy-bar-label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 0.9em;
-    color: #333;
-}
-
-/* Energy Bar Wrapper (the empty bar) */
-.energy-bar-wrapper {
-    height: 150px;
-    width: 40px;
-    background-color: #e0e0e0;
-    border: 2px solid #333;
+/* Custom checkbox styling */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
     border-radius: 3px;
-    margin: 0 auto;
+    background-color: #fff;
+    cursor: pointer;
     position: relative;
-    display: flex;
-    align-items: flex-end;
-    overflow: hidden;
+    vertical-align: middle;
+    margin-right: 8px;
+    transition: all 0.3s;
 }
 
-/* Energy Bar Fill (the colored part) */
-.energy-bar {
-    width: 100%;
-    background: linear-gradient(to top, #4CAF50, #8BC34A);
-    border-radius: 0 0 3px 3px;
-    transition: height 0.3s ease;
+input[type="checkbox"]:hover {
+    border-color: var(--secondary-color, #ffb300);
 }
 
-/* Energy bar color variants */
-.energy-bar.potential {
-    background: linear-gradient(to top, #2196F3, #64B5F6);
+input[type="checkbox"]:checked {
+    background-color: var(--primary-color, #ffd700);
+    border-color: var(--secondary-color, #ffb300);
 }
 
-.energy-bar.kinetic {
-    background: linear-gradient(to top, #4CAF50, #8BC34A);
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
 }
 
-.energy-bar.lost {
-    background: linear-gradient(to top, #FF9800, #FFB74D);
+/* Checkbox labels */
+label:has(input[type="checkbox"]) {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    margin: 5px 0;
 }
 
-.energy-bar.rotational {
-    background: linear-gradient(to top, #FF9800, #FFB74D);
-}
+/* ==================== BUTTONS ==================== */
 
-.energy-bar.translational {
-    background: linear-gradient(to top, #4CAF50, #81C784);
-}
-
-/* Energy Value Display */
-.energy-value {
-    margin-top: 5px;
-    font-size: 0.85em;
-    color: #555;
+/* Ensure buttons are responsive */
+button,
+.control-button {
+    min-width: 80px;
+    padding: 8px 16px;
+    white-space: nowrap;
 }
 
 /* ==================== SIMULATION HOLDERS ==================== */
@@ -210,25 +236,175 @@ input[type="range"]::-moz-range-track {
 
 /* ==================== RESPONSIVE DESIGN ==================== */
 
+/* Large screens - desktop, laptop, tablets in landscape mode */
+/* Ensure consecutive sliders fit in a single row */
+@media (min-width: 1025px) {
+    .simulation-controls,
+    .controls-panel,
+    .control-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 15px;
+        align-items: center;
+    }
+
+    .slider-row {
+        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        gap: 10px;
+        margin-bottom: 0;
+        min-width: 0; /* Allow shrinking */
+    }
+
+    .slider-label {
+        flex: 0 0 auto;
+        min-width: 60px;
+        max-width: 100px;
+        font-size: 0.9em;
+        margin-bottom: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .slider-row input[type="range"] {
+        flex: 1 1 auto;
+        min-width: 100px;
+        max-width: none;
+        margin-bottom: 0;
+    }
+
+    .slider-row input[type="number"] {
+        flex: 0 0 auto;
+        width: 65px;
+        max-width: 65px;
+    }
+
+    /* Dynamic width calculation for multiple consecutive sliders */
+    /* 2 sliders in a row */
+    .simulation-controls .slider-row:nth-child(2):nth-last-child(1),
+    .simulation-controls .slider-row:first-child:nth-last-child(2),
+    .controls-panel .slider-row:nth-child(2):nth-last-child(1),
+    .controls-panel .slider-row:first-child:nth-last-child(2),
+    .control-panel .slider-row:nth-child(2):nth-last-child(1),
+    .control-panel .slider-row:first-child:nth-last-child(2) {
+        flex: 0 1 calc(50% - 10px);
+    }
+
+    /* 3 sliders in a row */
+    .simulation-controls .slider-row:nth-child(3):nth-last-child(1),
+    .simulation-controls .slider-row:nth-child(2):nth-last-child(2),
+    .simulation-controls .slider-row:first-child:nth-last-child(3),
+    .controls-panel .slider-row:nth-child(3):nth-last-child(1),
+    .controls-panel .slider-row:nth-child(2):nth-last-child(2),
+    .controls-panel .slider-row:first-child:nth-last-child(3),
+    .control-panel .slider-row:nth-child(3):nth-last-child(1),
+    .control-panel .slider-row:nth-child(2):nth-last-child(2),
+    .control-panel .slider-row:first-child:nth-last-child(3) {
+        flex: 0 1 calc(33.333% - 10px);
+    }
+
+    /* 4 sliders in a row */
+    .simulation-controls .slider-row:nth-child(4):nth-last-child(1),
+    .simulation-controls .slider-row:nth-child(3):nth-last-child(2),
+    .simulation-controls .slider-row:nth-child(2):nth-last-child(3),
+    .simulation-controls .slider-row:first-child:nth-last-child(4),
+    .controls-panel .slider-row:nth-child(4):nth-last-child(1),
+    .controls-panel .slider-row:nth-child(3):nth-last-child(2),
+    .controls-panel .slider-row:nth-child(2):nth-last-child(3),
+    .controls-panel .slider-row:first-child:nth-last-child(4),
+    .control-panel .slider-row:nth-child(4):nth-last-child(1),
+    .control-panel .slider-row:nth-child(3):nth-last-child(2),
+    .control-panel .slider-row:nth-child(2):nth-last-child(3),
+    .control-panel .slider-row:first-child:nth-last-child(4) {
+        flex: 0 1 calc(25% - 12px);
+    }
+
+    /* 5 sliders in a row */
+    .simulation-controls .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5),
+    .controls-panel .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5),
+    .control-panel .slider-row:nth-child(-n+5):nth-last-child(n+1):nth-last-child(-n+5) {
+        flex: 0 1 calc(20% - 12px);
+    }
+
+    /* 6+ sliders in a row */
+    .simulation-controls .slider-row:nth-child(n+6),
+    .controls-panel .slider-row:nth-child(n+6),
+    .control-panel .slider-row:nth-child(n+6) {
+        flex: 0 1 calc(16.666% - 13px);
+    }
+}
+
+/* Tablets in landscape mode - compact side-by-side sliders */
+@media (min-width: 577px) and (max-width: 1024px) and (orientation: landscape) {
+    .simulation-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        align-items: center;
+    }
+
+    .slider-row {
+        flex: 0 1 auto;
+        flex-wrap: nowrap;
+        gap: 5px;
+        margin-bottom: 0;
+    }
+
+    .slider-label {
+        flex: 0 0 auto;
+        min-width: 50px;
+        max-width: 75px;
+        font-size: 0.75em;
+        margin-bottom: 0;
+    }
+
+    .slider-row input[type="range"] {
+        flex: 0 0 70px;
+        width: 70px;
+        min-width: 70px;
+        margin-bottom: 0;
+    }
+
+    .slider-row input[type="number"] {
+        flex: 0 0 auto;
+        width: 50px;
+        max-width: 50px;
+        font-size: 0.75em;
+        padding: 3px;
+    }
+}
+
 @media (max-width: 768px) {
     .controls-panel {
         flex-direction: column;
         padding: 12px;
     }
 
-    .control-item {
-        min-width: 100%;
-        flex: 1 1 100%;
+    /* Keep sliders compact - label, slider, and number on same line for tablets */
+    .slider-row {
+        flex-wrap: nowrap;
+        gap: 8px;
     }
 
-    .energy-bars {
-        gap: 10px;
-        padding: 8px;
+    .slider-label {
+        flex: 0 0 auto;
+        min-width: 70px;
+        max-width: 100px;
+        margin-bottom: 0;
+        font-size: 0.9em;
     }
 
-    .energy-bar-wrapper {
-        height: 120px;
-        width: 35px;
+    .slider-row input[type="range"] {
+        flex: 1 1 auto;
+        min-width: 100px;
+        margin-bottom: 0;
+    }
+
+    .slider-row input[type="number"] {
+        flex: 0 0 auto;
+        width: 65px;
+        max-width: 65px;
     }
 
     .sim-holder {
@@ -242,27 +418,26 @@ input[type="range"]::-moz-range-track {
         gap: 10px;
     }
 
-    .energy-bars {
-        flex-wrap: wrap;
-        gap: 8px;
+    /* Compact sliders for small phones */
+    .slider-row {
+        gap: 6px;
     }
 
-    .energy-bar-container {
-        flex: 1 1 60px;
+    .slider-label {
+        font-size: 0.85em;
         min-width: 60px;
+        max-width: 85px;
     }
 
-    .energy-bar-wrapper {
-        height: 100px;
-        width: 30px;
+    .slider-row input[type="range"] {
+        min-width: 80px;
     }
 
-    .energy-bar-label {
-        font-size: 0.8em;
-    }
-
-    .energy-value {
-        font-size: 0.75em;
+    .slider-row input[type="number"] {
+        width: 60px;
+        max-width: 60px;
+        font-size: 0.85em;
+        padding: 3px;
     }
 
     .sim-holder {
@@ -271,9 +446,26 @@ input[type="range"]::-moz-range-track {
 }
 
 @media (max-width: 320px) {
-    .energy-bar-wrapper {
-        height: 80px;
-        width: 25px;
+    /* Extra compact sliders for very small screens */
+    .slider-row {
+        gap: 4px;
+    }
+
+    .slider-label {
+        min-width: 50px;
+        max-width: 70px;
+        font-size: 0.8em;
+    }
+
+    .slider-row input[type="range"] {
+        min-width: 60px;
+    }
+
+    .slider-row input[type="number"] {
+        width: 50px;
+        max-width: 50px;
+        font-size: 0.8em;
+        padding: 2px;
     }
 
     .sim-holder {

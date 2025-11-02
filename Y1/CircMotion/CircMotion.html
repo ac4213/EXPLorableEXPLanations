@@ -168,6 +168,7 @@
                 <label><input type="checkbox" id="showTension" checked> Show String Tension</label>
                 <label><input type="checkbox" id="showVelocity" checked> Show Velocity Vector</label>
                 <label><input type="checkbox" id="showAccelerations" checked> Show Accelerations</label>
+                <label><input type="checkbox" id="showTotalAcceleration"> Show Total Acceleration</label>
             </div>
         </div>
         
@@ -184,6 +185,7 @@
                 <li><span style="color: #00cc00;">Green Arrow</span>: Velocity Vector</li>
                 <li><span style="color: #ff0066;">Red Arrow</span>: Centripetal Acceleration</li>
                 <li><span style="color: #ff9900;">Orange Arrow</span>: Tangential Acceleration</li>
+                <li><span style="color: #9900ff;">Purple Arrow</span>: Total Acceleration (vector sum)</li>
             </ul>
         </div>
     </div>
@@ -319,74 +321,63 @@
         </div>
     </div>
 
+    <!-- QUIZ SECTION -->
     <div class="content-section">
-        <h2>Knowledge Check Quiz</h2>
-
         <div class="quiz-container">
+            <h2>Knowledge Check Quiz</h2>
+
             <div class="quiz-question">
-                <h3>Question 1</h3>
-                <p>In uniform circular motion, which statement is correct?</p>
+                <h3>Question 1: In uniform circular motion, which statement is correct?</h3>
                 <div class="quiz-options">
                     <label><input type="radio" name="q1" value="a"> The velocity is constant</label>
                     <label><input type="radio" name="q1" value="b"> The speed is constant but velocity changes</label>
                     <label><input type="radio" name="q1" value="c"> Both speed and velocity are constant</label>
                     <label><input type="radio" name="q1" value="d"> The acceleration is zero</label>
                 </div>
-                <button onclick="checkAnswer('q1', 'b', 'q1-feedback')">Check Answer</button>
-                <div id="q1-feedback" class="feedback"></div>
             </div>
-            
+
             <div class="quiz-question">
-                <h3>Question 2</h3>
-                <p>A particle moves in a circle of radius 0.5 m with angular velocity 4 rad/s. What is its centripetal acceleration?</p>
+                <h3>Question 2: A particle moves in a circle of radius 0.5 m with angular velocity 4 rad/s. What is its centripetal acceleration?</h3>
                 <div class="quiz-options">
                     <label><input type="radio" name="q2" value="a"> 2 m/s²</label>
                     <label><input type="radio" name="q2" value="b"> 4 m/s²</label>
                     <label><input type="radio" name="q2" value="c"> 8 m/s²</label>
                     <label><input type="radio" name="q2" value="d"> 16 m/s²</label>
                 </div>
-                <button onclick="checkAnswer('q2', 'c', 'q2-feedback')">Check Answer</button>
-                <div id="q2-feedback" class="feedback"></div>
             </div>
-            
+
             <div class="quiz-question">
-                <h3>Question 3</h3>
-                <p>When a string is cut during circular motion, the object:</p>
+                <h3>Question 3: When a string is cut during circular motion, the object:</h3>
                 <div class="quiz-options">
                     <label><input type="radio" name="q3" value="a"> Continues in circular motion</label>
                     <label><input type="radio" name="q3" value="b"> Moves radially outward</label>
                     <label><input type="radio" name="q3" value="c"> Moves tangentially in a straight line</label>
                     <label><input type="radio" name="q3" value="d"> Falls vertically downward</label>
                 </div>
-                <button onclick="checkAnswer('q3', 'c', 'q3-feedback')">Check Answer</button>
-                <div id="q3-feedback" class="feedback"></div>
             </div>
-            
+
             <div class="quiz-question">
-                <h3>Question 4</h3>
-                <p>The relationship between angular acceleration \(\alpha\) and tangential acceleration \(a_t\) is:</p>
+                <h3>Question 4: The relationship between angular acceleration \(\alpha\) and tangential acceleration \(a_t\) is:</h3>
                 <div class="quiz-options">
                     <label><input type="radio" name="q4" value="a"> \(a_t = \alpha/r\)</label>
                     <label><input type="radio" name="q4" value="b"> \(a_t = \alpha r\)</label>
                     <label><input type="radio" name="q4" value="c"> \(a_t = \alpha^2 r\)</label>
                     <label><input type="radio" name="q4" value="d"> \(a_t = r/\alpha\)</label>
                 </div>
-                <button onclick="checkAnswer('q4', 'b', 'q4-feedback')">Check Answer</button>
-                <div id="q4-feedback" class="feedback"></div>
             </div>
-            
+
             <div class="quiz-question">
-                <h3>Question 5</h3>
-                <p>A wheel completes 10 revolutions in 5 seconds starting from rest with uniform acceleration. What is the angular acceleration?</p>
+                <h3>Question 5: A wheel completes 10 revolutions in 5 seconds starting from rest with uniform acceleration. What is the angular acceleration?</h3>
                 <div class="quiz-options">
                     <label><input type="radio" name="q5" value="a"> \(2\pi\) rad/s²</label>
                     <label><input type="radio" name="q5" value="b"> \(4\pi\) rad/s²</label>
                     <label><input type="radio" name="q5" value="c"> \(\frac{8\pi}{5}\) rad/s²</label>
                     <label><input type="radio" name="q5" value="d"> \(\frac{16\pi}{25}\) rad/s²</label>
                 </div>
-                <button onclick="checkAnswer('q5', 'c', 'q5-feedback')">Check Answer</button>
-                <div id="q5-feedback" class="feedback"></div>
             </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
         </div>
     </div>
 
@@ -399,12 +390,50 @@
     <script src="/assets/common/quizzes.js"></script>
 
     <script>
+        // Quiz handler for Circular Motion
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Speed constant but velocity changes
+                q2: 'c',  // ac = ω²r = 4² × 0.5 = 8 m/s²
+                q3: 'c',  // Moves tangentially
+                q4: 'b',  // at = αr
+                q5: 'c'   // θ = 10 × 2π = 20π, θ = ½αt², α = 2θ/t² = 40π/25 = 8π/5
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <script>
         // Page-specific JavaScript
         // p5.js sketch for circular motion simulation
         let sketch = function(p) {
             let angle = 0;
-            let omega = 2.0; // Current angular velocity (rad/s)
-            let omega0 = 2.0; // Initial angular velocity
+            let omega = 2.0; // Current angular velocity (rad/s) - evolves with physics
+            let omega0 = 2.0; // Initial angular velocity from slider
             let alpha = 0; // Angular acceleration (rad/s²)
             let radius = 150;
             let stringCut = false;
@@ -414,7 +443,6 @@
             let centerX, centerY;
             let trailPoints = [];
             let mass = 0.1; // kg (for display purposes)
-            let time = 0; // Time since last reset
             
             p.setup = function() {
                 let canvas = p.createCanvas(p.windowWidth > 800 ? 800 : p.windowWidth - 40, 500);
@@ -445,18 +473,14 @@
                 
                 // Update values from sliders
                 if (!isPaused) {
-                    omega0 = parseFloat(document.getElementById('angularVelocity').value);
                     alpha = parseFloat(document.getElementById('angularAcceleration').value);
                     radius = parseFloat(document.getElementById('stringLength').value);
-                    
-                    // Calculate current angular velocity based on initial velocity and acceleration
-                    omega = omega0 + alpha * time;
-                    
+
+                    // Apply angular acceleration: ω = ω + α * Δt
+                    omega += alpha * 0.016; // Δt ≈ 0.016s at 60fps
+
                     // Clamp omega to reasonable bounds
                     omega = p.constrain(omega, -10, 10);
-                    
-                    // Update time
-                    time += 0.016; // Assuming ~60fps
                 }
                 
                 // Calculate position
@@ -521,24 +545,47 @@
                 
                 // Draw acceleration vectors
                 if (document.getElementById('showAccelerations').checked && !stringCut) {
-                    // Centripetal acceleration
+                    // Centripetal acceleration (pointing toward center)
                     let ac = omega * omega * radius;
                     let acScale = 30;
+                    let acVecX = -ac * p.cos(angle) / 100 * acScale;
+                    let acVecY = -ac * p.sin(angle) / 100 * acScale;
+
                     p.stroke(255, 0, 102);
                     p.strokeWeight(3);
-                    drawArrow(p, beadPos.x, beadPos.y, 
-                             beadPos.x - acScale * p.cos(angle), 
-                             beadPos.y - acScale * p.sin(angle));
-                    
-                    // Tangential acceleration (scaled down for better proportion)
+                    drawArrow(p, beadPos.x, beadPos.y,
+                             beadPos.x + acVecX,
+                             beadPos.y + acVecY);
+
+                    // Tangential acceleration (tangent to circle)
+                    let at = Math.abs(radius * alpha);
+                    let atScale = 30;
+                    let atVecX = 0;
+                    let atVecY = 0;
+
                     if (Math.abs(alpha) > 0.01) {
-                        let at = radius * alpha;
-                        let atScale = at; // Changed from 30 to 10 for smaller arrows
+                        // Tangent direction depends on sign of alpha
+                        let tangentDir = alpha > 0 ? 1 : -1;
+                        atVecX = -tangentDir * at * p.sin(angle) / 100 * atScale;
+                        atVecY = tangentDir * at * p.cos(angle) / 100 * atScale;
+
                         p.stroke(255, 153, 0);
                         p.strokeWeight(3);
-                        drawArrow(p, beadPos.x, beadPos.y, 
-                                 beadPos.x - atScale * p.sin(angle), 
-                                 beadPos.y + atScale * p.cos(angle));
+                        drawArrow(p, beadPos.x, beadPos.y,
+                                 beadPos.x + atVecX,
+                                 beadPos.y + atVecY);
+                    }
+
+                    // Total acceleration (vector sum of centripetal and tangential)
+                    if (document.getElementById('showTotalAcceleration').checked) {
+                        let aTotalX = acVecX + atVecX;
+                        let aTotalY = acVecY + atVecY;
+
+                        p.stroke(153, 0, 255);
+                        p.strokeWeight(4);
+                        drawArrow(p, beadPos.x, beadPos.y,
+                                 beadPos.x + aTotalX,
+                                 beadPos.y + aTotalY);
                     }
                 }
                 
@@ -588,16 +635,15 @@
             
             p.reset = function() {
                 angle = 0;
-                omega = 2.0;
-                omega0 = 2.0;
-                time = 0;
+                // Read initial angular velocity from slider
+                omega0 = parseFloat(document.getElementById('angularVelocity').value);
+                omega = omega0; // Set current omega to initial value
+                alpha = 0;
                 stringCut = false;
                 isPaused = false;
                 trailPoints = [];
                 beadPos = p.createVector(centerX + radius, centerY);
-                document.getElementById('angularVelocity').value = 2.0;
                 document.getElementById('angularAcceleration').value = 0;
-                document.getElementById('angVelValue').textContent = '2.0';
                 document.getElementById('angAccValue').textContent = '0.0';
                 document.getElementById('pauseSimulation').textContent = 'Pause';
             };
@@ -627,6 +673,8 @@
         // Slider event handlers
         document.getElementById('angularVelocity').addEventListener('input', function(e) {
             document.getElementById('angVelValue').textContent = e.target.value;
+            // Reset simulation when initial angular velocity is changed
+            myp5.reset();
         });
         
         document.getElementById('angularAcceleration').addEventListener('input', function(e) {
@@ -637,7 +685,7 @@
             document.getElementById('lengthValue').textContent = e.target.value;
         });
 
-        // toggleSolution and checkAnswer functions now loaded from /assets/common/problems.js and /assets/common/quizzes.js
+        // toggleSolution function now loaded from /assets/common/problems.js
     </script>
 </body>
 </html>

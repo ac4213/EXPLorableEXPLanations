@@ -327,7 +327,7 @@
 
                 <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
                 <div id="solution1" class="hidden">
-                    <h4>Solution:</h4>
+                    
                     <p><strong>(a) Principal stresses:</strong></p>
                     <p>For the given stress tensor, since σ₃₃ = 30 MPa has no coupling with the other components (σ₁₃ = σ₂₃ = 0), one principal stress is σ₃ = 30 MPa.</p>
 
@@ -362,7 +362,7 @@
 
                 <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
                 <div id="solution2" class="hidden">
-                    <h4>Solution:</h4>
+                    
                     <p><strong>(a) Stress invariants:</strong></p>
                     <p>First invariant (trace):</p>
                     <p>\[I_1 = \sigma_{11} + \sigma_{22} + \sigma_{33} = 60 + 40 + 30 = 130 \text{ MPa}\]</p>
@@ -406,7 +406,7 @@
 
                 <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
                 <div id="solution3" class="hidden">
-                    <h4>Solution:</h4>
+                    
                     <p><strong>(a) Radii of three Mohr's circles:</strong></p>
                     <p>Circle 1 (largest, between σ₁ and σ₃):</p>
                     <p>\[R_1 = \frac{\sigma_1 - \sigma_3}{2} = \frac{100 - (-20)}{2} = 60 \text{ MPa}\]</p>
@@ -533,13 +533,47 @@
                 </div>
                 
                 <button id="submit-quiz">Submit Quiz</button>
-                <div id="quiz-results" class="hidden"></div>
+                <div id="quiz-results"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // toggleSolution function now loaded from /assets/common/problems.js
+        // Quiz handler for 3D Stress
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Diagonal elements are normal stresses (not shear)
+                q2: 'c',  // Von Mises based on distortion energy
+                q3: 'd',  // Isotropic needs fewest constants (2: E and ν)
+                q4: 'b',  // Hydrostatic pressure state
+                q5: 'c'   // Tensor transformation under rotation
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
     </script>
 
     <!-- Common JavaScript functions -->
