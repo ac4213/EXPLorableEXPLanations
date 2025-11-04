@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>2DOFs Free Undamped Vibration</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2DOFs Free Undamped Vibration - Interactive Lecture</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
     <link rel="stylesheet" href="/assets/css/main.css">
@@ -9,38 +11,75 @@
     <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
-
-    <style>
-        /* Page-specific styles for 2DOFs visualization layout */
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        .cell {
-            margin: 5px;
-            text-align: center;
-        }
-        #sketch-holder {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-        canvas {
-            margin-top: 5px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <h1 style="margin-bottom: 5px;">2DOFs Free Vibration Visualisation</h1>
-        <button id="animateBtn" style="margin-top: 5px; margin-bottom: 10px;">Start Animation</button>
+    <header>
+        <h1>2DOFs Free Vibration</h1>
+        <p class="subtitle">Understanding Two Degree of Freedom Undamped Vibration Systems</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Two Degrees of Freedom (2DOF) Systems</h2>
+
+        <h3>What are 2DOF Systems?</h3>
+        <p>A two-degree-of-freedom (2DOF) system requires two independent coordinates to completely describe its motion. These systems are fundamental in structural dynamics and mechanical vibrations, representing the next level of complexity after single degree of freedom systems.</p>
+
+        <div class="key-point">
+            <p><strong>Key Characteristics:</strong></p>
+            <ul>
+                <li>Two independent displacement coordinates (x₁, x₂)</li>
+                <li>Two natural frequencies (ω₁, ω₂)</li>
+                <li>Two mode shapes describing independent vibration patterns</li>
+                <li>Coupling between masses through springs or dampers</li>
+            </ul>
+        </div>
+
+        <h3>Equations of Motion</h3>
+        <div class="equation-box">
+            <p>For a 2DOF undamped system with two masses connected by springs:</p>
+            <p>\([M]\{\ddot{x}\} + [K]\{x\} = \{0\}\)</p>
+            <p>Where:</p>
+            <ul style="list-style: none;">
+                <li>\([M]\) = Mass matrix = \(\begin{bmatrix} m_1 & 0 \\ 0 & m_2 \end{bmatrix}\)</li>
+                <li>\([K]\) = Stiffness matrix = \(\begin{bmatrix} k_1+k_2 & -k_2 \\ -k_2 & k_2 \end{bmatrix}\)</li>
+                <li>\(\{x\}\) = Displacement vector = \(\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)</li>
+            </ul>
+        </div>
+
+        <h3>Natural Frequencies and Mode Shapes</h3>
+        <p>The natural frequencies are found by solving the eigenvalue problem:</p>
+        <div class="equation-box">
+            <p>\(\det([K] - \omega^2[M]) = 0\)</p>
+            <p>This yields two natural frequencies: \(\omega_1\) and \(\omega_2\) where \(\omega_1 < \omega_2\)</p>
+            <p>Each natural frequency has an associated mode shape that describes the relative motion of the two masses.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Mode Shapes:</strong> Each mode shape represents a pattern of motion where all parts of the system oscillate at the same frequency and pass through equilibrium simultaneously. The two masses move in-phase for the first mode and out-of-phase for the second mode.</p>
+        </div>
+
+        <h3>Applications</h3>
+        <ul>
+            <li><strong>Vehicle Suspensions:</strong> Modeling car body and wheel masses</li>
+            <li><strong>Building Structures:</strong> Two-story building analysis</li>
+            <li><strong>Machine Foundations:</strong> Equipment mounted on flexible structures</li>
+            <li><strong>Mechanical Systems:</strong> Coupled oscillators in machinery</li>
+        </ul>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation</h2>
+        <p>This simulation demonstrates the free vibration response of a 2DOF system. The visualization shows three different scenarios:</p>
+        <ul>
+            <li><strong>Mode 1:</strong> Both masses oscillate in-phase at the first natural frequency</li>
+            <li><strong>Mode 2:</strong> Masses oscillate out-of-phase at the second natural frequency</li>
+            <li><strong>Free Vibration:</strong> Combined response from initial conditions (x₁=0, x₂=1)</li>
+        </ul>
+
+        <div id="button-container">
+            <button id="animateBtn">Start Animation</button>
+        </div>
+
         <div id="sketch-holder"></div>
     </div>
 
@@ -382,6 +421,57 @@
     </script>
 
     <div class="content-section">
+        <h2>Applications and Examples</h2>
+        <p>Two degree of freedom systems are fundamental models in structural dynamics and mechanical engineering:</p>
+        <ul>
+            <li><strong>Building Structures:</strong> Two-story buildings can be modeled as 2DOF systems to predict earthquake response and design damping systems.</li>
+            <li><strong>Vehicle Dynamics:</strong> Pitch and bounce motion of vehicles on suspension systems are analyzed using 2DOF models for ride comfort optimization.</li>
+            <li><strong>Coupled Oscillators:</strong> Vibration absorbers and tuned mass dampers use 2DOF analysis to suppress structural vibrations.</li>
+            <li><strong>Molecular Physics:</strong> Diatomic molecules and coupled pendulums exhibit 2DOF behavior with normal modes.</li>
+            <li><strong>Rotating Machinery:</strong> Rotor-bearing systems with two degrees of freedom (horizontal and vertical) require 2DOF analysis for stability.</li>
+            <li><strong>Control Systems:</strong> Multi-input multi-output (MIMO) controllers for coupled systems use 2DOF models for analysis and design.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Equations of Motion</td>
+                    <td>\(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\)</td>
+                    <td>Matrix form for 2DOF system</td>
+                </tr>
+                <tr>
+                    <td>Eigenvalue Problem</td>
+                    <td>\((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</td>
+                    <td>Solve for natural frequencies</td>
+                </tr>
+                <tr>
+                    <td>Natural Frequencies</td>
+                    <td>\(\omega_1, \omega_2\)</td>
+                    <td>Two distinct natural frequencies</td>
+                </tr>
+                <tr>
+                    <td>Mode Shapes</td>
+                    <td>\(\mathbf{\Phi}_1, \mathbf{\Phi}_2\)</td>
+                    <td>Relative motion patterns</td>
+                </tr>
+                <tr>
+                    <td>General Solution</td>
+                    <td>\(\mathbf{x}(t) = C_1\mathbf{\Phi}_1\cos(\omega_1 t) + C_2\mathbf{\Phi}_2\cos(\omega_2 t)\)</td>
+                    <td>Free vibration response</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
 
         <div class="practice-problems">
@@ -470,106 +560,9 @@
                 <p><strong>Note:</strong> The response is a superposition of both natural modes, creating a beating phenomenon.</p>
             </div>
         </div>
-
-    <div class="content-section">
-        <h2>Understanding Two Degrees of Freedom (2DOF) Systems</h2>
-
-        <h3>What are 2DOF Systems?</h3>
-        <p>A two-degree-of-freedom (2DOF) system requires two independent coordinates to completely describe its motion. These systems are fundamental in structural dynamics and mechanical vibrations, representing the next level of complexity after single degree of freedom systems.</p>
-
-        <div class="key-point">
-            <p><strong>Key Characteristics:</strong></p>
-            <ul>
-                <li>Two independent displacement coordinates (x₁, x₂)</li>
-                <li>Two natural frequencies (ω₁, ω₂)</li>
-                <li>Two mode shapes describing independent vibration patterns</li>
-                <li>Coupling between masses through springs or dampers</li>
-            </ul>
-        </div>
-
-        <h3>Equations of Motion</h3>
-        <div class="equation-box">
-            <p>For a 2DOF undamped system with two masses connected by springs:</p>
-            <p>\([M]\{\ddot{x}\} + [K]\{x\} = \{0\}\)</p>
-            <p>Where:</p>
-            <ul style="list-style: none;">
-                <li>\([M]\) = Mass matrix = \(\begin{bmatrix} m_1 & 0 \\ 0 & m_2 \end{bmatrix}\)</li>
-                <li>\([K]\) = Stiffness matrix = \(\begin{bmatrix} k_1+k_2 & -k_2 \\ -k_2 & k_2 \end{bmatrix}\)</li>
-                <li>\(\{x\}\) = Displacement vector = \(\begin{bmatrix} x_1 \\ x_2 \end{bmatrix}\)</li>
-            </ul>
-        </div>
-
-        <h3>Natural Frequencies and Mode Shapes</h3>
-        <p>The natural frequencies are found by solving the eigenvalue problem:</p>
-        <div class="equation-box">
-            <p>\(\det([K] - \omega^2[M]) = 0\)</p>
-            <p>This yields two natural frequencies: \(\omega_1\) and \(\omega_2\) where \(\omega_1 < \omega_2\)</p>
-            <p>Each natural frequency has an associated mode shape that describes the relative motion of the two masses.</p>
-        </div>
-
-        <div class="key-point">
-            <p><strong>Mode Shapes:</strong> Each mode shape represents a pattern of motion where all parts of the system oscillate at the same frequency and pass through equilibrium simultaneously. The two masses move in-phase for the first mode and out-of-phase for the second mode.</p>
-        </div>
-
-        <h3>Applications</h3>
-        <ul>
-            <li><strong>Vehicle Suspensions:</strong> Modeling car body and wheel masses</li>
-            <li><strong>Building Structures:</strong> Two-story building analysis</li>
-            <li><strong>Machine Foundations:</strong> Equipment mounted on flexible structures</li>
-            <li><strong>Mechanical Systems:</strong> Coupled oscillators in machinery</li>
-        </ul>
-
-    <div class="content-section">
-        <h2>Applications and Examples</h2>
-        <p>Two degree of freedom systems are fundamental models in structural dynamics and mechanical engineering:</p>
-        <ul>
-            <li><strong>Building Structures:</strong> Two-story buildings can be modeled as 2DOF systems to predict earthquake response and design damping systems.</li>
-            <li><strong>Vehicle Dynamics:</strong> Pitch and bounce motion of vehicles on suspension systems are analyzed using 2DOF models for ride comfort optimization.</li>
-            <li><strong>Coupled Oscillators:</strong> Vibration absorbers and tuned mass dampers use 2DOF analysis to suppress structural vibrations.</li>
-            <li><strong>Molecular Physics:</strong> Diatomic molecules and coupled pendulums exhibit 2DOF behavior with normal modes.</li>
-            <li><strong>Rotating Machinery:</strong> Rotor-bearing systems with two degrees of freedom (horizontal and vertical) require 2DOF analysis for stability.</li>
-            <li><strong>Control Systems:</strong> Multi-input multi-output (MIMO) controllers for coupled systems use 2DOF models for analysis and design.</li>
-        </ul>
     </div>
 
     <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
-            <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td>Equations of Motion</td>
-                    <td>\(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\)</td>
-                    <td>Matrix form for 2DOF system</td>
-                </tr>
-                <tr>
-                    <td>Eigenvalue Problem</td>
-                    <td>\((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</td>
-                    <td>Solve for natural frequencies</td>
-                </tr>
-                <tr>
-                    <td>Natural Frequencies</td>
-                    <td>\(\omega_1, \omega_2\)</td>
-                    <td>Two distinct natural frequencies</td>
-                </tr>
-                <tr>
-                    <td>Mode Shapes</td>
-                    <td>\(\mathbf{\Phi}_1, \mathbf{\Phi}_2\)</td>
-                    <td>Relative motion patterns</td>
-                </tr>
-                <tr>
-                    <td>General Solution</td>
-                    <td>\(\mathbf{x}(t) = C_1\mathbf{\Phi}_1\cos(\omega_1 t) + C_2\mathbf{\Phi}_2\cos(\omega_2 t)\)</td>
-                    <td>Free vibration response</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
         <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
@@ -674,8 +667,8 @@
         });
     </script>
 
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
 </body>
-<footer>
-    <script src="/assets/common/footer.js"></script>
-  </footer>
 </html>

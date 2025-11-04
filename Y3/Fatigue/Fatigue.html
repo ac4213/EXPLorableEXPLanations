@@ -25,22 +25,57 @@
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <style>
-        /* Page-specific styles for fatigue module */
-        .material-selector {
+        /* Info box styling - used for material selector and damage results */
+        .info-box {
             margin: 15px 0;
             padding: 15px;
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
             border-radius: 0 4px 4px 0;
         }
 
-        .material-selector h4 {
+        .info-box h4 {
             margin-top: 0;
             margin-bottom: 10px;
+        }
+
+        /* Golden theme info boxes */
+        .info-box-golden {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box-golden h4 {
             color: #b38600;
         }
 
-        .material-selector select {
+        /* Blue theme info boxes */
+        .info-box-blue {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        /* Stress blocks container - 3 column grid layout */
+        .stress-blocks-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stress-blocks-container .info-box {
+            margin: 0;
+            min-width: 0;
+        }
+
+        .stress-blocks-container .slider-container {
+            width: 100%;
+        }
+
+        .stress-blocks-container .slider-container input[type="range"] {
+            max-width: 100%;
+        }
+
+        /* Material/dropdown selector styling */
+        .info-box select {
             width: 100%;
             padding: 10px;
             border-radius: 5px;
@@ -51,69 +86,44 @@
             transition: all 0.3s;
         }
 
-        .material-selector select:hover {
+        .info-box select:hover {
             border-color: var(--secondary-color);
             background-color: #fffef5;
         }
 
-        .material-selector select:focus {
+        .info-box select:focus {
             outline: none;
             border-color: var(--link-hover-color);
             box-shadow: 0 0 5px rgba(28, 1, 184, 0.2);
         }
 
-        .preset-buttons {
-            margin: 15px 0;
+        /* Material comparison button hover effects */
+        #hold-material:hover,
+        #reset-materials:hover {
+            border-color: var(--secondary-color);
+            background-color: #fffef5;
         }
 
-        .calculated-params {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
+        #hold-material:active,
+        #reset-materials:active {
+            background-color: var(--primary-color);
+            color: white;
         }
 
-        .calculated-params h4 {
-            margin-top: 0;
-            color: #b38600;
+        /* Plot container styling to properly contain Plotly plots */
+        .plot-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            overflow: visible;
+            margin: 10px 0;
         }
 
-        .calculated-params p {
-            margin: 5px 0;
-        }
-
-        .damage-block {
-            background-color: #e6f7ff;
-            border-left: 4px solid #1890ff;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 0 4px 4px 0;
-        }
-
-        .damage-results {
-            background-color: #f9f9f9;
-            border: 2px solid #ddd;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .damage-status {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        .status-safe {
-            color: #155724;
-        }
-
-        .status-warning {
-            color: #856404;
-        }
-
-        .status-failure {
-            color: #721c24;
+        .simulation-display {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            margin-bottom: 30px;
         }
 
         /* Responsive design */
@@ -121,7 +131,6 @@
             .simulation-container {
                 grid-template-columns: 1fr;
             }
-
             .plot-container {
                 height: 300px;
             }
@@ -130,12 +139,6 @@
         @media (max-width: 480px) {
             .plot-container {
                 height: 250px;
-            }
-
-            .preset-buttons button {
-                display: block;
-                width: 100%;
-                margin: 5px 0;
             }
         }
     </style>
@@ -184,7 +187,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                     <div class="slider-container" style="margin:0;">
                         <label for="max-stress" style="display:block;font-size:13px;margin-bottom:3px;">Max Stress (MPa):</label>
-                        <input type="range" id="max-stress" min="0" max="500" value="200" step="10" style="width:100%;">
+                        <input type="range" id="max-stress" min="-200" max="500" value="200" step="10" style="width:100%;">
                         <span id="max-stress-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">200</span>
                     </div>
 
@@ -201,19 +204,15 @@
                     <span id="frequency-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">0.5</span>
                 </div>
                 
-                <div class="calculated-params">
-                    <h4>Calculated Parameters:</h4>
-                    <p>Stress Amplitude (σₐ): <strong><span id="stress-amplitude">150</span> MPa</strong></p>
-                    <p>Mean Stress (σₘ): <strong><span id="mean-stress-value">50</span> MPa</strong></p>
-                    <p>Stress Ratio (R): <strong><span id="stress-ratio">-0.50</span></strong></p>
-                </div>
-                
-                <div class="preset-buttons">
-                    <h4>Common Loading Types:</h4>
-                    <button id="fully-reversed">Fully Reversed (R = -1)</button>
-                    <button id="zero-to-max">Zero-to-Max (R = 0)</button>
-                    <button id="fluctuating-tension">Fluctuating Tension</button>
-                    <button id="fluctuating-compression">Fluctuating Compression</button>
+                <div style="margin: 15px 0;">
+                    <h4 style="margin-bottom: 10px;">Common Loading Types:</h4>
+                    <select id="loading-type-preset" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; font-size: 14px; cursor: pointer;">
+                        <option value="">-- Select Loading Type --</option>
+                        <option value="fully-reversed">Fully Reversed (R = -1)</option>
+                        <option value="zero-to-max">Zero-to-Max (R = 0)</option>
+                        <option value="fluctuating-tension">Fluctuating Tension</option>
+                        <option value="fluctuating-compression">Fluctuating Compression</option>
+                    </select>
                 </div>
             </div>
             
@@ -248,23 +247,6 @@
         <div class="simulation-container">
             <div class="simulation-controls">
                 <h3 style="margin-top:0;margin-bottom:10px;">Material Parameters</h3>
-
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                    <div class="slider-container" style="margin:0;">
-                        <label for="fatigue-strength" style="display:block;font-size:13px;margin-bottom:3px;">Fatigue Strength Coeff. (MPa):</label>
-                        <input type="range" id="fatigue-strength" min="500" max="1500" value="1000" step="50" style="width:100%;">
-                        <span id="fatigue-strength-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">1000</span>
-                    </div>
-
-                    <div class="slider-container" style="margin:0;">
-                        <label for="fatigue-exponent" style="display:block;font-size:13px;margin-bottom:3px;">Fatigue Strength Exponent:</label>
-                        <input type="range" id="fatigue-exponent" min="-0.15" max="-0.05" value="-0.09" step="0.01" style="width:100%;">
-                        <span id="fatigue-exponent-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">-0.09</span>
-                    </div>
-                </div>
-                
-                <div class="material-selector">
-                    <h4>Material Presets:</h4>
                     <select id="material-preset">
                         <option value="">-- Select a Material --</option>
                         <option value="steel-1045">Steel 1045 (Normalised)</option>
@@ -283,9 +265,38 @@
                         <option value="nickel-200">Nickel 200</option>
                         <option value="inconel-718">Inconel 718</option>
                     </select>
+
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                    <div class="slider-container" style="margin:0;">
+                        <label for="fatigue-strength" style="display:block;font-size:13px;margin-bottom:3px;">Fatigue Strength Coeff. (MPa):</label>
+                        <input type="range" id="fatigue-strength" min="500" max="1500" value="1000" step="50" style="width:100%;">
+                        <span id="fatigue-strength-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">1000</span>
+                    </div>
+
+                    <div class="slider-container" style="margin:0;">
+                        <label for="fatigue-exponent" style="display:block;font-size:13px;margin-bottom:3px;">Fatigue Strength Exponent:</label>
+                        <input type="range" id="fatigue-exponent" min="-0.15" max="-0.05" value="-0.09" step="0.01" style="width:100%;">
+                        <span id="fatigue-exponent-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">-0.09</span>
+                    </div>
                 </div>
+
                 
-                <div style="margin: 15px 0; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button id="hold-material" style="padding: 8px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; font-size: 14px; cursor: pointer; transition: all 0.3s;">
+                            Hold Material
+                        </button>
+                        <button id="reset-materials" style="padding: 8px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; font-size: 14px; cursor: pointer; transition: all 0.3s;">
+                            Reset Plot
+                        </button>
+                    </div>
+                
+            </div>
+            
+
+            <div class="simulation-display">
+                <h3>S-N Curve (Wöhler Diagram)</h3>
+                <div id="sn-curve-plot" class="plot-container"></div>
+                                <div style="margin: 15px 0; padding: 10px; background-color: #f0f0f0; border-radius: 5px;">
                     <label style="display: flex; align-items: center; cursor: pointer; font-weight: bold; color: #b38600;">
                         <input type="checkbox" id="log-log-scale" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
                         Use Log-Log Scale (straight line)
@@ -295,17 +306,6 @@
                         <strong>Semi-log:</strong> Only N-axis logarithmic - shows power law as curve
                     </p>
                 </div>
-                
-                <div class="calculated-params">
-                    <h4>Endurance Limits:</h4>
-                    <p>At 10⁶ cycles: <strong><span id="endurance-limit">310</span> MPa</strong></p>
-                    <p>At 10⁷ cycles: <strong><span id="long-endurance-limit">250</span> MPa</strong></p>
-                </div>
-            </div>
-            
-            <div class="simulation-display">
-                <h3>S-N Curve (Wöhler Diagram)</h3>
-                <div id="sn-curve-plot" class="plot-container"></div>
                 <div class="key-point" style="margin-top: 15px;">
                     <p><strong>Understanding Scale Types:</strong></p>
                     <ul>
@@ -336,47 +336,40 @@
 
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;">
                     <div class="slider-container" style="margin:0;">
-                        <label for="ultimate-strength" style="display:block;font-size:12px;margin-bottom:3px;">UTS (MPa):</label>
+                        <label for="ultimate-strength" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_{UTS}\) (MPa):</label>
                         <input type="range" id="ultimate-strength" min="300" max="1600" value="800" step="50" style="width:100%;">
                         <span id="ultimate-strength-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">800</span>
                     </div>
 
                     <div class="slider-container" style="margin:0;">
-                        <label for="yield-strength" style="display:block;font-size:12px;margin-bottom:3px;">Yield (MPa):</label>
+                        <label for="yield-strength" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_Y\) (MPa):</label>
                         <input type="range" id="yield-strength" min="200" max="1400" value="600" step="50" style="width:100%;">
                         <span id="yield-strength-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">600</span>
                     </div>
 
                     <div class="slider-container" style="margin:0;">
-                        <label for="endurance-limit-input" style="display:block;font-size:12px;margin-bottom:3px;">Endurance (MPa):</label>
+                        <label for="endurance-limit-input" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_E\) (MPa):</label>
                         <input type="range" id="endurance-limit-input" min="100" max="700" value="300" step="25" style="width:100%;">
                         <span id="endurance-limit-input-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">300</span>
                     </div>
                 </div>
 
-                <h4 style="margin:10px 0 8px 0;font-size:14px;">Assessment Point:</h4>
+                <h4 style="font-size:12px;">Assessment Point:</h4>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
                     <div class="slider-container" style="margin:0;">
-                        <label for="point-mean-stress" style="display:block;font-size:13px;margin-bottom:3px;">Mean Stress (MPa):</label>
+                        <label for="point-mean-stress" style="display:block;font-size:13px;margin-bottom:3px;">\(\sigma_m\) (MPa):</label>
                         <input type="range" id="point-mean-stress" min="0" max="800" value="200" step="25" style="width:100%;">
                         <span id="point-mean-stress-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">200</span>
                     </div>
 
                     <div class="slider-container" style="margin:0;">
-                        <label for="point-stress-amplitude" style="display:block;font-size:13px;margin-bottom:3px;">Stress Amplitude (MPa):</label>
+                        <label for="point-stress-amplitude" style="display:block;font-size:13px;margin-bottom:3px;">\(\sigma_a\) (MPa):</label>
                         <input type="range" id="point-stress-amplitude" min="0" max="600" value="150" step="25" style="width:100%;">
                         <span id="point-stress-amplitude-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;">150</span>
                     </div>
                 </div>
-                
-                <div class="calculated-params">
-                    <h4>Safety Factors:</h4>
-                    <p>Goodman: <strong><span id="goodman-sf">1.2</span></strong></p>
-                    <p>Gerber: <strong><span id="gerber-sf">1.5</span></strong></p>
-                    <p>Soderberg: <strong><span id="soderberg-sf">0.9</span></strong></p>
-                </div>
             </div>
-            
+
             <div class="simulation-display">
                 <h3>Haigh Diagram</h3>
                 <div id="haigh-diagram" class="plot-container"></div>
@@ -402,55 +395,48 @@
         
         <div class="simulation-container">
             <div class="simulation-controls">
-                <h3>Variable Amplitude Loading</h3>
-                
-                <div class="damage-block">
-                    <h4>Stress Block 1:</h4>
-                    <div class="slider-container">
-                        <label for="stress-amp-1">Stress Amplitude (MPa):</label>
-                        <input type="range" id="stress-amp-1" min="50" max="500" value="300" step="25">
-                        <span id="stress-amp-1-value" class="slider-value">300</span>
+                <div class="stress-blocks-container">
+                    <div class="info-box info-box-blue">
+                        <h4>Stress Block 1:</h4>
+                        <div class="slider-container">
+                            <label for="stress-amp-1">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-1" min="100" max="500" value="300" step="25">
+                            <span id="stress-amp-1-value" class="slider-value">300</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="cycles-1">\(n_1\):</label>
+                            <input type="range" id="cycles-1" min="1000" max="100000" value="10000" step="100">
+                            <span id="cycles-1-value" class="slider-value">10000</span>
+                        </div>
                     </div>
-                    <div class="slider-container">
-                        <label for="cycles-1">Cycles Applied:</label>
-                        <input type="range" id="cycles-1" min="100" max="100000" value="10000" step="1000">
-                        <span id="cycles-1-value" class="slider-value">10000</span>
+
+                    <div class="info-box info-box-blue">
+                        <h4>Stress Block 2:</h4>
+                        <div class="slider-container">
+                            <label for="stress-amp-2">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-2" min="100" max="500" value="275" step="25">
+                            <span id="stress-amp-2-value" class="slider-value">275</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="cycles-2">\(n_2\):</label>
+                            <input type="range" id="cycles-2" min="1000" max="100000" value="50000" step="100">
+                            <span id="cycles-2-value" class="slider-value">50000</span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="damage-block">
-                    <h4>Stress Block 2:</h4>
-                    <div class="slider-container">
-                        <label for="stress-amp-2">Stress Amplitude (MPa):</label>
-                        <input type="range" id="stress-amp-2" min="50" max="500" value="200" step="25">
-                        <span id="stress-amp-2-value" class="slider-value">200</span>
+
+                    <div class="info-box info-box-blue">
+                        <h4>Stress Block 3:</h4>
+                        <div class="slider-container">
+                            <label for="stress-amp-3">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-3" min="100" max="500" value="325" step="25">
+                            <span id="stress-amp-3-value" class="slider-value">325</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="cycles-3">\(n_3\):</label>
+                            <input type="range" id="cycles-3" min="1000" max="100000" value="100000" step="100">
+                            <span id="cycles-3-value" class="slider-value">100000</span>
+                        </div>
                     </div>
-                    <div class="slider-container">
-                        <label for="cycles-2">Cycles Applied:</label>
-                        <input type="range" id="cycles-2" min="100" max="500000" value="50000" step="5000">
-                        <span id="cycles-2-value" class="slider-value">50000</span>
-                    </div>
-                </div>
-                
-                <div class="damage-block">
-                    <h4>Stress Block 3:</h4>
-                    <div class="slider-container">
-                        <label for="stress-amp-3">Stress Amplitude (MPa):</label>
-                        <input type="range" id="stress-amp-3" min="50" max="500" value="150" step="25">
-                        <span id="stress-amp-3-value" class="slider-value">150</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="cycles-3">Cycles Applied:</label>
-                        <input type="range" id="cycles-3" min="100" max="1000000" value="100000" step="10000">
-                        <span id="cycles-3-value" class="slider-value">100000</span>
-                    </div>
-                </div>
-                
-                <div class="damage-results">
-                    <h4>Cumulative Damage Results:</h4>
-                    <p>Total Damage (D): <strong><span id="total-damage">0.73</span></strong></p>
-                    <p>Remaining Life: <strong><span id="remaining-life">27%</span></strong></p>
-                    <p>Status: <strong><span id="damage-status" class="damage-status status-safe">Safe</span></strong></p>
                 </div>
             </div>
             

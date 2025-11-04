@@ -117,6 +117,10 @@ let snCurvePlot = null;
 let haighDiagramPlot = null;
 let damagePlot = null;
 
+// S-N curve held materials state
+let heldMaterials = [];
+const materialColors = ['#1c01b8', '#ff0000', '#006e12', '#ff6600', '#9933ff', '#00cccc', '#cc9900', '#ff1493'];
+
 // Initialise when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
     // Add a small delay to ensure all elements are rendered
@@ -150,11 +154,12 @@ function initStressTimePlot() {
     const maxStress = parseFloat(document.getElementById('max-stress').value);
     const minStress = parseFloat(document.getElementById('min-stress').value);
     const frequency = parseFloat(document.getElementById('frequency').value);
-    
-    updateStressParams(maxStress, minStress);
-    
+
     const data = generateStressTimeData(maxStress, minStress, frequency);
-    
+    const amplitude = (maxStress - minStress) / 2;
+    const meanStress = (maxStress + minStress) / 2;
+    const stressRatio = maxStress !== 0 ? minStress / maxStress : 0;
+
     Plotly.newPlot('stress-time-plot', [{
         x: data.time,
         y: data.stress,
@@ -168,19 +173,46 @@ function initStressTimePlot() {
         type: 'scatter',
         mode: 'lines',
         line: { color: '#cc9900', width: 2, dash: 'dash' },
-        name: 'Mean Stress'
+        name: 'Mean'
     }], {
-        title: { text: 'Stress vs. Time', font: { size: 16 }},
-        xaxis: { title: 'Time (s)', range: [0, 10] },
-        yaxis: { 
-            title: 'Stress (MPa)', 
+        xaxis: {
+            title: 't (s)',
+            range: [0, 10],
+            dtick: 1
+        },
+        yaxis: {
+            title: 'σ (MPa)',
             range: [Math.min(minStress, -50) - 50, Math.max(maxStress, 50) + 50]
         },
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 60, r: 40, t: 50, b: 60 }
+        margin: { l: 60, r: 40, t: 0, b: 150 },
+        legend: {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.15,
+            yanchor: 'top'
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: -0.50,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>Calculated Parameters:</b><br>σₐ = ${amplitude.toFixed(1)} MPa  |  σₘ = ${meanStress.toFixed(1)} MPa  |  R = ${isFinite(stressRatio) ? stressRatio.toFixed(2) : "∞"}`,
+            showarrow: false,
+            font: { size: 11, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 2,
+            borderpad: 6,
+            width: 280
+        }]
     }, {
-        responsive: true
+        responsive: true,
+        displayModeBar: false
     });
 }
 
@@ -188,11 +220,12 @@ function updateStressTimePlot() {
     const maxStress = parseFloat(document.getElementById('max-stress').value);
     const minStress = parseFloat(document.getElementById('min-stress').value);
     const frequency = parseFloat(document.getElementById('frequency').value);
-    
-    updateStressParams(maxStress, minStress);
-    
+
     const data = generateStressTimeData(maxStress, minStress, frequency);
-    
+    const amplitude = (maxStress - minStress) / 2;
+    const meanStress = (maxStress + minStress) / 2;
+    const stressRatio = maxStress !== 0 ? minStress / maxStress : 0;
+
     // Use Plotly.react instead of update to properly refresh the plot
     Plotly.react('stress-time-plot', [{
         x: data.time,
@@ -207,17 +240,47 @@ function updateStressTimePlot() {
         type: 'scatter',
         mode: 'lines',
         line: { color: '#cc9900', width: 2, dash: 'dash' },
-        name: 'Mean Stress'
+        name: 'Mean'
     }], {
         title: { text: 'Stress vs. Time', font: { size: 16 }},
-        xaxis: { title: 'Time (s)', range: [0, 10] },
-        yaxis: { 
-            title: 'Stress (MPa)', 
+        xaxis: {
+            title: 't (s)',
+            range: [0, 10],
+            dtick: 1
+        },
+        yaxis: {
+            title: 'σ (MPa)',
             range: [Math.min(minStress, -50) - 50, Math.max(maxStress, 50) + 50]
         },
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 60, r: 40, t: 50, b: 60 }
+        margin: { l: 60, r: 40, t: 0, b: 150 },
+        legend: {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.15,
+            yanchor: 'top'
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: -0.50,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>Calculated Parameters:</b><br>σₐ = ${amplitude.toFixed(1)} MPa  |  σₘ = ${meanStress.toFixed(1)} MPa  |  R = ${isFinite(stressRatio) ? stressRatio.toFixed(2) : "∞"}`,
+            showarrow: false,
+            font: { size: 11, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 2,
+            borderpad: 6,
+            width: 280
+        }]
+    }, {
+        responsive: true,
+        displayModeBar: false
     });
 }
 
@@ -238,16 +301,6 @@ function generateStressTimeData(maxStress, minStress, frequency) {
     return { time, stress, meanStress, amplitude };
 }
 
-function updateStressParams(maxStress, minStress) {
-    const amplitude = (maxStress - minStress) / 2;
-    const meanStress = (maxStress + minStress) / 2;
-    const stressRatio = maxStress !== 0 ? minStress / maxStress : 0;
-    
-    document.getElementById('stress-amplitude').textContent = amplitude.toFixed(1);
-    document.getElementById('mean-stress-value').textContent = meanStress.toFixed(1);
-    document.getElementById('stress-ratio').textContent = isFinite(stressRatio) ? stressRatio.toFixed(2) : "∞";
-}
-
 function setupStressTimeControls() {
     document.getElementById('max-stress').addEventListener('input', function() {
         const maxStress = parseFloat(this.value);
@@ -257,9 +310,11 @@ function setupStressTimeControls() {
             document.getElementById('min-stress-value').textContent = maxStress - 10;
         }
         document.getElementById('max-stress-value').textContent = maxStress;
+        // Reset dropdown when slider is manually adjusted
+        document.getElementById('loading-type-preset').value = '';
         updateStressTimePlot();
     });
-    
+
     document.getElementById('min-stress').addEventListener('input', function() {
         const minStress = parseFloat(this.value);
         const maxStress = parseFloat(document.getElementById('max-stress').value);
@@ -268,46 +323,48 @@ function setupStressTimeControls() {
             document.getElementById('max-stress-value').textContent = minStress + 10;
         }
         document.getElementById('min-stress-value').textContent = minStress;
+        // Reset dropdown when slider is manually adjusted
+        document.getElementById('loading-type-preset').value = '';
         updateStressTimePlot();
     });
-    
+
     document.getElementById('frequency').addEventListener('input', function() {
         document.getElementById('frequency-value').textContent = this.value;
         updateStressTimePlot();
     });
-    
-    // Preset buttons
-    document.getElementById('fully-reversed').addEventListener('click', function() {
-        const maxStress = parseFloat(document.getElementById('max-stress').value);
-        const amplitude = Math.abs(maxStress);
-        document.getElementById('max-stress').value = amplitude;
-        document.getElementById('min-stress').value = -amplitude;
-        document.getElementById('max-stress-value').textContent = amplitude;
-        document.getElementById('min-stress-value').textContent = -amplitude;
-        updateStressTimePlot();
-    });
-    
-    document.getElementById('zero-to-max').addEventListener('click', function() {
-        const maxStress = parseFloat(document.getElementById('max-stress').value);
-        document.getElementById('min-stress').value = 0;
-        document.getElementById('min-stress-value').textContent = 0;
-        updateStressTimePlot();
-    });
-    
-    document.getElementById('fluctuating-tension').addEventListener('click', function() {
-        document.getElementById('max-stress').value = 300;
-        document.getElementById('min-stress').value = 100;
-        document.getElementById('max-stress-value').textContent = 300;
-        document.getElementById('min-stress-value').textContent = 100;
-        updateStressTimePlot();
-    });
-    
-    document.getElementById('fluctuating-compression').addEventListener('click', function() {
-        document.getElementById('max-stress').value = -100;
-        document.getElementById('min-stress').value = -300;
-        document.getElementById('max-stress-value').textContent = -100;
-        document.getElementById('min-stress-value').textContent = -300;
-        updateStressTimePlot();
+
+    // Loading type preset dropdown
+    document.getElementById('loading-type-preset').addEventListener('change', function() {
+        const selectedType = this.value;
+
+        if (selectedType === 'fully-reversed') {
+            const maxStress = parseFloat(document.getElementById('max-stress').value);
+            const amplitude = Math.abs(maxStress);
+            document.getElementById('max-stress').value = amplitude;
+            document.getElementById('min-stress').value = -amplitude;
+            document.getElementById('max-stress-value').textContent = amplitude;
+            document.getElementById('min-stress-value').textContent = -amplitude;
+            updateStressTimePlot();
+        } else if (selectedType === 'zero-to-max') {
+            const maxStress = parseFloat(document.getElementById('max-stress').value);
+            document.getElementById('min-stress').value = 0;
+            document.getElementById('min-stress-value').textContent = 0;
+            updateStressTimePlot();
+        } else if (selectedType === 'fluctuating-tension') {
+            document.getElementById('max-stress').value = 300;
+            document.getElementById('min-stress').value = 100;
+            document.getElementById('max-stress-value').textContent = 300;
+            document.getElementById('min-stress-value').textContent = 100;
+            updateStressTimePlot();
+        } else if (selectedType === 'fluctuating-compression') {
+            document.getElementById('max-stress').value = -100;
+            document.getElementById('min-stress').value = -300;
+            document.getElementById('max-stress-value').textContent = -100;
+            document.getElementById('min-stress-value').textContent = -300;
+            updateStressTimePlot();
+        }
+
+        // Dropdown stays on selected option (no reset)
     });
 }
 
@@ -316,63 +373,110 @@ function initSNCurvePlot() {
     const fatigueStrength = parseFloat(document.getElementById('fatigue-strength').value);
     const fatigueExponent = parseFloat(document.getElementById('fatigue-exponent').value);
     const useLogLog = document.getElementById('log-log-scale').checked;
-    
+
     const data = generateSNCurveDataLog(fatigueStrength, fatigueExponent);
-    
+
     // Calculate proper Y-axis range
     const minStress = Math.min(...data.stressAmplitude.filter(s => s > 0));
     const maxStress = Math.max(...data.stressAmplitude);
-    
+
     // Configure Y-axis based on scale selection
     const yaxisConfig = useLogLog ? {
-        title: 'Stress Amplitude (MPa)',
+        title: 'σ<sub>a</sub> (MPa)',
         type: 'log',
         range: [Math.log10(minStress * 0.5), Math.log10(maxStress * 1.5)],
         showgrid: true,
         gridcolor: '#e0e0e0',
         tickformat: '.0f'
     } : {
-        title: 'Stress Amplitude (MPa)',
+        title: 'σ<sub>a</sub> (MPa)',
         type: 'linear',
         range: [0, maxStress * 1.1],
         showgrid: true,
         gridcolor: '#e0e0e0'
     };
-    
-    const plotTitle = useLogLog ? 
-        'S-N Curve (Log-Log Scale - Straight Line)' : 
-        'S-N Curve (Semi-Log Scale - Curved Line)';
-    
-    Plotly.newPlot('sn-curve-plot', [{
+
+    const plotTitle = useLogLog ?
+        '(Log-Log Scale - Straight Line)' :
+        '(Semi-Log Scale - Curved Line)';
+
+    // Calculate endurance limits for annotation
+    const enduranceLimit1e3 = fatigueStrength * Math.pow(2 * 1e3, fatigueExponent);
+    const enduranceLimit1e6 = fatigueStrength * Math.pow(2 * 1e6, fatigueExponent);
+
+    // Prepare traces: held materials + current material
+    const traces = [];
+
+    // Add held materials
+    heldMaterials.forEach((mat, index) => {
+        const matData = generateSNCurveDataLog(mat.sigmaF, mat.b);
+        traces.push({
+            x: matData.cycles,
+            y: matData.stressAmplitude,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: materialColors[index % materialColors.length], width: 2, dash: 'dot' },
+            name: mat.name
+        });
+    });
+
+    // Add current material curve
+    traces.push({
         x: data.cycles,
         y: data.stressAmplitude,
         type: 'scatter',
         mode: 'lines',
-        line: { color: '#1c01b8', width: 3 },
-        name: 'S-N Curve'
-    }], {
+        line: { color: materialColors[heldMaterials.length % materialColors.length], width: 3 },
+        name: 'Current Material'
+    });
+
+    Plotly.newPlot('sn-curve-plot', traces, {
         title: { text: plotTitle, font: { size: 16 }},
         xaxis: {
-            title: 'Number of Cycles (N)',
+            title: 'N (cycles)',
             type: 'log',
-            range: [Math.log10(100), Math.log10(100000000)], // 10^2 to 10^8
+            range: [2, 8], // 10^2 to 10^8
             showgrid: true,
             gridcolor: '#e0e0e0',
-            tickformat: '.0e'
+            tickmode: 'linear',
+            tick0: 2,
+            dtick: 1,
+            tickformat: '',
+            tickvals: [2, 3, 4, 5, 6, 7, 8],
+            ticktext: ['10²', '10³', '10⁴', '10⁵', '10⁶', '10⁷', '10⁸']
         },
         yaxis: yaxisConfig,
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 70, r: 40, t: 50, b: 60 },
-        showlegend: false
+        margin: { l: 70, r: 40, t: 50, b: 90 },
+        showlegend: heldMaterials.length > 0,
+        legend: {
+            orientation: 'v',
+            x: 1.02,
+            y: 1,
+            xanchor: 'left',
+            yanchor: 'top'
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: -0.2,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>Endurance Limits:</b><br>At 10³ cycles: ${enduranceLimit1e3.toFixed(0)} MPa  |  At 10⁶ cycles: ${enduranceLimit1e6.toFixed(0)} MPa`,
+            showarrow: false,
+            font: { size: 11, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 2,
+            borderpad: 6
+        }]
     }, {
         responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ['select2d', 'lasso2d']
+        displayModeBar: false
     });
-    
-    updateEnduranceLimits(fatigueStrength, fatigueExponent);
+
     console.log(`S-N curve initialised (${useLogLog ? 'log-log' : 'semi-log'} scale)`);
 }
 
@@ -380,64 +484,117 @@ function updateSNCurvePlot() {
     const fatigueStrength = parseFloat(document.getElementById('fatigue-strength').value);
     const fatigueExponent = parseFloat(document.getElementById('fatigue-exponent').value);
     const useLogLog = document.getElementById('log-log-scale').checked;
-    
+
     const data = generateSNCurveDataLog(fatigueStrength, fatigueExponent);
-    
-    // Calculate proper Y-axis range
-    const minStress = Math.min(...data.stressAmplitude.filter(s => s > 0));
-    const maxStress = Math.max(...data.stressAmplitude);
-    
+
+    // Calculate proper Y-axis range for all materials
+    let allStresses = [...data.stressAmplitude];
+    heldMaterials.forEach(mat => {
+        const matData = generateSNCurveDataLog(mat.sigmaF, mat.b);
+        allStresses = allStresses.concat(matData.stressAmplitude);
+    });
+
+    const minStress = Math.min(...allStresses.filter(s => s > 0));
+    const maxStress = Math.max(...allStresses);
+
     // Configure Y-axis based on scale selection
     const yaxisConfig = useLogLog ? {
-        title: 'Stress Amplitude (MPa)',
+        title: 'σ<sub>a</sub> (MPa)',
         type: 'log',
         range: [Math.log10(minStress * 0.5), Math.log10(maxStress * 1.5)],
         showgrid: true,
         gridcolor: '#e0e0e0',
         tickformat: '.0f'
     } : {
-        title: 'Stress Amplitude (MPa)',
+        title: 'σ<sub>a</sub> (MPa)',
         type: 'linear',
         range: [0, maxStress * 1.1],
         showgrid: true,
         gridcolor: '#e0e0e0'
     };
-    
-    const plotTitle = useLogLog ? 
-        'S-N Curve (Log-Log Scale - Straight Line)' : 
-        'S-N Curve (Semi-Log Scale - Curved Line)';
-    
-    // Use Plotly.react with appropriate scale
-    Plotly.react('sn-curve-plot', [{
+
+    const plotTitle = useLogLog ?
+        '(Log-Log Scale - Straight Line)' :
+        '(Semi-Log Scale - Curved Line)';
+
+    // Calculate endurance limits for annotation
+    const enduranceLimit1e3 = fatigueStrength * Math.pow(2 * 1e3, fatigueExponent);
+    const enduranceLimit1e6 = fatigueStrength * Math.pow(2 * 1e6, fatigueExponent);
+
+    // Prepare traces: held materials + current material
+    const traces = [];
+
+    // Add held materials
+    heldMaterials.forEach((mat, index) => {
+        const matData = generateSNCurveDataLog(mat.sigmaF, mat.b);
+        traces.push({
+            x: matData.cycles,
+            y: matData.stressAmplitude,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: materialColors[index % materialColors.length], width: 2, dash: 'dot' },
+            name: mat.name
+        });
+    });
+
+    // Add current material curve
+    traces.push({
         x: data.cycles,
         y: data.stressAmplitude,
         type: 'scatter',
         mode: 'lines',
-        line: { color: '#1c01b8', width: 3 },
-        name: 'S-N Curve'
-    }], {
+        line: { color: materialColors[heldMaterials.length % materialColors.length], width: 3 },
+        name: 'Current Material'
+    });
+
+    // Use Plotly.react with appropriate scale
+    Plotly.react('sn-curve-plot', traces, {
         title: { text: plotTitle, font: { size: 16 }},
         xaxis: {
-            title: 'Number of Cycles (N)',
+            title: 'N (cycles)',
             type: 'log',
-            range: [Math.log10(100), Math.log10(100000000)], // 10^2 to 10^8
+            range: [2, 8], // 10^2 to 10^8
             showgrid: true,
             gridcolor: '#e0e0e0',
-            tickformat: '.0e'
+            tickmode: 'linear',
+            tick0: 2,
+            dtick: 1,
+            tickformat: '',
+            tickvals: [2, 3, 4, 5, 6, 7, 8],
+            ticktext: ['10²', '10³', '10⁴', '10⁵', '10⁶', '10⁷', '10⁸']
         },
         yaxis: yaxisConfig,
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 70, r: 40, t: 50, b: 60 },
-        showlegend: false
+        margin: { l: 70, r: 40, t: 50, b: 90 },
+        showlegend: heldMaterials.length > 0,
+        legend: {
+            orientation: 'v',
+            x: 1.02,
+            y: 1,
+            xanchor: 'left',
+            yanchor: 'top'
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: -0.2,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>Endurance Limits:</b><br>At 10³ cycles: ${enduranceLimit1e3.toFixed(0)} MPa  |  At 10⁶ cycles: ${enduranceLimit1e6.toFixed(0)} MPa`,
+            showarrow: false,
+            font: { size: 11, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 2,
+            borderpad: 6
+        }]
     }, {
         responsive: true,
-        displayModeBar: true,
-        displaylogo: false,
-        modeBarButtonsToRemove: ['select2d', 'lasso2d']
+        displayModeBar: false
     });
-    
-    updateEnduranceLimits(fatigueStrength, fatigueExponent);
+
     console.log(`S-N curve updated (${useLogLog ? 'log-log' : 'semi-log'} scale)`);
 }
 
@@ -507,13 +664,45 @@ function generateSNCurveData(fatigueStrength, fatigueExponent) {
     return generateSNCurveDataLog(fatigueStrength, fatigueExponent);
 }
 
-function updateEnduranceLimits(fatigueStrength, fatigueExponent) {
-    // Calculate endurance limits at 10^6 and 10^7 cycles
-    const enduranceLimit1e6 = fatigueStrength * Math.pow(2 * 1e6, fatigueExponent);
-    const enduranceLimit1e7 = fatigueStrength * Math.pow(2 * 1e7, fatigueExponent);
-    
-    document.getElementById('endurance-limit').textContent = enduranceLimit1e6.toFixed(0);
-    document.getElementById('long-endurance-limit').textContent = enduranceLimit1e7.toFixed(0);
+function holdCurrentMaterial() {
+    const selectedMaterial = document.getElementById('material-preset').value;
+    if (selectedMaterial && materials[selectedMaterial]) {
+        const material = materials[selectedMaterial];
+
+        // Check if material is already held
+        const isHeld = heldMaterials.some(mat => mat.name === material.name);
+        if (!isHeld) {
+            heldMaterials.push({
+                name: material.name,
+                sigmaF: material.sigmaF,
+                b: material.b
+            });
+            updateSNCurvePlot();
+            console.log('Material held:', material.name);
+        }
+    } else {
+        // Hold current slider values
+        const fatigueStrength = parseFloat(document.getElementById('fatigue-strength').value);
+        const fatigueExponent = parseFloat(document.getElementById('fatigue-exponent').value);
+        const materialName = `Custom (σ'f=${fatigueStrength}, b=${fatigueExponent})`;
+
+        const isHeld = heldMaterials.some(mat => mat.name === materialName);
+        if (!isHeld) {
+            heldMaterials.push({
+                name: materialName,
+                sigmaF: fatigueStrength,
+                b: fatigueExponent
+            });
+            updateSNCurvePlot();
+            console.log('Custom material held');
+        }
+    }
+}
+
+function resetHeldMaterials() {
+    heldMaterials = [];
+    updateSNCurvePlot();
+    console.log('Held materials reset');
 }
 
 function setupSNCurveControls() {
@@ -522,51 +711,61 @@ function setupSNCurveControls() {
         document.getElementById('fatigue-strength-value').textContent = this.value;
         updateSNCurvePlot();
     });
-    
+
     // Fatigue exponent slider
     document.getElementById('fatigue-exponent').addEventListener('input', function() {
         document.getElementById('fatigue-exponent-value').textContent = this.value;
         updateSNCurvePlot();
     });
-    
+
     // Scale toggle checkbox
     document.getElementById('log-log-scale').addEventListener('change', function() {
         updateSNCurvePlot();
         console.log('Scale changed to:', this.checked ? 'log-log' : 'semi-log');
     });
-    
+
+    // Hold material button
+    document.getElementById('hold-material').addEventListener('click', function() {
+        holdCurrentMaterial();
+    });
+
+    // Reset button
+    document.getElementById('reset-materials').addEventListener('click', function() {
+        resetHeldMaterials();
+    });
+
     // Material dropdown handler
     document.getElementById('material-preset').addEventListener('change', function() {
         const selectedMaterial = this.value;
         if (selectedMaterial && materials[selectedMaterial]) {
             const material = materials[selectedMaterial];
-            
+
             // Update sliders
             document.getElementById('fatigue-strength').value = material.sigmaF;
             document.getElementById('fatigue-exponent').value = material.b;
-            
+
             // Update slider display values
             document.getElementById('fatigue-strength-value').textContent = material.sigmaF;
             document.getElementById('fatigue-exponent-value').textContent = material.b;
-            
+
             // Update S-N curve with animation
             updateSNCurvePlot();
-            
+
             // Also update Haigh diagram material properties if needed
             if (material.Su && material.Sy) {
                 document.getElementById('ultimate-strength').value = material.Su;
                 document.getElementById('yield-strength').value = material.Sy;
                 document.getElementById('ultimate-strength-value').textContent = material.Su;
                 document.getElementById('yield-strength-value').textContent = material.Sy;
-                
+
                 // Calculate approximate endurance limit (typically 0.35-0.5 of Su for steels)
                 const enduranceLimit = material.sigmaF * Math.pow(2 * 1e6, material.b);
                 document.getElementById('endurance-limit-input').value = Math.round(enduranceLimit);
                 document.getElementById('endurance-limit-input-value').textContent = Math.round(enduranceLimit);
-                
+
                 updateHaighDiagram();
             }
-            
+
             console.log('Material selected:', material.name);
         }
     });
@@ -687,18 +886,57 @@ function initHaighDiagram() {
         name: 'Assessment Point'
     });
 
+    // Calculate safety factors for annotation
+    const goodmanSF = calculateGoodmanSF(pointMeanStress, pointStressAmplitude, enduranceLimit, ultimateStrength);
+    const gerberSF = calculateGerberSF(pointMeanStress, pointStressAmplitude, enduranceLimit, ultimateStrength);
+    const soderbergSF = calculateSoderbergSF(pointMeanStress, pointStressAmplitude, enduranceLimit, yieldStrength);
+
     Plotly.newPlot('haigh-diagram', traces, {
-        title: { text: 'Haigh Diagram', font: { size: 16 }},
-        xaxis: { title: 'Mean Stress (MPa)', range: [0, ultimateStrength * 1.1] },
-        yaxis: { title: 'Stress Amplitude (MPa)', range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1] },
+        xaxis: {
+            title: 'Mean Stress (MPa)',
+            range: [0, ultimateStrength * 1.1],
+            constrain: 'domain',
+            constraintoward: 'left'
+        },
+        yaxis: {
+            title: 'Stress Amplitude (MPa)',
+            range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1],
+            scaleanchor: 'x',
+            scaleratio: 1,
+            constrain: 'domain',
+            constraintoward: 'bottom'
+        },
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 60, r: 40, t: 50, b: 60 }
+        margin: { l: 50, r: 20, t: 30, b: 50 },
+        height: 500,
+        legend: {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.05,
+            yanchor: 'top',
+            font: { size: 9 }
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: 0.75,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>SF:</b> Goodman: ${goodmanSF.toFixed(2)} | Gerber: ${gerberSF.toFixed(2)} | Soderberg: ${soderbergSF.toFixed(2)}`,
+            showarrow: false,
+            font: { size: 9, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 1,
+            borderpad: 3
+        }]
     }, {
-        responsive: true
+        responsive: true,
+        displayModeBar: false
     });
-
-    updateSafetyFactors(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
 }
 
 function updateHaighDiagram() {
@@ -815,16 +1053,57 @@ function updateHaighDiagram() {
         name: 'Assessment Point'
     });
 
+    // Calculate safety factors for annotation
+    const goodmanSF = calculateGoodmanSF(pointMeanStress, pointStressAmplitude, enduranceLimit, ultimateStrength);
+    const gerberSF = calculateGerberSF(pointMeanStress, pointStressAmplitude, enduranceLimit, ultimateStrength);
+    const soderbergSF = calculateSoderbergSF(pointMeanStress, pointStressAmplitude, enduranceLimit, yieldStrength);
+
     Plotly.react('haigh-diagram', traces, {
-        title: { text: 'Haigh Diagram', font: { size: 16 }},
-        xaxis: { title: 'Mean Stress (MPa)', range: [0, ultimateStrength * 1.1] },
-        yaxis: { title: 'Stress Amplitude (MPa)', range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1] },
+        xaxis: {
+            title: 'Mean Stress (MPa)',
+            range: [0, ultimateStrength * 1.1],
+            constrain: 'domain',
+            constraintoward: 'left'
+        },
+        yaxis: {
+            title: 'Stress Amplitude (MPa)',
+            range: [0, Math.max(enduranceLimit, yieldStrength) * 1.1],
+            scaleanchor: 'x',
+            scaleratio: 1,
+            constrain: 'domain',
+            constraintoward: 'bottom'
+        },
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
-        margin: { l: 60, r: 40, t: 50, b: 60 }
+        margin: { l: 50, r: 20, t: 30, b: 50 },
+        height: 500,
+        legend: {
+            orientation: 'h',
+            x: 0.5,
+            xanchor: 'center',
+            y: 1.05,
+            yanchor: 'top',
+            font: { size: 9 }
+        },
+        annotations: [{
+            xref: 'paper',
+            yref: 'paper',
+            x: 0.5,
+            y: 0.75,
+            xanchor: 'center',
+            yanchor: 'top',
+            text: `<b>SF:</b> Goodman: ${goodmanSF.toFixed(2)} | Gerber: ${gerberSF.toFixed(2)} | Soderberg: ${soderbergSF.toFixed(2)}`,
+            showarrow: false,
+            font: { size: 9, color: '#b38600' },
+            bgcolor: '#fff3cd',
+            bordercolor: '#ffc107',
+            borderwidth: 1,
+            borderpad: 3
+        }]
+    }, {
+        responsive: true,
+        displayModeBar: false
     });
-
-    updateSafetyFactors(pointMeanStress, pointStressAmplitude, ultimateStrength, yieldStrength, enduranceLimit);
 }
 
 function generateHaighDiagramData(ultimateStrength, yieldStrength, enduranceLimit) {
@@ -856,17 +1135,6 @@ function generateHaighDiagramData(ultimateStrength, yieldStrength, enduranceLimi
         soderberg: { x: meanStress, y: soderbergLine },
         yield: { x: meanStress, y: yieldLine }
     };
-}
-
-function updateSafetyFactors(meanStress, stressAmplitude, ultimateStrength, yieldStrength, enduranceLimit) {
-    // Calculate safety factors using different criteria
-    const goodmanSF = calculateGoodmanSF(meanStress, stressAmplitude, enduranceLimit, ultimateStrength);
-    const gerberSF = calculateGerberSF(meanStress, stressAmplitude, enduranceLimit, ultimateStrength);
-    const soderbergSF = calculateSoderbergSF(meanStress, stressAmplitude, enduranceLimit, yieldStrength);
-    
-    document.getElementById('goodman-sf').textContent = goodmanSF.toFixed(2);
-    document.getElementById('gerber-sf').textContent = gerberSF.toFixed(2);
-    document.getElementById('soderberg-sf').textContent = soderbergSF.toFixed(2);
 }
 
 function calculateGoodmanSF(sm, sa, Se, Sut) {
@@ -1001,7 +1269,7 @@ function updateDamagePlot() {
     const cycles3 = parseFloat(document.getElementById('cycles-3').value);
     
     // Use default material properties for damage calculation
-    const sigmaF = 1120;  // Fatigue strength coefficient (MPa)
+    const sigmaF = 1020;  // Fatigue strength coefficient (MPa)
     const b = -0.092;     // Fatigue strength exponent
     
     // Calculate cycles to failure for each stress level
@@ -1077,23 +1345,23 @@ function updateDamagePlot() {
     };
 
     // Determine status and color for center annotation
-    let statusText, statusColor;
+    let statusColor, statusLabel;
     if (totalDamage >= 1.0) {
-        statusText = `FAILURE<br>D = ${totalDamage.toFixed(2)}`;
+        statusLabel = 'FAILURE';
         statusColor = '#DC3545'; // Red
     } else if (totalDamage >= 0.7) {
-        statusText = `WARNING<br>D = ${totalDamage.toFixed(2)}`;
+        statusLabel = 'WARNING';
         statusColor = '#FFC107'; // Amber
     } else {
-        statusText = `SAFE<br>D = ${totalDamage.toFixed(2)}`;
+        statusLabel = 'SAFE';
         statusColor = '#28A745'; // Green
     }
 
+    // Calculate remaining life percentage
+    const remainingLife = Math.max(0, (1 - totalDamage) * 100);
+
+    // Build comprehensive center text with results - using multiple annotations for better styling
     const layout = {
-        title: {
-            text: 'Palmgren-Miner Damage Accumulation',
-            font: { size: 16 }
-        },
         showlegend: true,
         legend: {
             orientation: 'v',
@@ -1103,19 +1371,63 @@ function updateDamagePlot() {
         paper_bgcolor: '#fffbeb',
         plot_bgcolor: 'white',
         margin: { l: 20, r: 180, t: 50, b: 20 },
-        annotations: [{
-            font: { size: 18, color: statusColor },
-            showarrow: false,
-            text: statusText,
-            x: 0.5,
-            y: 0.5
-        }],
+        annotations: [
+            // Status label at top
+            {
+                font: { size: 18, color: statusColor },
+                showarrow: false,
+                text: `<b>${statusLabel}</b>`,
+                x: 0.5,
+                y: 0.65,
+                xanchor: 'center',
+                yanchor: 'middle'
+            },
+            // Total damage value
+            {
+                font: { size: 11, color: '#333' },
+                showarrow: false,
+                text: 'Total Damage (D):',
+                x: 0.5,
+                y: 0.55,
+                xanchor: 'center',
+                yanchor: 'middle'
+            },
+            {
+                font: { size: 20, color: statusColor },
+                showarrow: false,
+                text: `<b>${totalDamage.toFixed(3)}</b>`,
+                x: 0.5,
+                y: 0.5,
+                xanchor: 'center',
+                yanchor: 'middle'
+            },
+            // Remaining life
+            {
+                font: { size: 11, color: '#333' },
+                showarrow: false,
+                text: 'Remaining Life:',
+                x: 0.5,
+                y: 0.4,
+                xanchor: 'center',
+                yanchor: 'middle'
+            },
+            {
+                font: { size: 16, color: statusColor },
+                showarrow: false,
+                text: `<b>${remainingLife.toFixed(1)}%</b>`,
+                x: 0.5,
+                y: 0.35,
+                xanchor: 'center',
+                yanchor: 'middle'
+            }
+        ],
         height: 400
     };
 
-    Plotly.react('damage-plot', [trace], layout, { responsive: true });
-    
-    updateDamageResults(totalDamage);
+    Plotly.react('damage-plot', [trace], layout, {
+        responsive: true,
+        displayModeBar: false
+    });
 }
 
 function calculateCyclesToFailure(stressAmplitude, sigmaF, b) {
@@ -1123,24 +1435,6 @@ function calculateCyclesToFailure(stressAmplitude, sigmaF, b) {
     // Rearranged: Nf = (σₐ/σ'f)^(1/b) / 2
     if (stressAmplitude <= 0) return Infinity;
     return Math.pow(stressAmplitude / sigmaF, 1 / b) / 2;
-}
-
-function updateDamageResults(totalDamage) {
-    document.getElementById('total-damage').textContent = totalDamage.toFixed(3);
-    document.getElementById('remaining-life').textContent = 
-        Math.max(0, (1 - totalDamage) * 100).toFixed(1) + '%';
-    
-    const statusElement = document.getElementById('damage-status');
-    if (totalDamage >= 1) {
-        statusElement.textContent = 'Failure Expected';
-        statusElement.className = 'damage-status status-failure';
-    } else if (totalDamage >= 0.7) {
-        statusElement.textContent = 'Warning - Near Limit';
-        statusElement.className = 'damage-status status-warning';
-    } else {
-        statusElement.textContent = 'Safe';
-        statusElement.className = 'damage-status status-safe';
-    }
 }
 
 function setupDamageControls() {

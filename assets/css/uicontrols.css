@@ -54,13 +54,27 @@
     flex-shrink: 0;
 }
 
-/* Sliders with compact width */
+/* Sliders with compact width for standard inline layouts */
 .controls-panel input[type="range"],
 .simulation-controls input[type="range"],
 .control-panel input[type="range"],
 .gear-controls input[type="range"] {
     width: 120px;
     flex-shrink: 0;
+}
+
+/* Override for sliders inside grid layouts - make them flexible and responsive */
+.controls-panel [style*="display:grid"] .slider-container input[type="range"],
+.controls-panel [style*="display: grid"] .slider-container input[type="range"],
+.simulation-controls [style*="display:grid"] .slider-container input[type="range"],
+.simulation-controls [style*="display: grid"] .slider-container input[type="range"],
+.control-panel [style*="display:grid"] .slider-container input[type="range"],
+.control-panel [style*="display: grid"] .slider-container input[type="range"],
+.gear-controls [style*="display:grid"] .slider-container input[type="range"],
+.gear-controls [style*="display: grid"] .slider-container input[type="range"] {
+    width: 100% !important;
+    min-width: 100px; /* Increased from 80px to accommodate labels and values */
+    flex-shrink: 1;
 }
 
 /* Value display spans */
@@ -421,6 +435,62 @@ button:disabled,
     transform: none;
 }
 
+/* ==================== GRID LAYOUT ENHANCEMENTS ==================== */
+
+/* Ensure grid containers with sliders maintain proper spacing and prevent overlap */
+.controls-panel [style*="grid-template-columns"],
+.simulation-controls [style*="grid-template-columns"],
+.control-panel [style*="grid-template-columns"],
+.gear-controls [style*="grid-template-columns"] {
+    width: 100%;
+}
+
+/* Ensure slider containers in grids don't overflow */
+.controls-panel [style*="display:grid"] .slider-container,
+.controls-panel [style*="display: grid"] .slider-container,
+.simulation-controls [style*="display:grid"] .slider-container,
+.simulation-controls [style*="display: grid"] .slider-container,
+.control-panel [style*="display:grid"] .slider-container,
+.control-panel [style*="display: grid"] .slider-container,
+.gear-controls [style*="display:grid"] .slider-container,
+.gear-controls [style*="display: grid"] .slider-container {
+    min-width: 140px; /* Ensure enough space for label + slider + value */
+    overflow: visible; /* Allow content to be visible but constrained by parent */
+    max-width: 100%; /* Prevent expanding beyond grid cell */
+}
+
+/* Labels in grid layouts should not overflow */
+.controls-panel [style*="display:grid"] .slider-container label,
+.controls-panel [style*="display: grid"] .slider-container label,
+.simulation-controls [style*="display:grid"] .slider-container label,
+.simulation-controls [style*="display: grid"] .slider-container label,
+.control-panel [style*="display:grid"] .slider-container label,
+.control-panel [style*="display: grid"] .slider-container label,
+.gear-controls [style*="display:grid"] .slider-container label,
+.gear-controls [style*="display: grid"] .slider-container label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Value displays in grid layouts should also be constrained */
+.controls-panel [style*="display:grid"] .slider-container span,
+.controls-panel [style*="display: grid"] .slider-container span,
+.simulation-controls [style*="display:grid"] .slider-container span,
+.simulation-controls [style*="display: grid"] .slider-container span,
+.control-panel [style*="display:grid"] .slider-container span,
+.control-panel [style*="display: grid"] .slider-container span,
+.gear-controls [style*="display:grid"] .slider-container span,
+.gear-controls [style*="display: grid"] .slider-container span {
+    display: block;
+    text-align: center;
+    max-width: 100%;
+    min-width: 50px; /* Ensure enough space for negative values like -300 */
+    white-space: nowrap; /* Prevent wrapping */
+    font-family: monospace; /* Fixed-width font for consistent spacing */
+}
+
 /* ==================== SIMULATION HOLDERS ==================== */
 
 /* Common sim-holder class (used in many pages) */
@@ -446,21 +516,118 @@ button:disabled,
         gap: 12px 25px;
     }
 
-    .controls-panel input[type="range"],
-    .simulation-controls input[type="range"],
-    .control-panel input[type="range"],
-    .gear-controls input[type="range"] {
+    /* Fixed width for standard inline sliders */
+    .controls-panel > .control-row input[type="range"],
+    .controls-panel > .slider-row input[type="range"],
+    .controls-panel > .slider-container input[type="range"],
+    .simulation-controls > .control-row input[type="range"],
+    .simulation-controls > .slider-row input[type="range"],
+    .simulation-controls > .slider-container input[type="range"],
+    .control-panel > .control-row input[type="range"],
+    .control-panel > .slider-row input[type="range"],
+    .control-panel > .slider-container input[type="range"],
+    .gear-controls > .control-row input[type="range"],
+    .gear-controls > .slider-row input[type="range"],
+    .gear-controls > .slider-container input[type="range"] {
         width: 150px;
+    }
+
+    /* Flexible width for sliders in grid layouts - adapt to available space */
+    .controls-panel [style*="display:grid"] input[type="range"],
+    .controls-panel [style*="display: grid"] input[type="range"],
+    .simulation-controls [style*="display:grid"] input[type="range"],
+    .simulation-controls [style*="display: grid"] input[type="range"],
+    .control-panel [style*="display:grid"] input[type="range"],
+    .control-panel [style*="display: grid"] input[type="range"],
+    .gear-controls [style*="display:grid"] input[type="range"],
+    .gear-controls [style*="display: grid"] input[type="range"] {
+        width: 100% !important;
+        min-width: 120px;
+    }
+}
+
+/* Large Desktop/Ultra-wide - even more space for sliders (≥1440px) */
+@media (min-width: 1440px) {
+    .controls-panel,
+    .simulation-controls,
+    .control-panel,
+    .gear-controls {
+        gap: 15px 30px;
+    }
+
+    /* Increase standard inline slider width on large screens */
+    .controls-panel > .control-row input[type="range"],
+    .controls-panel > .slider-row input[type="range"],
+    .controls-panel > .slider-container input[type="range"],
+    .simulation-controls > .control-row input[type="range"],
+    .simulation-controls > .slider-row input[type="range"],
+    .simulation-controls > .slider-container input[type="range"],
+    .control-panel > .control-row input[type="range"],
+    .control-panel > .slider-row input[type="range"],
+    .control-panel > .slider-container input[type="range"],
+    .gear-controls > .control-row input[type="range"],
+    .gear-controls > .slider-row input[type="range"],
+    .gear-controls > .slider-container input[type="range"] {
+        width: 180px;
+    }
+
+    /* Grid sliders expand even more on large screens */
+    .controls-panel [style*="display:grid"] input[type="range"],
+    .controls-panel [style*="display: grid"] input[type="range"],
+    .simulation-controls [style*="display:grid"] input[type="range"],
+    .simulation-controls [style*="display: grid"] input[type="range"],
+    .control-panel [style*="display:grid"] input[type="range"],
+    .control-panel [style*="display: grid"] input[type="range"],
+    .gear-controls [style*="display:grid"] input[type="range"],
+    .gear-controls [style*="display: grid"] input[type="range"] {
+        min-width: 150px;
+    }
+}
+
+/* Medium screens - reduce 3-column grids to 2-column (900px-1200px) */
+@media (min-width: 900px) and (max-width: 1200px) {
+    /* Force 3-column grids to become 2-column on medium screens to prevent overlap */
+    .controls-panel [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .controls-panel [style*="grid-template-columns:1fr 1fr 1fr"],
+    .simulation-controls [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .simulation-controls [style*="grid-template-columns:1fr 1fr 1fr"],
+    .control-panel [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .control-panel [style*="grid-template-columns:1fr 1fr 1fr"],
+    .gear-controls [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .gear-controls [style*="grid-template-columns:1fr 1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
     }
 }
 
 /* Tablets landscape - still compact (769px-1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
-    .controls-panel input[type="range"],
-    .simulation-controls input[type="range"],
-    .control-panel input[type="range"],
-    .gear-controls input[type="range"] {
+    /* Fixed width for standard inline sliders */
+    .controls-panel > .control-row input[type="range"],
+    .controls-panel > .slider-row input[type="range"],
+    .controls-panel > .slider-container input[type="range"],
+    .simulation-controls > .control-row input[type="range"],
+    .simulation-controls > .slider-row input[type="range"],
+    .simulation-controls > .slider-container input[type="range"],
+    .control-panel > .control-row input[type="range"],
+    .control-panel > .slider-row input[type="range"],
+    .control-panel > .slider-container input[type="range"],
+    .gear-controls > .control-row input[type="range"],
+    .gear-controls > .slider-row input[type="range"],
+    .gear-controls > .slider-container input[type="range"] {
         width: 130px;
+    }
+
+    /* Flexible width for sliders in grid layouts */
+    .controls-panel [style*="display:grid"] input[type="range"],
+    .controls-panel [style*="display: grid"] input[type="range"],
+    .simulation-controls [style*="display:grid"] input[type="range"],
+    .simulation-controls [style*="display: grid"] input[type="range"],
+    .control-panel [style*="display:grid"] input[type="range"],
+    .control-panel [style*="display: grid"] input[type="range"],
+    .gear-controls [style*="display:grid"] input[type="range"],
+    .gear-controls [style*="display: grid"] input[type="range"] {
+        width: 100% !important;
+        min-width: 100px;
     }
 }
 
@@ -472,6 +639,30 @@ button:disabled,
     .gear-controls {
         gap: 10px 15px;
         padding: 12px;
+    }
+
+    /* Force 3-column grids to become 2-column on tablets */
+    .controls-panel [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .controls-panel [style*="grid-template-columns:1fr 1fr 1fr"],
+    .simulation-controls [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .simulation-controls [style*="grid-template-columns:1fr 1fr 1fr"],
+    .control-panel [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .control-panel [style*="grid-template-columns:1fr 1fr 1fr"],
+    .gear-controls [style*="grid-template-columns: 1fr 1fr 1fr"],
+    .gear-controls [style*="grid-template-columns:1fr 1fr 1fr"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Reduce minimum widths for smaller screens */
+    .controls-panel [style*="display:grid"] .slider-container,
+    .controls-panel [style*="display: grid"] .slider-container,
+    .simulation-controls [style*="display:grid"] .slider-container,
+    .simulation-controls [style*="display: grid"] .slider-container,
+    .control-panel [style*="display:grid"] .slider-container,
+    .control-panel [style*="display: grid"] .slider-container,
+    .gear-controls [style*="display:grid"] .slider-container,
+    .gear-controls [style*="display: grid"] .slider-container {
+        min-width: 120px;
     }
 
     .controls-panel .control-row,
@@ -510,6 +701,26 @@ button:disabled,
     .gear-controls {
         padding: 10px;
         gap: 10px;
+    }
+
+    /* Force all multi-column grids to single column on small phones */
+    .controls-panel [style*="grid-template-columns"],
+    .simulation-controls [style*="grid-template-columns"],
+    .control-panel [style*="grid-template-columns"],
+    .gear-controls [style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Further reduce minimum widths for small phones */
+    .controls-panel [style*="display:grid"] .slider-container,
+    .controls-panel [style*="display: grid"] .slider-container,
+    .simulation-controls [style*="display:grid"] .slider-container,
+    .simulation-controls [style*="display: grid"] .slider-container,
+    .control-panel [style*="display:grid"] .slider-container,
+    .control-panel [style*="display: grid"] .slider-container,
+    .gear-controls [style*="display:grid"] .slider-container,
+    .gear-controls [style*="display: grid"] .slider-container {
+        min-width: 0; /* Allow full flexibility on small screens */
     }
 
     .controls-panel .control-row,

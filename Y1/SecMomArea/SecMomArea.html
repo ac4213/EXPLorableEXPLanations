@@ -27,20 +27,20 @@
         <p>Interactive exploration of centroids and second moment of area</p>
     </header>
     
-    <div class="section">
+    <div class="content-section">
         <h2>What is a Centroid?</h2>
         <p>The centroid of a shape is the geometric centre of the shape - the balancing point if it were made of a uniform material.</p>
-        <div class="math-container">
+        <div class="equation-box">
             <p>For a composite shape made up of multiple simple shapes, the centroid can be found using:</p>
             \[ y_c = \frac{\sum A_i y_i}{\sum A_i} \]
             <p>Where \(y_c\) is the y-coordinate of the centroid, \(A_i\) is the area of each component, and \(y_i\) is the centroid of each component.</p>
         </div>
     </div>
-    
-    <div class="section">
+
+    <div class="content-section">
         <h2>What is Second Moment of Area?</h2>
         <p>The Second Moment of Area (also called Moment of Inertia) measures how far a shape's area is distributed from an axis. It's crucial for determining resistance to bending.</p>
-        <div class="math-container">
+        <div class="equation-box">
             <p>For a simple rectangle about its centroidal x-axis:</p>
             \[ I_x = \frac{bh^3}{12} \]
             <p>Where \(b\) is the width and \(h\) is the height perpendicular to the x-axis.</p>
@@ -58,9 +58,9 @@
         <!-- Control buttons and sliders will be added here by JavaScript -->
     </div>
     
-    <div class="control-panel">
-        <div class="info-panel">
-            <h2>Instructions</h2>
+    <div class="content-section">
+        <div class="key-point">
+            <h3>Instructions</h3>
             <p>Use the sliders to adjust the dimensions of the I-section. Observe how changing the dimensions affects the centroid location and second moment of area.</p>
             <p>Key observations to note:</p>
             <ul>
@@ -69,16 +69,16 @@
                 <li>Symmetrical shapes have predictable centroid locations</li>
             </ul>
         </div>
-        
-        <div class="info-panel">
-            <h2>Section Properties</h2>
+
+        <div class="key-point">
+            <h3>Section Properties</h3>
             <div id="results-content">
                 <!-- Results will be displayed here -->
             </div>
         </div>
     </div>
-    
-    <div class="section">
+
+    <div class="content-section">
         <h2>Applications and Examples</h2>
         <p>The second moment of area is essential in various engineering applications:</p>
         <ul>
@@ -676,7 +676,7 @@ function drawArrow(fromx, fromy, tox, toy, color, twoheaded) {
         </div>
     </div>
 
-    <div class="section">
+    <div class="content-section">
         <h2>Summary of Key Equations</h2>
         <div class="equation-box">
             <table>

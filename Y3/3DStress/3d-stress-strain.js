@@ -335,10 +335,10 @@ class StressCube {
     drawShearOnFace(createVector(0, 0, -h), createVector(0, -1, 0), stressComponents.yz, [0, 255, 255]);
 
     // τ_xz (yellow) on +x, -x, +z, -z faces
-    drawShearOnFace(createVector( h, 0, 0), createVector(0, 0,  1), stressComponents.xz, [255, 255, 0]);
-    drawShearOnFace(createVector(-h, 0, 0), createVector(0, 0, -1), stressComponents.xz, [255, 255, 0]);
-    drawShearOnFace(createVector(0, 0,  h), createVector( 1, 0, 0), stressComponents.xz, [255, 255, 0]);
-    drawShearOnFace(createVector(0, 0, -h), createVector(-1, 0, 0), stressComponents.xz, [255, 255, 0]);
+    drawShearOnFace(createVector( h, 0, 0), createVector(0, 0,  1), stressComponents.xz, [204, 170, 0]);
+    drawShearOnFace(createVector(-h, 0, 0), createVector(0, 0, -1), stressComponents.xz, [204, 170, 0]);
+    drawShearOnFace(createVector(0, 0,  h), createVector( 1, 0, 0), stressComponents.xz, [204, 170, 0]);
+    drawShearOnFace(createVector(0, 0, -h), createVector(-1, 0, 0), stressComponents.xz, [204, 170, 0]);
   }
 
   drawPrincipalStresses() {

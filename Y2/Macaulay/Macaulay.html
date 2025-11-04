@@ -12,21 +12,43 @@
   <link rel="stylesheet" href="/assets/css/simulations.css">
   <link rel="stylesheet" href="/assets/css/uicontrols.css">
   <style>
-    :root { --primary: #ffd700; --secondary:#ffb300; --bg:#fffbeb; --text:#222; }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    header{background:var(--primary);padding:16px 20px;color:#fff}
-    header h1{margin:0;font-variant:small-caps}
-    .wrap{max-width:1120px;margin:0 auto;padding:16px}
-    .panel{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:16px}
-    #controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-bottom:12px}
-    .control{display:grid;gap:6px}
-    select,input[type=range]{width:100%}
-    button{background:var(--primary);border:0;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;color:#fff}
-    button.toggled{background:#b8860b;color:#fff}
-    .muted{opacity:.45;pointer-events:none}
-    #sketch-holder{border:1px solid #ddd;border-radius:10px;background:#f9f9f9;overflow:hidden}
-    .note{font-size:12px;color:#555}
+    /* Page-specific styles for Macaulay simulation */
+    #controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .control {
+      display: grid;
+      gap: 6px;
+    }
+
+    .control label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    select, input[type=range] {
+      width: 100%;
+    }
+
+    button.toggled {
+      background-color: #b8860b;
+      color: #fff;
+    }
+
+    .muted {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #555;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -107,11 +129,10 @@
     </div>
   </div>
 
-  <div class="simulation-container">
+  <div class="simulation-section">
     <h2>Interactive Beam Simulation</h2>
     <p>Explore how different loading configurations affect beam deflection, shear force, and bending moment diagrams. The simulation uses Macaulay's method for determinate beams and the stiffness method for indeterminate cases.</p>
-    <div class="panel">
-      <div id="controls">
+    <div id="controls">
         <div class="control">
           <label for="beam-type">Beam & Loading</label>
           <select id="beam-type">
@@ -162,7 +183,6 @@
 
       <div id="sketch-holder"></div>
       <p class="note" id="msg"></p>
-    </div>
   </div>
 
 <script>
@@ -517,8 +537,6 @@ function titleText(){
   }
 }
 </script>
-
-</div> <!-- End simulation-container -->
 
 <div class="content-section">
   <h2>Practice Problems</h2>

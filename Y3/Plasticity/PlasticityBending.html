@@ -69,8 +69,8 @@
   <div class="simulation-container">
     <div class="simulation-title">Simulation 1: Plasticity Progression in Cross-Sections</div>
 
-    <div class="controls">
-      <div class="control-group">
+    <div class="controls-panel">
+      <div class="control-row">
         <label>Section Type:</label>
         <select id="sectionType1">
           <option value="rectangular">Rectangular</option>
@@ -78,12 +78,12 @@
           <option value="i-section">I-Section</option>
         </select>
       </div>
-      <div class="control-group">
+      <div class="slider-row">
         <label>Yield Stress (MPa):</label>
         <input type="range" id="yieldStress1" min="200" max="500" value="250" step="10"/>
         <span class="value-display" id="yieldValue1">250</span>
       </div>
-      <div class="control-group">
+      <div class="slider-row">
         <label>Bending Moment (kN·m):</label>
         <input type="range" id="momentSlider1" min="0" max="300" value="0" step="1"/>
         <span class="value-display" id="momentValue1">0</span>
@@ -92,8 +92,8 @@
       <div class="legend">
         <span class="chip-blue">Elastic</span>
         <span class="chip-red">Plastic</span>
-        <span class="chip-grey">Yield lines ±σ<sub>y</sub></span>
-        <span class="chip-gold">Bisectrix (full plastic NA)</span>
+        <span class="chip-grey">Yield ±σ<sub>y</sub></span>
+        <span class="chip-gold">Bisectrix</span>
       </div>
     </div>
 
@@ -104,9 +104,9 @@
     </div>
 
     <div id="t-inputs" class="section-inputs">
-      <label>Flange width b<sub>f</sub> (mm): <input type="number" id="t-bf" value="180" min="40" max="800"/></label>
+      <label>Flange width b<sub>f</sub> (mm): <input type="number" id="t-bf" value="170" min="40" max="800"/></label>
       <label>Flange thickness t<sub>f</sub> (mm): <input type="number" id="t-tf" value="30" min="4" max="200"/></label>
-      <label>Web thickness t<sub>w</sub> (mm): <input type="number" id="t-tw" value="20" min="4" max="200"/></label>
+      <label>Web thickness t<sub>w</sub> (mm): <input type="number" id="t-tw" value="30" min="4" max="200"/></label>
       <label>Web height h<sub>w</sub> (mm): <input type="number" id="t-hw" value="170" min="20" max="800"/></label>
     </div>
 
@@ -135,18 +135,18 @@
   <div class="simulation-container">
     <div class="simulation-title">Simulation 2: Residual Stress Formation</div>
 
-    <div class="controls">
-      <div class="control-group">
+    <div class="controls-panel">
+      <div class="slider-row">
         <label>Fibre Position (y/h):</label>
         <input type="range" id="fibrePosition" min="-1" max="1" value="0.5" step="0.05"/>
         <span class="value-display" id="fibreValue">0.50</span>
       </div>
-      <div class="control-group">
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <button id="loadBtn">Load</button>
         <button id="unloadBtn" disabled>Unload to 0</button>
         <button id="resetBtn2">Reset</button>
       </div>
-      <div class="control-group">
+      <div class="slider-row">
         <label>Applied Moment (kN·m):</label>
         <input type="range" id="momentSlider2" min="0" max="300" value="0" step="1" disabled/>
         <span class="value-display" id="momentValue2">0</span>
@@ -559,9 +559,9 @@ function createSimulation1(){
         dims = {b:+document.getElementById('rect-b').value||120,
                 h:+document.getElementById('rect-h').value||200};
       } else if(sectionType==='t-section'){
-        dims = {bf:+document.getElementById('t-bf').value||180,
+        dims = {bf:+document.getElementById('t-bf').value||170,
                 tf:+document.getElementById('t-tf').value||30,
-                tw:+document.getElementById('t-tw').value||20,
+                tw:+document.getElementById('t-tw').value||30,
                 hw:+document.getElementById('t-hw').value||170};
       } else {
         dims = {bf:+document.getElementById('i-bf').value||150,
@@ -572,113 +572,193 @@ function createSimulation1(){
       recalcProps();
     }
 
-    // resultants for given (y0,c)
-    function computeFM(y0,c){
-      const {ys,bs,dy,yc} = geom;
-      let F=0, MM=0;
-      for(let i=0;i<ys.length;i++){
-        const y=ys[i], b=bs[i];
+    // Compute force and moment resultants for given NA position (y0) and elastic core half-height (c)
+    function computeFM(y0, c){
+      const {ys, bs, dy, yc} = geom;
+      let F = 0, MM = 0;
+      for(let i = 0; i < ys.length; i++){
+        const y = ys[i], b = bs[i];
         let sig;
-        if(y <= y0-c) sig = -yieldStress;
-        else if(y >= y0+c) sig = +yieldStress;
-        else sig = (yieldStress/c)*(y - y0);
-        F  += sig*b*dy;
-        MM += sig*(y - yc)*b*dy;
+        if(y <= y0 - c) sig = -yieldStress;
+        else if(y >= y0 + c) sig = +yieldStress;
+        else sig = c > 1e-9 ? (yieldStress / c) * (y - y0) : 0;
+        F  += sig * b * dy;
+        MM += sig * (y - yc) * b * dy;
       }
-      return {F, M:MM/1e6};
+      return {F, M: MM / 1e6};
     }
 
-    // Find NA for given c by force equilibrium
-    function y0ForC_monotone(c, y0_hint){
-      // Core must lie inside geometry
-      const loPhys = Math.max(c, 1e-6);
-      const hiPhys = Math.min(geom.H - c, geom.H - 1e-6);
+    // Find neutral axis position y0 for a given elastic core half-height c
+    // Uses force equilibrium (F = 0) and ensures monotonic transition from yc to y_pna
+    function findNA_forC(c, y0_hint){
+      const {ys, bs, dy} = geom;
 
-      if(loPhys >= hiPhys) return geom.yc;
+      // Physical bounds: NA must be positioned such that core fits within section
+      const y_min = Math.max(c, 0);
+      const y_max = Math.min(geom.H - c, geom.H);
 
-      const F_at = (y0)=> computeFM(y0,c).F;
+      if(y_min >= y_max) return geom.yc;
 
-      // Search over the full physically valid range
-      let lo = loPhys;
-      let hi = hiPhys;
-      let Flo = F_at(lo);
-      let Fhi = F_at(hi);
+      // For given y0, compute axial force
+      const computeF = (y0) => {
+        let F = 0;
+        for(let i = 0; i < ys.length; i++){
+          const y = ys[i], b = bs[i];
+          let sig;
+          if(y <= y0 - c) sig = -yieldStress;
+          else if(y >= y0 + c) sig = +yieldStress;
+          else sig = c > 1e-9 ? (yieldStress / c) * (y - y0) : 0;
+          F += sig * b * dy;
+        }
+        return F;
+      };
 
-      // If no sign change, return the elastic centroid as fallback
-      if(Flo * Fhi > 0) {
-        // Try to find a point closer to the hint
-        const y0c = Math.max(lo, Math.min(y0_hint ?? geom.yc, hi));
-        const Fc = F_at(y0c);
-        if(Math.abs(Fc) < 1e-3) return y0c;
-        return geom.yc;
+      // To avoid finding the "wrong" root in asymmetric sections,
+      // we restrict the search range to be between yc and y_pna.
+      // The NA must transition monotonically from yc (elastic) to y_pna (plastic).
+
+      const y_lower_bound = Math.min(geom.yc, geom.y_pna);
+      const y_upper_bound = Math.max(geom.yc, geom.y_pna);
+
+      // Constrain search to monotonic transition region
+      let lo = Math.max(y_min, y_lower_bound);
+      let hi = Math.min(y_max, y_upper_bound);
+
+      // Safety check
+      if(lo >= hi) return y0_hint || geom.yc;
+
+      let F_lo = computeF(lo);
+      let F_hi = computeF(hi);
+
+      // Check if root exists in interval
+      if(F_lo * F_hi > 0){
+        // No sign change in the constrained interval
+        // Return the endpoint closer to zero force, or the hint if valid
+        if(y0_hint && y0_hint >= lo && y0_hint <= hi){
+          const F_hint = computeF(y0_hint);
+          if(Math.abs(F_hint) < Math.max(Math.abs(F_lo), Math.abs(F_hi))){
+            return y0_hint;
+          }
+        }
+        return Math.abs(F_lo) < Math.abs(F_hi) ? lo : hi;
       }
 
-      // Bisection search for force equilibrium
-      let mid = y0_hint ?? geom.yc;
-      for(let it=0; it<60; it++){
-        mid = 0.5*(lo + hi);
-        const Fm = F_at(mid);
-        if(Math.abs(Fm) < 1e-6) break;
-        if(Flo * Fm <= 0){
+      // Bisection search for F = 0
+      for(let iter = 0; iter < 100; iter++){
+        const mid = 0.5 * (lo + hi);
+        const F_mid = computeF(mid);
+
+        if(Math.abs(F_mid) < 1e-3) return mid;
+        if(Math.abs(hi - lo) < 1e-9) return mid;
+
+        if(F_lo * F_mid < 0){
           hi = mid;
-          Fhi = Fm;
+          F_hi = F_mid;
         } else {
           lo = mid;
-          Flo = Fm;
+          F_lo = F_mid;
         }
       }
 
-      return mid;
+      return 0.5 * (lo + hi);
     }
 
     function solveDistribution(){
-      if(solved && solved.M===M_target && solved.yield===yieldStress) return solved;
+      if(solved && solved.M === M_target && solved.yield === yieldStress) return solved;
 
-      if(M_target <= Me*0.999){
-        const k=(M_target*1e6)/geom.I;
-        const out = geom.ys.map(y=>({y, sigma:k*(y-geom.yc)}));
+      // CASE 1: Fully elastic (M ≤ Me)
+      if(M_target <= Me * 0.999){
+        const k = (M_target * 1e6) / geom.I;
+        const out = geom.ys.map(y => ({y, sigma: k * (y - geom.yc)}));
         y0_prev = geom.yc;
-        solved = {stage:'elastic', dist:out, y0:geom.yc, c:geom.yMax, M:M_target, yield:yieldStress};
+        solved = {stage: 'elastic', dist: out, y0: geom.yc, c: geom.yMax, M: M_target, yield: yieldStress};
         return solved;
       }
 
-      if(M_target >= Mp*0.999){
-        const out = geom.ys.map(y=>({y, sigma:(y<geom.y_pna? -yieldStress : +yieldStress)}));
+      // CASE 2: Fully plastic (M ≥ Mp)
+      if(M_target >= Mp * 0.999){
+        const out = geom.ys.map(y => ({y, sigma: (y < geom.y_pna ? -yieldStress : +yieldStress)}));
         y0_prev = geom.y_pna;
-        solved = {stage:'plastic', dist:out, y0:geom.y_pna, c:0, M:M_target, yield:yieldStress};
+        solved = {stage: 'plastic', dist: out, y0: geom.y_pna, c: 0, M: M_target, yield: yieldStress};
         return solved;
       }
 
-      // Elastoplastic
-      let c_lo = 1e-6, c_hi = geom.yMax - 1e-6;
-      let y0_guess = y0_prev;
-      let y0_best = y0_prev, c_best = c_hi, M_best = Me;
+      // CASE 3: Elastoplastic (Me < M < Mp)
+      // Strategy: parametrize by elastic core half-height c
+      // As M increases from Me to Mp:
+      //   - c decreases from yMax to 0
+      //   - NA (y0) transitions from yc to y_pna
 
-      for(let it=0; it<70; it++){
-        const c_try = 0.5*(c_lo + c_hi);
-        const y0_try = y0ForC_monotone(c_try, y0_guess);
-        const M_try = computeFM(y0_try, c_try).M;
+      // Determine bounds on c
+      // At M = Me, the entire section is elastic with c = yMax
+      // At M = Mp, the entire section is plastic with c = 0
 
-        if(Math.abs(M_try - M_target) < 1e-3){
-          y0_best=y0_try; c_best=c_try; M_best=M_try; break;
+      // Interpolate c based on M to get initial bounds
+      const alpha = (M_target - Me) / (Mp - Me);  // 0 at Me, 1 at Mp
+
+      // Initial guess: linearly interpolate c
+      const c_elastic = geom.yMax;
+      const c_plastic = 0;
+      const c_guess = c_elastic * (1 - alpha);
+
+      // Search bounds for c
+      let c_lo = 1e-6;
+      let c_hi = geom.yMax;
+
+      // Bisection on c to match target moment
+      let y0_best = geom.yc, c_best = c_guess, M_best = Me;
+
+      for(let iter = 0; iter < 120; iter++){
+        const c_mid = 0.5 * (c_lo + c_hi);
+
+        // For this c, find NA position that satisfies force equilibrium
+        // Pass previous y0 as hint to maintain continuity
+        const y0_mid = findNA_forC(c_mid, y0_best);
+
+        // Compute moment for this (y0, c) pair
+        const result = computeFM(y0_mid, c_mid);
+        const M_mid = result.M;
+        const F_mid = result.F;
+
+        // Check for convergence
+        if(Math.abs(M_mid - M_target) < 1e-4){
+          y0_best = y0_mid;
+          c_best = c_mid;
+          M_best = M_mid;
+          break;
         }
-        if(M_try < M_target) c_hi = c_try; else c_lo = c_try;
 
-        y0_best=y0_try; c_best=c_try; M_best=M_try;
-        y0_guess = y0_try;
+        if(Math.abs(c_hi - c_lo) < 1e-9){
+          y0_best = y0_mid;
+          c_best = c_mid;
+          M_best = M_mid;
+          break;
+        }
+
+        // Adjust c bounds
+        // Smaller c → larger M (more plasticity)
+        if(M_mid < M_target){
+          c_hi = c_mid;
+        } else {
+          c_lo = c_mid;
+        }
+
+        y0_best = y0_mid;
+        c_best = c_mid;
+        M_best = M_mid;
       }
 
-      const out = geom.ys.map(y=>{
+      // Build stress distribution
+      const out = geom.ys.map(y => {
         let sig;
         if(y <= y0_best - c_best) sig = -yieldStress;
         else if(y >= y0_best + c_best) sig = +yieldStress;
-        else sig = (yieldStress/c_best)*(y - y0_best);
-        return {y, sigma:sig};
+        else sig = c_best > 1e-9 ? (yieldStress / c_best) * (y - y0_best) : 0;
+        return {y, sigma: sig};
       });
 
       y0_prev = y0_best;
-
-      solved = {stage:'elastoplastic', dist:out, y0:y0_best, c:c_best, M:M_best, yield:yieldStress};
+      solved = {stage: 'elastoplastic', dist: out, y0: y0_best, c: c_best, M: M_best, yield: yieldStress};
       return solved;
     }
 
@@ -710,7 +790,25 @@ function createSimulation1(){
       document.getElementById('resetBtn1').addEventListener('click', ()=>{
         M_target=0; document.getElementById('momentSlider1').value=0;
         document.getElementById('momentValue1').textContent='0';
-        y0_prev = geom.yc;
+        // Reset dimensions to defaults for all section types
+        if(sectionType==='rectangular'){
+          document.getElementById('rect-b').value=120;
+          document.getElementById('rect-h').value=200;
+          dims = {b:120, h:200};
+        } else if(sectionType==='t-section'){
+          document.getElementById('t-bf').value=170;
+          document.getElementById('t-tf').value=30;
+          document.getElementById('t-tw').value=30;
+          document.getElementById('t-hw').value=170;
+          dims = {bf:170, tf:30, tw:30, hw:170};
+        } else if(sectionType==='i-section'){
+          document.getElementById('i-bf').value=150;
+          document.getElementById('i-tf').value=25;
+          document.getElementById('i-tw').value=15;
+          document.getElementById('i-h').value=200;
+          dims = {bf:150, tf:25, tw:15, h:200};
+        }
+        recalcProps();
         solved=null; updateStageIndicators();
       });
 

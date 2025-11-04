@@ -133,6 +133,325 @@
             align-items: center;
             gap: 5px;
         }
+
+        /* Custom stress-colored sliders */
+        /* Inherit all responsive behavior and sizing from uicontrols.css */
+        /* Only override track and thumb colors for stress components */
+
+        /* σ_xx (red) slider track */
+        #sigma-xx::-webkit-slider-track {
+            background: #ff0000 !important;
+            border-color: #cc0000 !important;
+        }
+        #sigma-xx::-moz-range-track {
+            background: #ff0000 !important;
+            border-color: #cc0000 !important;
+        }
+        #sigma-xx:hover::-webkit-slider-track {
+            background: #ff3333 !important;
+            border-color: #cc0000 !important;
+        }
+        #sigma-xx::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #f00 !important;
+        }
+        #sigma-xx::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #f00 !important;
+        }
+
+        /* σ_yy (blue) slider track */
+        #sigma-yy::-webkit-slider-track {
+            background: #0000ff !important;
+            border-color: #0000cc !important;
+        }
+        #sigma-yy::-moz-range-track {
+            background: #0000ff !important;
+            border-color: #0000cc !important;
+        }
+        #sigma-yy:hover::-webkit-slider-track {
+            background: #3333ff !important;
+            border-color: #0000cc !important;
+        }
+        #sigma-yy::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #00f !important;
+        }
+        #sigma-yy::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #00f !important;
+        }
+
+        /* σ_zz (green) slider track */
+        #sigma-zz::-webkit-slider-track {
+            background: #00bb00 !important;
+            border-color: #008800 !important;
+        }
+        #sigma-zz::-moz-range-track {
+            background: #00bb00 !important;
+            border-color: #008800 !important;
+        }
+        #sigma-zz:hover::-webkit-slider-track {
+            background: #00dd00 !important;
+            border-color: #008800 !important;
+        }
+        #sigma-zz::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #0b0 !important;
+        }
+        #sigma-zz::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #0b0 !important;
+        }
+
+        /* τ_xy (purple) slider track */
+        #tau-xy::-webkit-slider-track {
+            background: #ff00ff !important;
+            border-color: #cc00cc !important;
+        }
+        #tau-xy::-moz-range-track {
+            background: #ff00ff !important;
+            border-color: #cc00cc !important;
+        }
+        #tau-xy:hover::-webkit-slider-track {
+            background: #ff33ff !important;
+            border-color: #cc00cc !important;
+        }
+        #tau-xy::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #f0f !important;
+        }
+        #tau-xy::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #f0f !important;
+        }
+
+        /* τ_yz (cyan) slider track */
+        #tau-yz::-webkit-slider-track {
+            background: #00ffff !important;
+            border-color: #00cccc !important;
+        }
+        #tau-yz::-moz-range-track {
+            background: #00ffff !important;
+            border-color: #00cccc !important;
+        }
+        #tau-yz:hover::-webkit-slider-track {
+            background: #33ffff !important;
+            border-color: #00cccc !important;
+        }
+        #tau-yz::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #0ff !important;
+        }
+        #tau-yz::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #0ff !important;
+        }
+
+        /* τ_xz (muted yellow) slider track - more readable on white */
+        #tau-xz::-webkit-slider-track {
+            background: rgb(204, 170, 0) !important;
+            border-color: #997700 !important;
+        }
+        #tau-xz::-moz-range-track {
+            background: #ccaa00 !important;
+            border-color: #997700 !important;
+        }
+        #tau-xz:hover::-webkit-slider-track {
+            background: #ddbb00 !important;
+            border-color: #997700 !important;
+        }
+        #tau-xz::-webkit-slider-thumb {
+            background: #fff !important;
+            border-color: #ccaa00 !important;
+        }
+        #tau-xz::-moz-range-thumb {
+            background: #fff !important;
+            border-color: #ccaa00 !important;
+        }
+
+        /* Compact 2-row layout: normal stresses on top, shear stresses on bottom */
+        .simulation-section {
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .control-panel {
+            padding: 15px !important;
+            box-sizing: border-box !important;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        .control-group {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+        }
+
+        /* Force 2-row layout at all screen sizes */
+        .control-group > div[style*="grid"] {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 15px !important;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 0 !important;
+        }
+
+        /* Slider container - vertical layout with label on top */
+        .slider-container {
+            min-width: 0;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 3px !important;
+        }
+
+        .slider-container label {
+            display: block !important;
+            text-align: center !important;
+            margin: 0 0 3px 0 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100% !important;
+            max-width: 180px !important;
+            margin: 0 auto !important;
+        }
+
+        .slider-container span {
+            display: block !important;
+            text-align: center !important;
+            margin: 3px 0 0 0 !important;
+            font-family: monospace !important;
+        }
+
+        /* Responsive adjustments - keep 3 columns but adjust sizing */
+        @media (max-width: 900px) {
+            .control-group > div[style*="grid"] {
+                gap: 12px !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .control-group > div[style*="grid"] {
+                gap: 10px !important;
+            }
+
+            .slider-container label {
+                font-size: 12px !important;
+            }
+
+            .slider-container span {
+                font-size: 11px !important;
+            }
+        }
+
+        /* Phone-specific: shorter sliders but keep large knobs */
+        @media (max-width: 576px) {
+            /* Override uicontrols.css padding on control-panel */
+            .control-panel {
+                padding: 8px !important;
+            }
+
+            .control-group > div[style*="grid"] {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 2px !important;
+                column-gap: 2px !important;
+            }
+
+            /* Override uicontrols.css flex: 1 1 100% that breaks grid layout */
+            .control-panel .slider-container {
+                flex: initial !important;
+                min-width: 0 !important;
+            }
+
+            .slider-container label {
+                font-size: 9px !important;
+            }
+
+            .slider-container span {
+                font-size: 9px !important;
+            }
+
+            /* Make sliders shorter (reduced width) on phones */
+            .slider-container input[type="range"] {
+                max-width: 90px !important;
+                width: 100% !important;
+            }
+        }
+
+        /* Add color to labels to match stress components */
+        label[for="sigma-xx"] {
+            color: #f00;
+            font-weight: bold;
+        }
+
+        label[for="sigma-yy"] {
+            color: #00f;
+            font-weight: bold;
+        }
+
+        label[for="sigma-zz"] {
+            color: #0b0;
+            font-weight: bold;
+        }
+
+        label[for="tau-xy"] {
+            color: #f0f;
+            font-weight: bold;
+        }
+
+        label[for="tau-yz"] {
+            color: #0ff;
+            font-weight: bold;
+        }
+
+        label[for="tau-xz"] {
+            color: #ccaa00;
+            font-weight: bold;
+        }
+
+        /* Value display with matching colors */
+        #sigma-xx-value {
+            color: #f00;
+            font-weight: bold;
+        }
+
+        #sigma-yy-value {
+            color: #00f;
+            font-weight: bold;
+        }
+
+        #sigma-zz-value {
+            color: #0b0;
+            font-weight: bold;
+        }
+
+        #tau-xy-value {
+            color: #f0f;
+            font-weight: bold;
+        }
+
+        #tau-yz-value {
+            color: #0ff;
+            font-weight: bold;
+        }
+
+        #tau-xz-value {
+            color: #ccaa00;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -145,66 +464,53 @@
     <div class="container" style="grid-template-columns:1fr">
         <div class="simulation-section">
             <h2>Interactive 3D Stress Visualisation</h2>
+                                    <div class="control-group">
+                    <div class="button-container">
+                        <button id="reset-view">Reset View</button>
+                        <button id="toggle-rotation">Stop Rotation</button>
+                        <button id="toggle-principal">Show Principal Stresses</button>
+                        <label><input type="checkbox" id="show-deformation" checked> Show deformation</label>
+                    </div>
+                </div>
             <div id="sketch-holder">
                 <!-- Our p5.js sketch will go here -->
-            </div>
-            <div id="axis-legend" style="margin-top:8px;font-size:14px;line-height:1.4;">
-            <strong>Stress colours:</strong>
-            <span style="margin-left:8px;color:#f00;">σ_x (red)</span>
-            <span style="margin-left:8px;color:#00f;">σ_y (blue)</span>
-            <span style="margin-left:8px;color:#0b0;">σ_z (green)</span>
-            <span style="margin-left:8px;color:#f0f;">τ_xy (purple)</span>
-            <span style="margin-left:8px;color:#0ff;">τ_yz (cyan)</span>
-            <span style="margin-left:8px;color:#ff0;">τ_xz (yellow)</span>
             </div>
             
             <div class="control-panel">
                 <div class="control-group">
-                    <h3>Stress Components (MPa)</h3>
+                    <h5>Stress Components (MPa)</h5>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px;">
                         <div class="slider-container" style="margin: 0;">
-                            <label for="sigma-xx" style="display: block; margin-bottom: 5px;">σ<sub>xx</sub>:</label>
+                            <label for="sigma-xx" style="display: block; margin-bottom: 5px;">σ<sub>xx</sub></label>
                             <input type="range" id="sigma-xx" min="-100" max="100" value="50" class="slider" style="width: 100%;">
                             <span id="sigma-xx-value" style="display: block; text-align: center; margin-top: 3px;">50</span>
                         </div>
                         <div class="slider-container" style="margin: 0;">
-                            <label for="sigma-yy" style="display: block; margin-bottom: 5px;">σ<sub>yy</sub>:</label>
+                            <label for="sigma-yy" style="display: block; margin-bottom: 5px;">σ<sub>yy</sub></label>
                             <input type="range" id="sigma-yy" min="-100" max="100" value="30" class="slider" style="width: 100%;">
                             <span id="sigma-yy-value" style="display: block; text-align: center; margin-top: 3px;">30</span>
                         </div>
                         <div class="slider-container" style="margin: 0;">
-                            <label for="sigma-zz" style="display: block; margin-bottom: 5px;">σ<sub>zz</sub>:</label>
+                            <label for="sigma-zz" style="display: block; margin-bottom: 5px;">σ<sub>zz</sub></label>
                             <input type="range" id="sigma-zz" min="-100" max="100" value="10" class="slider" style="width: 100%;">
                             <span id="sigma-zz-value" style="display: block; text-align: center; margin-top: 3px;">10</span>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
                         <div class="slider-container" style="margin: 0;">
-                            <label for="tau-xy" style="display: block; margin-bottom: 5px;">τ<sub>xy</sub>:</label>
+                            <label for="tau-xy" style="display: block; margin-bottom: 5px;">τ<sub>xy</sub></label>
                             <input type="range" id="tau-xy" min="-50" max="50" value="15" class="slider" style="width: 100%;">
                             <span id="tau-xy-value" style="display: block; text-align: center; margin-top: 3px;">15</span>
                         </div>
                         <div class="slider-container" style="margin: 0;">
-                            <label for="tau-yz" style="display: block; margin-bottom: 5px;">τ<sub>yz</sub>:</label>
+                            <label for="tau-yz" style="display: block; margin-bottom: 5px;">τ<sub>yz</sub></label>
                             <input type="range" id="tau-yz" min="-50" max="50" value="5" class="slider" style="width: 100%;">
                             <span id="tau-yz-value" style="display: block; text-align: center; margin-top: 3px;">5</span>
                         </div>
                         <div class="slider-container" style="margin: 0;">
-                            <label for="tau-xz" style="display: block; margin-bottom: 5px;">τ<sub>xz</sub>:</label>
+                            <label for="tau-xz" style="display: block; margin-bottom: 5px;">τ<sub>xz</sub></label>
                             <input type="range" id="tau-xz" min="-50" max="50" value="10" class="slider" style="width: 100%;">
                             <span id="tau-xz-value" style="display: block; text-align: center; margin-top: 3px;">10</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <h3>View Controls</h3>
-                    <div class="button-container">
-                        <button id="reset-view">Reset View</button>
-                        <button id="toggle-rotation">Stop Rotation</button>
-                        <button id="toggle-principal">Show Principal Stresses</button>
-                        <div class="checkbox-container">
-                        <label><input type="checkbox" id="show-deformation" checked> Show deformation</label>
                         </div>
                     </div>
                 </div>
@@ -225,7 +531,7 @@
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 15px;">
                     <div class="result-panel" style="background-color: #e6f7ff; border-left: 4px solid #1890ff;">
-                        <h3 style="color: #1890ff; margin-top: 0;">Equivalent Failure Stresses (σ_Y=110 MPa)</h3>
+                        <h3 style="color: #1890ff; margin-top: 0;">Equivalent Failure Stresses (\(σ_Y\) = 110 MPa)</h3>
                         <div id="failure-criteria" style="font-size: 13px;"></div>
                     </div>
                     <div class="plot-container" style="flex-grow: 1;">
