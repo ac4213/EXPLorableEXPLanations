@@ -1,3 +1,16 @@
+// Global variables
+var cnv, cnvx, cnvy; // Canvas variables
+var bgdRGB = [245, 245, 245]; // Light gray background color
+var themass; // The mass object in the simulation
+var mypars; // Mass and simulation parameters
+var results; // Calculation results
+var counter = 0; // Animation counter
+var yMass = 250; // Initial mass position (centered vertically)
+var UNDERDAMPED = false;
+var OVERDAMPED = false; // System state flags
+var TIMEHISTORY, FRFAMP, FRFPHASE; // Chart containers
+var forcingEnabled = false; // Toggle for forcing
+
 // Mass object constructor
 function Mass(x, y, wdth, hght) {
     this.x = x;
@@ -256,24 +269,23 @@ function drawStaticElements() {
     }
 
     pop();
-}// Global variables
-var cnv, cnvx, cnvy; // Canvas variables
-var bgdRGB = [245, 245, 245]; // Light gray background color
-var themass; // The mass object in the simulation
-var mypars; // Mass and simulation parameters
-var results; // Calculation results
-var counter = 0; // Animation counter
-var yMass = 250; // Initial mass position (centered vertically)
-var UNDERDAMPED = false; 
-var OVERDAMPED = false; // System state flags
-var TIMEHISTORY, FRFAMP, FRFPHASE; // Chart containers
-var forcingEnabled = false; // Toggle for forcing
+}
 
 // Setup function - initializes the simulation
 function setup() {
+    // Wait for DOM to be ready
+    const sketchHolder = document.getElementById('sketch-holder');
+    if (!sketchHolder) {
+        console.error('ERROR: sketch-holder element not found! DOM may not be ready.');
+        return;
+    }
+
+    console.log('Setting up p5.js canvas...', 'sketch-holder found:', sketchHolder);
+
     // Create canvas and position it in the designated container
     cnv = createCanvas(200, 500);
     cnv.parent('sketch-holder');
+    console.log('Canvas created and attached to sketch-holder');
     cnvx = cnv.position().x;
     cnvy = cnv.position().y;
     background(bgdRGB[0], bgdRGB[1], bgdRGB[2]);

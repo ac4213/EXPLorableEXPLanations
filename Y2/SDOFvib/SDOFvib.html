@@ -17,12 +17,9 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-    <!-- Import libraries with defer for better performance -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js" defer></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js" defer></script>
-
-    <!-- Main script for the simulation -->
-    <script src="SDOFvib.js" defer></script>
+    <!-- Import libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <style>
         /* Page-specific styles */
@@ -38,6 +35,8 @@
             flex: 0 0 200px;
             min-height: 500px;
             margin: 0;
+            background-color: #f0f0f0;
+            border: 2px solid #ccc;
         }
 
         #chart-container {
@@ -680,5 +679,8 @@
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Main simulation script - load last to ensure DOM and libraries are ready -->
+    <script src="SDOFvib.js"></script>
 </body>
 </html>
