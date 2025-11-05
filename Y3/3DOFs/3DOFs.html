@@ -1344,6 +1344,24 @@
 </div>
 
 <div class="content-section">
+    <h2>Summary of Key Equations</h2>
+    <div class="key-point">
+        <h3>Key Takeaways</h3>
+        <ol>
+            <li><strong>Equations of Motion:</strong> Undamped MDOF systems are governed by \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\), with mass and stiffness matrices derived from free-body diagrams</li>
+            <li><strong>Natural Frequencies:</strong> 3-DOF systems have three natural frequencies found by solving the eigenvalue problem \((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</li>
+            <li><strong>Mode Shapes:</strong> Each natural frequency has an associated mode shape (eigenvector) representing the pattern of vibration</li>
+            <li><strong>Orthogonality:</strong> Mode shapes satisfy \(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) and \(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\), enabling modal decomposition</li>
+            <li><strong>Modal Decomposition:</strong> Coupled physical equations transform into independent modal equations: \(\ddot{q}_i + \omega_i^2 q_i = 0\)</li>
+            <li><strong>Proportional Damping:</strong> Rayleigh damping \(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\) preserves modal decoupling with damping ratios \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</li>
+            <li><strong>Forced Response:</strong> External forces are projected onto modal coordinates via \(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\), allowing each mode to be solved independently</li>
+            <li><strong>Resonance:</strong> Large amplitude responses occur when forcing frequency approaches a natural frequency, emphasizing the importance of knowing system eigenvalues</li>
+            <li><strong>Modal Superposition:</strong> Total response is the sum of all modal contributions: \(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</li>
+        </ol>
+    </div>
+</div>
+
+<div class="content-section">
     <h2>Practice Problems</h2>
 
     <div class="practice-problems">
@@ -1505,24 +1523,6 @@
 
         <button id="submit-quiz">Submit Quiz</button>
         <div id="quiz-results"></div>
-    </div>
-</div>
-
-<div class="content-section">
-    <h2>Summary of Key Equations</h2>
-    <div class="key-point">
-        <h3>Key Takeaways</h3>
-        <ol>
-            <li><strong>Equations of Motion:</strong> Undamped MDOF systems are governed by \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\), with mass and stiffness matrices derived from free-body diagrams</li>
-            <li><strong>Natural Frequencies:</strong> 3-DOF systems have three natural frequencies found by solving the eigenvalue problem \((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</li>
-            <li><strong>Mode Shapes:</strong> Each natural frequency has an associated mode shape (eigenvector) representing the pattern of vibration</li>
-            <li><strong>Orthogonality:</strong> Mode shapes satisfy \(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) and \(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\), enabling modal decomposition</li>
-            <li><strong>Modal Decomposition:</strong> Coupled physical equations transform into independent modal equations: \(\ddot{q}_i + \omega_i^2 q_i = 0\)</li>
-            <li><strong>Proportional Damping:</strong> Rayleigh damping \(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\) preserves modal decoupling with damping ratios \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</li>
-            <li><strong>Forced Response:</strong> External forces are projected onto modal coordinates via \(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\), allowing each mode to be solved independently</li>
-            <li><strong>Resonance:</strong> Large amplitude responses occur when forcing frequency approaches a natural frequency, emphasizing the importance of knowing system eigenvalues</li>
-            <li><strong>Modal Superposition:</strong> Total response is the sum of all modal contributions: \(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</li>
-        </ol>
     </div>
 </div>
 

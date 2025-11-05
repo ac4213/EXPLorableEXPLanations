@@ -151,30 +151,6 @@
         </div>
     </div>
 
-    <div class="content-section">
-        <h2>Engineering Applications</h2>
-        
-        <h3>Navigation and Transport</h3>
-        <ul>
-            <li><strong>Aircraft Navigation:</strong> Pilots must account for wind velocity to determine ground speed and heading</li>
-            <li><strong>Marine Engineering:</strong> Ships must consider ocean currents when plotting courses</li>
-            <li><strong>Spacecraft Rendezvous:</strong> Docking procedures require precise relative velocity calculations</li>
-        </ul>
-        
-        <h3>Mechanical Systems</h3>
-        <ul>
-            <li><strong>Gear Trains:</strong> Relative motion between gears determines transmission ratios</li>
-            <li><strong>Cam Mechanisms:</strong> The follower's motion relative to the cam determines the output motion</li>
-            <li><strong>Robotic Arms:</strong> End-effector position depends on relative motion of joints</li>
-        </ul>
-        
-        <h3>Fluid Dynamics</h3>
-        <ul>
-            <li><strong>Wind Tunnel Testing:</strong> Air velocity relative to the model simulates flight conditions</li>
-            <li><strong>Turbomachinery:</strong> Blade velocity relative to fluid determines energy transfer</li>
-        </ul>
-    </div>
-
     <div class="simulation-section">
         <h2>Interactive Simulation</h2>
         <p>Explore relative motion by observing two objects from different reference frames. Switch between viewpoints to see how motion appears different from each perspective.</p>
@@ -243,6 +219,68 @@
                 <p>Relative Velocity: <span id="vel-rel-ab">3.61 m/s</span></p>
                 <p>Components: <span id="vel-rel-ab-comp">(3.54, -0.71) m/s</span></p>
             </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Navigation and Transport</h3>
+        <ul>
+            <li><strong>Aircraft Navigation:</strong> Pilots must account for wind velocity to determine ground speed and heading</li>
+            <li><strong>Marine Engineering:</strong> Ships must consider ocean currents when plotting courses</li>
+            <li><strong>Spacecraft Rendezvous:</strong> Docking procedures require precise relative velocity calculations</li>
+        </ul>
+
+        <h3>Mechanical Systems</h3>
+        <ul>
+            <li><strong>Gear Trains:</strong> Relative motion between gears determines transmission ratios</li>
+            <li><strong>Cam Mechanisms:</strong> The follower's motion relative to the cam determines the output motion</li>
+            <li><strong>Robotic Arms:</strong> End-effector position depends on relative motion of joints</li>
+        </ul>
+
+        <h3>Fluid Dynamics</h3>
+        <ul>
+            <li><strong>Wind Tunnel Testing:</strong> Air velocity relative to the model simulates flight conditions</li>
+            <li><strong>Turbomachinery:</strong> Blade velocity relative to fluid determines energy transfer</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Relative Position</td>
+                    <td>\(\vec{r}_{B/A} = \vec{r}_B - \vec{r}_A\)</td>
+                    <td>Position of B relative to A</td>
+                </tr>
+                <tr>
+                    <td>Relative Velocity</td>
+                    <td>\(\vec{v}_{B/A} = \vec{v}_B - \vec{v}_A\)</td>
+                    <td>Velocity of B relative to A</td>
+                </tr>
+                <tr>
+                    <td>Reciprocity</td>
+                    <td>\(\vec{v}_{B/A} = -\vec{v}_{A/B}\)</td>
+                    <td>Relative velocities are opposite</td>
+                </tr>
+                <tr>
+                    <td>Velocity Addition</td>
+                    <td>\(\vec{v}_{C/A} = \vec{v}_{C/B} + \vec{v}_{B/A}\)</td>
+                    <td>Chain rule for reference frames</td>
+                </tr>
+                <tr>
+                    <td>Component Form</td>
+                    <td>\(\vec{v}_{B/A} = (v_{Bx} - v_{Ax})\hat{i} + (v_{By} - v_{Ay})\hat{j}\)</td>
+                    <td>2D relative velocity components</td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -316,44 +354,6 @@
                 
                 <p>From Car A's viewpoint, Car B appears to approach from the southeast at 25 m/s.</p>
             </div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
-            <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td>Relative Position</td>
-                    <td>\(\vec{r}_{B/A} = \vec{r}_B - \vec{r}_A\)</td>
-                    <td>Position of B relative to A</td>
-                </tr>
-                <tr>
-                    <td>Relative Velocity</td>
-                    <td>\(\vec{v}_{B/A} = \vec{v}_B - \vec{v}_A\)</td>
-                    <td>Velocity of B relative to A</td>
-                </tr>
-                <tr>
-                    <td>Reciprocity</td>
-                    <td>\(\vec{v}_{B/A} = -\vec{v}_{A/B}\)</td>
-                    <td>Relative velocities are opposite</td>
-                </tr>
-                <tr>
-                    <td>Velocity Addition</td>
-                    <td>\(\vec{v}_{C/A} = \vec{v}_{C/B} + \vec{v}_{B/A}\)</td>
-                    <td>Chain rule for reference frames</td>
-                </tr>
-                <tr>
-                    <td>Component Form</td>
-                    <td>\(\vec{v}_{B/A} = (v_{Bx} - v_{Ax})\hat{i} + (v_{By} - v_{Ay})\hat{j}\)</td>
-                    <td>2D relative velocity components</td>
-                </tr>
-            </table>
         </div>
     </div>
 

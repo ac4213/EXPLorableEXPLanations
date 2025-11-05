@@ -237,22 +237,84 @@
             </ol>
         </div>
 
+        <h2>Summary of Key Equations</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li>Work is the dot product of force and displacement</li>
+                <li>The work-energy theorem states: Total work = Change in kinetic energy</li>
+                <li>Conservative forces (gravity, springs) have associated potential energies</li>
+                <li>Non-conservative forces (friction) dissipate mechanical energy</li>
+                <li>For systems with rotation, total energy includes both translational and rotational kinetic energy</li>
+                <li>Energy methods often simplify problems by avoiding acceleration calculations</li>
+            </ol>
+        </div>
+
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Work of a Force</td>
+                        <td>\(W = \vec{F} \cdot \vec{s}\)</td>
+                        <td>Scalar product of force and displacement</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy (Translation)</td>
+                        <td>\(E_k = \frac{1}{2}mv^2\)</td>
+                        <td>Energy due to linear motion</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy (Rotation)</td>
+                        <td>\(E_{k,\text{rot}} = \frac{1}{2}I\omega^2\)</td>
+                        <td>Energy due to rotational motion</td>
+                    </tr>
+                    <tr>
+                        <td>Gravitational PE</td>
+                        <td>\(U_g = mgh\)</td>
+                        <td>Potential energy due to height</td>
+                    </tr>
+                    <tr>
+                        <td>Elastic PE</td>
+                        <td>\(U_k = \frac{1}{2}kx^2\)</td>
+                        <td>Energy stored in springs</td>
+                    </tr>
+                    <tr>
+                        <td>Work-Energy Theorem</td>
+                        <td>\(\sum W = \Delta E_k\)</td>
+                        <td>Fundamental principle</td>
+                    </tr>
+                    <tr>
+                        <td>Conservation of Energy</td>
+                        <td>\(E_1 + W_{\text{nc}} = E_2\)</td>
+                        <td>Including non-conservative work</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <h2>Practice Problems</h2>
-        
+
         <div class="practice-problems">
             <h3>Problem 1: Sliding Block</h3>
             <p>A 5 kg block starts from rest at the top of a 30° incline that is 2 metres long. If the coefficient of kinetic friction is 0.2, find the speed of the block at the bottom.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
             <div id="solution1" class="hidden">
                 <p>Given: \(m = 5\) kg, \(\theta = 30°\), \(s = 2\) m, \(\mu_k = 0.2\), \(v_1 = 0\)</p>
-                
+
                 <p>Height change: \(h = s \sin\theta = 2 \sin 30° = 1\) m</p>
-                
+
                 <p>Normal force: \(N = mg\cos\theta = 5 \times 9.81 \times \cos 30° = 42.5\) N</p>
-                
+
                 <p>Work by friction: \(W_f = -\mu_k N s = -0.2 \times 42.5 \times 2 = -17\) J</p>
-                
+
                 <p>Using work-energy theorem:</p>
                 <p>\(mgh + W_f = \frac{1}{2}mv_2^2\)</p>
                 <p>\(5 \times 9.81 \times 1 - 17 = \frac{1}{2} \times 5 \times v_2^2\)</p>
@@ -359,68 +421,6 @@
 
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results"></div>
-        </div>
-
-        <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li>Work is the dot product of force and displacement</li>
-                <li>The work-energy theorem states: Total work = Change in kinetic energy</li>
-                <li>Conservative forces (gravity, springs) have associated potential energies</li>
-                <li>Non-conservative forces (friction) dissipate mechanical energy</li>
-                <li>For systems with rotation, total energy includes both translational and rotational kinetic energy</li>
-                <li>Energy methods often simplify problems by avoiding acceleration calculations</li>
-            </ol>
-        </div>
-
-        <div class="equation-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Concept</th>
-                        <th>Equation</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Work of a Force</td>
-                        <td>\(W = \vec{F} \cdot \vec{s}\)</td>
-                        <td>Scalar product of force and displacement</td>
-                    </tr>
-                    <tr>
-                        <td>Kinetic Energy (Translation)</td>
-                        <td>\(E_k = \frac{1}{2}mv^2\)</td>
-                        <td>Energy due to linear motion</td>
-                    </tr>
-                    <tr>
-                        <td>Kinetic Energy (Rotation)</td>
-                        <td>\(E_{k,\text{rot}} = \frac{1}{2}I\omega^2\)</td>
-                        <td>Energy due to rotational motion</td>
-                    </tr>
-                    <tr>
-                        <td>Gravitational PE</td>
-                        <td>\(U_g = mgh\)</td>
-                        <td>Potential energy due to height</td>
-                    </tr>
-                    <tr>
-                        <td>Elastic PE</td>
-                        <td>\(U_k = \frac{1}{2}kx^2\)</td>
-                        <td>Energy stored in springs</td>
-                    </tr>
-                    <tr>
-                        <td>Work-Energy Theorem</td>
-                        <td>\(\sum W = \Delta E_k\)</td>
-                        <td>Fundamental principle</td>
-                    </tr>
-                    <tr>
-                        <td>Conservation of Energy</td>
-                        <td>\(E_1 + W_{\text{nc}} = E_2\)</td>
-                        <td>Including non-conservative work</td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 

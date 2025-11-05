@@ -284,6 +284,38 @@
             <li><strong>Cable compression:</strong> Cables can only be in tension</li>
         </ul>
 
+        <h2>Advanced Topics</h2>
+
+        <h3>Two-Force Members</h3>
+        <p>When a body is in equilibrium under exactly two forces:</p>
+        <div class="key-point">
+            <ul>
+                <li>The forces must be equal in magnitude</li>
+                <li>The forces must be opposite in direction</li>
+                <li>The forces must be collinear (act along the same line)</li>
+                <li>Examples: simple links, cables, struts</li>
+            </ul>
+        </div>
+
+        <h3>Three-Force Members</h3>
+        <p>When a body is in equilibrium under exactly three forces:</p>
+        <div class="key-point">
+            <ul>
+                <li>The three forces must be concurrent (meet at a point), OR</li>
+                <li>The three forces must be parallel</li>
+                <li>This principle helps simplify many FBD problems</li>
+            </ul>
+        </div>
+
+        <h3>Statically Determinate vs Indeterminate</h3>
+        <div class="equation-box">
+            <p><strong>Degree of Static Indeterminacy:</strong></p>
+            <p>DSI = Number of unknowns - Number of equilibrium equations</p>
+            <p>If DSI = 0: Statically determinate (can solve using statics alone)</p>
+            <p>If DSI > 0: Statically indeterminate (requires additional compatibility equations)</p>
+            <p>If DSI < 0: Mechanism (unstable structure)</p>
+        </div>
+
         <h2>Engineering Applications</h2>
         <p>Free body diagrams are fundamental tools used across all branches of engineering and physics:</p>
         <ul>
@@ -294,6 +326,68 @@
             <li><strong>Vehicle Dynamics:</strong> Analyzing suspension systems, braking forces, and cornering behavior. FBDs help optimize handling, safety, and comfort.</li>
             <li><strong>Robotics:</strong> Determining actuator requirements and joint forces in robotic arms and mobile robots. FBDs ensure robots can perform required tasks safely.</li>
         </ul>
+
+        <h2>Summary of Key Equations</h2>
+        <div class="key-point">
+            <h3>Essential Concepts</h3>
+            <p>Free Body Diagrams are fundamental tools in engineering mechanics that allow us to systematically analyze forces and achieve equilibrium. Here are the key takeaways from this lecture:</p>
+
+            <h4>1. What is a Free Body Diagram?</h4>
+            <ul>
+                <li>A graphical representation showing a body isolated from its surroundings</li>
+                <li>Shows ALL external forces and moments acting on the body</li>
+                <li>Does NOT show internal forces, velocities, or accelerations</li>
+            </ul>
+
+            <h4>2. Types of Forces</h4>
+            <ul>
+                <li><strong>Active Forces:</strong> Externally applied loads (point forces, moments, distributed loads, weight)</li>
+                <li><strong>Reactive Forces:</strong> Forces from supports and constraints (normal forces, friction, support reactions)</li>
+                <li><strong>Special Forces:</strong> Cables (tension only), springs (Hooke's Law: F = kΔx), normal forces (perpendicular to surface)</li>
+            </ul>
+
+            <h4>3. Support Types (2D)</h4>
+            <ul>
+                <li><strong>Roller:</strong> 1 reaction (perpendicular to surface), allows translation and rotation</li>
+                <li><strong>Pin:</strong> 2 reactions (horizontal and vertical), allows rotation</li>
+                <li><strong>Fixed:</strong> 2 reactions + 1 moment, prevents all movement and rotation</li>
+                <li><strong>Collar:</strong> 1 reaction + 1 moment, allows translation along guide</li>
+            </ul>
+
+            <h4>4. Contact Conditions</h4>
+            <ul>
+                <li><strong>Smooth Contact:</strong> Frictionless surface providing only normal force perpendicular to surface</li>
+                <li><strong>Rough Contact:</strong> Surface with friction providing both normal and friction forces (f ≤ μN)</li>
+            </ul>
+
+            <h4>5. Equilibrium Conditions (2D)</h4>
+            <p>For a body in static equilibrium, three equations must be satisfied:</p>
+            <ul>
+                <li>\(\sum F_x = 0\) - Sum of horizontal forces equals zero</li>
+                <li>\(\sum F_y = 0\) - Sum of vertical forces equals zero</li>
+                <li>\(\sum M_O = 0\) - Sum of moments about any point O equals zero</li>
+            </ul>
+
+            <h4>6. Systematic FBD Drawing Procedure</h4>
+            <ol>
+                <li>Isolate the body of interest from its surroundings</li>
+                <li>Draw the body's outline or simplified representation</li>
+                <li>Add all active forces (applied loads, weight, moments)</li>
+                <li>Replace supports with their reaction forces/moments</li>
+                <li>Add coordinate system and label all forces clearly</li>
+                <li>Apply equilibrium equations to solve for unknowns</li>
+            </ol>
+
+            <h4>7. Key Principles to Remember</h4>
+            <ul>
+                <li>Distributed loads can be replaced by their resultant at the centroid</li>
+                <li>Massless cables have constant tension throughout</li>
+                <li>Pulleys redirect cable forces but maintain tension (if massless and frictionless)</li>
+                <li>Two-force members have equal, opposite, collinear forces</li>
+                <li>Three-force members have concurrent or parallel forces</li>
+                <li>Check static determinacy: compare unknowns vs. available equations</li>
+            </ul>
+        </div>
 
         <h2>Practice Problems</h2>
         
@@ -477,68 +571,6 @@
             </div>
         </div>
 
-        <h2>Summary</h2>
-        <div class="key-point">
-            <h3>Essential Concepts</h3>
-            <p>Free Body Diagrams are fundamental tools in engineering mechanics that allow us to systematically analyze forces and achieve equilibrium. Here are the key takeaways from this lecture:</p>
-
-            <h4>1. What is a Free Body Diagram?</h4>
-            <ul>
-                <li>A graphical representation showing a body isolated from its surroundings</li>
-                <li>Shows ALL external forces and moments acting on the body</li>
-                <li>Does NOT show internal forces, velocities, or accelerations</li>
-            </ul>
-
-            <h4>2. Types of Forces</h4>
-            <ul>
-                <li><strong>Active Forces:</strong> Externally applied loads (point forces, moments, distributed loads, weight)</li>
-                <li><strong>Reactive Forces:</strong> Forces from supports and constraints (normal forces, friction, support reactions)</li>
-                <li><strong>Special Forces:</strong> Cables (tension only), springs (Hooke's Law: F = kΔx), normal forces (perpendicular to surface)</li>
-            </ul>
-
-            <h4>3. Support Types (2D)</h4>
-            <ul>
-                <li><strong>Roller:</strong> 1 reaction (perpendicular to surface), allows translation and rotation</li>
-                <li><strong>Pin:</strong> 2 reactions (horizontal and vertical), allows rotation</li>
-                <li><strong>Fixed:</strong> 2 reactions + 1 moment, prevents all movement and rotation</li>
-                <li><strong>Collar:</strong> 1 reaction + 1 moment, allows translation along guide</li>
-            </ul>
-
-            <h4>4. Contact Conditions</h4>
-            <ul>
-                <li><strong>Smooth Contact:</strong> Frictionless surface providing only normal force perpendicular to surface</li>
-                <li><strong>Rough Contact:</strong> Surface with friction providing both normal and friction forces (f ≤ μN)</li>
-            </ul>
-
-            <h4>5. Equilibrium Conditions (2D)</h4>
-            <p>For a body in static equilibrium, three equations must be satisfied:</p>
-            <ul>
-                <li>\(\sum F_x = 0\) - Sum of horizontal forces equals zero</li>
-                <li>\(\sum F_y = 0\) - Sum of vertical forces equals zero</li>
-                <li>\(\sum M_O = 0\) - Sum of moments about any point O equals zero</li>
-            </ul>
-
-            <h4>6. Systematic FBD Drawing Procedure</h4>
-            <ol>
-                <li>Isolate the body of interest from its surroundings</li>
-                <li>Draw the body's outline or simplified representation</li>
-                <li>Add all active forces (applied loads, weight, moments)</li>
-                <li>Replace supports with their reaction forces/moments</li>
-                <li>Add coordinate system and label all forces clearly</li>
-                <li>Apply equilibrium equations to solve for unknowns</li>
-            </ol>
-
-            <h4>7. Key Principles to Remember</h4>
-            <ul>
-                <li>Distributed loads can be replaced by their resultant at the centroid</li>
-                <li>Massless cables have constant tension throughout</li>
-                <li>Pulleys redirect cable forces but maintain tension (if massless and frictionless)</li>
-                <li>Two-force members have equal, opposite, collinear forces</li>
-                <li>Three-force members have concurrent or parallel forces</li>
-                <li>Check static determinacy: compare unknowns vs. available equations</li>
-            </ul>
-        </div>
-
         <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
@@ -595,55 +627,6 @@
             <div id="quiz-results"></div>
         </div>
     </div>
-
-    <div class="content-section">
-        <h2>Advanced Topics</h2>
-        
-        <h3>Two-Force Members</h3>
-        <p>When a body is in equilibrium under exactly two forces:</p>
-        <div class="key-point">
-            <ul>
-                <li>The forces must be equal in magnitude</li>
-                <li>The forces must be opposite in direction</li>
-                <li>The forces must be collinear (act along the same line)</li>
-                <li>Examples: simple links, cables, struts</li>
-            </ul>
-        </div>
-
-                <h3>Three-Force Members</h3>
-        <p>When a body is in equilibrium under exactly three forces:</p>
-        <div class="key-point">
-            <ul>
-                <li>The three forces must be concurrent (meet at a point), OR</li>
-                <li>The three forces must be parallel</li>
-                <li>This principle helps simplify many FBD problems</li>
-            </ul>
-        </div>
-
-        <h3>Statically Determinate vs Indeterminate</h3>
-        <div class="equation-box">
-            <p><strong>Degree of Static Indeterminacy:</strong></p>
-            <p>DSI = Number of unknowns - Number of equilibrium equations</p>
-            <p>If DSI = 0: Statically determinate (can solve using statics alone)</p>
-            <p>If DSI > 0: Statically indeterminate (requires additional compatibility equations)</p>
-            <p>If DSI < 0: Mechanism (unstable structure)</p>
-        </div>
-
-        <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li>Free body diagrams are essential tools for solving mechanics problems</li>
-                <li>Always include ALL external forces and reactions</li>
-                <li>Different supports provide different constraints and reactions</li>
-                <li>Systematic approach ensures no forces are missed</li>
-                <li>Practice drawing FBDs for various configurations builds intuition</li>
-                <li>Understanding support types is crucial for structural analysis</li>
-            </ol>
-        </div>
-    </div>
-
-
 
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>

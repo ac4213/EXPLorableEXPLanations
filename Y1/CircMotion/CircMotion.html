@@ -204,81 +204,6 @@
     </div>
 
     <div class="content-section">
-        <h2>Practice Problems</h2>
-        
-        <div class="practice-problems">
-            <h3>Problem 1: Uniform Circular Motion</h3>
-            <p>A bead of mass 50 g is attached to a string of length 0.8 m and rotates in a horizontal circle at a constant angular velocity of 5 rad/s. Calculate:</p>
-            <ol type="a">
-                <li>The linear speed of the bead</li>
-                <li>The centripetal acceleration</li>
-                <li>The tension in the string</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p><strong>Given:</strong> \(m = 0.05\) kg, \(r = 0.8\) m, \(\omega = 5\) rad/s</p>
-                <p><strong>a) Linear speed:</strong><br>
-                \(v = r\omega = 0.8 \times 5 = 4\) m/s</p>
-                <p><strong>b) Centripetal acceleration:</strong><br>
-                \(a_c = \omega^2 r = 5^2 \times 0.8 = 25 \times 0.8 = 20\) m/s²</p>
-                <p><strong>c) Tension (Centripetal force):</strong><br>
-                \(T = F_c = ma_c = 0.05 \times 20 = 1.0\) N</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 2: Angular Acceleration</h3>
-            <p>A wheel starts from rest and accelerates uniformly to 120 rpm in 4 seconds. Find:</p>
-            <ol type="a">
-                <li>The angular acceleration</li>
-                <li>The number of revolutions made in these 4 seconds</li>
-                <li>The tangential acceleration of a point 0.3 m from the axis</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p><strong>Given:</strong> \(\omega_0 = 0\), \(\omega = 120\) rpm \(= 120 \times \frac{2\pi}{60} = 4\pi\) rad/s, \(t = 4\) s, \(r = 0.3\) m</p>
-                <p><strong>a) Angular acceleration:</strong><br>
-                \(\alpha = \frac{\omega - \omega_0}{t} = \frac{4\pi}{4} = \pi\) rad/s² \(\approx 3.14\) rad/s²</p>
-                <p><strong>b) Angular displacement:</strong><br>
-                \(\theta = \omega_0 t + \frac{1}{2}\alpha t^2 = 0 + \frac{1}{2} \times \pi \times 16 = 8\pi\) rad<br>
-                Number of revolutions \(= \frac{8\pi}{2\pi} = 4\) revolutions</p>
-                <p><strong>c) Tangential acceleration:</strong><br>
-                \(a_t = r\alpha = 0.3 \times \pi \approx 0.942\) m/s²</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 3: Non-Uniform Circular Motion</h3>
-            <p>A particle moves in a circle of radius 2 m with an angular velocity that increases from 2 rad/s to 6 rad/s over a distance of \(4\pi\) radians. Calculate:</p>
-            <ol type="a">
-                <li>The angular acceleration</li>
-                <li>The time taken for this change</li>
-                <li>The magnitude of total acceleration when \(\omega = 4\) rad/s</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p><strong>Given:</strong> \(r = 2\) m, \(\omega_0 = 2\) rad/s, \(\omega = 6\) rad/s, \(\theta = 4\pi\) rad</p>
-                <p><strong>a) Angular acceleration:</strong><br>
-                Using \(\omega^2 = \omega_0^2 + 2\alpha\theta\)<br>
-                \(36 = 4 + 2\alpha(4\pi)\)<br>
-                \(32 = 8\pi\alpha\)<br>
-                \(\alpha = \frac{4}{\pi} \approx 1.27\) rad/s²</p>
-                <p><strong>b) Time taken:</strong><br>
-                \(\omega = \omega_0 + \alpha t\)<br>
-                \(6 = 2 + \frac{4}{\pi}t\)<br>
-                \(t = \frac{4\pi}{4} = \pi \approx 3.14\) s</p>
-                <p><strong>c) Total acceleration at \(\omega = 4\) rad/s:</strong><br>
-                \(a_c = \omega^2 r = 16 \times 2 = 32\) m/s²<br>
-                \(a_t = r\alpha = 2 \times \frac{4}{\pi} \approx 2.55\) m/s²<br>
-                \(a_{total} = \sqrt{32^2 + 2.55^2} \approx 32.1\) m/s²</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-section">
         <h2>Summary of Key Equations</h2>
         <div class="equation-box">
             <table>
@@ -318,6 +243,81 @@
                     <td>Equations for angular motion (analogous to linear)</td>
                 </tr>
             </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Uniform Circular Motion</h3>
+            <p>A bead of mass 50 g is attached to a string of length 0.8 m and rotates in a horizontal circle at a constant angular velocity of 5 rad/s. Calculate:</p>
+            <ol type="a">
+                <li>The linear speed of the bead</li>
+                <li>The centripetal acceleration</li>
+                <li>The tension in the string</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong> \(m = 0.05\) kg, \(r = 0.8\) m, \(\omega = 5\) rad/s</p>
+                <p><strong>a) Linear speed:</strong><br>
+                \(v = r\omega = 0.8 \times 5 = 4\) m/s</p>
+                <p><strong>b) Centripetal acceleration:</strong><br>
+                \(a_c = \omega^2 r = 5^2 \times 0.8 = 25 \times 0.8 = 20\) m/s²</p>
+                <p><strong>c) Tension (Centripetal force):</strong><br>
+                \(T = F_c = ma_c = 0.05 \times 20 = 1.0\) N</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Angular Acceleration</h3>
+            <p>A wheel starts from rest and accelerates uniformly to 120 rpm in 4 seconds. Find:</p>
+            <ol type="a">
+                <li>The angular acceleration</li>
+                <li>The number of revolutions made in these 4 seconds</li>
+                <li>The tangential acceleration of a point 0.3 m from the axis</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong> \(\omega_0 = 0\), \(\omega = 120\) rpm \(= 120 \times \frac{2\pi}{60} = 4\pi\) rad/s, \(t = 4\) s, \(r = 0.3\) m</p>
+                <p><strong>a) Angular acceleration:</strong><br>
+                \(\alpha = \frac{\omega - \omega_0}{t} = \frac{4\pi}{4} = \pi\) rad/s² \(\approx 3.14\) rad/s²</p>
+                <p><strong>b) Angular displacement:</strong><br>
+                \(\theta = \omega_0 t + \frac{1}{2}\alpha t^2 = 0 + \frac{1}{2} \times \pi \times 16 = 8\pi\) rad<br>
+                Number of revolutions \(= \frac{8\pi}{2\pi} = 4\) revolutions</p>
+                <p><strong>c) Tangential acceleration:</strong><br>
+                \(a_t = r\alpha = 0.3 \times \pi \approx 0.942\) m/s²</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Non-Uniform Circular Motion</h3>
+            <p>A particle moves in a circle of radius 2 m with an angular velocity that increases from 2 rad/s to 6 rad/s over a distance of \(4\pi\) radians. Calculate:</p>
+            <ol type="a">
+                <li>The angular acceleration</li>
+                <li>The time taken for this change</li>
+                <li>The magnitude of total acceleration when \(\omega = 4\) rad/s</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong> \(r = 2\) m, \(\omega_0 = 2\) rad/s, \(\omega = 6\) rad/s, \(\theta = 4\pi\) rad</p>
+                <p><strong>a) Angular acceleration:</strong><br>
+                Using \(\omega^2 = \omega_0^2 + 2\alpha\theta\)<br>
+                \(36 = 4 + 2\alpha(4\pi)\)<br>
+                \(32 = 8\pi\alpha\)<br>
+                \(\alpha = \frac{4}{\pi} \approx 1.27\) rad/s²</p>
+                <p><strong>b) Time taken:</strong><br>
+                \(\omega = \omega_0 + \alpha t\)<br>
+                \(6 = 2 + \frac{4}{\pi}t\)<br>
+                \(t = \frac{4\pi}{4} = \pi \approx 3.14\) s</p>
+                <p><strong>c) Total acceleration at \(\omega = 4\) rad/s:</strong><br>
+                \(a_c = \omega^2 r = 16 \times 2 = 32\) m/s²<br>
+                \(a_t = r\alpha = 2 \times \frac{4}{\pi} \approx 2.55\) m/s²<br>
+                \(a_{total} = \sqrt{32^2 + 2.55^2} \approx 32.1\) m/s²</p>
+            </div>
         </div>
     </div>
 

@@ -56,11 +56,11 @@ The framework follows these principles:
 
 /assets/
 ├── css/
-│   ├── main.css              # Core styling (589 lines)
+│   ├── main.css              # Core styling (374 lines)
 │   ├── problems.css          # Practice problem styles
 │   ├── quizzes.css           # Quiz styles
-│   ├── simulations.css       # Simulation layouts (445 lines)
-│   └── uicontrols.css        # Control panels & buttons (817 lines)
+│   ├── simulations.css       # Simulation layouts (393 lines)
+│   └── uicontrols.css        # Control panels & buttons (782 lines)
 └── common/
     ├── footer.js             # Automatic footer generation
     ├── problems.js           # Problem solution toggles
@@ -608,7 +608,7 @@ Start with the template structure (see next section) and customize for your topi
 **Auto-generated content:**
 - Copyright notice
 - Institution information
-- Navigation links
+- Navigation links: Home | About | About the Author | Contact
 - Contact information
 
 **Usage:** Simply include the script tag in your footer:

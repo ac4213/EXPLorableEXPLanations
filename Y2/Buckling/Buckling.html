@@ -233,6 +233,44 @@
     </div>
 
     <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Euler Buckling Load</td>
+                    <td>\(P_{cr} = \frac{\pi^2 EI}{(KL)^2}\)</td>
+                    <td>Critical load for slender columns</td>
+                </tr>
+                <tr>
+                    <td>Effective Length Factor</td>
+                    <td>\(K\)</td>
+                    <td>Depends on end conditions (0.5 to 2.0)</td>
+                </tr>
+                <tr>
+                    <td>Slenderness Ratio</td>
+                    <td>\(\lambda = \frac{KL}{r}\)</td>
+                    <td>Ratio of effective length to radius of gyration</td>
+                </tr>
+                <tr>
+                    <td>Critical Stress</td>
+                    <td>\(\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2 E}{(KL/r)^2}\)</td>
+                    <td>Buckling stress for slender columns</td>
+                </tr>
+                <tr>
+                    <td>Radius of Gyration</td>
+                    <td>\(r = \sqrt{\frac{I}{A}}\)</td>
+                    <td>Geometric property of cross-section</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -347,44 +385,6 @@
     </div>
 
     <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
-            <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td>Euler Buckling Load</td>
-                    <td>\(P_{cr} = \frac{\pi^2 EI}{(KL)^2}\)</td>
-                    <td>Critical load for slender columns</td>
-                </tr>
-                <tr>
-                    <td>Effective Length Factor</td>
-                    <td>\(K\)</td>
-                    <td>Depends on end conditions (0.5 to 2.0)</td>
-                </tr>
-                <tr>
-                    <td>Slenderness Ratio</td>
-                    <td>\(\lambda = \frac{KL}{r}\)</td>
-                    <td>Ratio of effective length to radius of gyration</td>
-                </tr>
-                <tr>
-                    <td>Critical Stress</td>
-                    <td>\(\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2 E}{(KL/r)^2}\)</td>
-                    <td>Buckling stress for slender columns</td>
-                </tr>
-                <tr>
-                    <td>Radius of Gyration</td>
-                    <td>\(r = \sqrt{\frac{I}{A}}\)</td>
-                    <td>Geometric property of cross-section</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <div class="content-section">
         <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">
@@ -439,84 +439,6 @@
             
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results"></div>
-        </div>
-    </div>
-    
-    <div class="content-section">
-        <h2>Summary: Key Equations Reference</h2>
-        
-        <div class="equation-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>Equation</th>
-                        <th>Variables</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Euler Critical Load</td>
-                        <td>\(P_{cr} = \frac{\pi^2 EI}{L_e^2}\)</td>
-                        <td>\(E\) = modulus of elasticity<br>\(I\) = second moment of area<br>\(L_e\) = effective length</td>
-                    </tr>
-                    <tr>
-                        <td>Effective Length</td>
-                        <td>\(L_e = K \cdot L\)</td>
-                        <td>\(K\) = effective length factor<br>\(L\) = actual length</td>
-                    </tr>
-                    <tr>
-                        <td>Slenderness Ratio</td>
-                        <td>\(\lambda = \frac{L_e}{r}\)</td>
-                        <td>\(r\) = radius of gyration</td>
-                    </tr>
-                    <tr>
-                        <td>Radius of Gyration</td>
-                        <td>\(r = \sqrt{\frac{I}{A}}\)</td>
-                        <td>\(A\) = cross-sectional area</td>
-                    </tr>
-                    <tr>
-                        <td>Buckling Mode Shapes</td>
-                        <td>\(y = A\sin\left(\frac{m\pi x}{L}\right)\)</td>
-                        <td>\(m\) = mode number (1, 2, 3, ...)<br>First mode: \(m = 1\)</td>
-                    </tr>
-                    <tr>
-                        <td>Higher Mode Critical Loads</td>
-                        <td>\(P_{cr,m} = \frac{m^2\pi^2 EI}{L_e^2}\)</td>
-                        <td>Higher modes at \(m^2\) times first mode</td>
-                    </tr>
-                    <tr>
-                        <td>Rankine-Gordon Formula</td>
-                        <td>\(P_{design} = \frac{\sigma_c A}{1 + a\lambda^2}\)</td>
-                        <td>\(a = \frac{\sigma_c}{\pi^2 E}\) = Rankine constant<br>\(\sigma_c\) = compressive strength</td>
-                    </tr>
-                    <tr>
-                        <td>Critical Stress</td>
-                        <td>\(\sigma_{cr} = \frac{P_{cr}}{A} = \frac{\pi^2 E}{\lambda^2}\)</td>
-                        <td>Euler stress based on slenderness</td>
-                    </tr>
-                    <tr>
-                        <td>Non-dimensional Slenderness</td>
-                        <td>\(\bar{\lambda} = \sqrt{\frac{f_y}{\sigma_{cr}}}\)</td>
-                        <td>\(f_y\) = yield strength</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="key-point">
-            <h3>Conclusion</h3>
-            <p>Understanding elastic instability is crucial for structural engineers. Key points to remember:</p>
-            <ol>
-                <li>Buckling can occur at loads well below material strength limits</li>
-                <li>The Euler formula derives from solving the differential equation of the elastic curve</li>
-                <li>Multiple buckling modes exist, with the first mode determining the critical load</li>
-                <li>Slenderness ratio is the primary factor affecting buckling resistance</li>
-                <li>End conditions significantly influence critical loads through the effective length factor</li>
-                <li>The Rankine-Gordon formula provides practical design by combining material and stability failure</li>
-                <li>Prevention of buckling through proper design is essential for structural safety</li>
-            </ol>
-            <p>These principles are fundamental for designing safe and efficient compression members in buildings, bridges, and other structures.</p>
         </div>
     </div>
 

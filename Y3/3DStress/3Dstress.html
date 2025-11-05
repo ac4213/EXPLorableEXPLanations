@@ -462,6 +462,66 @@
     </header>
 
     <div class="container" style="grid-template-columns:1fr">
+        <div class="content-section">
+            <h2>3D Stress and Strain Theory</h2>
+
+            <section id="cauchy-stress">
+                <h3>Cauchy Stress Tensor</h3>
+                <p>The Cauchy stress tensor is a second-order tensor used to represent the state of stress at a point within a material. In three dimensions, it is represented as a 3×3 matrix:</p>
+                <div class="equation-box">
+                    \[\boldsymbol{\sigma} = \begin{bmatrix}
+                    \sigma_{xx} & \tau_{xy} & \tau_{xz} \\
+                    \tau_{yx} & \sigma_{yy} & \tau_{yz} \\
+                    \tau_{zx} & \tau_{zy} & \sigma_{zz}
+                    \end{bmatrix}\]
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li>σ<sub>xx</sub>, σ<sub>yy</sub>, σ<sub>zz</sub> are normal stresses</li>
+                    <li>τ<sub>xy</sub>, τ<sub>yz</sub>, τ<sub>xz</sub>, τ<sub>yx</sub>, τ<sub>zy</sub>, τ<sub>zx</sub> are shear stresses</li>
+                </ul>
+                <p>Due to moment equilibrium, the stress tensor is symmetric, meaning τ<sub>ij</sub> = τ<sub>ji</sub>.</p>
+
+                <div class="key-point">
+                    <p>The stress tensor completely defines the state of stress at a point. Each component represents the stress (force per unit area) acting on a plane perpendicular to one axis in the direction of another axis.</p>
+                </div>
+            </section>
+
+            <section id="green-strain">
+                <h3>Green-Lagrange Strain Tensor</h3>
+                <p>The Green-Lagrange strain tensor describes the deformation of a material from an initial to a deformed state. For small strains, it simplifies to the infinitesimal strain tensor:</p>
+                <div class="equation-box">
+                    \[\boldsymbol{\varepsilon} = \begin{bmatrix}
+                    \varepsilon_{xx} & \gamma_{xy}/2 & \gamma_{xz}/2 \\
+                    \gamma_{xy}/2 & \varepsilon_{yy} & \gamma_{yz}/2 \\
+                    \gamma_{xz}/2 & \gamma_{yz}/2 & \varepsilon_{zz}
+                    \end{bmatrix}\]
+                </div>
+                <p>Where ε represents normal strains and γ represents engineering shear strains.</p>
+            </section>
+
+            <section id="failure-criteria">
+                <h3>Failure Criteria</h3>
+                <p>Several criteria predict material failure under complex stress states:</p>
+
+                <h4>Von Mises Criterion</h4>
+                <div class="equation-box">
+                    \[\sigma_{VM} = \sqrt{\frac{1}{2}[(σ_1-σ_2)^2 + (σ_2-σ_3)^2 + (σ_3-σ_1)^2]}\]
+                </div>
+                <p>Failure occurs when σ<sub>VM</sub> ≥ σ<sub>y</sub> (yield strength)</p>
+
+                <h4>Tresca Criterion</h4>
+                <div class="equation-box">
+                    \[\tau_{max} = \frac{σ_{max} - σ_{min}}{2}\]
+                </div>
+                <p>Failure occurs when τ<sub>max</sub> ≥ σ<sub>y</sub>/2</p>
+
+                <div class="key-point">
+                    <p>The von Mises criterion is based on distortion energy theory and is widely used for ductile materials. The Tresca criterion is more conservative than von Mises but simpler to calculate.</p>
+                </div>
+            </section>
+        </div>
+
         <div class="simulation-section">
             <h2>Interactive 3D Stress Visualisation</h2>
                                     <div class="control-group">
@@ -541,66 +601,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="content-section">
-            <h2>3D Stress and Strain Theory</h2>
-            
-            <section id="cauchy-stress">
-                <h3>Cauchy Stress Tensor</h3>
-                <p>The Cauchy stress tensor is a second-order tensor used to represent the state of stress at a point within a material. In three dimensions, it is represented as a 3×3 matrix:</p>
-                <div class="equation-box">
-                    \[\boldsymbol{\sigma} = \begin{bmatrix} 
-                    \sigma_{xx} & \tau_{xy} & \tau_{xz} \\
-                    \tau_{yx} & \sigma_{yy} & \tau_{yz} \\
-                    \tau_{zx} & \tau_{zy} & \sigma_{zz}
-                    \end{bmatrix}\]
-                </div>
-                <p>Where:</p>
-                <ul>
-                    <li>σ<sub>xx</sub>, σ<sub>yy</sub>, σ<sub>zz</sub> are normal stresses</li>
-                    <li>τ<sub>xy</sub>, τ<sub>yz</sub>, τ<sub>xz</sub>, τ<sub>yx</sub>, τ<sub>zy</sub>, τ<sub>zx</sub> are shear stresses</li>
-                </ul>
-                <p>Due to moment equilibrium, the stress tensor is symmetric, meaning τ<sub>ij</sub> = τ<sub>ji</sub>.</p>
-                
-                <div class="key-point">
-                    <p>The stress tensor completely defines the state of stress at a point. Each component represents the stress (force per unit area) acting on a plane perpendicular to one axis in the direction of another axis.</p>
-                </div>
-            </section>
-            
-            <section id="green-strain">
-                <h3>Green-Lagrange Strain Tensor</h3>
-                <p>The Green-Lagrange strain tensor describes the deformation of a material from an initial to a deformed state. For small strains, it simplifies to the infinitesimal strain tensor:</p>
-                <div class="equation-box">
-                    \[\boldsymbol{\varepsilon} = \begin{bmatrix} 
-                    \varepsilon_{xx} & \gamma_{xy}/2 & \gamma_{xz}/2 \\
-                    \gamma_{xy}/2 & \varepsilon_{yy} & \gamma_{yz}/2 \\
-                    \gamma_{xz}/2 & \gamma_{yz}/2 & \varepsilon_{zz}
-                    \end{bmatrix}\]
-                </div>
-                <p>Where ε represents normal strains and γ represents engineering shear strains.</p>
-            </section>
-            
-            <section id="failure-criteria">
-                <h3>Failure Criteria</h3>
-                <p>Several criteria predict material failure under complex stress states:</p>
-                
-                <h4>Von Mises Criterion</h4>
-                <div class="equation-box">
-                    \[\sigma_{VM} = \sqrt{\frac{1}{2}[(σ_1-σ_2)^2 + (σ_2-σ_3)^2 + (σ_3-σ_1)^2]}\]
-                </div>
-                <p>Failure occurs when σ<sub>VM</sub> ≥ σ<sub>y</sub> (yield strength)</p>
-                
-                <h4>Tresca Criterion</h4>
-                <div class="equation-box">
-                    \[\tau_{max} = \frac{σ_{max} - σ_{min}}{2}\]
-                </div>
-                <p>Failure occurs when τ<sub>max</sub> ≥ σ<sub>y</sub>/2</p>
-                
-                <div class="key-point">
-                    <p>The von Mises criterion is based on distortion energy theory and is widely used for ductile materials. The Tresca criterion is more conservative than von Mises but simpler to calculate.</p>
-                </div>
-            </section>
         </div>
 
         <div class="content-section">

@@ -350,6 +350,26 @@
     </div>
 
     <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Stress transformation:</strong> Stress components change with coordinate system rotation, but the stress state itself is invariant</li>
+                <li><strong>Principal stresses:</strong> Maximum and minimum normal stresses occur on planes with zero shear stress</li>
+                <li><strong>Mohr's circle:</strong> Graphical tool for visualising stress transformations and finding principal values</li>
+                <li><strong>Failure criteria:</strong> Different theories for predicting failure based on material behaviour:
+                    <ul>
+                        <li>Rankine: Brittle materials (maximum principal stress)</li>
+                        <li>Tresca: Ductile materials (maximum shear stress)</li>
+                        <li>Von Mises: Ductile materials (distortion energy)</li>
+                    </ul>
+                </li>
+                <li><strong>Factor of safety:</strong> Design parameter ensuring components operate below failure conditions</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
         
         <div class="practice-problems">
@@ -394,25 +414,59 @@
                 <p>FS = 300/264.58 = 1.13</p>
             </div>
         </div>
-    </div>
 
-    <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li><strong>Stress transformation:</strong> Stress components change with coordinate system rotation, but the stress state itself is invariant</li>
-                <li><strong>Principal stresses:</strong> Maximum and minimum normal stresses occur on planes with zero shear stress</li>
-                <li><strong>Mohr's circle:</strong> Graphical tool for visualising stress transformations and finding principal values</li>
-                <li><strong>Failure criteria:</strong> Different theories for predicting failure based on material behaviour:
-                    <ul>
-                        <li>Rankine: Brittle materials (maximum principal stress)</li>
-                        <li>Tresca: Ductile materials (maximum shear stress)</li>
-                        <li>Von Mises: Ductile materials (distortion energy)</li>
-                    </ul>
-                </li>
-                <li><strong>Factor of safety:</strong> Design parameter ensuring components operate below failure conditions</li>
+        <div class="practice-problems">
+            <h3>Problem 3: Mohr's Circle Construction and Analysis</h3>
+            <p>A stress element is subjected to the following stresses:</p>
+            <ul>
+                <li>σ<sub>xx</sub> = 100 MPa (tension)</li>
+                <li>σ<sub>yy</sub> = 40 MPa (tension)</li>
+                <li>τ<sub>xy</sub> = -50 MPa (negative shear)</li>
+            </ul>
+            <p>Using Mohr's Circle principles, determine:</p>
+            <ol type="a">
+                <li>The center and radius of Mohr's Circle</li>
+                <li>The principal stresses σ₁ and σ₂</li>
+                <li>The principal angle θ<sub>p</sub></li>
+                <li>The maximum in-plane shear stress and its orientation</li>
+                <li>The stress components on a plane at θ = 30° counterclockwise from the x-axis</li>
             </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+
+                <p><strong>(a) Center and radius of Mohr's Circle:</strong></p>
+                <p>\[C = \frac{\sigma_{xx} + \sigma_{yy}}{2} = \frac{100 + 40}{2} = 70 \text{ MPa}\]</p>
+                <p>\[R = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\]</p>
+                <p>\[R = \sqrt{\left(\frac{100 - 40}{2}\right)^2 + (-50)^2} = \sqrt{30^2 + 50^2} = \sqrt{900 + 2500} = 58.31 \text{ MPa}\]</p>
+
+                <p><strong>(b) Principal stresses:</strong></p>
+                <p>\[\sigma_1 = C + R = 70 + 58.31 = 128.31 \text{ MPa}\]</p>
+                <p>\[\sigma_2 = C - R = 70 - 58.31 = 11.69 \text{ MPa}\]</p>
+
+                <p><strong>(c) Principal angle:</strong></p>
+                <p>\[\tan(2\theta_p) = \frac{2\tau_{xy}}{\sigma_{xx} - \sigma_{yy}} = \frac{2(-50)}{100 - 40} = \frac{-100}{60} = -1.667\]</p>
+                <p>\[2\theta_p = \arctan(-1.667) = -59.04°\]</p>
+                <p>\[\theta_p = -29.52° \text{ (or } 60.48° \text{ from the other solution)}\]</p>
+
+                <p><strong>(d) Maximum in-plane shear stress:</strong></p>
+                <p>\[\tau_{max} = R = 58.31 \text{ MPa}\]</p>
+                <p>This occurs at planes 45° from the principal planes:</p>
+                <p>\[\theta_s = \theta_p + 45° = -29.52° + 45° = 15.48°\]</p>
+
+                <p><strong>(e) Stress components at θ = 30°:</strong></p>
+                <p>Using stress transformation equations (or Mohr's Circle with 2θ = 60°):</p>
+                <p>\[\sigma_{x'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} + \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) + \tau_{xy}\sin(2\theta)\]</p>
+                <p>\[\sigma_{x'} = 70 + 30\cos(60°) + (-50)\sin(60°)\]</p>
+                <p>\[\sigma_{x'} = 70 + 30(0.5) + (-50)(0.866) = 70 + 15 - 43.3 = 41.7 \text{ MPa}\]</p>
+
+                <p>\[\sigma_{y'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} - \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) - \tau_{xy}\sin(2\theta)\]</p>
+                <p>\[\sigma_{y'} = 70 - 15 + 43.3 = 98.3 \text{ MPa}\]</p>
+
+                <p>\[\tau_{x'y'} = -\frac{\sigma_{xx} - \sigma_{yy}}{2}\sin(2\theta) + \tau_{xy}\cos(2\theta)\]</p>
+                <p>\[\tau_{x'y'} = -30\sin(60°) + (-50)\cos(60°) = -30(0.866) + (-50)(0.5)\]</p>
+                <p>\[\tau_{x'y'} = -26.0 - 25.0 = -51.0 \text{ MPa}\]</p>
+            </div>
         </div>
     </div>
 
@@ -441,63 +495,6 @@
 
         // toggleSolution function now loaded from /assets/common/problems.js
     </script>
-
-<!-- ADDITIONAL PRACTICE PROBLEM -->
-<div class="content-section">
-    <div class="practice-problems">
-        <h3>Problem 3: Mohr's Circle Construction and Analysis</h3>
-        <p>A stress element is subjected to the following stresses:</p>
-        <ul>
-            <li>σ<sub>xx</sub> = 100 MPa (tension)</li>
-            <li>σ<sub>yy</sub> = 40 MPa (tension)</li>
-            <li>τ<sub>xy</sub> = -50 MPa (negative shear)</li>
-        </ul>
-        <p>Using Mohr's Circle principles, determine:</p>
-        <ol type="a">
-            <li>The center and radius of Mohr's Circle</li>
-            <li>The principal stresses σ₁ and σ₂</li>
-            <li>The principal angle θ<sub>p</sub></li>
-            <li>The maximum in-plane shear stress and its orientation</li>
-            <li>The stress components on a plane at θ = 30° counterclockwise from the x-axis</li>
-        </ol>
-
-        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-        <div id="solution3" class="hidden">
-            
-            <p><strong>(a) Center and radius of Mohr's Circle:</strong></p>
-            <p>\[C = \frac{\sigma_{xx} + \sigma_{yy}}{2} = \frac{100 + 40}{2} = 70 \text{ MPa}\]</p>
-            <p>\[R = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\]</p>
-            <p>\[R = \sqrt{\left(\frac{100 - 40}{2}\right)^2 + (-50)^2} = \sqrt{30^2 + 50^2} = \sqrt{900 + 2500} = 58.31 \text{ MPa}\]</p>
-
-            <p><strong>(b) Principal stresses:</strong></p>
-            <p>\[\sigma_1 = C + R = 70 + 58.31 = 128.31 \text{ MPa}\]</p>
-            <p>\[\sigma_2 = C - R = 70 - 58.31 = 11.69 \text{ MPa}\]</p>
-
-            <p><strong>(c) Principal angle:</strong></p>
-            <p>\[\tan(2\theta_p) = \frac{2\tau_{xy}}{\sigma_{xx} - \sigma_{yy}} = \frac{2(-50)}{100 - 40} = \frac{-100}{60} = -1.667\]</p>
-            <p>\[2\theta_p = \arctan(-1.667) = -59.04°\]</p>
-            <p>\[\theta_p = -29.52° \text{ (or } 60.48° \text{ from the other solution)}\]</p>
-
-            <p><strong>(d) Maximum in-plane shear stress:</strong></p>
-            <p>\[\tau_{max} = R = 58.31 \text{ MPa}\]</p>
-            <p>This occurs at planes 45° from the principal planes:</p>
-            <p>\[\theta_s = \theta_p + 45° = -29.52° + 45° = 15.48°\]</p>
-
-            <p><strong>(e) Stress components at θ = 30°:</strong></p>
-            <p>Using stress transformation equations (or Mohr's Circle with 2θ = 60°):</p>
-            <p>\[\sigma_{x'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} + \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) + \tau_{xy}\sin(2\theta)\]</p>
-            <p>\[\sigma_{x'} = 70 + 30\cos(60°) + (-50)\sin(60°)\]</p>
-            <p>\[\sigma_{x'} = 70 + 30(0.5) + (-50)(0.866) = 70 + 15 - 43.3 = 41.7 \text{ MPa}\]</p>
-
-            <p>\[\sigma_{y'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} - \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) - \tau_{xy}\sin(2\theta)\]</p>
-            <p>\[\sigma_{y'} = 70 - 15 + 43.3 = 98.3 \text{ MPa}\]</p>
-
-            <p>\[\tau_{x'y'} = -\frac{\sigma_{xx} - \sigma_{yy}}{2}\sin(2\theta) + \tau_{xy}\cos(2\theta)\]</p>
-            <p>\[\tau_{x'y'} = -30\sin(60°) + (-50)\cos(60°) = -30(0.866) + (-50)(0.5)\]</p>
-            <p>\[\tau_{x'y'} = -26.0 - 25.0 = -51.0 \text{ MPa}\]</p>
-        </div>
-    </div>
-</div>
 
 <!-- QUIZ SECTION -->
 <div class="content-section">

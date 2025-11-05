@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <p>Coventry University, United Kingdom</p>
         <div class="footer-links">
             <a href="/index.html">Home</a> |
+            <a href="/about.html">About</a> |
+            <a href="/author.html">About the Author</a> |
             <a href="mailto:ac4213@coventry.ac.uk?subject=ExplExpl%20Website%20Feedback">Contact</a>
         </div>
         <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=ExplExpl%20Bug%20Report">Let me know!</a></p>
