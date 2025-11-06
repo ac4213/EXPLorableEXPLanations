@@ -175,6 +175,10 @@
             <div>High Score: <span id="high-score">0</span></div>
             <div>Level: <span id="level">1</span></div>
         </div>
+
+        <div id="combo-display" style="display: none; text-align: center; margin: 10px 0; font-size: 1.5em; font-weight: bold; color: #ff6b6b; transition: transform 0.2s ease-out; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+            <span id="combo-text"></span>
+        </div>
         
         <div>
             <button id="new-game-btn">New Game</button>
@@ -233,12 +237,22 @@
         let animations = [];
         let animationId = null;
         let devicePixelRatio = 1;
+
+        // Combo system
+        let comboCount = 0;
+        let comboMultiplier = 1;
+        let comboTimer = null;
+
+        // Particles and popups
+        let particles = [];
+        let scorePopups = [];
         
         // Input tracking
         let inputStartPos = null;
         let isDragging = false;
         let lastInputTime = 0;
-        const INPUT_COOLDOWN = 100; // ms between inputs
+        const INPUT_COOLDOWN = 50; // ms between inputs
+        let dragTarget = null; // Track the gem being dragged towards
         
         // Gem colors and DOM elements
         const gemColors = ['#FFFFFF', '#3498DB', '#333333', '#E74C3C', '#2ECC71', '#95A5A6'];
@@ -344,16 +358,31 @@
         
         function handleInputMove(e) {
             if (!inputStartPos || isAnimating) return;
-            
+
             const pos = getInputPosition(e);
             if (!pos) return;
-            
+
             const dx = pos.x - inputStartPos.x;
             const dy = pos.y - inputStartPos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+
+            // Update drag target for visual feedback
+            if (selectedGem && distance > gemSize * 0.15) {
+                const gridPos = pixelToGrid(pos.x, pos.y);
+                if (gridPos) {
+                    const tdx = gridPos.x - selectedGem.x;
+                    const tdy = gridPos.y - selectedGem.y;
+                    // Only show target if adjacent
+                    if (Math.abs(tdx) + Math.abs(tdy) === 1) {
+                        dragTarget = gridPos;
+                    } else {
+                        dragTarget = null;
+                    }
+                }
+            }
+
             // Detect swipe/drag
-            if (distance > gemSize * 0.3 && !isDragging) {
+            if (distance > gemSize * 0.2 && !isDragging) {
                 isDragging = true;
                 if (selectedGem) {
                     attemptSwap(pos.x, pos.y);
@@ -371,14 +400,15 @@
                 const dx = pos.x - inputStartPos.x;
                 const dy = pos.y - inputStartPos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < gemSize * 0.2) {
+
+                if (distance < gemSize * 0.3) {
                     attemptSwap(pos.x, pos.y);
                 }
             }
             
             inputStartPos = null;
             isDragging = false;
+            dragTarget = null;
         }
         
         function getInputPosition(e) {
@@ -458,19 +488,25 @@
             if (animationId) {
                 cancelAnimationFrame(animationId);
             }
-            
+
             function animate(timestamp) {
                 updateAnimations();
+                updateParticles();
+                updateScorePopups();
                 drawGrid();
+                drawParticles();
+                drawScorePopups();
                 animationId = requestAnimationFrame(animate);
             }
-            
+
             animationId = requestAnimationFrame(animate);
         }
         
         function startNewGame() {
             // Reset game state
             animations = [];
+            particles = [];
+            scorePopups = [];
             score = 0;
             level = 1;
             stoneChance = 0.03;
@@ -478,8 +514,13 @@
             isAnimating = false;
             isDragging = false;
             inputStartPos = null;
-            
+            dragTarget = null;
+            comboCount = 0;
+            comboMultiplier = 1;
+            if (comboTimer) clearTimeout(comboTimer);
+
             updateDisplay();
+            updateComboDisplay();
             gameOverModal.style.display = 'none';
             
             // Create new grid
@@ -566,6 +607,20 @@
                     gemSize - 4,
                     gemSize - 4
                 );
+            }
+
+            // Highlight drag target
+            if (dragTarget) {
+                ctx.strokeStyle = '#00BCD4';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(
+                    gridOffsetX + dragTarget.x * gemSize + 2,
+                    gridOffsetY + dragTarget.y * gemSize + 2,
+                    gemSize - 4,
+                    gemSize - 4
+                );
+                ctx.setLineDash([]);
             }
         }
         
@@ -774,7 +829,7 @@
                 x: x,
                 y: y,
                 progress: 0,
-                speed: options.speed || 0.05,
+                speed: options.speed || 0.15,
                 ...options
             };
             animations.push(anim);
@@ -835,15 +890,15 @@
                 fromY: gem2.y,
                 toX: gem1.x,
                 toY: gem1.y,
-                speed: 0.1
+                speed: 0.2
             });
-            
+
             addAnimation('slide', gem2.x, gem2.y, {
                 fromX: gem1.x,
                 fromY: gem1.y,
                 toX: gem2.x,
                 toY: gem2.y,
-                speed: 0.1,
+                speed: 0.2,
                 callback: () => {
                     // Check for matches
                     if (checkForMatches().length > 0) {
@@ -859,15 +914,15 @@
                             fromY: gem2.y,
                             toX: gem1.x,
                             toY: gem1.y,
-                            speed: 0.1
+                            speed: 0.2
                         });
-                        
+
                         addAnimation('slide', gem2.x, gem2.y, {
                             fromX: gem1.x,
                             fromY: gem1.y,
                             toX: gem2.x,
                             toY: gem2.y,
-                            speed: 0.1,
+                            speed: 0.2,
                             callback: () => {
                                 isAnimating = false;
                                 selectedGem = null;
@@ -982,15 +1037,24 @@
                     if (!hasValidMoves()) {
                         gameOver();
                     }
-                }, 300);
+                }, 100);
                 return;
             }
             
             // Process each match
             matches.forEach(match => {
-                // Update score
-                updateScore(match.count * 10);
-                
+                // Calculate center of match for popup
+                const centerX = Math.floor(match.coords.reduce((sum, c) => sum + c.x, 0) / match.coords.length);
+                const centerY = Math.floor(match.coords.reduce((sum, c) => sum + c.y, 0) / match.coords.length);
+
+                // Update score with popup
+                updateScore(match.count * 10, centerX, centerY);
+
+                // Create particles for each matched gem
+                match.coords.forEach(c => {
+                    createParticles(c.x, c.y, gemColors[match.type] || '#FFD700');
+                });
+
                 // Handle special gem creation
                 if (match.type === RAINBOW_TYPE) {
                     // Rainbow explosion
@@ -1038,8 +1102,8 @@
             // Drop gems after animations
             setTimeout(() => {
                 dropGems();
-                setTimeout(checkForCascades, 300);
-            }, 300);
+                setTimeout(checkForCascades, 150);
+            }, 150);
         }
         
         function explodeArea(centerX, centerY, radius) {
@@ -1047,8 +1111,12 @@
                 for (let x = Math.max(0, centerX - radius); x <= Math.min(GRID_SIZE - 1, centerX + radius); x++) {
                     if (grid[y][x] !== -1) {
                         addAnimation('explosion', x, y);
+                        const gemType = grid[y][x] >= EXPLOSIVE_OFFSET && grid[y][x] < RAINBOW_TYPE
+                            ? grid[y][x] - EXPLOSIVE_OFFSET
+                            : grid[y][x];
+                        createParticles(x, y, gemColors[gemType] || '#FFD700');
                         grid[y][x] = -1;
-                        updateScore(15);
+                        updateScore(15, x, y);
                     }
                 }
             }
@@ -1071,13 +1139,13 @@
                                 fromY: y,
                                 toX: x,
                                 toY: writeY,
-                                speed: 0.08
+                                speed: 0.15
                             });
                         }
                         writeY--;
                     }
                 }
-                
+
                 // Fill with new gems - always falling from the top
                 for (let y = writeY; y >= 0; y--) {
                     if (Math.random() < stoneChance) {
@@ -1085,14 +1153,14 @@
                     } else {
                         newGrid[y][x] = Math.floor(Math.random() * GEM_TYPES);
                     }
-                    
+
                     // Animate new gems falling from above the grid
                     addAnimation('slide', x, y, {
                         fromX: x,
                         fromY: -2,  // Start from above the grid
                         toX: x,
                         toY: y,
-                        speed: 0.08
+                        speed: 0.15
                     });
                 }
             }
@@ -1102,17 +1170,57 @@
         
         function checkForCascades() {
             const matches = checkForMatches();
-            
+
             if (matches.length > 0) {
+                // Increment combo
+                comboCount++;
+                comboMultiplier = Math.min(1 + Math.floor(comboCount / 2) * 0.5, 5); // Max 5x
+                updateComboDisplay();
+
                 updateScore(20 * matches.length);
                 processMatches();
             } else {
                 isAnimating = false;
-                
+
+                // Reset combo after a delay
+                if (comboTimer) clearTimeout(comboTimer);
+                comboTimer = setTimeout(resetCombo, 2000);
+
                 // Check for game over
                 if (!hasValidMoves()) {
                     gameOver();
                 }
+            }
+        }
+
+        function resetCombo() {
+            comboCount = 0;
+            comboMultiplier = 1;
+            updateComboDisplay();
+        }
+
+        function updateComboDisplay() {
+            const comboDisplay = document.getElementById('combo-display');
+            const comboText = document.getElementById('combo-text');
+
+            if (comboCount > 0) {
+                comboDisplay.style.display = 'block';
+                let message = '';
+                if (comboCount === 1) message = 'COMBO!';
+                else if (comboCount === 2) message = 'GREAT!';
+                else if (comboCount === 3) message = 'AMAZING!';
+                else if (comboCount === 4) message = 'INCREDIBLE!';
+                else if (comboCount >= 5) message = 'LEGENDARY!';
+
+                comboText.textContent = `${message} ${comboMultiplier.toFixed(1)}x`;
+
+                // Pulse animation
+                comboDisplay.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    comboDisplay.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                comboDisplay.style.display = 'none';
             }
         }
         
@@ -1177,10 +1285,16 @@
             return false;
         }
         
-        function updateScore(points) {
-            score += points;
+        function updateScore(points, x = null, y = null) {
+            const multipliedPoints = Math.floor(points * comboMultiplier);
+            score += multipliedPoints;
             updateDisplay();
-            
+
+            // Create score popup if position provided
+            if (x !== null && y !== null) {
+                createScorePopup(multipliedPoints, x, y);
+            }
+
             // Level up
             const newLevel = Math.floor(score / 500) + 1;
             if (newLevel > level) {
@@ -1253,10 +1367,107 @@
             }
         }
         
+        // Particle System
+        function createParticles(gridX, gridY, color) {
+            const centerX = gridOffsetX + gridX * gemSize + gemSize / 2;
+            const centerY = gridOffsetY + gridY * gemSize + gemSize / 2;
+            const count = 8;
+
+            for (let i = 0; i < count; i++) {
+                const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+                const speed = 2 + Math.random() * 3;
+
+                particles.push({
+                    x: centerX,
+                    y: centerY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1.0,
+                    decay: 0.02,
+                    size: 3 + Math.random() * 3,
+                    color: color
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.2; // Gravity
+                p.life -= p.decay;
+
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function drawParticles() {
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        // Score Popup System
+        function createScorePopup(points, gridX, gridY) {
+            const x = gridOffsetX + gridX * gemSize + gemSize / 2;
+            const y = gridOffsetY + gridY * gemSize + gemSize / 2;
+
+            scorePopups.push({
+                text: `+${points}`,
+                x: x,
+                y: y,
+                vy: -2,
+                life: 1.0,
+                decay: 0.015
+            });
+        }
+
+        function updateScorePopups() {
+            for (let i = scorePopups.length - 1; i >= 0; i--) {
+                const popup = scorePopups[i];
+                popup.y += popup.vy;
+                popup.vy += 0.05; // Slow down upward movement
+                popup.life -= popup.decay;
+
+                if (popup.life <= 0) {
+                    scorePopups.splice(i, 1);
+                }
+            }
+        }
+
+        function drawScorePopups() {
+            scorePopups.forEach(popup => {
+                ctx.save();
+                ctx.globalAlpha = popup.life;
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 3;
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                // Outline
+                ctx.strokeText(popup.text, popup.x, popup.y);
+                // Fill
+                ctx.fillText(popup.text, popup.x, popup.y);
+
+                ctx.restore();
+            });
+        }
+
         // Utility functions
         function easeInOutCubic(t) {
-            return t < 0.5 
-                ? 4 * t * t * t 
+            return t < 0.5
+                ? 4 * t * t * t
                 : 1 - Math.pow(-2 * t + 2, 3) / 2;
         }
         

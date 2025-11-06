@@ -1,36 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asteroids</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <style>
         body {
             margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             background: #000;
             overflow: hidden;
+            touch-action: none;
         }
         canvas {
             max-width: 800px !important;
             max-height: 600px !important;
         }
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            display: none;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 1000;
+        }
+        .control-group {
+            display: flex;
+            gap: 10px;
+        }
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .control-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
+        }
+        .control-btn.fire {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 100, 100, 0.3);
+            border-color: rgba(255, 100, 100, 0.7);
+        }
+        .control-btn.fire:active {
+            background: rgba(255, 100, 100, 0.5);
+        }
+        @media (max-width: 767px), (hover: none) {
+            #controls {
+                display: flex !important;
+            }
+        }
     </style>
 </head>
 <body>
+<div id="controls">
+    <div class="control-group">
+        <div class="control-btn" id="leftBtn">◄</div>
+        <div class="control-group" style="flex-direction: column;">
+            <div class="control-btn" id="thrustBtn">▲</div>
+            <div class="control-btn" id="brakeBtn">▼</div>
+        </div>
+        <div class="control-btn" id="rightBtn">►</div>
+    </div>
+    <div class="control-group">
+        <div class="control-btn fire" id="fireBtn">●</div>
+    </div>
+</div>
 <script>
 let ship;
 let asteroids = [];
 let bullets = [];
+let ufos = [];
+let ufoShots = [];
+let powerUps = [];
 let score = 0;
 let gameOver = false;
 let levelCleared = false;
 let currentLevel = 1;
 let canvasWidth, canvasHeight;
 let levelStartTime = 0;
-const LEVEL_TRANSITION_DURATION = 3000; // 3 seconds
+let combo = 0;
+let comboTimer = 0;
+let transitionAlpha = 0;
+const LEVEL_TRANSITION_DURATION = 2000; // 2 seconds
+const COMBO_TIMEOUT = 3000; // 3 seconds to maintain combo
 
 function calculateCanvasSize() {
     canvasWidth = min(windowWidth - 20, 800);
@@ -52,6 +124,12 @@ class Ship {
         this.vel = createVector(0, 0);
         this.isBoosting = false;
         this.isBraking = false;
+        this.shield = false;
+        this.shieldTime = 0;
+        this.rapidFire = false;
+        this.rapidFireTime = 0;
+        this.multiShot = false;
+        this.multiShotTime = 0;
     }
 
     boosting(b) {
@@ -72,11 +150,22 @@ class Ship {
         }
         this.pos.add(this.vel);
         this.vel.mult(0.99);
-        
+
         if (this.pos.x > canvasWidth) this.pos.x = 0;
         if (this.pos.x < 0) this.pos.x = canvasWidth;
         if (this.pos.y > canvasHeight) this.pos.y = 0;
         if (this.pos.y < 0) this.pos.y = canvasHeight;
+
+        // Update power-up timers
+        if (this.shield && millis() > this.shieldTime) {
+            this.shield = false;
+        }
+        if (this.rapidFire && millis() > this.rapidFireTime) {
+            this.rapidFire = false;
+        }
+        if (this.multiShot && millis() > this.multiShotTime) {
+            this.multiShot = false;
+        }
     }
 
     boost() {
@@ -93,11 +182,21 @@ class Ship {
     render() {
         push();
         translate(this.pos.x, this.pos.y);
+
+        // Draw shield if active
+        if (this.shield) {
+            noFill();
+            stroke(100, 200, 255);
+            strokeWeight(2);
+            circle(0, 0, this.r * 3);
+            strokeWeight(1);
+        }
+
         rotate(this.heading);
         fill(0);
         stroke(255);
         triangle(-this.r, this.r, this.r, this.r, 0, -this.r);
-        
+
         // Show brake lights when braking
         if (this.isBraking) {
             fill(255, 0, 0);
@@ -196,7 +295,143 @@ class Bullet {
     }
 
     offscreen() {
-        return (this.pos.x > canvasWidth || this.pos.x < 0 || 
+        return (this.pos.x > canvasWidth || this.pos.x < 0 ||
+                this.pos.y > canvasHeight || this.pos.y < 0);
+    }
+}
+
+class PowerUp {
+    constructor(pos, type) {
+        this.pos = pos.copy();
+        this.type = type; // 'shield', 'rapid', 'multi'
+        this.vel = createVector(random(-1, 1), random(-1, 1));
+        this.r = 15;
+        this.lifetime = millis() + 10000; // 10 seconds
+    }
+
+    update() {
+        this.pos.add(this.vel);
+        if (this.pos.x > canvasWidth) this.pos.x = 0;
+        if (this.pos.x < 0) this.pos.x = canvasWidth;
+        if (this.pos.y > canvasHeight) this.pos.y = 0;
+        if (this.pos.y < 0) this.pos.y = canvasHeight;
+    }
+
+    render() {
+        push();
+        translate(this.pos.x, this.pos.y);
+
+        // Pulsing effect
+        let pulse = sin(millis() * 0.005) * 0.3 + 1;
+        scale(pulse);
+
+        if (this.type === 'shield') {
+            stroke(100, 200, 255);
+            fill(100, 200, 255, 100);
+            circle(0, 0, this.r * 2);
+            stroke(100, 200, 255);
+            text('S', -5, 5);
+        } else if (this.type === 'rapid') {
+            stroke(255, 200, 0);
+            fill(255, 200, 0, 100);
+            circle(0, 0, this.r * 2);
+            stroke(255, 200, 0);
+            text('R', -5, 5);
+        } else if (this.type === 'multi') {
+            stroke(255, 100, 200);
+            fill(255, 100, 200, 100);
+            circle(0, 0, this.r * 2);
+            stroke(255, 100, 200);
+            text('M', -5, 5);
+        }
+        pop();
+    }
+
+    hits(ship) {
+        let d = dist(this.pos.x, this.pos.y, ship.pos.x, ship.pos.y);
+        return d < this.r + ship.r;
+    }
+
+    expired() {
+        return millis() > this.lifetime;
+    }
+}
+
+class UFO {
+    constructor(level) {
+        this.pos = createVector(random(canvasWidth), random() < 0.5 ? 0 : canvasHeight);
+        this.vel = createVector(random(-2, 2), random(-2, 2));
+        this.r = 20;
+        this.shootTimer = millis() + random(1000, 3000);
+        this.level = level;
+    }
+
+    update() {
+        this.pos.add(this.vel);
+
+        // Bounce off edges
+        if (this.pos.x > canvasWidth || this.pos.x < 0) {
+            this.vel.x *= -1;
+        }
+        if (this.pos.y > canvasHeight || this.pos.y < 0) {
+            this.vel.y *= -1;
+        }
+    }
+
+    render() {
+        push();
+        translate(this.pos.x, this.pos.y);
+        stroke(0, 255, 0);
+        fill(0);
+        // UFO shape
+        ellipse(0, 0, this.r * 2, this.r);
+        ellipse(0, -5, this.r, this.r * 0.5);
+        line(-this.r, 0, this.r, 0);
+        pop();
+    }
+
+    shouldShoot() {
+        if (millis() > this.shootTimer) {
+            this.shootTimer = millis() + random(1500, 3000);
+            return true;
+        }
+        return false;
+    }
+
+    shoot(target) {
+        let direction = p5.Vector.sub(target, this.pos);
+        direction.normalize();
+        return new UfoShot(this.pos, direction);
+    }
+}
+
+class UfoShot {
+    constructor(pos, direction) {
+        this.pos = pos.copy();
+        this.vel = direction.copy();
+        this.vel.mult(5);
+        this.r = 3;
+    }
+
+    update() {
+        this.pos.add(this.vel);
+    }
+
+    render() {
+        push();
+        stroke(0, 255, 0);
+        strokeWeight(6);
+        point(this.pos.x, this.pos.y);
+        pop();
+    }
+
+    hits(ship) {
+        let d = dist(this.pos.x, this.pos.y, ship.pos.x, ship.pos.y);
+        return d < this.r + ship.r;
+    }
+
+    offscreen() {
+        return (this.pos.x > canvasWidth || this.pos.x < 0 ||
                 this.pos.y > canvasHeight || this.pos.y < 0);
     }
 }
@@ -204,17 +439,28 @@ class Bullet {
 function startLevel(level) {
     asteroids = [];
     bullets = [];
+    ufos = [];
+    ufoShots = [];
     ship.pos = createVector(canvasWidth/2, canvasHeight/2);
     ship.vel = createVector(0, 0);
-    
-    // Increase number of asteroids with each level
-    let numAsteroids = 4 + level;
+
+    // Improved difficulty curve - gradual progression
+    let numAsteroids = min(3 + floor(level * 1.5), 15);
     for (let i = 0; i < numAsteroids; i++) {
         asteroids.push(new Asteroid(null, null, level));
     }
-    
+
+    // Add UFOs starting from level 3
+    if (level >= 3) {
+        let numUfos = min(floor((level - 2) / 2), 3);
+        for (let i = 0; i < numUfos; i++) {
+            ufos.push(new UFO(level));
+        }
+    }
+
     levelCleared = false;
     levelStartTime = millis();
+    transitionAlpha = 255;
 }
 
 function setup() {
@@ -234,40 +480,124 @@ function resetGame() {
 
 function draw() {
     background(0);
-    
+
     if (!gameOver && !levelCleared) {
-        // Check if level is cleared
-        if (asteroids.length === 0) {
+        // Check if level is cleared (no asteroids and no UFOs)
+        if (asteroids.length === 0 && ufos.length === 0) {
             levelCleared = true;
             levelStartTime = millis();
         }
 
+        // Update combo timer
+        if (combo > 0 && millis() > comboTimer) {
+            combo = 0;
+        }
+
+        // Asteroids
         for (let i = asteroids.length - 1; i >= 0; i--) {
-            if (ship.hits(asteroids[i])) {
+            if (ship.hits(asteroids[i]) && !ship.shield) {
                 gameOver = true;
             }
             asteroids[i].render();
             asteroids[i].update();
         }
 
+        // UFOs
+        for (let i = ufos.length - 1; i >= 0; i--) {
+            ufos[i].update();
+            ufos[i].render();
+
+            // UFO shoots at ship
+            if (ufos[i].shouldShoot()) {
+                ufoShots.push(ufos[i].shoot(ship.pos));
+            }
+        }
+
+        // UFO shots
+        for (let i = ufoShots.length - 1; i >= 0; i--) {
+            ufoShots[i].update();
+            ufoShots[i].render();
+
+            if (ufoShots[i].offscreen()) {
+                ufoShots.splice(i, 1);
+            } else if (ufoShots[i].hits(ship) && !ship.shield) {
+                gameOver = true;
+            }
+        }
+
+        // Power-ups
+        for (let i = powerUps.length - 1; i >= 0; i--) {
+            powerUps[i].update();
+            powerUps[i].render();
+
+            if (powerUps[i].expired()) {
+                powerUps.splice(i, 1);
+            } else if (powerUps[i].hits(ship)) {
+                let type = powerUps[i].type;
+                if (type === 'shield') {
+                    ship.shield = true;
+                    ship.shieldTime = millis() + 8000;
+                } else if (type === 'rapid') {
+                    ship.rapidFire = true;
+                    ship.rapidFireTime = millis() + 10000;
+                } else if (type === 'multi') {
+                    ship.multiShot = true;
+                    ship.multiShotTime = millis() + 10000;
+                }
+                powerUps.splice(i, 1);
+            }
+        }
+
+        // Bullets
         for (let i = bullets.length - 1; i >= 0; i--) {
             bullets[i].render();
             bullets[i].update();
             if (bullets[i].offscreen()) {
                 bullets.splice(i, 1);
             } else {
+                // Check asteroid hits
                 for (let j = asteroids.length - 1; j >= 0; j--) {
                     if (bullets[i] && bullets[i].hits(asteroids[j])) {
+                        let asteroidPos = asteroids[j].pos.copy();
                         if (asteroids[j].r > 15) {
                             let newAsteroids = [];
                             newAsteroids[0] = new Asteroid(asteroids[j].pos, asteroids[j].r, asteroids[j].level+2);
                             newAsteroids[1] = new Asteroid(asteroids[j].pos, asteroids[j].r, asteroids[j].level+2);
                             asteroids = asteroids.concat(newAsteroids);
                         }
+
+                        // Combo system
+                        combo++;
+                        comboTimer = millis() + COMBO_TIMEOUT;
+                        let comboBonus = combo > 1 ? (combo - 1) * 50 : 0;
+                        score += 100 + comboBonus;
+
+                        // Chance to spawn power-up
+                        if (random() < 0.15) {
+                            let types = ['shield', 'rapid', 'multi'];
+                            let type = random(types);
+                            powerUps.push(new PowerUp(asteroidPos, type));
+                        }
+
                         asteroids.splice(j, 1);
                         bullets.splice(i, 1);
-                        score += 100;
                         break;
+                    }
+                }
+
+                // Check UFO hits
+                if (bullets[i]) {
+                    for (let j = ufos.length - 1; j >= 0; j--) {
+                        let d = dist(bullets[i].pos.x, bullets[i].pos.y, ufos[j].pos.x, ufos[j].pos.y);
+                        if (d < ufos[j].r) {
+                            combo++;
+                            comboTimer = millis() + COMBO_TIMEOUT;
+                            let comboBonus = combo > 1 ? (combo - 1) * 50 : 0;
+                            score += 300 + comboBonus;
+                            ufos.splice(j, 1);
+                            bullets.splice(i, 1);
+                            break;
+                        }
                     }
                 }
             }
@@ -286,17 +616,63 @@ function draw() {
     textAlign(LEFT);
     text(`Level: ${currentLevel}`, 10, 30);
 
-    // Level cleared screen
+    // Display combo
+    if (combo > 1) {
+        textAlign(CENTER);
+        textSize(32);
+        fill(255, 200, 0);
+        text(`${combo}x COMBO!`, canvasWidth/2, 40);
+    }
+
+    // Display active power-ups
+    let powerUpY = 60;
+    if (ship.shield) {
+        fill(100, 200, 255);
+        textAlign(LEFT);
+        textSize(16);
+        text('SHIELD', 10, powerUpY);
+        powerUpY += 20;
+    }
+    if (ship.rapidFire) {
+        fill(255, 200, 0);
+        textAlign(LEFT);
+        textSize(16);
+        text('RAPID FIRE', 10, powerUpY);
+        powerUpY += 20;
+    }
+    if (ship.multiShot) {
+        fill(255, 100, 200);
+        textAlign(LEFT);
+        textSize(16);
+        text('MULTI SHOT', 10, powerUpY);
+        powerUpY += 20;
+    }
+
+    // Level cleared screen with animated transition
     if (levelCleared) {
+        // Fade in effect
+        let elapsed = millis() - levelStartTime;
+        let fadeAlpha = min(255, (elapsed / 500) * 255);
+
+        push();
+        fill(255, 255, 255, fadeAlpha);
         textAlign(CENTER);
         textSize(64);
-        fill(255);
-        text('LEVEL CLEARED!', canvasWidth/2, canvasHeight/2);
+        text('LEVEL CLEARED!', canvasWidth/2, canvasHeight/2 - 20);
         textSize(32);
-        text(`Score: ${score}`, canvasWidth/2, canvasHeight/2 + 50);
-        
+        text(`Score: ${score}`, canvasWidth/2, canvasHeight/2 + 30);
+
+        // Pulsing "Next Level" indicator
+        if (elapsed > 1000) {
+            let pulse = sin(millis() * 0.005) * 50 + 200;
+            fill(pulse, pulse, 0, fadeAlpha);
+            textSize(24);
+            text('Next Level...', canvasWidth/2, canvasHeight/2 + 70);
+        }
+        pop();
+
         // Start next level after delay
-        if (millis() - levelStartTime > LEVEL_TRANSITION_DURATION) {
+        if (elapsed > LEVEL_TRANSITION_DURATION) {
             currentLevel++;
             startLevel(currentLevel);
         }
@@ -310,7 +686,13 @@ function draw() {
         text('GAME OVER', canvasWidth/2, canvasHeight/2);
         textSize(32);
         text(`Final Score: ${score}`, canvasWidth/2, canvasHeight/2 + 50);
-        text('Press R to Restart', canvasWidth/2, canvasHeight/2 + 100);
+
+        // Show appropriate restart instruction based on screen size
+        if (width <= 767) {
+            text('Tap Fire or R to Restart', canvasWidth/2, canvasHeight/2 + 100);
+        } else {
+            text('Press R to Restart', canvasWidth/2, canvasHeight/2 + 100);
+        }
     }
 }
 
@@ -332,11 +714,26 @@ function keyPressed() {
     } else if (keyCode === DOWN_ARROW) {
         ship.braking(true);
     } else if (key === ' ') {
-        bullets.push(new Bullet(ship));
+        fireBullets();
     } else if (key === 'r' || key === 'R') {
         if (gameOver) {
             resetGame();
         }
+    }
+}
+
+function fireBullets() {
+    if (ship.multiShot) {
+        // Fire 3 bullets in a spread pattern
+        bullets.push(new Bullet(ship));
+        let tempHeading = ship.heading;
+        ship.heading -= 0.2;
+        bullets.push(new Bullet(ship));
+        ship.heading = tempHeading + 0.2;
+        bullets.push(new Bullet(ship));
+        ship.heading = tempHeading;
+    } else {
+        bullets.push(new Bullet(ship));
     }
 }
 
@@ -348,6 +745,121 @@ function keyReleased() {
     } else if (keyCode === DOWN_ARROW) {
         ship.braking(false);
     }
+}
+
+// Touch and mouse controls for mobile devices and small screens
+function setupTouchControls() {
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+    const thrustBtn = document.getElementById('thrustBtn');
+    const brakeBtn = document.getElementById('brakeBtn');
+    const fireBtn = document.getElementById('fireBtn');
+
+    // Left button
+    leftBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        ship.setRotation(-0.1);
+    });
+    leftBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        ship.setRotation(0);
+    });
+    leftBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        ship.setRotation(-0.1);
+    });
+    leftBtn.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        ship.setRotation(0);
+    });
+
+    // Right button
+    rightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        ship.setRotation(0.1);
+    });
+    rightBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        ship.setRotation(0);
+    });
+    rightBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        ship.setRotation(0.1);
+    });
+    rightBtn.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        ship.setRotation(0);
+    });
+
+    // Thrust button
+    thrustBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        ship.boosting(true);
+    });
+    thrustBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        ship.boosting(false);
+    });
+    thrustBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        ship.boosting(true);
+    });
+    thrustBtn.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        ship.boosting(false);
+    });
+
+    // Brake button
+    brakeBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        ship.braking(true);
+    });
+    brakeBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        ship.braking(false);
+    });
+    brakeBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        ship.braking(true);
+    });
+    brakeBtn.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        ship.braking(false);
+    });
+
+    // Fire button
+    fireBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (!gameOver && !levelCleared) {
+            fireBullets();
+        } else if (gameOver) {
+            resetGame();
+        }
+    });
+    fireBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        if (!gameOver && !levelCleared) {
+            fireBullets();
+        } else if (gameOver) {
+            resetGame();
+        }
+    });
+
+    // Handle mouse leaving button while pressed
+    [leftBtn, rightBtn, thrustBtn, brakeBtn].forEach(btn => {
+        btn.addEventListener('mouseleave', () => {
+            ship.setRotation(0);
+            ship.boosting(false);
+            ship.braking(false);
+        });
+    });
+}
+
+// Call setupTouchControls after DOM is loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupTouchControls);
+} else {
+    setupTouchControls();
 }
 </script>
 </body>
