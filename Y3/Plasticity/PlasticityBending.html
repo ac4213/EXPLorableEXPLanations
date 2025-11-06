@@ -62,6 +62,22 @@
     <p>\[\sigma = \frac{My}{I}\]</p>
     <p>\[M_e = \frac{\sigma_y I}{y_{max}},\quad M_p = \sigma_y Z,\quad f=\frac{M_p}{M_e}=\frac{Z}{S}\]</p>
   </div>
+
+  <div class="equation-box">
+    <h3>Key Concepts</h3>
+    <ol>
+      <li><strong>Elastic Limit Load:</strong> When the extreme fibre first reaches yield stress:
+        \[M_e = \frac{\sigma_y I}{y_{max}} = \sigma_y S\]
+        where \(S = I/y_{max}\) is the elastic section modulus.</li>
+      <li><strong>Plastic Limit Load:</strong> When the entire section is fully plastic:
+        \[M_p = \sigma_y Z\]
+        where \(Z\) is the plastic section modulus, defined as the first moment of area about the plastic neutral axis (bisectrix).</li>
+      <li><strong>Shape Factor:</strong> The ratio of plastic to Elastic Limit Load:
+        \[f = \frac{M_p}{M_e} = \frac{Z}{S}\]
+        For a rectangle: \(f = 1.5\); for an I-section: \(f \approx 1.15\)</li>
+      <li><strong>Plastic Neutral Axis (bisectrix):</strong> The axis that divides the cross-section into two equal areas (not the centroid for asymmetric sections).</li>
+    </ol>
+  </div>
 </div>
 
 <!-- SIMULATION 1 -->
@@ -167,36 +183,6 @@
   </div>
 </div>
 
-<!-- TEACHING CONTENT SECTION -->
-<div class="content-section">
-  <h2>Understanding Plastic Bending Theory</h2>
-
-  <div class="equation-box">
-    <h3>Key Concepts</h3>
-    <ol>
-      <li><strong>Elastic Limit Load:</strong> When the extreme fibre first reaches yield stress:
-        \[M_e = \frac{\sigma_y I}{y_{max}} = \sigma_y S\]
-        where \(S = I/y_{max}\) is the elastic section modulus.</li>
-      <li><strong>Plastic Limit Load:</strong> When the entire section is fully plastic:
-        \[M_p = \sigma_y Z\]
-        where \(Z\) is the plastic section modulus, defined as the first moment of area about the plastic neutral axis (bisectrix).</li>
-      <li><strong>Shape Factor:</strong> The ratio of plastic to Elastic Limit Load:
-        \[f = \frac{M_p}{M_e} = \frac{Z}{S}\]
-        For a rectangle: \(f = 1.5\); for an I-section: \(f \approx 1.15\)</li>
-      <li><strong>Plastic Neutral Axis:</strong> The axis that divides the cross-section into two equal areas (not the centroid for asymmetric sections).</li>
-    </ol>
-  </div>
-
-  <div class="key-point">
-    <h3>Applications in Structural Design</h3>
-    <ul>
-      <li><strong>Limit State Design:</strong> Plastic analysis allows structures to be designed based on their ultimate load capacity rather than just elastic limits.</li>
-      <li><strong>Redistribution of Moments:</strong> In continuous beams, plastic hinges form at highly stressed sections, allowing moment redistribution.</li>
-      <li><strong>Economy:</strong> Understanding plastic behaviour permits more efficient use of materials, reducing weight and cost.</li>
-      <li><strong>Residual Stresses:</strong> After unloading from plastic deformation, residual stresses remain locked in the section.</li>
-    </ul>
-  </div>
-</div>
 
 <!-- APPLICATIONS AND EXAMPLES SECTION -->
 <div class="content-section">
@@ -363,8 +349,8 @@
 
 <!-- QUIZ SECTION -->
 <div class="content-section">
-  <div class="quiz-container">
     <h2>Knowledge Check Quiz</h2>
+  <div class="quiz-container">
 
     <div class="quiz-question">
       <h3>Question 1: What is the yield stress?</h3>

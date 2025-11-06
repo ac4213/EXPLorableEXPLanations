@@ -29,8 +29,6 @@
         <h1>Parabolic Motion</h1>
         <p class="subtitle">Interactive Lecture & Simulation</p>
     </header>
-
-    <div id="react-visualizer"></div>
     
         <div class="content-section">
             <h2>Understanding Projectile Motion</h2>
@@ -107,20 +105,6 @@
                 <li>Avoid obstacles to see the full projectile path</li>
                 <li>Click RESET to clear all trajectories and create new obstacles</li>
             </ul>
-
-            <h3>Real-world Applications</h3>
-            <p>Understanding projectile motion is crucial for:</p>
-            <ul>
-                <li><strong>Sports:</strong> Optimizing trajectories in basketball, football, golf, javelin, shot put, and archery</li>
-                <li><strong>Engineering:</strong> Ballistics, trajectory planning, water fountain design</li>
-                <li><strong>Military applications:</strong> Artillery aiming, missile guidance systems</li>
-                <li><strong>Space exploration:</strong> Launch trajectories, orbital mechanics (which builds on these concepts)</li>
-                <li><strong>Entertainment:</strong> Roller coaster design, stunt choreography</li>
-            </ul>
-            
-            <div class="key-point">
-                <p><strong>Engineering Insight:</strong> Engineers must account for both ideal and non-ideal conditions when designing systems involving projectile motion. While the parabolic model provides a useful starting point, real-world factors like air resistance, wind, and varying gravitational fields often require more complex calculations or computer simulations.</p>
-            </div>
         </div>
 
     <div class="content-section">
@@ -253,7 +237,6 @@
         </div>
         
         <div class="key-point">
-            <h3>Conclusion</h3>
             <p>Understanding projectile motion is fundamental to classical mechanics and has numerous practical applications. The key insights to remember are:</p>
             <ol>
                 <li>The horizontal and vertical components of motion are independent</li>
@@ -399,20 +382,6 @@
 
     <script>
         // toggleSolution function now loaded from /assets/common/problems.js
-        
-        // Function to render the React component
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if React and ReactDOM are available
-            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && 
-                typeof document.getElementById('react-visualizer') !== 'undefined') {
-                // Create a placeholder message
-                const placeholder = document.createElement('div');
-                placeholder.innerHTML = '<h2 style="text-align: center; padding: 20px;">Interactive Data Visualization</h2>' + 
-                                        '<p style="text-align: center;">Explore how changing the initial velocity, angle, and gravity affects projectile motion.</p>' +
-                                        '<p style="text-align: center; margin-top: 20px;"><em>Use the simulation below to experiment with these concepts in real-time.</em></p>';
-                document.getElementById('react-visualizer').appendChild(placeholder);
-            }
-        });
         
         // Quiz functionality
         document.addEventListener('DOMContentLoaded', function() {

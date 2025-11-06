@@ -49,7 +49,25 @@
             <p>Where \(I_c\) is the moment about the centroidal axis, \(A\) is the area, and \(d\) is the distance between axes.</p>
         </div>
     </div>
-    
+
+    <div class="content-section">
+        <h2>Notable Second Moments of Area for Common Shapes</h2>
+        <p>The following formulas give the second moment of area about the centroidal axes (x and y) for common shapes:</p>
+        <div class="equation-box">
+            <h3>Rectangle (width b, height h):</h3>
+            <p>\[ I_x = \frac{bh^3}{12} \quad \text{and} \quad I_y = \frac{hb^3}{12} \]</p>
+
+            <h3>Circle (diameter d):</h3>
+            <p>\[ I_x = I_y = \frac{\pi d^4}{64} \]</p>
+
+            <h3>Triangle (base b, height h, about centroidal axis parallel to base):</h3>
+            <p>\[ I_x = \frac{bh^3}{36} \]</p>
+
+            <h3>I-beam (composite shape):</h3>
+            <p>Use the parallel axis theorem to calculate the total second moment by summing contributions from flanges and web. See the interactive example below!</p>
+        </div>
+    </div>
+
     <div id="sketch-holder">
         <!-- Our sketch will go here! -->
     </div>
@@ -70,12 +88,7 @@
             </ul>
         </div>
 
-        <div class="key-point">
-            <h3>Section Properties</h3>
-            <div id="results-content">
-                <!-- Results will be displayed here -->
-            </div>
-        </div>
+        <!-- Results now displayed in canvas -->
     </div>
 
     <div class="content-section">
@@ -108,7 +121,6 @@ let symmetricMode = false;
 
 // UI elements
 let buttonContainer;
-let resultDiv;
 
 function setup() {
     // Create canvas
@@ -138,9 +150,6 @@ function setup() {
     angleMode(DEGREES);
     rectMode(CENTER);
     textSize(12);
-    
-    // Set up results area
-    resultDiv = select('#results-content');
     
     // Enable manual redraw to improve performance
     noLoop();
@@ -216,12 +225,12 @@ function draw() {
     
     // Draw reference arrows showing the distances
     drawReferenceArrows();
-    
-    // Update the result display
-    updateResults(ctroid, Ixx);
-    
+
     // Draw explanatory text on the canvas
     drawExplanatoryText(ctroid, Ixx);
+
+    // Draw results infobox at bottom right
+    drawResultsInfobox(ctroid, Ixx);
 }
 
 function resetFigure() {
@@ -425,50 +434,84 @@ function drawReferenceArrows() {
     pop();
 }
 
-function updateResults(ctroid, Ixx) {
-    if (!resultDiv) return;
-    
+function drawResultsInfobox(ctroid, Ixx) {
     // Calculate individual second moments
     let Ixx1 = Math.round(secmomarea([figura[0]], ctroid.y));
     let Ixx2 = Math.round(secmomarea([figura[1]], ctroid.y));
     let Ixx3 = Math.round(secmomarea([figura[2]], ctroid.y));
-    
-    // Create a formatted HTML result
-    let html = `
-        <table>
-        <tr>
-            <th>Property</th>
-            <th>Value</th>
-        </tr>
-        <tr>
-            <td>Centroid (X, Y)</td>
-            <td>(${ctroid.x.toFixed(1)}, ${ctroid.y.toFixed(1)}) mm</td>
-        </tr>
-        <tr>
-            <td>Total Area</td>
-            <td>${getTotalArea().toFixed(0)} mm²</td>
-        </tr>
-        <tr>
-            <td>Iₓₓ (Top Flange)</td>
-            <td>${Ixx1.toFixed(0)} mm⁴</td>
-        </tr>
-        <tr>
-            <td>Iₓₓ (Web)</td>
-            <td>${Ixx2.toFixed(0)} mm⁴</td>
-        </tr>
-        <tr>
-            <td>Iₓₓ (Bottom Flange)</td>
-            <td>${Ixx3.toFixed(0)} mm⁴</td>
-        </tr>
-        <tr>
-            <td><strong>Total Iₓₓ</strong></td>
-            <td><strong>${Math.round(Ixx).toFixed(0)} mm⁴</strong></td>
-        </tr>
-        </table>
-        ${symmetricMode ? '<p><strong>Symmetric Mode: ON</strong></p>' : ''}
-    `;
-    
-    resultDiv.html(html);
+
+    push();
+
+    // Infobox position (bottom right)
+    let boxX = width - 230;
+    let boxY = height - 210;
+    let boxW = 220;
+    let boxH = 200;
+
+    // Draw semi-transparent background box
+    rectMode(CORNER); // Use corner mode for proper positioning
+    fill(255, 255, 255, 230);
+    stroke(100);
+    strokeWeight(1);
+    rect(boxX, boxY, boxW, boxH, 5);
+
+    // Draw title
+    fill(0);
+    noStroke();
+    textAlign(LEFT, TOP);
+    textSize(13);
+    textStyle(BOLD);
+    text("Section Properties", boxX + 10, boxY + 8);
+
+    // Draw results
+    textSize(11);
+    textStyle(NORMAL);
+    let y = boxY + 30;
+    let lineH = 18;
+
+    text("Centroid: (" + ctroid.x.toFixed(1) + ", " + ctroid.y.toFixed(1) + ") mm", boxX + 10, y);
+    y += lineH;
+    text("Total Area: " + getTotalArea().toFixed(0) + " mm²", boxX + 10, y);
+    y += lineH;
+
+    // Separator
+    stroke(200);
+    strokeWeight(1);
+    line(boxX + 10, y + 5, boxX + boxW - 10, y + 5);
+    y += 15;
+
+    noStroke();
+    fill(200, 0, 0);
+    text("Ixx (Top Flange): " + Ixx1.toFixed(0) + " mm⁴", boxX + 10, y);
+    y += lineH;
+
+    fill(0, 155, 0);
+    text("Ixx (Web): " + Ixx2.toFixed(0) + " mm⁴", boxX + 10, y);
+    y += lineH;
+
+    fill(0, 0, 200);
+    text("Ixx (Bottom Flange): " + Ixx3.toFixed(0) + " mm⁴", boxX + 10, y);
+    y += lineH;
+
+    // Separator
+    stroke(200);
+    strokeWeight(1);
+    line(boxX + 10, y + 5, boxX + boxW - 10, y + 5);
+    y += 15;
+
+    noStroke();
+    fill(0);
+    textStyle(BOLD);
+    text("Total Ixx: " + Math.round(Ixx).toFixed(0) + " mm⁴", boxX + 10, y);
+
+    if (symmetricMode) {
+        y += lineH;
+        fill(0, 100, 0);
+        textSize(10);
+        text("SYMMETRIC MODE: ON", boxX + 10, y);
+    }
+
+    pop();
 }
 
 function drawExplanatoryText(ctroid, Ixx) {
@@ -611,6 +654,44 @@ function drawArrow(fromx, fromy, tox, toy, color, twoheaded) {
     </script>
 
     <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Shape</th>
+                    <th>Second Moment of Area</th>
+                    <th>About Axis</th>
+                </tr>
+                <tr>
+                    <td>Rectangle</td>
+                    <td>\(I = \frac{bh^3}{12}\)</td>
+                    <td>Centroidal horizontal axis</td>
+                </tr>
+                <tr>
+                    <td>Circle</td>
+                    <td>\(I = \frac{\pi d^4}{64}\)</td>
+                    <td>Diameter</td>
+                </tr>
+                <tr>
+                    <td>Parallel Axis Theorem</td>
+                    <td>\(I = I_c + Ad^2\)</td>
+                    <td>Any parallel axis</td>
+                </tr>
+                <tr>
+                    <td>Bending Stress</td>
+                    <td>\(\sigma = \frac{My}{I}\)</td>
+                    <td>Stress in bending</td>
+                </tr>
+                <tr>
+                    <td>Centroid</td>
+                    <td>\(\bar{y} = \frac{\sum A_i y_i}{\sum A_i}\)</td>
+                    <td>Composite shapes</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
 
         <div class="practice-problems">
@@ -673,44 +754,6 @@ function drawArrow(fromx, fromy, tox, toy, color, twoheaded) {
                 <p><strong>Step 2: Calculate maximum bending stress</strong></p>
                 <p>\(\sigma_{max} = \frac{My_{max}}{I} = \frac{50 \times 10^6 \times 125}{91.13 \times 10^6} = 68.5 \text{ MPa}\)</p>
             </div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
-            <table>
-                <tr>
-                    <th>Shape</th>
-                    <th>Second Moment of Area</th>
-                    <th>About Axis</th>
-                </tr>
-                <tr>
-                    <td>Rectangle</td>
-                    <td>\(I = \frac{bh^3}{12}\)</td>
-                    <td>Centroidal horizontal axis</td>
-                </tr>
-                <tr>
-                    <td>Circle</td>
-                    <td>\(I = \frac{\pi d^4}{64}\)</td>
-                    <td>Diameter</td>
-                </tr>
-                <tr>
-                    <td>Parallel Axis Theorem</td>
-                    <td>\(I = I_c + Ad^2\)</td>
-                    <td>Any parallel axis</td>
-                </tr>
-                <tr>
-                    <td>Bending Stress</td>
-                    <td>\(\sigma = \frac{My}{I}\)</td>
-                    <td>Stress in bending</td>
-                </tr>
-                <tr>
-                    <td>Centroid</td>
-                    <td>\(\bar{y} = \frac{\sum A_i y_i}{\sum A_i}\)</td>
-                    <td>Composite shapes</td>
-                </tr>
-            </table>
         </div>
     </div>
 

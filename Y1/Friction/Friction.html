@@ -182,15 +182,6 @@
     <div id="friction-sim-holder" style="width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
       <!-- Friction simulation will go here -->
     </div>
-
-    <div id="friction-data" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
-      <h4>Friction Analysis:</h4>
-      <p>Normal Force: <span id="normalForce">--</span> N</p>
-      <p>Maximum Static Friction: <span id="maxStaticFriction">--</span> N</p>
-      <p>Kinetic Friction: <span id="kineticFriction">--</span> N</p>
-      <p>Current Friction Force: <span id="currentFriction">--</span> N</p>
-      <p>Block Status: <span id="blockStatus">Stationary</span></p>
-    </div>
   </div>
 
   <div class="content-section">
@@ -238,6 +229,7 @@
           <option value="none">None</option>
           <option value="translation">Pure Translation (Green)</option>
           <option value="rotation">Pure Rotation (Red)</option>
+          <option value="purple">Combined Rolling (Purple)</option>
           <option value="combined" selected>Combined Rolling (All Vectors)</option>
         </select>
       </div>
@@ -343,6 +335,49 @@
   </div>
 
   <div class="content-section">
+    <h2>Summary of Key Equations</h2>
+    <div class="equation-box">
+      <table>
+        <tr>
+          <th>Concept</th>
+          <th>Equation</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>Normal Force</td>
+          <td>\(N\)</td>
+          <td>Perpendicular contact force between surfaces</td>
+        </tr>
+        <tr>
+          <td>Friction Force</td>
+          <td>\(F_f \leq \mu_s N\)</td>
+          <td>Static friction before sliding</td>
+        </tr>
+        <tr>
+          <td>Kinetic Friction</td>
+          <td>\(F_k = \mu_k N\)</td>
+          <td>Friction force during sliding motion</td>
+        </tr>
+        <tr>
+          <td>Angle of Repose</td>
+          <td>\(\theta_{max} = \tan^{-1}(\mu_s)\)</td>
+          <td>Maximum incline angle before sliding begins</td>
+        </tr>
+        <tr>
+          <td>Rolling Resistance</td>
+          <td>\(F_{rr} = C_{rr} N\)</td>
+          <td>Resistance force for rolling objects</td>
+        </tr>
+        <tr>
+          <td>Power Dissipation</td>
+          <td>\(P = F_{rr} \cdot v\)</td>
+          <td>Power lost to rolling resistance</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-section">
     <h2>Practice Problems</h2>
 
     <div class="practice-problems">
@@ -418,49 +453,6 @@
         <p>New power: \(P = 367.9 \times 27.78 = 10,218 \text{ W} = 10.22 \text{ kW}\)</p>
         <p>Extra power needed: \(10.22 - 6.13 = 4.09 \text{ kW}\) (67% increase!)</p>
       </div>
-    </div>
-  </div>
-
-  <div class="content-section">
-    <h2>Summary of Key Equations</h2>
-    <div class="equation-box">
-      <table>
-        <tr>
-          <th>Concept</th>
-          <th>Equation</th>
-          <th>Description</th>
-        </tr>
-        <tr>
-          <td>Friction Force</td>
-          <td>\(F_f \leq \mu_s N\)</td>
-          <td>Maximum static friction before sliding</td>
-        </tr>
-        <tr>
-          <td>Kinetic Friction</td>
-          <td>\(F_k = \mu_k N\)</td>
-          <td>Friction force during sliding motion</td>
-        </tr>
-        <tr>
-          <td>Normal Force</td>
-          <td>\(N\)</td>
-          <td>Perpendicular contact force between surfaces</td>
-        </tr>
-        <tr>
-          <td>Angle of Repose</td>
-          <td>\(\theta_{max} = \arctan(\mu_s)\)</td>
-          <td>Maximum incline angle before sliding begins</td>
-        </tr>
-        <tr>
-          <td>Rolling Resistance</td>
-          <td>\(F_{rr} = C_{rr} N\)</td>
-          <td>Resistance force for rolling objects</td>
-        </tr>
-        <tr>
-          <td>Power Dissipation</td>
-          <td>\(P = F_{rr} \cdot v\)</td>
-          <td>Power lost to rolling resistance</td>
-        </tr>
-      </table>
     </div>
   </div>
 
@@ -739,8 +731,32 @@ const frictionSketch = (p) => {
 
     p.pop();
 
-    // Update data panel
-    updateFrictionData(normalForce, maxStaticFriction, kineticFriction, frictionForce);
+    // Friction Analysis Infobox (top-left)
+    p.push();
+    p.fill(255, 255, 255, 240);
+    p.stroke(100);
+    p.strokeWeight(1);
+    p.rect(10, 10, 220, 140, 5);
+
+    p.noStroke();
+    p.fill(0);
+    p.textAlign(p.LEFT, p.TOP);
+    p.textSize(14);
+    p.textStyle(p.BOLD);
+    p.text('Friction Analysis:', 20, 20);
+    p.textStyle(p.NORMAL);
+    p.textSize(12);
+    p.text(`Normal Force: ${normalForce.toFixed(1)} N`, 20, 45);
+    p.text(`Max Static Friction: ${maxStaticFriction.toFixed(1)} N`, 20, 65);
+    p.text(`Kinetic Friction: ${kineticFriction.toFixed(1)} N`, 20, 85);
+    p.text(`Current Friction: ${frictionForce.toFixed(1)} N`, 20, 105);
+
+    const statusText = block.isMoving ? 'Moving' : 'Stationary';
+    const statusColor = block.isMoving ? p.color(204, 0, 0) : p.color(0, 204, 0);
+    p.fill(statusColor);
+    p.textStyle(p.BOLD);
+    p.text(`Block Status: ${statusText}`, 20, 125);
+    p.pop();
   };
 
   // dashed lines helper
@@ -774,14 +790,14 @@ const rollingSketch = (p) => {
     // --- Motion control by mode ---
     const dt = (p.deltaTime || 16.67) / 1000; // seconds
     const Rpx = wheel.radius / 60;            // "meters" per pixel scaling
-    const v = (vectorMode === 'rotation') ? 0 : wheel.speed;                // linear speed for translation & combined
+    const v = (vectorMode === 'rotation') ? 0 : wheel.speed;                // linear speed for translation & combined (including none)
     const omega = (vectorMode === 'translation') ? 0 : (wheel.speed / Rpx); // rad/s (so that ωR ≈ v in "visual m/s")
 
     // Update translation
-    if (vectorMode === 'combined') {
+    if (vectorMode === 'combined' || vectorMode === 'purple') {
       // Enforce rolling condition in pixels: x_dot = ωR
       wheel.x += (omega * wheel.radius) * dt;
-    } else if (vectorMode === 'translation') {
+    } else if (vectorMode === 'translation' || vectorMode === 'none') {
       // Keep extra visual scale for clarity
       wheel.x += v * 2;
     }
@@ -871,7 +887,7 @@ const rollingSketch = (p) => {
         }
 
         // Combined (purple) = translation + rotation
-        if (vectorMode === 'combined') {
+        if (vectorMode === 'combined' || vectorMode === 'purple') {
           const rotX = -rotMagVis * Math.sin(ang);
           const rotY =  rotMagVis * Math.cos(ang);
           const totalX = v + rotX;
@@ -893,7 +909,7 @@ const rollingSketch = (p) => {
         p.strokeWeight(3);
         p.fill(0, 200, 0);
         drawArrow(p, cx, cy, cx + v * scale, cy);
-      } else if (vectorMode === 'combined') {
+      } else if (vectorMode === 'combined' || vectorMode === 'purple') {
         // Rotation about COM => red at COM is zero; show purple (equals green length)
         p.stroke(150, 0, 200);
         p.strokeWeight(3);
@@ -903,7 +919,7 @@ const rollingSketch = (p) => {
       // rotation-only: COM rotational velocity is zero -> no COM vector drawn
 
       // Labels for combined pure rolling
-      if (vectorMode === 'combined') {
+      if (vectorMode === 'combined' || vectorMode === 'purple') {
         p.fill(0);
         p.noStroke();
         p.textAlign(p.CENTER);
@@ -924,11 +940,13 @@ const rollingSketch = (p) => {
     p.text(
       vectorMode === 'combined'
         ? `Pure rolling: v = ωR ✔`
-        : vectorMode === 'translation'
-          ? `Mode: Pure Translation`
-          : vectorMode === 'rotation'
-            ? `Mode: Pure Rotation`
-            : `Mode: None`,
+        : vectorMode === 'purple'
+          ? `Pure rolling: v = ωR ✔ (resultant only)`
+          : vectorMode === 'translation'
+            ? `Mode: Pure Translation`
+            : vectorMode === 'rotation'
+              ? `Mode: Pure Rotation`
+              : `Mode: None`,
       10, 50
     );
   };
@@ -1022,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', function () {
       note.textContent = '(controls ω via ω = v/R)';
     } else if (vectorMode === 'translation') {
       note.textContent = '(linear speed)';
-    } else if (vectorMode === 'combined') {
+    } else if (vectorMode === 'combined' || vectorMode === 'purple') {
       note.textContent = '(pure rolling: ω = v/R)';
     } else {
       note.textContent = '';
@@ -1112,16 +1130,6 @@ function resetBlock() {
   if (label) label.textContent = '0';
 }
 
-function updateFrictionData(normalForce, maxStaticFriction, kineticFriction, currentFriction) {
-  document.getElementById('normalForce').textContent = normalForce.toFixed(1);
-  document.getElementById('maxStaticFriction').textContent = maxStaticFriction.toFixed(1);
-  document.getElementById('kineticFriction').textContent = kineticFriction.toFixed(1);
-  document.getElementById('currentFriction').textContent = currentFriction.toFixed(1);
-  const statusEl = document.getElementById('blockStatus');
-  statusEl.textContent = block.isMoving ? 'Moving' : 'Stationary';
-  statusEl.style.color = block.isMoving ? '#cc0000' : '#00cc00';
-  statusEl.style.fontWeight = 'bold';
-}
 
 // toggleSolution function now loaded from /assets/common/problems.js
 

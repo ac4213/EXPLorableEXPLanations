@@ -369,90 +369,6 @@
     </div>
 
     <div class="content-section">
-        <h2>Practice Problems</h2>
-        
-        <div class="practice-problems">
-            <h3>Problem 1: Four-Bar Linkage Velocity Analysis</h3>
-            <p>A four-bar linkage has the following dimensions: Ground link = 100 mm, Crank = 40 mm, Coupler = 80 mm, Rocker = 60 mm. If the crank rotates at 120 rpm clockwise, calculate:</p>
-            <ol>
-                <li>The angular velocity of the crank in rad/s</li>
-                <li>The velocity of the coupler point when the crank angle is 45°</li>
-                <li>The angular velocity of the rocker at this instant</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p>Given: L₁ = 100 mm, L₂ = 40 mm, L₃ = 80 mm, L₄ = 60 mm, n = 120 rpm, θ₂ = 45°</p>
-                
-                <p>a) Angular velocity of crank:</p>
-                <p>\(\omega_2 = \frac{2\pi n}{60} = \frac{2\pi \times 120}{60} = 12.57 \text{ rad/s}\)</p>
-                
-                <p>b) Velocity of coupler point A (crank-coupler joint):</p>
-                <p>\(v_A = \omega_2 \times r_2 = 12.57 \times 40 = 502.8 \text{ mm/s}\)</p>
-                <p>Direction: Perpendicular to crank, at angle 45° - 90° = -45° to horizontal</p>
-                
-                <p>c) To find rocker angular velocity, use velocity diagram method:</p>
-                <p>Using loop closure and velocity equations:</p>
-                <p>After solving (using graphical or analytical methods), \(\omega_4 \approx 5.24 \text{ rad/s}\)</p>
-            </div>
-        </div>
-
-        <div class="practice-problems">
-            <h3>Problem 2: Slider-Crank Acceleration Analysis</h3>
-            <p>A slider-crank mechanism has a crank radius of 50 mm and connecting rod length of 150 mm. The crank rotates at a constant 300 rpm. Calculate the acceleration of the piston when the crank angle is 90° from the horizontal.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p>Given: r = 50 mm, l = 150 mm, n = 300 rpm (constant), θ = 90°</p>
-                
-                <p>Angular velocity:</p>
-                <p>\(\omega = \frac{2\pi \times 300}{60} = 31.42 \text{ rad/s}\)</p>
-                <p>\(\alpha = 0\) (constant speed)</p>
-                
-                <p>At θ = 90°:</p>
-                <p>Crank pin position: x = 0, y = 50 mm</p>
-                
-                <p>Connecting rod angle:</p>
-                <p>\(\beta = \sin^{-1}\left(\frac{r \sin\theta}{l}\right) = \sin^{-1}\left(\frac{50}{150}\right) = 19.47°\)</p>
-                
-                <p>Piston acceleration (using standard formula):</p>
-                <p>\(a_p = -r\omega^2[\cos\theta + \frac{r\cos(2\theta)}{l}]\)</p>
-                <p>\(a_p = -50 \times 31.42^2[0 + \frac{50 \times (-1)}{150}]\)</p>
-                <p>\(a_p = -50 \times 987.4 \times (-0.333) = 16,446 \text{ mm/s}^2 = 16.45 \text{ m/s}^2\)</p>
-                <p>Direction: Towards the crank centre (positive x-direction)</p>
-            </div>
-        </div>
-
-        <div class="practice-problems">
-            <h3>Problem 3: Coriolis Acceleration in Quick-Return Mechanism</h3>
-            <p>In a quick-return mechanism, the crank rotates at 60 rpm. At a certain instant, the slotted lever has an angular velocity of 2 rad/s and the sliding block is 100 mm from the pivot with a relative velocity of 200 mm/s along the slot. Calculate the Coriolis acceleration of the sliding block.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p>Given: ω_lever = 2 rad/s, v_rel = 200 mm/s, r = 100 mm</p>
-                
-                <p>Coriolis acceleration formula:</p>
-                <p>\(a_{Coriolis} = 2\omega \times v_{rel}\)</p>
-                
-                <p>Magnitude:</p>
-                <p>\(|a_{Coriolis}| = 2 \times \omega_{lever} \times v_{rel}\)</p>
-                <p>\(|a_{Coriolis}| = 2 \times 2 \times 200 = 800 \text{ mm/s}^2\)</p>
-                
-                <p>Direction: Perpendicular to both ω (vertical) and v_rel (along slot)</p>
-                <p>Using right-hand rule: The Coriolis acceleration is perpendicular to the slot</p>
-                
-                <p>Total acceleration of sliding block includes:</p>
-                <ul>
-                    <li>Tangential acceleration due to angular acceleration of lever</li>
-                    <li>Centripetal acceleration = ω²r = 4 × 100 = 400 mm/s²</li>
-                    <li>Coriolis acceleration = 800 mm/s²</li>
-                    <li>Relative acceleration along the slot</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="content-section">
         <h2>Summary of Key Equations</h2>
         <div class="equation-box">
             <table>
@@ -463,13 +379,18 @@
                 </tr>
                 <tr>
                     <td>Angular Velocity</td>
-                    <td>\(\omega = \frac{2\pi n}{60}\)</td>
+                    <td>\(\omega = \frac{2\pi}{60} N\)</td>
                     <td>Convert RPM to rad/s</td>
                 </tr>
                 <tr>
                     <td>Linear Velocity</td>
                     <td>\(\vec{v} = \vec{\omega} \times \vec{r}\)</td>
                     <td>Velocity of point on rotating body</td>
+                </tr>
+                <tr>
+                    <td>Velocity equation</td>
+                    <td>\(\vec{v}_P =\vec{v}_O + \vec{\omega} \times \vec{r}_{PO}\)</td>
+                    <td>Velocity of point P wrt O</td>
                 </tr>
                 <tr>
                     <td>Relative Velocity</td>
@@ -491,7 +412,96 @@
                     <td>\(a_t = \alpha r\)</td>
                     <td>Due to angular acceleration</td>
                 </tr>
+                <tr>
+                    <td>Acceleration equation</td>
+                    <td>\(\vec{a}_P =\vec{a}_O + \vec{\omega} \times \left(\vec{\omega} \times\vec{r}_{PO}\right)+\left(\alpha\times\vec{r}_{PO}\right)\)</td>
+                    <td>Acceleration of point P wrt O</td>
+                </tr>
             </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Four-Bar Linkage Velocity Analysis</h3>
+            <p>A four-bar linkage has the following dimensions: Ground link = 100 mm, Crank = 40 mm, Coupler = 80 mm, Rocker = 60 mm. If the crank rotates at 120 rpm clockwise, calculate:</p>
+            <ol>
+                <li>The angular velocity of the crank in rad/s</li>
+                <li>The velocity of the coupler point when the crank angle is 45°</li>
+                <li>The angular velocity of the rocker at this instant</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: L₁ = 100 mm, L₂ = 40 mm, L₃ = 80 mm, L₄ = 60 mm, n = 120 rpm, θ₂ = 45°</p>
+
+                <p>a) Angular velocity of crank:</p>
+                <p>\(\omega_2 = \frac{2\pi n}{60} = \frac{2\pi \times 120}{60} = 12.57 \text{ rad/s}\)</p>
+
+                <p>b) Velocity of coupler point A (crank-coupler joint):</p>
+                <p>\(v_A = \omega_2 \times r_2 = 12.57 \times 40 = 502.8 \text{ mm/s}\)</p>
+                <p>Direction: Perpendicular to crank, at angle 45° - 90° = -45° to horizontal</p>
+
+                <p>c) To find rocker angular velocity, use velocity diagram method:</p>
+                <p>Using loop closure and velocity equations:</p>
+                <p>After solving (using graphical or analytical methods), \(\omega_4 \approx 5.24 \text{ rad/s}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Slider-Crank Acceleration Analysis</h3>
+            <p>A slider-crank mechanism has a crank radius of 50 mm and connecting rod length of 150 mm. The crank rotates at a constant 300 rpm. Calculate the acceleration of the piston when the crank angle is 90° from the horizontal.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: r = 50 mm, l = 150 mm, n = 300 rpm (constant), θ = 90°</p>
+
+                <p>Angular velocity:</p>
+                <p>\(\omega = \frac{2\pi \times 300}{60} = 31.42 \text{ rad/s}\)</p>
+                <p>\(\alpha = 0\) (constant speed)</p>
+
+                <p>At θ = 90°:</p>
+                <p>Crank pin position: x = 0, y = 50 mm</p>
+
+                <p>Connecting rod angle:</p>
+                <p>\(\beta = \sin^{-1}\left(\frac{r \sin\theta}{l}\right) = \sin^{-1}\left(\frac{50}{150}\right) = 19.47°\)</p>
+
+                <p>Piston acceleration (using standard formula):</p>
+                <p>\(a_p = -r\omega^2[\cos\theta + \frac{r\cos(2\theta)}{l}]\)</p>
+                <p>\(a_p = -50 \times 31.42^2[0 + \frac{50 \times (-1)}{150}]\)</p>
+                <p>\(a_p = -50 \times 987.4 \times (-0.333) = 16,446 \text{ mm/s}^2 = 16.45 \text{ m/s}^2\)</p>
+                <p>Direction: Towards the crank centre (positive x-direction)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Coriolis Acceleration in Quick-Return Mechanism</h3>
+            <p>In a quick-return mechanism, the crank rotates at 60 rpm. At a certain instant, the slotted lever has an angular velocity of 2 rad/s and the sliding block is 100 mm from the pivot with a relative velocity of 200 mm/s along the slot. Calculate the Coriolis acceleration of the sliding block.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: ω_lever = 2 rad/s, v_rel = 200 mm/s, r = 100 mm</p>
+
+                <p>Coriolis acceleration formula:</p>
+                <p>\(a_{Coriolis} = 2\omega \times v_{rel}\)</p>
+
+                <p>Magnitude:</p>
+                <p>\(|a_{Coriolis}| = 2 \times \omega_{lever} \times v_{rel}\)</p>
+                <p>\(|a_{Coriolis}| = 2 \times 2 \times 200 = 800 \text{ mm/s}^2\)</p>
+
+                <p>Direction: Perpendicular to both ω (vertical) and v_rel (along slot)</p>
+                <p>Using right-hand rule: The Coriolis acceleration is perpendicular to the slot</p>
+
+                <p>Total acceleration of sliding block includes:</p>
+                <ul>
+                    <li>Tangential acceleration due to angular acceleration of lever</li>
+                    <li>Centripetal acceleration = ω²r = 4 × 100 = 400 mm/s²</li>
+                    <li>Coriolis acceleration = 800 mm/s²</li>
+                    <li>Relative acceleration along the slot</li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -550,66 +560,6 @@
             
             <button id="submit-quiz">Submit Quiz</button>
             <div id="quiz-results"></div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Summary: Key Equations Reference</h2>
-        
-        <div class="equation-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>Equation</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Position</td>
-                        <td>\(\vec{r}_A = \vec{r}_O + \vec{r}_{A/O}\)</td>
-                        <td>Vector addition of positions</td>
-                    </tr>
-                    <tr>
-                        <td>Velocity</td>
-                        <td>\(\vec{v}_A = \vec{v}_O + \vec{\omega} \times \vec{r}_{A/O}\)</td>
-                        <td>Includes rotational component</td>
-                    </tr>
-                    <tr>
-                        <td>Acceleration</td>
-                        <td>\(\vec{a}_A = \vec{a}_O + \vec{\alpha} \times \vec{r}_{A/O} + \vec{\omega} \times (\vec{\omega} \times \vec{r}_{A/O})\)</td>
-                        <td>Tangential + Centripetal</td>
-                    </tr>
-                    <tr>
-                        <td>Tangential Acceleration</td>
-                        <td>\(a_t = \alpha \times r\)</td>
-                        <td>Perpendicular to radius</td>
-                    </tr>
-                    <tr>
-                        <td>Centripetal Acceleration</td>
-                        <td>\(a_c = \omega^2 \times r\)</td>
-                        <td>Towards centre</td>
-                    </tr>
-                    <tr>
-                        <td>Coriolis Acceleration</td>
-                        <td>\(\vec{a}_{Cor} = 2\vec{\omega} \times \vec{v}_{rel}\)</td>
-                        <td>For relative motion in rotating frame</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="key-point">
-            <h3>Conclusion</h3>
-            <p>Understanding mechanism kinematics is fundamental to mechanical design and analysis. The key insights to remember are:</p>
-            <ol>
-                <li>Position, velocity, and acceleration analyses build upon each other sequentially</li>
-                <li>Velocity diagrams provide powerful graphical tools for complex mechanisms</li>
-                <li>Acceleration has both tangential and centripetal components in rotational motion</li>
-                <li>Coriolis effects must be considered in mechanisms with relative sliding motion</li>
-                <li>Different mechanisms provide unique motion characteristics suitable for specific applications</li>
-            </ol>
         </div>
     </div>
 
@@ -813,13 +763,48 @@
                 // Acceleration Analysis
                 if (showAcceleration) {
                     p.strokeWeight(2);
+
+                    // Point A (end of crank) acceleration
                     let aAtx = -alpha * A.y;
                     let aAty = alpha * A.x;
                     let aAcx = -omega * omega * A.x;
                     let aAcy = -omega * omega * A.y;
+                    let aAx_total = aAtx + aAcx;
+                    let aAy_total = aAty + aAcy;
 
-                    drawArrow(p, A.x, A.y, A.x + aAtx * 0.2 * SCALE, A.y + aAty * 0.2 * SCALE, [0,0,255]);
-                    drawArrow(p, A.x, A.y, A.x + aAcx * 0.2 * SCALE, A.y + aAcy * 0.2 * SCALE, [255,0,0]);
+                    drawArrow(p, A.x, A.y, A.x + aAx_total * 0.2 * SCALE, A.y + aAy_total * 0.2 * SCALE, [255,0,0]);
+
+                    // Calculate angular velocities for full analysis
+                    let rAB = p.createVector(B.x - A.x, B.y - A.y);
+                    let rB = p.createVector(B.x - O4.x, B.y - O4.y);
+                    let vAx = -omega * A.y;
+                    let vAy = omega * A.x;
+
+                    let M = [
+                        [-rAB.y, rB.y],
+                        [rAB.x, -rB.x]
+                    ];
+                    let rhs = [-vAx, -vAy];
+                    let det = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+
+                    if (Math.abs(det) > 0.001) {
+                        let omega3 = (rhs[0]*M[1][1] - rhs[1]*M[0][1]) / det;
+                        let omega4 = (M[0][0]*rhs[1] - M[1][0]*rhs[0]) / det;
+
+                        // Point B acceleration (from rocker link rotation)
+                        // Assume constant angular velocity for rocker (alpha4 ~= 0 for this visualization)
+                        let aBcx = -omega4 * omega4 * rB.x;
+                        let aBcy = -omega4 * omega4 * rB.y;
+
+                        drawArrow(p, B.x, B.y, B.x + aBcx * 0.2 * SCALE, B.y + aBcy * 0.2 * SCALE, [255,0,0]);
+                    }
+
+                    // Ground pivots O1 and O4 have zero acceleration
+                    // Draw small markers to show they were considered
+                    p.fill(100, 255, 100);
+                    p.noStroke();
+                    p.ellipse(O1.x, O1.y, 4, 4);
+                    p.ellipse(O4.x, O4.y, 4, 4);
                 }
 
                 // Display values

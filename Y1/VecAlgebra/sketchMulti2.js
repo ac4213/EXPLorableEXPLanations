@@ -728,18 +728,20 @@ function setupButtonContainer(p) {
     };
     
     function animateTriangleRule() {
-      animationStep += 1 / animationSteps;
+      if (animationStep < 2.1) {
+        animationStep += 1 / animationSteps;
+      }
       tempVectors = [];
-      
+
       if (animationStep <= 1) { // Move both vectors 1 and 2
         const v0 = vectors[vectorOrder[0]];
         const v1 = vectors[vectorOrder[1]];
         const v2 = vectors[vectorOrder[2]];
-        
+
         // Calculate displacement for first vector
         const xdisp = v0.x2 - v0.x1;
         const ydisp = v0.y2 - v0.y1;
-        
+
         // Create temporary vector for second vector
         const point1 = p.createVector(v1.x1 + animationStep * xdisp, v1.y1 + animationStep * ydisp);
         const point2 = p.createVector(v1.x2 + animationStep * xdisp, v1.y2 + animationStep * ydisp);
@@ -747,10 +749,10 @@ function setupButtonContainer(p) {
           gridStep,
           color: v1.col
         }));
-        
+
         // Save the starting point for the next phase of animation
         tempD1 = point1;
-        
+
         // Create temporary vector for third vector
         const point3 = p.createVector(v2.x1 + animationStep * xdisp, v2.y1 + animationStep * ydisp);
         const point4 = p.createVector(v2.x2 + animationStep * xdisp, v2.y2 + animationStep * ydisp);
@@ -758,16 +760,16 @@ function setupButtonContainer(p) {
           gridStep,
           color: v2.col
         }));
-        
-      } else if (animationStep > 1 && animationStep <= 2.1) { // Keep moving third vector
+
+      } else { // animationStep > 1 - Keep moving third vector or show final state
         const v0 = vectors[vectorOrder[0]];
         const v1 = vectors[vectorOrder[1]];
         const v2 = vectors[vectorOrder[2]];
-        
+
         // First displacement (already completed)
         const xdisp1 = v0.x2 - v0.x1;
         const ydisp1 = v0.y2 - v0.y1;
-        
+
         // Keep the second vector in place after first displacement
         const point1 = p.createVector(v1.x1 + xdisp1, v1.y1 + ydisp1);
         const point2 = p.createVector(v1.x2 + xdisp1, v1.y2 + ydisp1);
@@ -775,19 +777,22 @@ function setupButtonContainer(p) {
           gridStep,
           color: v1.col
         }));
-        
-        // Second displacement (in progress)
+
+        // Second displacement (in progress or completed)
         const xdisp2 = v1.x2 - v1.x1;
         const ydisp2 = v1.y2 - v1.y1;
-        
+
+        // Clamp animationStep - 1 to max of 1 to show final state
+        const progress = Math.min(animationStep - 1, 1);
+
         // Move the third vector according to both displacements
         const point3 = p.createVector(
-          v2.x1 + xdisp1 + (animationStep - 1) * xdisp2, 
-          v2.y1 + ydisp1 + (animationStep - 1) * ydisp2
+          v2.x1 + xdisp1 + progress * xdisp2,
+          v2.y1 + ydisp1 + progress * ydisp2
         );
         const point4 = p.createVector(
-          v2.x2 + xdisp1 + (animationStep - 1) * xdisp2, 
-          v2.y2 + ydisp1 + (animationStep - 1) * ydisp2
+          v2.x2 + xdisp1 + progress * xdisp2,
+          v2.y2 + ydisp1 + progress * ydisp2
         );
         tempVectors.push(new Vector(p, point3, point4, {
           gridStep,

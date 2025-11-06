@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Degree of Freedom Vibration - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        /* Page-specific styles for MDOFs layout */
+
+        /* Override the horizontal flexbox layout from uicontrols.css for this page */
+        .simulation-container .controls-panel {
+            display: block;
+            background-color: #f5f5f5;
+            padding: 15px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .controls-grid .control-group {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-group h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #b38600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        .controls-grid .slider-container {
+            margin-bottom: 12px;
+        }
+
+        .controls-grid .slider-container label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .controls-grid .slider-container .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Sliders adapt to column width but leave room for value display */
+        .controls-grid .slider-container input[type="range"] {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .value-display {
+            display: inline-block;
+            font-size: 12px;
+            min-width: 50px;
+            text-align: right;
+            font-weight: bold;
+            color: #b38600;
+            font-family: monospace;
+            flex-shrink: 0;
+        }
+
+        #button-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        #sketch-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Responsive adjustments - maintain 3 columns but adjust padding and font sizes */
+        @media (max-width: 1200px) {
+            .controls-grid .control-group {
+                padding: 10px;
+            }
+
+            .value-display {
+                min-width: 45px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .simulation-container .controls-panel {
+                padding: 6px;
+            }
+
+            .controls-grid {
+                gap: 6px;
+            }
+
+            .controls-grid .control-group {
+                padding: 6px;
+            }
+
+            .control-group h3 {
+                font-size: 11px;
+                margin-bottom: 5px;
+            }
+
+            .controls-grid .slider-container {
+                margin-bottom: 6px;
+            }
+
+            .controls-grid .slider-container label {
+                font-size: 10px;
+            }
+
+            .controls-grid .slider-container .slider-row {
+                gap: 4px;
+            }
+
+            .value-display {
+                font-size: 10px;
+                min-width: 38px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container .controls-panel {
+                padding: 4px;
+            }
+
+            .controls-grid {
+                gap: 4px;
+            }
+
+            .controls-grid .control-group {
+                padding: 4px;
+            }
+
+            .control-group h3 {
+                font-size: 9px;
+                margin-bottom: 3px;
+                padding-bottom: 1px;
+            }
+
+            .controls-grid .slider-container {
+                margin-bottom: 4px;
+            }
+
+            .controls-grid .slider-container label {
+                font-size: 8px;
+                margin-bottom: 1px;
+            }
+
+            .controls-grid .slider-container .slider-row {
+                gap: 3px;
+            }
+
+            .value-display {
+                font-size: 8px;
+                min-width: 32px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .simulation-container .controls-panel {
+                padding: 3px;
+            }
+
+            .controls-grid {
+                gap: 3px;
+            }
+
+            .controls-grid .control-group {
+                padding: 3px;
+            }
+
+            .control-group h3 {
+                font-size: 8px;
+                margin-bottom: 2px;
+                padding-bottom: 1px;
+            }
+
+            .controls-grid .slider-container {
+                margin-bottom: 3px;
+            }
+
+            .controls-grid .slider-container label {
+                font-size: 7px;
+                margin-bottom: 0px;
+            }
+
+            .controls-grid .slider-container .slider-row {
+                gap: 2px;
+            }
+
+            .value-display {
+                font-size: 7px;
+                min-width: 26px;
+            }
+
+            /* Ensure slider knobs remain a good size on small screens */
+            .controls-grid .slider-container input[type="range"]::-webkit-slider-thumb {
+                width: 16px;
+                height: 16px;
+            }
+
+            .controls-grid .slider-container input[type="range"]::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .simulation-container .controls-panel {
+                padding: 2px;
+            }
+
+            .controls-grid {
+                gap: 2px;
+            }
+
+            .controls-grid .control-group {
+                padding: 2px;
+            }
+
+            .control-group h3 {
+                font-size: 7px;
+                margin-bottom: 1px;
+                padding-bottom: 1px;
+                border-bottom-width: 1px;
+            }
+
+            .controls-grid .slider-container {
+                margin-bottom: 2px;
+            }
+
+            .controls-grid .slider-container label {
+                font-size: 6px;
+                margin-bottom: 0px;
+            }
+
+            .controls-grid .slider-container .slider-row {
+                gap: 2px;
+            }
+
+            .value-display {
+                font-size: 6px;
+                min-width: 22px;
+            }
+
+            /* Slider knobs smaller on very small screens */
+            .controls-grid .slider-container input[type="range"]::-webkit-slider-thumb {
+                width: 14px;
+                height: 14px;
+            }
+
+            .controls-grid .slider-container input[type="range"]::-moz-range-thumb {
+                width: 14px;
+                height: 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .simulation-container .controls-panel {
+                padding: 1px;
+            }
+
+            .controls-grid {
+                gap: 1px;
+            }
+
+            .controls-grid .control-group {
+                padding: 1px;
+            }
+
+            .control-group h3 {
+                font-size: 6px;
+                margin-bottom: 1px;
+                padding-bottom: 0px;
+                border-bottom-width: 1px;
+            }
+
+            .controls-grid .slider-container {
+                margin-bottom: 2px;
+            }
+
+            .controls-grid .slider-container label {
+                font-size: 5px;
+                margin-bottom: 0px;
+            }
+
+            .controls-grid .slider-container .slider-row {
+                gap: 1px;
+            }
+
+            .value-display {
+                font-size: 5px;
+                min-width: 18px;
+            }
+
+            /* Slider knobs even smaller on extremely small screens */
+            .controls-grid .slider-container input[type="range"]::-webkit-slider-thumb {
+                width: 12px;
+                height: 12px;
+            }
+
+            .controls-grid .slider-container input[type="range"]::-moz-range-thumb {
+                width: 12px;
+                height: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Multi-Degree of Freedom Vibration</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Multi-DOF Systems</h2>
+        <p>Multi-degree of freedom (MDOF) systems are mechanical systems that require more than one coordinate to describe their motion. Unlike SDOF systems, MDOF systems exhibit coupled behavior where motion in one coordinate affects motion in others.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> A 3-DOF system requires three independent coordinates to describe its configuration. Each mass can move independently, but they are coupled through springs and dampers, creating complex vibrational behavior with multiple natural frequencies.</p>
+        </div>
+
+        <h3>Equations of Motion</h3>
+        <p>For a 3-DOF undamped system with masses \(m_1, m_2, m_3\) and springs \(k_1, k_2, k_3, k_4\), the equations of motion are:</p>
+        <div class="equation-box">
+            <p>\[m_1\ddot{x}_1 + (k_1 + k_2)x_1 - k_2x_2 = 0\]</p>
+            <p>\[m_2\ddot{x}_2 - k_2x_1 + (k_2 + k_3)x_2 - k_3x_3 = 0\]</p>
+            <p>\[m_3\ddot{x}_3 - k_3x_2 + (k_3 + k_4)x_3 = 0\]</p>
+            <p>In matrix form:</p>
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+            <p>where the mass matrix \(\mathbf{M}\) and stiffness matrix \(\mathbf{K}\) are:</p>
+            <p>\[\mathbf{M} = \begin{bmatrix} m_1 & 0 & 0 \\ 0 & m_2 & 0 \\ 0 & 0 & m_3 \end{bmatrix}, \quad \mathbf{K} = \begin{bmatrix} k_1+k_2 & -k_2 & 0 \\ -k_2 & k_2+k_3 & -k_3 \\ 0 & -k_3 & k_3+k_4 \end{bmatrix}\]</p>
+        </div>
+
+        <h3>Modal Analysis</h3>
+        <p>The key to understanding MDOF systems is modal analysis, which decomposes the coupled motion into independent modal coordinates.</p>
+
+        <div class="equation-box">
+            <p><strong>Eigenvalue Problem:</strong></p>
+            <p>\[(\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\]</p>
+            <p>Solving this gives:</p>
+            <ul>
+                <li><strong>Eigenvalues:</strong> \(\omega_1^2, \omega_2^2, \omega_3^2\) (natural frequencies squared)</li>
+                <li><strong>Eigenvectors:</strong> \(\mathbf{\Phi}_1, \mathbf{\Phi}_2, \mathbf{\Phi}_3\) (mode shapes)</li>
+            </ul>
+        </div>
+
+        <h3>Mode Shapes</h3>
+        <p>Each mode shape represents a particular pattern of vibration where all masses oscillate at the same frequency with fixed amplitude ratios:</p>
+        <ul>
+            <li><strong>First Mode:</strong> Usually has all masses moving in phase (lowest frequency)</li>
+            <li><strong>Second Mode:</strong> Shows one or more sign changes (intermediate frequency)</li>
+            <li><strong>Third Mode:</strong> More complex pattern with multiple sign changes (highest frequency)</li>
+        </ul>
+
+        <h3>Orthogonality of Mode Shapes</h3>
+        <p>One of the most important properties of mode shapes is their orthogonality with respect to both the mass and stiffness matrices. This property is fundamental to modal analysis and allows us to decouple the system equations.</p>
+
+        <div class="equation-box">
+            <p><strong>Orthogonality Conditions:</strong></p>
+            <p>For any two distinct mode shapes \(\mathbf{\Phi}_i\) and \(\mathbf{\Phi}_j\) where \(i \neq j\):</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{M} \mathbf{\Phi}_j = 0 \quad \text{(Mass orthogonality)}\]</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{K} \mathbf{\Phi}_j = 0 \quad \text{(Stiffness orthogonality)}\]</p>
+            <p>These conditions are often normalized such that:</p>
+            <p>\[\mathbf{\Phi}_i^T \mathbf{M} \mathbf{\Phi}_i = 1 \quad \text{and} \quad \mathbf{\Phi}_i^T \mathbf{K} \mathbf{\Phi}_i = \omega_i^2\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Why Orthogonality Matters:</strong> The orthogonality conditions allow us to transform the coupled system \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\) into \(n\) independent SDOF equations in modal coordinates. This is the essence of modal decomposition and makes solving MDOF systems tractable.</p>
+        </div>
+
+        <p><strong>Proof of Orthogonality:</strong> Consider two mode shapes satisfying the eigenvalue equations:</p>
+        <div class="equation-box">
+            <p>\[\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{M}\mathbf{\Phi}_i\]</p>
+            <p>\[\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{M}\mathbf{\Phi}_j\]</p>
+            <p>Pre-multiplying the first equation by \(\mathbf{\Phi}_j^T\) and the second by \(\mathbf{\Phi}_i^T\), then using the symmetry of \(\mathbf{M}\) and \(\mathbf{K}\), we get:</p>
+            <p>\[(\omega_i^2 - \omega_j^2)\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\]</p>
+            <p>For distinct natural frequencies (\(\omega_i \neq \omega_j\)), this implies \(\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\).</p>
+        </div>
+
+        <h3>Modal Decomposition</h3>
+        <div class="equation-box">
+            <p>Physical coordinates relate to modal coordinates by:</p>
+            <p>\[\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\]</p>
+            <p>For the undamped case, each modal equation becomes:</p>
+            <p>\[\ddot{q}_i + \omega_i^2 q_i = 0\]</p>
+            <p>This is identical to an undamped SDOF system!</p>
+        </div>
+
+        <h3>Damping in MDOF Systems</h3>
+        <p>In real systems, damping is always present. However, general damping matrices make modal decomposition ineffective because the modal equations remain coupled through the damping terms.</p>
+
+        <h4>Proportional (Rayleigh) Damping</h4>
+        <p>A special case that preserves the advantage of modal decomposition is <strong>proportional damping</strong> (also called Rayleigh damping), where the damping matrix is a linear combination of the mass and stiffness matrices:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{C} = \alpha \mathbf{M} + \beta \mathbf{K}\]</p>
+            <p>where \(\alpha\) and \(\beta\) are Rayleigh damping coefficients.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Key Property:</strong> With proportional damping, the mode shapes remain the same as for the undamped system, and the modal equations are decoupled. Each modal damping ratio becomes:</p>
+            <p>\[\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\]</p>
+        </div>
+
+        <p><strong>Determining Rayleigh Coefficients:</strong> If we know the damping ratios \(\zeta_i\) and \(\zeta_j\) at two different frequencies \(\omega_i\) and \(\omega_j\), we can solve for \(\alpha\) and \(\beta\):</p>
+
+        <div class="equation-box">
+            <p>\[\begin{bmatrix} \frac{1}{2\omega_i} & \frac{\omega_i}{2} \\ \frac{1}{2\omega_j} & \frac{\omega_j}{2} \end{bmatrix} \begin{bmatrix} \alpha \\ \beta \end{bmatrix} = \begin{bmatrix} \zeta_i \\ \zeta_j \end{bmatrix}\]</p>
+            <p>Solving this gives:</p>
+            <p>\[\alpha = \frac{2\omega_i\omega_j(\zeta_i\omega_j - \zeta_j\omega_i)}{\omega_j^2 - \omega_i^2}\]</p>
+            <p>\[\beta = \frac{2(\zeta_j\omega_j - \zeta_i\omega_i)}{\omega_j^2 - \omega_i^2}\]</p>
+        </div>
+
+        <p><strong>Damped Modal Equations:</strong> With proportional damping, the system equations in matrix form are:</p>
+        <div class="equation-box">
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\]</p>
+            <p>After modal transformation, each mode satisfies:</p>
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = 0\]</p>
+            <p>This is identical to a damped SDOF system with solution:</p>
+            <p>\[q_i(t) = e^{-\zeta_i\omega_i t}\left(A_i\cos(\omega_{di}t) + B_i\sin(\omega_{di}t)\right)\]</p>
+            <p>where \(\omega_{di} = \omega_i\sqrt{1-\zeta_i^2}\) is the damped natural frequency.</p>
+        </div>
+
+        <h3>Forced Vibration of MDOF Systems</h3>
+        <p>When external forces are applied to an MDOF system, the equations of motion become:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{M}\ddot{\mathbf{x}} + \mathbf{C}\dot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{f}(t)\]</p>
+            <p>where \(\mathbf{f}(t) = [f_1(t), f_2(t), f_3(t)]^T\) is the vector of external forces applied to each mass.</p>
+        </div>
+
+        <h4>Modal Transformation for Forced Response</h4>
+        <p>Using the modal transformation \(\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t)\) and pre-multiplying by \(\mathbf{\Phi}^T\), we obtain decoupled modal equations:</p>
+
+        <div class="equation-box">
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = Q_i(t)\]</p>
+            <p>where the modal force is:</p>
+            <p>\[Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\]</p>
+        </div>
+
+        <h4>Harmonic Forcing</h4>
+        <p>For harmonic excitation \(\mathbf{f}(t) = \mathbf{F}_0\sin(\Omega t)\), where \(\Omega\) is the forcing frequency, each modal equation becomes:</p>
+
+        <div class="equation-box">
+            <p>\[\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = Q_{i0}\sin(\Omega t)\]</p>
+            <p>where \(Q_{i0} = \mathbf{\Phi}_i^T\mathbf{F}_0\).</p>
+            <p>The steady-state solution for each modal coordinate is:</p>
+            <p>\[q_i(t) = \frac{Q_{i0}/\omega_i^2}{\sqrt{(1-r_i^2)^2 + (2\zeta_i r_i)^2}}\sin(\Omega t - \phi_i)\]</p>
+            <p>where \(r_i = \Omega/\omega_i\) is the frequency ratio and \(\phi_i = \tan^{-1}\left(\frac{2\zeta_i r_i}{1-r_i^2}\right)\) is the phase angle.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Resonance Phenomenon:</strong> Resonance occurs when the forcing frequency \(\Omega\) approaches one of the natural frequencies \(\omega_i\). At resonance, the amplitude of that particular mode becomes very large (theoretically infinite for undamped systems), and that mode dominates the response. This is why it's critical to avoid operating machinery at natural frequencies.</p>
+        </div>
+
+        <h4>Modal Superposition</h4>
+        <p>The total physical response is obtained by summing all modal contributions:</p>
+
+        <div class="equation-box">
+            <p>\[\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\]</p>
+            <p>Each mode contributes based on:</p>
+            <ul>
+                <li>How close the forcing frequency is to that mode's natural frequency (resonance effect)</li>
+                <li>The magnitude of the modal force \(Q_{i0}\) (participation factor)</li>
+                <li>The damping ratio \(\zeta_i\) of that mode</li>
+            </ul>
+        </div>
+
+        <p><strong>General Forcing:</strong> For arbitrary time-varying forces \(\mathbf{f}(t)\), the Duhamel integral (convolution) can be used for each modal equation:</p>
+
+        <div class="equation-box">
+            <p>\[q_i(t) = \frac{1}{\omega_{di}}\int_0^t Q_i(\tau)e^{-\zeta_i\omega_i(t-\tau)}\sin(\omega_{di}(t-\tau))d\tau\]</p>
+            <p>where \(\omega_{di} = \omega_i\sqrt{1-\zeta_i^2}\) is the damped natural frequency.</p>
+        </div>
+    </div>
+
+    <div class="simulation-container">
+        <h2>Interactive 3-DOF Vibration Simulation</h2>
+        <p>Explore how changing masses, spring stiffnesses, and initial conditions affects the vibrational behavior. Observe both modal and physical responses.</p>
+
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="control-group">
+                    <h3>Masses (kg)</h3>
+                    <div class="slider-container">
+                        <label for="m1">m₁:</label>
+                        <div class="slider-row">
+                            <input type="range" id="m1" min="0.1" max="10" step="0.1" value="3.0">
+                            <span id="m1-value" class="value-display">3.0</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="m2">m₂:</label>
+                        <div class="slider-row">
+                            <input type="range" id="m2" min="0.1" max="10" step="0.1" value="1.0">
+                            <span id="m2-value" class="value-display">1.0</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="m3">m₃:</label>
+                        <div class="slider-row">
+                            <input type="range" id="m3" min="0.1" max="10" step="0.1" value="2.0">
+                            <span id="m3-value" class="value-display">2.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Spring Stiffnesses (N/m)</h3>
+                    <div class="slider-container">
+                        <label for="k1">k₁:</label>
+                        <div class="slider-row">
+                            <input type="range" id="k1" min="10000" max="500000" step="10000" value="100000">
+                            <span id="k1-value" class="value-display">100e3</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="k2">k₂:</label>
+                        <div class="slider-row">
+                            <input type="range" id="k2" min="10000" max="500000" step="10000" value="200000">
+                            <span id="k2-value" class="value-display">200e3</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="k3">k₃:</label>
+                        <div class="slider-row">
+                            <input type="range" id="k3" min="10000" max="500000" step="10000" value="200000">
+                            <span id="k3-value" class="value-display">200e3</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="k4">k₄:</label>
+                        <div class="slider-row">
+                            <input type="range" id="k4" min="0" max="500000" step="10000" value="100000">
+                            <span id="k4-value" class="value-display">100e3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Initial Conditions & Damping</h3>
+                    <div class="slider-container">
+                        <label for="x1">x₁(0):</label>
+                        <div class="slider-row">
+                            <input type="range" id="x1" min="-1" max="1" step="0.1" value="1.0">
+                            <span id="x1-value" class="value-display">1.0</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="x2">x₂(0):</label>
+                        <div class="slider-row">
+                            <input type="range" id="x2" min="-1" max="1" step="0.1" value="0.0">
+                            <span id="x2-value" class="value-display">0.0</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="x3">x₃(0):</label>
+                        <div class="slider-row">
+                            <input type="range" id="x3" min="-1" max="1" step="0.1" value="0.0">
+                            <span id="x3-value" class="value-display">0.0</span>
+                        </div>
+                    </div>
+                    <div class="slider-container">
+                        <label for="beta">Damping (β):</label>
+                        <div class="slider-row">
+                            <input type="range" id="beta" min="0" max="0.01" step="0.0001" value="0.001">
+                            <span id="beta-value" class="value-display">0.001</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="button-container">
+            <button id="animate-btn">Start Animation</button>
+            <button id="reset-btn">Reset</button>
+        </div>
+
+        <div id="sketch-container"></div>
+    </div>
+
+    <script>
+        // Global sketch variables
+        let sketch = new p5(function(p) {
+            // Animation variables
+            let animating = false;
+            let t = 0;
+            let dt = 0.001;
+            let maxTime = 0.25;
+            let animationSpeed = 0.5;
+            
+            // System parameters
+            let m1 = 3.0;
+            let m2 = 1.0;
+            let m3 = 2.0;
+            let k1 = 100000;
+            let k2 = 200000;
+            let k3 = 200000;
+            let k4 = 100000;
+            let beta = 0.001;
+            let x0 = [1.0, 0.0, 0.0];
+            let v0 = [0.0, 0.0, 0.0];
+            
+            // Layout variables
+            let canvasWidth = 950;
+            let canvasHeight = 700;
+            let boxSize = 40;
+            let boxSpacing = 100;
+            let yPosition = 120;
+            let plotWidth = 400;
+            let plotHeight = 200;
+            
+            // Solution data
+            let timeArray = [];
+            let Omegan = [];
+            let Omegad = [];
+            let zeta = [];
+            let X = [];
+            let modalA = [];
+            let modalB = [];
+            let modalData = [[], [], []];
+            let physicalData = [[], [], []];
+            let needsRecalculation = true;
+            
+            p.setup = function() {
+                p.createCanvas(canvasWidth, canvasHeight);
+                setupSliders();
+                setupButtons();
+                setupSystem();
+            };
+            
+            p.draw = function() {
+                p.background(255);
+                
+                if (needsRecalculation) {
+                    setupSystem();
+                    needsRecalculation = false;
+                }
+                
+                if (animating) {
+                    t += dt * animationSpeed;
+                    if (t > maxTime) t = 0;
+                }
+                
+                let timeIndex = Math.floor(t / dt);
+                if (timeIndex >= timeArray.length) timeIndex = timeArray.length - 1;
+                
+                // Scale factor for animation
+                let sf = 150;
+                
+                try {
+                    // Modal plot (top left)
+                    drawModalPlot(50, yPosition, timeArray, modalData, t);
+                    
+                    // Physical plot (top right)
+                    drawPhysicalPlot(500, yPosition, timeArray, physicalData, t);
+                    
+                    // Animation (bottom)
+                    drawAnimation(
+                        50,
+                        420,
+                        sf * physicalData[0][timeIndex], 
+                        sf * physicalData[1][timeIndex], 
+                        sf * physicalData[2][timeIndex],
+                        x0 // keep your existing IC readout unchanged
+                    );
+                } catch (error) {
+                    console.error("Error in draw:", error);
+                    p.fill(255, 0, 0);
+                    p.textSize(14);
+                    p.text("Error: " + error.message, 20, 20);
+                }
+            };
+            
+            function setupButtons() {
+                document.getElementById("animate-btn").addEventListener("click", function() {
+                    animating = !animating;
+                    this.textContent = animating ? "Stop Animation" : "Start Animation";
+                });
+                
+                document.getElementById("reset-btn").addEventListener("click", function() {
+                    animating = false;
+                    document.getElementById("animate-btn").textContent = "Start Animation";
+                    t = 0;
+
+                    // Reset all slider values to their defaults
+                    m1 = 3.0;
+                    m2 = 1.0;
+                    m3 = 2.0;
+                    k1 = 100000;
+                    k2 = 200000;
+                    k3 = 200000;
+                    k4 = 100000;
+                    x0[0] = 1.0;
+                    x0[1] = 0.0;
+                    x0[2] = 0.0;
+                    beta = 0.001;
+
+                    // Update slider elements
+                    document.getElementById("m1").value = m1;
+                    document.getElementById("m2").value = m2;
+                    document.getElementById("m3").value = m3;
+                    document.getElementById("k1").value = k1;
+                    document.getElementById("k2").value = k2;
+                    document.getElementById("k3").value = k3;
+                    document.getElementById("k4").value = k4;
+                    document.getElementById("x1").value = x0[0];
+                    document.getElementById("x2").value = x0[1];
+                    document.getElementById("x3").value = x0[2];
+                    document.getElementById("beta").value = beta;
+
+                    // Update display values
+                    document.getElementById("m1-value").textContent = m1.toFixed(1);
+                    document.getElementById("m2-value").textContent = m2.toFixed(1);
+                    document.getElementById("m3-value").textContent = m3.toFixed(1);
+                    document.getElementById("k1-value").textContent = (k1/1000).toFixed(0) + "e3";
+                    document.getElementById("k2-value").textContent = (k2/1000).toFixed(0) + "e3";
+                    document.getElementById("k3-value").textContent = (k3/1000).toFixed(0) + "e3";
+                    document.getElementById("k4-value").textContent = (k4/1000).toFixed(0) + "e3";
+                    document.getElementById("x1-value").textContent = x0[0].toFixed(1);
+                    document.getElementById("x2-value").textContent = x0[1].toFixed(1);
+                    document.getElementById("x3-value").textContent = x0[2].toFixed(1);
+                    document.getElementById("beta-value").textContent = beta.toFixed(4);
+
+                    needsRecalculation = true;
+                });
+
+            }
+            
+            function setupSliders() {
+                // Mass sliders
+                document.getElementById("m1").addEventListener("input", function() {
+                    m1 = parseFloat(this.value);
+                    document.getElementById("m1-value").textContent = m1.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("m2").addEventListener("input", function() {
+                    m2 = parseFloat(this.value);
+                    document.getElementById("m2-value").textContent = m2.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("m3").addEventListener("input", function() {
+                    m3 = parseFloat(this.value);
+                    document.getElementById("m3-value").textContent = m3.toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                // Stiffness sliders
+                document.getElementById("k1").addEventListener("input", function() {
+                    k1 = parseFloat(this.value);
+                    document.getElementById("k1-value").textContent = (k1/1000).toFixed(0) + "e3";
+                    needsRecalculation = true;
+                });
+
+                document.getElementById("k2").addEventListener("input", function() {
+                    k2 = parseFloat(this.value);
+                    document.getElementById("k2-value").textContent = (k2/1000).toFixed(0) + "e3";
+                    needsRecalculation = true;
+                });
+
+                document.getElementById("k3").addEventListener("input", function() {
+                    k3 = parseFloat(this.value);
+                    document.getElementById("k3-value").textContent = (k3/1000).toFixed(0) + "e3";
+                    needsRecalculation = true;
+                });
+
+                document.getElementById("k4").addEventListener("input", function() {
+                    k4 = parseFloat(this.value);
+                    document.getElementById("k4-value").textContent = (k4/1000).toFixed(0) + "e3";
+                    needsRecalculation = true;
+                });
+                
+                // Initial conditions sliders
+                document.getElementById("x1").addEventListener("input", function() {
+                    x0[0] = parseFloat(this.value);
+                    document.getElementById("x1-value").textContent = x0[0].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("x2").addEventListener("input", function() {
+                    x0[1] = parseFloat(this.value);
+                    document.getElementById("x2-value").textContent = x0[1].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                document.getElementById("x3").addEventListener("input", function() {
+                    x0[2] = parseFloat(this.value);
+                    document.getElementById("x3-value").textContent = x0[2].toFixed(1);
+                    needsRecalculation = true;
+                });
+                
+                // Damping slider
+                document.getElementById("beta").addEventListener("input", function() {
+                    beta = parseFloat(this.value);
+                    document.getElementById("beta-value").textContent = beta.toFixed(4);
+                    needsRecalculation = true;
+                });
+            }
+            
+            function setupSystem() {
+                // Reset previous data
+                timeArray = [];
+                modalData = [[], [], []];
+                physicalData = [[], [], []];
+                t = 0; // ensure we start from initial frame
+                
+                try {
+                    // Mass matrix
+                    const M = [
+                        [m1, 0, 0],
+                        [0, m2, 0],
+                        [0, 0, m3]
+                    ];
+                    
+                    // Stiffness matrix
+                    const K = [
+                        [k1 + k2, -k2, 0],
+                        [-k2, k2 + k3, -k3],
+                        [0, -k3, k3 + k4]
+                    ];
+                    
+                    // Solve eigenvalue problem
+                    const Msqrt_inv = [
+                        [1/Math.sqrt(M[0][0]), 0, 0],
+                        [0, 1/Math.sqrt(M[1][1]), 0],
+                        [0, 0, 1/Math.sqrt(M[2][2])]
+                    ];
+                    
+                    const A1 = numeric.dot(Msqrt_inv, K);
+                    const A = numeric.dot(A1, Msqrt_inv);
+                    
+                    // Get eigenvalues and eigenvectors (A is symmetric -> eig.E is orthonormal)
+                    const eig = numeric.eig(A);
+                    
+                    // Sort eigenvalues and eigenvectors
+                    const indices = [0, 1, 2];
+                    indices.sort((a, b) => eig.lambda.x[a] - eig.lambda.x[b]);
+                    
+                    // Extract sorted eigenvalues (natural frequencies squared)
+                    const omega_squared = indices.map(i => eig.lambda.x[i]);
+                    Omegan = omega_squared.map(w2 => Math.sqrt(Math.abs(w2)));
+                    
+                    // Calculate damping ratios
+                    zeta = Omegan.map(omega => beta * omega / 2);
+                    
+                    // Calculate damped natural frequencies
+                    Omegad = Omegan.map((omega, i) => omega * Math.sqrt(Math.max(0, 1 - zeta[i] * zeta[i])));
+                    
+                    // Extract eigenvectors and transform them back to physical coordinates:
+                    // X = M^{-1/2} * Y  (mass-orthonormal: X^T M X = I)
+                    X = [[], [], []];
+                    for (let i = 0; i < 3; i++) {
+                        X[i] = [];
+                        for (let j = 0; j < 3; j++) {
+                            const eigenvectorIdx = indices[j];
+                            X[i][j] = eig.E.x[i][eigenvectorIdx] * Msqrt_inv[i][i];
+                        }
+                    }
+                    
+                    // IMPORTANT: keep mass-orthonormal scaling (do NOT re-normalize Euclidean).
+                    // Only flip sign for consistency if desired.
+                    for (let j = 0; j < 3; j++) {
+                        if (X[0][j] > 0) {
+                            X[0][j] *= -1;
+                            X[1][j] *= -1;
+                            X[2][j] *= -1;
+                        }
+                    }
+                    
+                    // ----- Correct mass-weighted projection for initial conditions -----
+                    const XT = numeric.transpose(X);
+                    const Mx0 = numeric.dot(M, x0);
+                    const Mv0 = numeric.dot(M, v0);
+                    const q0 = numeric.dot(XT, Mx0);
+                    const p0 = numeric.dot(XT, Mv0);
+                    // -------------------------------------------------------------------
+                    
+                    // Modal parameters for damped free oscillation
+                    modalA = [];
+                    modalB = [];
+                    for (let i = 0; i < 3; i++) {
+                        if (zeta[i] < 1) {
+                            // Underdamped: compute coefficients for sin/cos form
+                            modalA.push((p0[i] + zeta[i] * Omegan[i] * q0[i]) / Omegad[i]);
+                            modalB.push(q0[i]);
+                        } else if (zeta[i] === 1) {
+                            // Critically damped: q(t) = (C1 + C2*t)*exp(-ω_n*t)
+                            modalA.push(q0[i]); // C1
+                            modalB.push(p0[i] + Omegan[i] * q0[i]); // C2
+                        } else {
+                            // Overdamped: compute coefficients for exponential form
+                            // Two real roots: r1,r2 = -ζω_n ± ω_n*sqrt(ζ²-1)
+                            const sqrtTerm = Omegan[i] * Math.sqrt(zeta[i] * zeta[i] - 1);
+                            const r1 = -zeta[i] * Omegan[i] + sqrtTerm;
+                            const r2 = -zeta[i] * Omegan[i] - sqrtTerm;
+                            // q(t) = C1*exp(r1*t) + C2*exp(r2*t)
+                            // IC: q(0) = C1 + C2 = q0[i]
+                            //     q'(0) = C1*r1 + C2*r2 = p0[i]
+                            // Solving: C1 = (p0[i] - r2*q0[i])/(r1 - r2)
+                            //          C2 = (r1*q0[i] - p0[i])/(r1 - r2)
+                            const C1 = (p0[i] - r2 * q0[i]) / (r1 - r2);
+                            const C2 = (r1 * q0[i] - p0[i]) / (r1 - r2);
+                            modalA.push({C1, C2, r1, r2}); // Store all parameters
+                            modalB.push(null); // Not used for overdamped
+                        }
+                    }
+
+                    // Precompute data for plots
+                    for (let time = 0; time <= maxTime; time += dt) {
+                        timeArray.push(time);
+
+                        // Modal solutions
+                        const q_t = [0, 0, 0];
+                        for (let i = 0; i < 3; i++) {
+                            if (zeta[i] < 1) {
+                                // Underdamped
+                                const decay = Math.exp(-zeta[i] * Omegan[i] * time);
+                                q_t[i] = modalB[i] * decay * Math.cos(Omegad[i] * time) +
+                                         modalA[i] * decay * Math.sin(Omegad[i] * time);
+                            } else if (zeta[i] === 1) {
+                                // Critically damped: q(t) = (C1 + C2*t)*exp(-ω_n*t)
+                                const decay = Math.exp(-Omegan[i] * time);
+                                q_t[i] = (modalA[i] + modalB[i] * time) * decay;
+                            } else {
+                                // Overdamped: q(t) = C1*exp(r1*t) + C2*exp(r2*t)
+                                const params = modalA[i];
+                                q_t[i] = params.C1 * Math.exp(params.r1 * time) +
+                                         params.C2 * Math.exp(params.r2 * time);
+                            }
+
+                            modalData[i].push(q_t[i]);
+                        }
+
+                        // Physical solutions - x(t) = X * q(t)
+                        const x_t = numeric.dot(X, q_t);
+                        for (let i = 0; i < 3; i++) {
+                            physicalData[i].push(x_t[i]);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error in setupSystem:", error);
+                }
+            }
+            
+            function drawModalPlot(x, y, timeData, valueData, currentTime) {
+                p.push();
+                p.translate(x, y);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Modal Solution", plotWidth/2, -50);
+                
+                // Draw plot background
+                p.fill(240);
+                p.rect(0, -plotHeight/2, plotWidth, plotHeight);
+                
+                // Y-axis limits
+                let yMin = -1.5;
+                let yMax = 1.0;
+                
+                // Draw grid
+                p.stroke(200);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, -plotHeight/2, xPos, plotHeight/2);
+                }
+                for (let i = Math.floor(yMin); i <= Math.ceil(yMax); i++) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(0, yPos, plotWidth, yPos);
+                }
+                
+                // Draw axes - x-axis at bottom
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, plotHeight/2, plotWidth, plotHeight/2);  // x-axis
+                p.line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+                
+                // Draw ticks and labels on x-axis
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, plotHeight/2 - 3, xPos, plotHeight/2 + 3);
+                    p.text((i * 0.025).toFixed(2), xPos, plotHeight/2 + 15);
+                }
+                
+                // Draw ticks and labels on y-axis
+                p.textAlign(p.RIGHT);
+                p.fill(0);
+                for (let i = -1.5; i <= 1.0; i += 0.5) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i.toFixed(1), -8, yPos + 3);
+                }
+                
+                // Draw data lines
+                const colors = ['blue', 'red', 'green'];
+                
+                for (let i = 0; i < valueData.length; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let j = 0; j < timeData.length; j++) {
+                        let xPos = p.map(timeData[j], 0, maxTime, 0, plotWidth);
+                        let yPos = p.map(valueData[i][j], yMin, yMax, plotHeight/2, -plotHeight/2);
+                        p.vertex(xPos, yPos);
+                    }
+                    p.endShape();
+                }
+                
+                // Draw legend
+                const legendLabels = ['q₁(t)', 'q₂(t)', 'q₃(t)'];
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                
+                const legendX = plotWidth - 80;
+                const legendY = -plotHeight/2 + 20;
+                
+                for (let i = 0; i < 3; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.line(legendX, legendY + i * 15, legendX + 20, legendY + i * 15);
+                    p.fill(0);
+                    p.noStroke();
+                    p.text(legendLabels[i], legendX + 25, legendY + i * 15 + 3);
+                }
+                
+                // Draw vertical time indicator
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                let timePos = p.map(currentTime, 0, maxTime, 0, plotWidth);
+                p.line(timePos, -plotHeight/2, timePos, plotHeight/2);
+                p.drawingContext.setLineDash([]);
+                
+                p.pop();
+            }
+            
+            function drawPhysicalPlot(x, y, timeData, valueData, currentTime) {
+                p.push();
+                p.translate(x, y);
+                
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Physical Solution", plotWidth/2, -50);
+                
+                // Draw plot background
+                p.fill(240);
+                p.rect(0, -plotHeight/2, plotWidth, plotHeight);
+                
+                // Y-axis limits
+                let yMin = -0.6;
+                let yMax = 1.0;
+                
+                // Draw grid
+                p.stroke(200);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, -plotHeight/2, xPos, plotHeight/2);
+                }
+                for (let i = Math.floor(yMin); i <= Math.ceil(yMax); i++) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(0, yPos, plotWidth, yPos);
+                }
+                
+                // Draw axes - x-axis at bottom
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, plotHeight/2, plotWidth, plotHeight/2);  // x-axis
+                p.line(0, -plotHeight/2, 0, plotHeight/2);  // y-axis
+                
+                // Draw ticks and labels on x-axis
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i * 0.025, 0, maxTime, 0, plotWidth);
+                    p.line(xPos, plotHeight/2 - 3, xPos, plotHeight/2 + 3);
+                    p.text((i * 0.025).toFixed(2), xPos, plotHeight/2 + 15);
+                }
+                
+                // Draw ticks and labels on y-axis
+                p.textAlign(p.RIGHT);
+                p.fill(0);
+                for (let i = -0.6; i <= 1.0; i += 0.2) {
+                    let yPos = p.map(i, yMin, yMax, plotHeight/2, -plotHeight/2);
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i.toFixed(1), -8, yPos + 3);
+                }
+                
+                // Draw data lines
+                const colors = ['#D42323', '#FF8A00', '#7840CC']; // Red, Orange, Purple
+                
+                for (let i = 0; i < valueData.length; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let j = 0; j < timeData.length; j++) {
+                        let xPos = p.map(timeData[j], 0, maxTime, 0, plotWidth);
+                        let yPos = p.map(valueData[i][j], yMin, yMax, plotHeight/2, -plotHeight/2);
+                        p.vertex(xPos, yPos);
+                    }
+                    p.endShape();
+                }
+                
+                // Draw legend
+                const legendLabels = ['x₁(t)', 'x₂(t)', 'x₃(t)'];
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                
+                const legendX = plotWidth - 80;
+                const legendY = -plotHeight/2 + 20;
+                
+                for (let i = 0; i < 3; i++) {
+                    p.stroke(colors[i]);
+                    p.strokeWeight(2);
+                    p.line(legendX, legendY + i * 15, legendX + 20, legendY + i * 15);
+                    p.fill(0);
+                    p.noStroke();
+                    p.text(legendLabels[i], legendX + 25, legendY + i * 15 + 3);
+                }
+                
+                // Draw vertical time indicator
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                let timePos = p.map(currentTime, 0, maxTime, 0, plotWidth);
+                p.line(timePos, -plotHeight/2, timePos, plotHeight/2);
+                p.drawingContext.setLineDash([]);
+                
+                p.pop();
+            }
+            
+            function drawAnimation(x, y, disp1, disp2, disp3, x0_now) {
+                p.push();
+                p.translate(x, y);
+                
+                // Draw coordinate system
+                p.stroke(200);
+                p.strokeWeight(1);
+                
+                // Draw grid
+                p.push();
+                p.stroke(230)
+                for (let i = 0; i <= 20; i += 2) {
+                    p.line(i * 40, -150, i * 40, 150);
+                }
+                for (let i = -3; i <= 3; i++) {
+                    p.line(0, i * 50, 800, i * 50);
+                }
+                p.pop();
+                
+                // Draw main axes
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, 0, 800, 0);  // x-axis
+                p.line(0, -150, 0, 150);  // y-axis
+                
+                // Draw ticks and labels
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                for (let i = 0; i <= 20; i += 2) {
+                    let xPos = i * 40;
+                    p.line(xPos, -3, xPos, 3);
+                    p.text(i, xPos, 15);
+                }
+                
+                p.textAlign(p.RIGHT);
+                for (let i = -3; i <= 3; i++) {
+                    let yPos = i * 50;
+                    p.line(-3, yPos, 3, yPos);
+                    p.text(i, -8, yPos + 3);
+                }
+                
+                // Base positions for boxes
+                let baseX1 = 80;
+                let baseX2 = 280;
+                let baseX3 = 480;
+                let baseY = -20;
+                
+                // Display system parameters
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text("m₁=" + m1.toFixed(1) + " kg", baseX1 + boxSize/2, baseY - 20);
+                p.text("m₂=" + m2.toFixed(1) + " kg", baseX2 + boxSize/2, baseY - 20);
+                p.text("m₃=" + m3.toFixed(1) + " kg", baseX3 + boxSize/2, baseY - 20);
+                
+                p.text("k₁=" + (k1/1000).toFixed(0) + " kN/m", baseX1/2, baseY + 80);
+                p.text("k₂=" + (k2/1000).toFixed(0) + " kN/m", (baseX1 + boxSize + baseX2)/2, baseY + 80);
+                p.text("k₃=" + (k3/1000).toFixed(0) + " kN/m", (baseX2 + boxSize + baseX3)/2, baseY + 80);
+                p.text("k₄=" + (k4/1000).toFixed(0) + " kN/m", baseX3 + boxSize + 60, baseY + 80);
+                
+                // Draw static boxes (dashed)
+                drawDashedRect(baseX1, baseY, boxSize, boxSize);
+                drawDashedRect(baseX2, baseY, boxSize, boxSize);
+                drawDashedRect(baseX3, baseY, boxSize, boxSize);
+                
+                // Draw springs
+                drawSpring(0, 0, baseX1, 0);
+                drawSpring(baseX1 + boxSize, 0, baseX2, 0);
+                drawSpring(baseX2 + boxSize, 0, baseX3, 0);
+                drawSpring(baseX3 + boxSize, 0, 800, 0);
+                
+                // Draw dynamic boxes
+                // First mass (red)
+                p.push();
+                p.stroke(p.color(212, 35, 35));
+                p.strokeWeight(2);
+                p.noFill();
+                p.rect(baseX1 + disp1, baseY, boxSize, boxSize);
+                
+                // Second mass (orange)
+                p.stroke(p.color(255, 138, 0));
+                p.rect(baseX2 + disp2, baseY, boxSize, boxSize);
+                
+                // Third mass (purple)
+                p.stroke(p.color(120, 64, 204));
+                p.rect(baseX3 + disp3, baseY, boxSize, boxSize);
+                p.pop();
+                
+                // Add small labels
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text("m₁", baseX1 + boxSize/2 + disp1, baseY + boxSize + 15);
+                p.text("m₂", baseX2 + boxSize/2 + disp2, baseY + boxSize + 15);
+                p.text("m₃", baseX3 + boxSize/2 + disp3, baseY + boxSize + 15);
+                
+                // Display natural frequencies and damping ratios
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                let infoX = 640;
+                let infoY = -110;
+                p.text("Natural Frequencies:", infoX, infoY);
+                p.text("ω₁ = " + Omegan[0].toFixed(2) + " rad/s, ζ₁ = " + zeta[0].toFixed(4), infoX, infoY + 20);
+                p.text("ω₂ = " + Omegan[1].toFixed(2) + " rad/s, ζ₂ = " + zeta[1].toFixed(4), infoX, infoY + 40);
+                p.text("ω₃ = " + Omegan[2].toFixed(2) + " rad/s, ζ₃ = " + zeta[2].toFixed(4), infoX, infoY + 60);
+
+                                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Animation with Current I.C.", 400, 105);
+
+                // Initial condition readout (as in your provided file)
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.fill(0);
+                p.text(
+                    `x₁(0) = ${x0_now[0].toFixed(2)},  x₂(0) = ${x0_now[1].toFixed(2)},  x₃(0) = ${x0_now[2].toFixed(2)}`,
+                    300, 130
+                );
+                
+                
+                p.pop();
+            }
+            
+            function drawDashedRect(x, y, w, h) {
+                p.push();
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.noFill();
+                p.rect(x, y, w, h);
+                p.drawingContext.setLineDash([]);
+                p.pop();
+            }
+            
+            function drawSpring(x1, y1, x2, y2) {
+                p.push();
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.noFill();
+                
+                let len = x2 - x1;
+                let steps = Math.ceil(len / 10);
+                let stepSize = len / steps;
+                
+                p.beginShape();
+                p.vertex(x1, y1);
+                
+                for (let i = 0; i < steps; i++) {
+                    let x = x1 + i * stepSize;
+                    let y = y1 + ((i % 2) * 2 - 1) * 10;
+                    p.vertex(x, y);
+                }
+                
+                p.vertex(x2, y2);
+                p.endShape();
+                p.pop();
+            }
+        }, 'sketch-container');
+    </script>
+    </div> <!-- End simulation-container -->
+
+<div class="content-section">
+    <h2>Engineering Applications</h2>
+    <p>Three degree of freedom modal analysis is essential for complex structural and mechanical systems:</p>
+    <ul>
+        <li><strong>Multi-Story Buildings:</strong> Three-story buildings require 3DOF analysis for seismic design and understanding floor-to-floor interaction during earthquakes.</li>
+        <li><strong>Vehicle Dynamics:</strong> Advanced vehicle models include pitch, bounce, and roll using 3DOF systems for comprehensive ride and handling analysis.</li>
+        <li><strong>Aircraft Structures:</strong> Wing flutter and control surface dynamics often require 3DOF models to capture coupled bending-torsion modes.</li>
+        <li><strong>Rotating Machinery:</strong> Turbine-generator-foundation systems use 3DOF models to predict critical speeds and avoid resonance.</li>
+        <li><strong>Offshore Platforms:</strong> Wave-induced vibrations in three-legged jacket structures require 3DOF modal analysis for fatigue assessment.</li>
+        <li><strong>Satellite Dynamics:</strong> Attitude control and momentum wheel vibrations use 3DOF models for stability analysis.</li>
+    </ul>
+</div>
+
+<div class="content-section">
+    <h2>Summary of Key Equations</h2>
+    <div class="key-point">
+        <h3>Key Takeaways</h3>
+        <ol>
+            <li><strong>Equations of Motion:</strong> Undamped MDOF systems are governed by \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\), with mass and stiffness matrices derived from free-body diagrams</li>
+            <li><strong>Natural Frequencies:</strong> 3-DOF systems have three natural frequencies found by solving the eigenvalue problem \((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</li>
+            <li><strong>Mode Shapes:</strong> Each natural frequency has an associated mode shape (eigenvector) representing the pattern of vibration</li>
+            <li><strong>Orthogonality:</strong> Mode shapes satisfy \(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) and \(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\), enabling modal decomposition</li>
+            <li><strong>Modal Decomposition:</strong> Coupled physical equations transform into independent modal equations: \(\ddot{q}_i + \omega_i^2 q_i = 0\)</li>
+            <li><strong>Proportional Damping:</strong> Rayleigh damping \(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\) preserves modal decoupling with damping ratios \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</li>
+            <li><strong>Forced Response:</strong> External forces are projected onto modal coordinates via \(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\), allowing each mode to be solved independently</li>
+            <li><strong>Resonance:</strong> Large amplitude responses occur when forcing frequency approaches a natural frequency, emphasizing the importance of knowing system eigenvalues</li>
+            <li><strong>Modal Superposition:</strong> Total response is the sum of all modal contributions: \(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</li>
+        </ol>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Practice Problems</h2>
+
+    <div class="practice-problems">
+        <h3>Problem 1: Natural Frequencies</h3>
+        <p>A 3-DOF system has equal masses m = 2 kg and spring stiffnesses k₁ = k₂ = k₃ = k₄ = 1000 N/m. Calculate the three natural frequencies.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+        <div id="solution1" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>Mass matrix: \(\mathbf{M} = m\mathbf{I} = 2\mathbf{I}\)</p>
+            <p>Stiffness matrix:</p>
+            <p>\[\mathbf{K} = \begin{bmatrix} 2k & -k & 0 \\ -k & 2k & -k \\ 0 & -k & 2k \end{bmatrix} = 1000\begin{bmatrix} 2 & -1 & 0 \\ -1 & 2 & -1 \\ 0 & -1 & 2 \end{bmatrix}\]</p>
+
+            <p>Eigenvalue problem: \(\det(\mathbf{K} - \omega^2\mathbf{M}) = 0\)</p>
+            <p>This gives three natural frequencies:</p>
+            <p>\(\omega_1 = \sqrt{\frac{k}{m}(2 - \sqrt{2})} = \sqrt{\frac{1000}{2}(2 - \sqrt{2})} = 13.1\) rad/s</p>
+            <p>\(\omega_2 = \sqrt{\frac{2k}{m}} = \sqrt{\frac{2000}{2}} = 31.6\) rad/s</p>
+            <p>\(\omega_3 = \sqrt{\frac{k}{m}(2 + \sqrt{2})} = \sqrt{\frac{1000}{2}(2 + \sqrt{2})} = 38.3\) rad/s</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 2: Mode Shape Properties</h3>
+        <p>Explain why the mode shapes of a 3-DOF system are orthogonal with respect to the mass matrix.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+        <div id="solution2" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p>Mode shapes \(\mathbf{\Phi}_i\) and \(\mathbf{\Phi}_j\) satisfy the eigenvalue equations:</p>
+            <p>\(\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{M}\mathbf{\Phi}_i\)</p>
+            <p>\(\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{M}\mathbf{\Phi}_j\)</p>
+
+            <p>Pre-multiplying the first by \(\mathbf{\Phi}_j^T\) and the second by \(\mathbf{\Phi}_i^T\):</p>
+            <p>\(\mathbf{\Phi}_j^T\mathbf{K}\mathbf{\Phi}_i = \omega_i^2\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i\)</p>
+            <p>\(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = \omega_j^2\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j\)</p>
+
+            <p>Since \(\mathbf{K}\) and \(\mathbf{M}\) are symmetric:</p>
+            <p>\((\omega_i^2 - \omega_j^2)\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\)</p>
+
+            <p>For \(\omega_i \neq \omega_j\), we must have:</p>
+            <p>\(\mathbf{\Phi}_j^T\mathbf{M}\mathbf{\Phi}_i = 0\) (orthogonality condition)</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 3: Rayleigh Damping Coefficients</h3>
+        <p>A 3-DOF system has natural frequencies \(\omega_1 = 10\) rad/s and \(\omega_3 = 50\) rad/s. If we want damping ratios of \(\zeta_1 = 0.02\) and \(\zeta_3 = 0.05\), determine the Rayleigh damping coefficients \(\alpha\) and \(\beta\), and calculate the damping ratio for the second mode at \(\omega_2 = 30\) rad/s.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+        <div id="solution3" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p><strong>Step 1:</strong> Use the Rayleigh damping formula \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</p>
+            <p>For the first and third modes:</p>
+            <p>\[0.02 = \frac{\alpha}{2(10)} + \frac{\beta(10)}{2}\]</p>
+            <p>\[0.05 = \frac{\alpha}{2(50)} + \frac{\beta(50)}{2}\]</p>
+
+            <p><strong>Step 2:</strong> Simplify:</p>
+            <p>\[0.02 = \frac{\alpha}{20} + 5\beta\]</p>
+            <p>\[0.05 = \frac{\alpha}{100} + 25\beta\]</p>
+
+            <p><strong>Step 3:</strong> Solve for \(\beta\) from the system of equations:</p>
+            <p>From equation 1: \(\alpha = 0.4 - 100\beta\)</p>
+            <p>Substituting into equation 2: \(0.05 = \frac{0.4 - 100\beta}{100} + 25\beta\)</p>
+            <p>\[0.05 = 0.004 - \beta + 25\beta\]</p>
+            <p>\[0.046 = 24\beta\]</p>
+            <p>\[\beta = 0.00192 \text{ s}\]</p>
+
+            <p><strong>Step 4:</strong> Find \(\alpha\):</p>
+            <p>\[\alpha = 0.4 - 100(0.00192) = 0.208 \text{ rad/s}\]</p>
+
+            <p><strong>Step 5:</strong> Calculate \(\zeta_2\) at \(\omega_2 = 30\) rad/s:</p>
+            <p>\[\zeta_2 = \frac{0.208}{2(30)} + \frac{0.00192(30)}{2} = 0.00347 + 0.0288 = 0.0323\]</p>
+
+            <p><strong>Answer:</strong> \(\alpha = 0.208\) rad/s, \(\beta = 0.00192\) s, and \(\zeta_2 = 0.0323\) (3.23%)</p>
+        </div>
+    </div>
+
+    <div class="practice-problems">
+        <h3>Problem 4: Forced Harmonic Response</h3>
+        <p>A 3-DOF system with natural frequencies \(\omega_1 = 15\) rad/s, \(\omega_2 = 30\) rad/s, and \(\omega_3 = 45\) rad/s is subjected to a harmonic force \(f_1(t) = 100\sin(32t)\) N on the first mass only. If all modes have damping ratio \(\zeta_i = 0.05\) and the modal participation factor for the second mode is \(Q_{20} = 50\) N, find the amplitude of the second modal coordinate.</p>
+
+        <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+        <div id="solution4" class="hidden">
+            <p><strong>Solution:</strong></p>
+            <p><strong>Given:</strong> \(\omega_2 = 30\) rad/s, \(\Omega = 32\) rad/s, \(\zeta_2 = 0.05\), \(Q_{20} = 50\) N</p>
+
+            <p><strong>Step 1:</strong> Calculate the frequency ratio:</p>
+            <p>\[r_2 = \frac{\Omega}{\omega_2} = \frac{32}{30} = 1.067\]</p>
+
+            <p><strong>Step 2:</strong> Calculate the static deflection:</p>
+            <p>\[\delta_{st} = \frac{Q_{20}}{\omega_2^2} = \frac{50}{30^2} = \frac{50}{900} = 0.0556 \text{ m}\]</p>
+
+            <p><strong>Step 3:</strong> Calculate the dynamic magnification factor:</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(1-r_2^2)^2 + (2\zeta_2 r_2)^2}}\]</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(1-1.067^2)^2 + (2 \times 0.05 \times 1.067)^2}}\]</p>
+            <p>\[D_2 = \frac{1}{\sqrt{(-0.138)^2 + (0.1067)^2}} = \frac{1}{\sqrt{0.0190 + 0.0114}} = \frac{1}{0.174} = 5.74\]</p>
+
+            <p><strong>Step 4:</strong> Calculate the amplitude of the second modal coordinate:</p>
+            <p>\[|q_2| = \delta_{st} \times D_2 = 0.0556 \times 5.74 = 0.319 \text{ m}\]</p>
+
+            <p><strong>Answer:</strong> The amplitude is 0.319 m or 319 mm. Note that this is a significant amplitude because the forcing frequency (32 rad/s) is very close to the second natural frequency (30 rad/s), creating a near-resonance condition.</p>
+        </div>
+    </div>
+</div>
+
+<div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
+
+    <div class="quiz-container">
+        <div class="quiz-question">
+            <h3>Question 1: For a 3-DOF system, how many natural frequencies exist?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> One</label>
+                <label><input type="radio" name="q1" value="b"> Two</label>
+                <label><input type="radio" name="q1" value="c"> Three</label>
+                <label><input type="radio" name="q1" value="d"> Infinite</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 2: What is the main advantage of modal decomposition?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> It reduces computational cost</label>
+                <label><input type="radio" name="q2" value="b"> It decouples the equations of motion</label>
+                <label><input type="radio" name="q2" value="c"> It eliminates damping</label>
+                <label><input type="radio" name="q2" value="d"> It increases system stiffness</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 3: Which mode typically has the lowest natural frequency?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> The mode with the most sign changes</label>
+                <label><input type="radio" name="q3" value="b"> The mode where all masses move in phase</label>
+                <label><input type="radio" name="q3" value="c"> The mode with highest amplitude</label>
+                <label><input type="radio" name="q3" value="d"> The mode with zero displacement</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 4: What is the key property of proportional (Rayleigh) damping?</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> It eliminates all damping effects</label>
+                <label><input type="radio" name="q4" value="b"> It couples all modal equations together</label>
+                <label><input type="radio" name="q4" value="c"> It allows modal equations to remain decoupled</label>
+                <label><input type="radio" name="q4" value="d"> It increases system stiffness proportionally</label>
+            </div>
+        </div>
+
+        <div class="quiz-question">
+            <h3>Question 5: In a forced vibration of an MDOF system, resonance occurs when:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> The forcing frequency equals zero</label>
+                <label><input type="radio" name="q5" value="b"> The forcing frequency approaches one of the natural frequencies</label>
+                <label><input type="radio" name="q5" value="c"> All masses vibrate with the same amplitude</label>
+                <label><input type="radio" name="q5" value="d"> The damping ratio exceeds unity</label>
+            </div>
+        </div>
+
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
+    </div>
+</div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz handler for MDOFs
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Three natural frequencies
+                q2: 'b',  // Decouples the equations of motion
+                q3: 'b',  // Mode where all masses move in phase
+                q4: 'c',  // Allows modal equations to remain decoupled
+                q5: 'b'   // Forcing frequency approaches natural frequency
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+<footer>
+    <script src="/assets/common/footer.js"></script>
+</footer>
+</html>

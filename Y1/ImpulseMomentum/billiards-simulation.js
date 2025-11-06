@@ -7,20 +7,20 @@ function initializeBilliardsSimulation() {
     let billiardsSketch = function(p) {
         let whiteBall, blueBall;
         let showVectors = true;
-        let restitution = 0.9;
+        let restitution = 1;
         let massRatio = 1.0;
         let tableWidth = 800;
         let tableHeight = 400;
         let pixelsPerMeter = 40; // Scale factor
         let isRunning = false;
         let hasCollided = false;
-        let timeScale = 0.15; // Slow down factor for animation (15% speed)
-        
+        let timeScale = 0.01; // Slow down factor for animation (1% speed)
+
         // Initial conditions
         let whiteYPos = 200;
         let blueYPos = 200; // Blue ball always centred
-        let whiteSpeed = 5;
-        let blueSpeed = 2;
+        let whiteSpeed = 1;
+        let blueSpeed = 1;
         
         // Trail for visualisation
         let whiteTrail = [];

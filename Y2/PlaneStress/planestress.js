@@ -401,7 +401,10 @@ const failureCriteriaSketch = (p) => {
     drawPoint(s1, s2);
 
     // compute & update FS
-    updateSafety({ sy, sut, suc, s1, s2 });
+    const safetyFactors = updateSafety({ sy, sut, suc, s1, s2 });
+
+    // draw safety factors infobox on canvas
+    drawSafetyInfobox(safetyFactors);
   };
 
   function readInputs() {
@@ -548,6 +551,77 @@ const failureCriteriaSketch = (p) => {
         status.style.color = 'crimson';
       }
     }
+
+    // Return safety factors for canvas drawing
+    return {
+      rankine: fsRankine,
+      tresca: fsTresca,
+      vonMises: fsMises,
+      minFS: minFS,
+      isSafe: minFS >= 1
+    };
+  }
+
+  function drawSafetyInfobox(safetyFactors) {
+    const boxW = 200;
+    const boxH = 120;
+    const boxX = W - boxW;
+    const boxY = 15;
+
+    p.push();
+
+    // Draw semi-transparent background
+    p.fill(255, 255, 255, 240);
+    p.stroke(100);
+    p.strokeWeight(1);
+    p.rect(boxX, boxY, boxW, boxH, 5);
+
+    // Title
+    p.noStroke();
+    p.fill(0);
+    p.textAlign(p.LEFT, p.TOP);
+    p.textSize(13);
+    p.textStyle(p.BOLD);
+    p.text('Safety Factors', boxX + 10, boxY + 8);
+
+    // Results
+    p.textSize(11);
+    p.textStyle(p.NORMAL);
+    let y = boxY + 30;
+    const lineH = 18;
+
+    const fmt = x => (isFinite(x) ? x.toFixed(2) : '∞');
+
+    p.fill(90);
+    p.text('Rankine (Brittle):', boxX + 10, y);
+    p.textAlign(p.RIGHT, p.TOP);
+    p.text('FS = ' + fmt(safetyFactors.rankine), boxX + boxW - 10, y);
+    y += lineH;
+
+    p.textAlign(p.LEFT, p.TOP);
+    p.text('Tresca (Ductile):', boxX + 10, y);
+    p.textAlign(p.RIGHT, p.TOP);
+    p.text('FS = ' + fmt(safetyFactors.tresca), boxX + boxW - 10, y);
+    y += lineH;
+
+    p.textAlign(p.LEFT, p.TOP);
+    p.text('Von Mises (Ductile):', boxX + 10, y);
+    p.textAlign(p.RIGHT, p.TOP);
+    p.text('FS = ' + fmt(safetyFactors.vonMises), boxX + boxW - 10, y);
+    y += lineH + 5;
+
+    // Status
+    p.textAlign(p.CENTER, p.TOP);
+    p.textStyle(p.BOLD);
+    if (safetyFactors.isSafe) {
+      p.fill(0, 150, 0);
+      p.text('Component is SAFE', boxX + boxW/2, y);
+    } else {
+      p.fill(220, 20, 60);
+      p.text('Component FAILS', boxX + boxW/2, y);
+    }
+
+    p.pop();
   }
 };
 

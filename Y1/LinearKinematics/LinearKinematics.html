@@ -170,6 +170,26 @@
         </div>
     </div>
 
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Acceleration & Deceleration</h2>
+        <p>Observe how acceleration affects an object's motion. Click to apply acceleration!</p>
+
+        <div id="sketch-holder-acc-demo">
+            <!-- Acceleration demo will go here -->
+        </div>
+
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Applied Acceleration: <span id="acc-demo-value" class="slider-value">5.0</span> m/s²</label>
+                <input type="range" id="acc-demo-slider" min="-10" max="10" step="0.5" value="5">
+            </div>
+            <div style="text-align: center;">
+                <button id="reset-acc-demo">RESET</button>
+                <p><em>Click and hold on the track to apply acceleration. Release to coast at constant velocity.</em></p>
+            </div>
+        </div>
+    </div>
+
     <div class="content-section">
         <h2>Equations of Motion</h2>
         <p>For constant acceleration, we have five key kinematic equations:</p>
@@ -245,40 +265,6 @@
             </div>
         </div>
         
-        <div id="race-results" class="race-stats" style="display: none;">
-            <div class="stat-box">
-                <h4>Red Car</h4>
-                <p>Time: <span id="car1-time">-</span> s</p>
-                <p>Final velocity: <span id="car1-vf">-</span> m/s</p>
-            </div>
-            <div class="stat-box">
-                <h4>Blue Car</h4>
-                <p>Time: <span id="car2-time">-</span> s</p>
-                <p>Final velocity: <span id="car2-vf">-</span> m/s</p>
-            </div>
-        </div>
-        
-        <div id="winner-announcement" class="winner-announcement" style="display: none;"></div>
-    </div>
-
-    <div class="simulation-section">
-        <h2>Interactive Simulation: Acceleration & Deceleration</h2>
-        <p>Observe how acceleration affects an object's motion. Click to apply acceleration!</p>
-        
-        <div id="sketch-holder-acc-demo">
-            <!-- Acceleration demo will go here -->
-        </div>
-        
-        <div class="simulation-controls">
-            <div class="slider-container">
-                <label>Applied Acceleration: <span id="acc-demo-value" class="slider-value">5.0</span> m/s²</label>
-                <input type="range" id="acc-demo-slider" min="-10" max="10" step="0.5" value="5">
-            </div>
-            <div style="text-align: center;">
-                <button id="reset-acc-demo">RESET</button>
-                <p><em>Click and hold on the track to apply acceleration. Release to coast at constant velocity.</em></p>
-            </div>
-        </div>
     </div>
 
     <div class="content-section">
@@ -307,77 +293,6 @@
         
         <div class="key-point">
             <p><strong>Engineering Insight:</strong> In real-world applications, engineers must consider jerk (rate of change of acceleration) to ensure smooth motion and prevent mechanical stress. Sudden changes in acceleration can cause discomfort to passengers or damage to machinery.</p>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2>Practice Problems</h2>
-        
-        <div class="practice-problems">
-            <h3>Problem 1: Emergency Braking</h3>
-            <p>A car travelling at 30 m/s (108 km/h) needs to make an emergency stop. If the maximum deceleration is 8 m/s², calculate:</p>
-            <ol>
-                <li>The stopping distance</li>
-                <li>The time taken to stop</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p>Given: \(u = 30\) m/s, \(v = 0\) m/s (stops), \(a = -8\) m/s²</p>
-                
-                <p><strong>a) Stopping distance:</strong></p>
-                <p>Using: \(v^2 = u^2 + 2as\)</p>
-                <p>\(0 = 30^2 + 2(-8)s\)</p>
-                <p>\(0 = 900 - 16s\)</p>
-                <p>\(s = \frac{900}{16} = 56.25\) m</p>
-                
-                <p><strong>b) Time to stop:</strong></p>
-                <p>Using: \(v = u + at\)</p>
-                <p>\(0 = 30 + (-8)t\)</p>
-                <p>\(t = \frac{30}{8} = 3.75\) s</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 2: Overtaking Manoeuvre</h3>
-            <p>A car travelling at 20 m/s begins to overtake a lorry. It accelerates at 2 m/s² for 5 seconds. Calculate:</p>
-            <ol>
-                <li>The final velocity</li>
-                <li>The distance covered during acceleration</li>
-            </ol>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p>Given: \(u = 20\) m/s, \(a = 2\) m/s², \(t = 5\) s</p>
-                
-                <p><strong>a) Final velocity:</strong></p>
-                <p>Using: \(v = u + at\)</p>
-                <p>\(v = 20 + 2(5) = 30\) m/s</p>
-                
-                <p><strong>b) Distance covered:</strong></p>
-                <p>Using: \(s = ut + \frac{1}{2}at^2\)</p>
-                <p>\(s = 20(5) + \frac{1}{2}(2)(5^2)\)</p>
-                <p>\(s = 100 + 25 = 125\) m</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 3: Two-Stage Motion</h3>
-            <p>A train accelerates from rest at 1.5 m/s² for 20 seconds, then travels at constant velocity for 60 seconds. Find the total distance travelled.</p>
-            
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p><strong>Stage 1: Acceleration</strong></p>
-                <p>Given: \(u = 0\) m/s, \(a = 1.5\) m/s², \(t = 20\) s</p>
-                <p>Distance: \(s_1 = ut + \frac{1}{2}at^2 = 0 + \frac{1}{2}(1.5)(20^2) = 300\) m</p>
-                <p>Final velocity: \(v = u + at = 0 + 1.5(20) = 30\) m/s</p>
-                
-                <p><strong>Stage 2: Constant velocity</strong></p>
-                <p>Given: \(v = 30\) m/s, \(t = 60\) s</p>
-                <p>Distance: \(s_2 = vt = 30(60) = 1800\) m</p>
-                
-                <p><strong>Total distance:</strong> \(s_{total} = s_1 + s_2 = 300 + 1800 = 2100\) m</p>
-            </div>
         </div>
     </div>
 
@@ -416,6 +331,77 @@
                     <td>Displacement from average velocity</td>
                 </tr>
             </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Emergency Braking</h3>
+            <p>A car travelling at 30 m/s (108 km/h) needs to make an emergency stop. If the maximum deceleration is 8 m/s², calculate:</p>
+            <ol>
+                <li>The stopping distance</li>
+                <li>The time taken to stop</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(u = 30\) m/s, \(v = 0\) m/s (stops), \(a = -8\) m/s²</p>
+
+                <p><strong>a) Stopping distance:</strong></p>
+                <p>Using: \(v^2 = u^2 + 2as\)</p>
+                <p>\(0 = 30^2 + 2(-8)s\)</p>
+                <p>\(0 = 900 - 16s\)</p>
+                <p>\(s = \frac{900}{16} = 56.25\) m</p>
+
+                <p><strong>b) Time to stop:</strong></p>
+                <p>Using: \(v = u + at\)</p>
+                <p>\(0 = 30 + (-8)t\)</p>
+                <p>\(t = \frac{30}{8} = 3.75\) s</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Overtaking Manoeuvre</h3>
+            <p>A car travelling at 20 m/s begins to overtake a lorry. It accelerates at 2 m/s² for 5 seconds. Calculate:</p>
+            <ol>
+                <li>The final velocity</li>
+                <li>The distance covered during acceleration</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(u = 20\) m/s, \(a = 2\) m/s², \(t = 5\) s</p>
+
+                <p><strong>a) Final velocity:</strong></p>
+                <p>Using: \(v = u + at\)</p>
+                <p>\(v = 20 + 2(5) = 30\) m/s</p>
+
+                <p><strong>b) Distance covered:</strong></p>
+                <p>Using: \(s = ut + \frac{1}{2}at^2\)</p>
+                <p>\(s = 20(5) + \frac{1}{2}(2)(5^2)\)</p>
+                <p>\(s = 100 + 25 = 125\) m</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Two-Stage Motion</h3>
+            <p>A train accelerates from rest at 1.5 m/s² for 20 seconds, then travels at constant velocity for 60 seconds. Find the total distance travelled.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Stage 1: Acceleration</strong></p>
+                <p>Given: \(u = 0\) m/s, \(a = 1.5\) m/s², \(t = 20\) s</p>
+                <p>Distance: \(s_1 = ut + \frac{1}{2}at^2 = 0 + \frac{1}{2}(1.5)(20^2) = 300\) m</p>
+                <p>Final velocity: \(v = u + at = 0 + 1.5(20) = 30\) m/s</p>
+
+                <p><strong>Stage 2: Constant velocity</strong></p>
+                <p>Given: \(v = 30\) m/s, \(t = 60\) s</p>
+                <p>Distance: \(s_2 = vt = 30(60) = 1800\) m</p>
+
+                <p><strong>Total distance:</strong> \(s_{total} = s_1 + s_2 = 300 + 1800 = 2100\) m</p>
+            </div>
         </div>
     </div>
 
@@ -495,6 +481,8 @@
             let raceComplete = false;
             let startTime;
             let scaleFactor = 1.5; // pixels per metre
+            let winnerText = '';
+            let winnerColor = '';
             
             class Car {
                 constructor(y, colour, v0, acc) {
@@ -607,17 +595,17 @@
                 p.strokeWeight(4);
                 p.line(finishX, 100, finishX, 300);
                 
-                // Draw chequered pattern at finish
+                // Draw chequered pattern at finish (constrained to track bounds)
                 p.noStroke();
-                for (let i = 0; i < 3; i++) {
-                    for (let j = 0; j < 10; j++) {
-                        if ((i + j) % 2 === 0) {
-                            p.fill(0);
-                        } else {
-                            p.fill(255);
-                        }
-                        p.rect(finishX, 100 + i * 66 + j * 20, 10, 20);
+                let checkSize = 20;
+                let numChecks = Math.floor(200 / checkSize); // 200 = track height
+                for (let j = 0; j < numChecks; j++) {
+                    if (j % 2 === 0) {
+                        p.fill(0);
+                    } else {
+                        p.fill(255);
                     }
+                    p.rect(finishX, 100 + j * checkSize, 10, checkSize);
                 }
                 
                 // Draw distance markers
@@ -653,14 +641,67 @@
                 
                 // Draw time
                 if (racing) {
-                    let t = raceComplete ? 
-                        Math.max(car1.finishTime || 0, car2.finishTime || 0) : 
+                    let t = raceComplete ?
+                        Math.max(car1.finishTime || 0, car2.finishTime || 0) :
                         (p.millis() - startTime) / 1000;
                     p.fill(0);
                     p.textAlign(p.CENTER);
                     p.textSize(20);
                     p.text(`Time: ${t.toFixed(2)}s`, p.width/2, 30);
                     p.textSize(12);
+                }
+
+                // Draw race results as info boxes on canvas
+                if (raceComplete) {
+                    // Red car stats (top left)
+                    p.push();
+                    p.fill(255, 107, 107, 240);
+                    p.stroke(200, 80, 80);
+                    p.strokeWeight(2);
+                    p.rect(10, 120, 150, 60, 5);
+                    p.noStroke();
+                    p.fill(0);
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(14);
+                    p.textStyle(p.BOLD);
+                    p.text('Red Car', 20, 130);
+                    p.textStyle(p.NORMAL);
+                    p.textSize(12);
+                    p.text(`Time: ${car1.finishTime.toFixed(2)} s`, 20, 150);
+                    p.text(`Final v: ${car1.v.toFixed(1)} m/s`, 20, 165);
+                    p.pop();
+
+                    // Blue car stats (bottom left)
+                    p.push();
+                    p.fill(77, 171, 247, 240);
+                    p.stroke(50, 130, 200);
+                    p.strokeWeight(2);
+                    p.rect(10, 220, 150, 60, 5);
+                    p.noStroke();
+                    p.fill(0);
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(14);
+                    p.textStyle(p.BOLD);
+                    p.text('Blue Car', 20, 230);
+                    p.textStyle(p.NORMAL);
+                    p.textSize(12);
+                    p.text(`Time: ${car2.finishTime.toFixed(2)} s`, 20, 250);
+                    p.text(`Final v: ${car2.v.toFixed(1)} m/s`, 20, 265);
+                    p.pop();
+
+                    // Winner announcement (center)
+                    p.push();
+                    p.fill(winnerColor);
+                    p.stroke(0);
+                    p.strokeWeight(2);
+                    p.rect(p.width/2 - 120, 190, 240, 50, 5);
+                    p.noStroke();
+                    p.fill(0);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(18);
+                    p.textStyle(p.BOLD);
+                    p.text(winnerText, p.width/2, 215);
+                    p.pop();
                 }
             };
             
@@ -683,42 +724,36 @@
                 racing = true;
                 raceComplete = false;
                 startTime = p.millis();
-                
-                // Hide previous results
-                document.getElementById('race-results').style.display = 'none';
-                document.getElementById('winner-announcement').style.display = 'none';
+                winnerText = '';
+                winnerColor = '';
             };
-            
+
             window.resetRace = function() {
                 racing = false;
                 raceComplete = false;
                 car1.reset();
                 car2.reset();
-                document.getElementById('race-results').style.display = 'none';
-                document.getElementById('winner-announcement').style.display = 'none';
+                winnerText = '';
+                winnerColor = '';
             };
-            
+
+            window.updateRaceDistance = function(newDistance) {
+                raceDistance = newDistance;
+                // Adjust scale factor based on race distance
+                scaleFactor = Math.min(700 / raceDistance, 3);
+            };
+
             function showResults() {
-                document.getElementById('race-results').style.display = 'flex';
-                document.getElementById('car1-time').textContent = car1.finishTime.toFixed(2);
-                document.getElementById('car1-vf').textContent = car1.v.toFixed(1);
-                document.getElementById('car2-time').textContent = car2.finishTime.toFixed(2);
-                document.getElementById('car2-vf').textContent = car2.v.toFixed(1);
-                
-                let winnerDiv = document.getElementById('winner-announcement');
-                winnerDiv.style.display = 'block';
+                // Results now drawn on canvas
                 if (car1.finishTime < car2.finishTime) {
-                    winnerDiv.textContent = '🏆 Red Car Wins! 🏆';
-                    winnerDiv.style.backgroundColor = '#ffebee';
-                    winnerDiv.style.color = '#ff6b6b';
+                    winnerText = '🏆 Red Car Wins! 🏆';
+                    winnerColor = p.color(255, 235, 238);
                 } else if (car2.finishTime < car1.finishTime) {
-                    winnerDiv.textContent = '🏆 Blue Car Wins! 🏆';
-                    winnerDiv.style.backgroundColor = '#e3f2fd';
-                    winnerDiv.style.color = '#4dabf7';
+                    winnerText = '🏆 Blue Car Wins! 🏆';
+                    winnerColor = p.color(227, 242, 253);
                 } else {
-                    winnerDiv.textContent = "It's a Tie!";
-                    winnerDiv.style.backgroundColor = '#fff3cd';
-                    winnerDiv.style.color = '#856404';
+                    winnerText = "🏁 It's a Tie! 🏁";
+                    winnerColor = p.color(255, 243, 205);
                 }
             }
         };
@@ -909,6 +944,8 @@
             });
             raceDistSlider.addEventListener('input', e => {
                 document.getElementById('race-distance-value').textContent = e.target.value;
+                // Update race distance in real time
+                window.updateRaceDistance(parseFloat(e.target.value));
             });
             
             // Acceleration demo slider

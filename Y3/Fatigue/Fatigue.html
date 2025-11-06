@@ -64,14 +64,35 @@
         .stress-blocks-container .info-box {
             margin: 0;
             min-width: 0;
+            overflow: hidden;
         }
 
         .stress-blocks-container .slider-container {
             width: 100%;
+            overflow: hidden;
         }
 
         .stress-blocks-container .slider-container input[type="range"] {
+            width: 100% !important;
             max-width: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .stress-blocks-container .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .stress-blocks-container .slider-container label {
+            font-size: 12px;
+        }
+
+        .stress-blocks-container .slider-container .slider-value {
+            font-size: 12px;
         }
 
         /* Material/dropdown selector styling */
@@ -398,43 +419,43 @@
                 <div class="stress-blocks-container">
                     <div class="info-box info-box-blue">
                         <h4>Stress Block 1:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-1">\(\sigma_a\) (MPa):</label>
-                            <input type="range" id="stress-amp-1" min="100" max="500" value="300" step="25">
-                            <span id="stress-amp-1-value" class="slider-value">300</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="stress-amp-1" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-1" min="100" max="500" value="300" step="25" style="width:100%;">
+                            <span id="stress-amp-1-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">300</span>
                         </div>
-                        <div class="slider-container">
-                            <label for="cycles-1">\(n_1\):</label>
-                            <input type="range" id="cycles-1" min="1000" max="100000" value="10000" step="100">
-                            <span id="cycles-1-value" class="slider-value">10000</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="cycles-1" style="display:block;font-size:12px;margin-bottom:3px;">\(n_1\):</label>
+                            <input type="range" id="cycles-1" min="1000" max="100000" value="10000" step="100" style="width:100%;">
+                            <span id="cycles-1-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">10000</span>
                         </div>
                     </div>
 
                     <div class="info-box info-box-blue">
                         <h4>Stress Block 2:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-2">\(\sigma_a\) (MPa):</label>
-                            <input type="range" id="stress-amp-2" min="100" max="500" value="275" step="25">
-                            <span id="stress-amp-2-value" class="slider-value">275</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="stress-amp-2" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-2" min="100" max="500" value="275" step="25" style="width:100%;">
+                            <span id="stress-amp-2-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">275</span>
                         </div>
-                        <div class="slider-container">
-                            <label for="cycles-2">\(n_2\):</label>
-                            <input type="range" id="cycles-2" min="1000" max="100000" value="50000" step="100">
-                            <span id="cycles-2-value" class="slider-value">50000</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="cycles-2" style="display:block;font-size:12px;margin-bottom:3px;">\(n_2\):</label>
+                            <input type="range" id="cycles-2" min="1000" max="100000" value="50000" step="100" style="width:100%;">
+                            <span id="cycles-2-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">50000</span>
                         </div>
                     </div>
 
                     <div class="info-box info-box-blue">
                         <h4>Stress Block 3:</h4>
-                        <div class="slider-container">
-                            <label for="stress-amp-3">\(\sigma_a\) (MPa):</label>
-                            <input type="range" id="stress-amp-3" min="100" max="500" value="325" step="25">
-                            <span id="stress-amp-3-value" class="slider-value">325</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="stress-amp-3" style="display:block;font-size:12px;margin-bottom:3px;">\(\sigma_a\) (MPa):</label>
+                            <input type="range" id="stress-amp-3" min="100" max="500" value="325" step="25" style="width:100%;">
+                            <span id="stress-amp-3-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">325</span>
                         </div>
-                        <div class="slider-container">
-                            <label for="cycles-3">\(n_3\):</label>
-                            <input type="range" id="cycles-3" min="1000" max="100000" value="100000" step="100">
-                            <span id="cycles-3-value" class="slider-value">100000</span>
+                        <div class="slider-container" style="margin:5px 0;">
+                            <label for="cycles-3" style="display:block;font-size:12px;margin-bottom:3px;">\(n_3\):</label>
+                            <input type="range" id="cycles-3" min="1000" max="100000" value="100000" step="100" style="width:100%;">
+                            <span id="cycles-3-value" class="slider-value" style="display:block;text-align:center;margin-top:2px;font-size:12px;">100000</span>
                         </div>
                     </div>
                 </div>

@@ -1240,6 +1240,22 @@ function setupHaighDiagramControls() {
     });
     
     document.getElementById('endurance-limit-input').addEventListener('input', function() {
+        const enduranceLimit = parseFloat(this.value);
+        const yieldStrength = parseFloat(document.getElementById('yield-strength').value);
+        const ultimateStrength = parseFloat(document.getElementById('ultimate-strength').value);
+
+        // If endurance limit exceeds yield strength, increase yield strength to match
+        if (enduranceLimit > yieldStrength) {
+            document.getElementById('yield-strength').value = enduranceLimit;
+            document.getElementById('yield-strength-value').textContent = enduranceLimit;
+
+            // If yield strength now exceeds ultimate strength, increase ultimate strength to match
+            if (enduranceLimit > ultimateStrength) {
+                document.getElementById('ultimate-strength').value = enduranceLimit;
+                document.getElementById('ultimate-strength-value').textContent = enduranceLimit;
+            }
+        }
+
         document.getElementById('endurance-limit-input-value').textContent = this.value;
         updateHaighDiagram();
     });

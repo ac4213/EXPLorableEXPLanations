@@ -15,11 +15,14 @@
 
     <!-- Import MathJax for LaTeX rendering (async for progressive rendering) -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <!-- Import libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- Main simulation script - load last to ensure DOM and libraries are ready -->
+    <script src="SDOFvib.js"></script>
 
     <style>
         /* Page-specific styles */
@@ -131,6 +134,15 @@
                 <li><strong>Overdamped</strong> (\(\zeta > 1\)): The system returns to equilibrium without oscillation but more slowly than a critically damped system</li>
             </ol>
             
+            <h3>Effect of Damping on Response</h3>
+            <p>Damping has several important effects on SDOF systems:</p>
+            <ol>
+                <li>Reduces the peak amplitude at resonance</li>
+                <li>Broadens the resonance peak</li>
+                <li>Limits the maximum amplitude ratio to \(1/(2\zeta)\) at resonance</li>
+                <li>Creates a phase shift that varies from 0° at low frequencies to -180° at high frequencies, passing through -90° at resonance</li>
+            </ol>
+            
             <h3>Natural Frequency and Damped Natural Frequency</h3>
             <div class="equation-box">
                 <p>Natural frequency (pulsation): \(\omega_n = \sqrt{\frac{k}{m}}\) [rad/s]</p>
@@ -160,8 +172,20 @@
                 <p>The resonance frequency \(\omega_r\) for a SDOF system is:</p>
                 <p>\[\omega_R=\omega_n\sqrt{1-2\zeta^2}\]</p>
             </div>
+
+            <h3>Frequency Response Function</h3>
+            <p>The Frequency Response Function is a fundamental tool in vibration analysis that shows how a system responds to different forcing frequencies:</p>
+            <div class="equation-box">
+                <p>\[H(\omega) = \frac{X(\omega)}{F(\omega)} = \frac{1/k}{[1-(\omega/\omega_n)^2]^2 + [2\zeta(\omega/\omega_n)]^2}\]</p>
+            </div>
+
+            <p>The FRF has two components:</p>
+            <ul>
+                <li><strong>Amplitude ratio:</strong> Shows how the amplitude of response varies with frequency</li>
+                <li><strong>Phase angle:</strong> Shows the phase shift between the input force and output displacement</li>
+            </ul>
         </div>
-        
+
         <div class="simulation-section">
             <h2>Interactive Simulation</h2>
             <p>Experiment with different parameters to see how they affect the behavior of a SDOF system:</p>
@@ -265,115 +289,6 @@
         <ul>
             <li><strong>Impact Operations:</strong> Impact hammers, drop forges, and stamping presses are modeled as SDOF systems to predict forces and deflections.</li>
         </ul>
-
-        <h3>Frequency Response Function (FRF)</h3>
-        <p>The Frequency Response Function is a fundamental tool in vibration analysis that shows how a system responds to different forcing frequencies:</p>
-        <div class="equation-box">
-            <p>\[H(\omega) = \frac{X(\omega)}{F(\omega)} = \frac{1/k}{[1-(\omega/\omega_n)^2]^2 + [2\zeta(\omega/\omega_n)]^2}\]</p>
-        </div>
-
-        <p>The FRF has two components:</p>
-        <ul>
-            <li><strong>Amplitude ratio:</strong> Shows how the amplitude of response varies with frequency</li>
-            <li><strong>Phase angle:</strong> Shows the phase shift between the input force and output displacement</li>
-        </ul>
-
-        <h3>Effects of Damping on System Response</h3>
-        <p>Damping has several important effects on SDOF systems:</p>
-        <ol>
-            <li>Reduces the peak amplitude at resonance</li>
-            <li>Broadens the resonance peak</li>
-            <li>Limits the maximum amplitude ratio to \(1/(2\zeta)\) at resonance</li>
-            <li>Creates a phase shift that varies from 0° at low frequencies to -180° at high frequencies, passing through -90° at resonance</li>
-        </ol>
-    </div>
-
-    <div class="content-section">
-        <h2>Practice Problems</h2>
-
-        <div class="practice-problems">
-            <h3>Problem 1: Natural Frequency Calculation</h3>
-            <p>A machine component has a mass of 5 kg and is supported by a spring with stiffness 8000 N/m. Calculate:</p>
-            <ol type="a">
-                <li>The natural frequency in rad/s</li>
-                <li>The natural frequency in Hz</li>
-                <li>The period of oscillation</li>
-            </ol>
-            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
-            <div id="solution1" class="hidden">
-                <p><strong>Solution:</strong></p>
-                <p>a) The natural frequency in rad/s:</p>
-                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{8000}{5}} = \sqrt{1600} = 40\) rad/s</p>
-                
-                <p>b) The natural frequency in Hz:</p>
-                <p>\(f_n = \frac{\omega_n}{2\pi} = \frac{40}{2\pi} = 6.37\) Hz</p>
-                
-                <p>c) The period of oscillation:</p>
-                <p>\(T = \frac{1}{f_n} = \frac{1}{6.37} = 0.157\) seconds</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 2: Damping Ratio Determination</h3>
-            <p>A vibrating system with mass 2 kg and spring stiffness 1800 N/m has a logarithmic decrement of 0.5. Calculate:</p>
-            <ol type="a">
-                <li>The damping ratio</li>
-                <li>The damping coefficient</li>
-                <li>The critical damping coefficient</li>
-                <li>Classify the system as underdamped, critically damped, or overdamped</li>
-            </ol>
-            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
-            <div id="solution2" class="hidden">
-                <p><strong>Solution:</strong></p>
-                <p>a) The damping ratio:</p>
-                <p>The logarithmic decrement \(\delta = 0.5\)</p>
-                <p>\(\zeta = \frac{\delta}{\sqrt{4\pi^2 + \delta^2}} = \frac{0.5}{\sqrt{4\pi^2 + 0.5^2}} = \frac{0.5}{\sqrt{39.74}} = \frac{0.5}{6.3} = 0.079\)</p>
-                
-                <p>b) The damping coefficient:</p>
-                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{1800}{2}} = 30\) rad/s</p>
-                <p>\(c = 2\zeta\omega_n m = 2 \times 0.079 \times 30 \times 2 = 9.48\) Ns/m</p>
-                
-                <p>c) The critical damping coefficient:</p>
-                <p>\(c_{critical} = 2m\omega_n = 2 \times 2 \times 30 = 120\) Ns/m</p>
-                
-                <p>d) Since \(\zeta = 0.079 < 1\), the system is <strong>underdamped</strong>.</p>
-            </div>
-        </div>
-        
-        <div class="practice-problems">
-            <h3>Problem 3: Resonance and Amplitude</h3>
-            <p>A machine with mass 100 kg is mounted on a spring with stiffness \(k = 4 \times 10^5\) N/m and a damper with damping coefficient \(c = 1000\) Ns/m. The machine is subjected to a harmonic force with amplitude \(F_0 = 5000\) N. Calculate:</p>
-            <ol type="a">
-                <li>The natural frequency</li>
-                <li>The amplitude of vibration at resonance</li>
-                <li>The amplitude of vibration when the forcing frequency is 10 Hz</li>
-            </ol>
-            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
-            <div id="solution3" class="hidden">
-                <p><strong>Solution:</strong></p>
-                <p>a) The natural frequency:</p>
-                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{4 \times 10^5}{100}} = \sqrt{4000} = 63.25\) rad/s</p>
-                <p>\(f_n = \frac{\omega_n}{2\pi} = \frac{63.25}{2\pi} = 10.07\) Hz</p>
-                
-                <p>b) The amplitude of vibration at resonance:</p>
-                <p>First, calculate the damping ratio:</p>
-                <p>\(c_{critical} = 2m\omega_n = 2 \times 100 \times 63.25 = 12650\) Ns/m</p>
-                <p>\(\zeta = \frac{c}{c_{critical}} = \frac{1000}{12650} = 0.079\)</p>
-                
-                <p>At resonance \(\omega = \omega_R\)</p>
-                <p>\(\omega_R=\omega_n\sqrt{1-2\zeta^2}=62.85\) rad/s, the amplitude is:</p>
-                <p>\(X = \frac{F_0/k}{2\zeta\sqrt{1-\zeta^2}} = \frac{5000/(4 \times 10^5)}{2 \times 0.079 \times \sqrt{1-0.079^2}} = \frac{0.0125}{0.158} = 0.079\) m (or 79 mm)</p>
-                
-                <p>c) The amplitude of vibration when the forcing frequency is 10 Hz:</p>
-                <p>\(\omega = 2\pi f = 2\pi \times 10 = 62.83\) rad/s</p>
-                <p>\(\rho = \frac{\omega}{\omega_n} = \frac{62.83}{63.25} = 0.993\)</p>
-                
-                <p>\(X = \frac{F_0/k}{\sqrt{[1-\rho^2]^2 + [2\zeta \rho]^2}} = \frac{0.0125}{\sqrt{[1-0.993^2]^2 + [2 \times 0.079 \times 0.993]^2}}\)</p>
-                <p>\(X = \frac{0.0125}{\sqrt{[0.014]^2 + [0.157]^2}} = \frac{0.0125}{0.158} = 0.079\) m (or 79 mm)</p>
-                
-                <p>Note: Since 10 Hz is very close to the resonant frequency (10.07 Hz), the amplitude is nearly the same as at exact resonance.</p>
-            </div>
-        </div>
     </div>
 
     <div class="content-section">
@@ -416,6 +331,94 @@
                     <td>Excitation to natural frequency</td>
                 </tr>
             </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Natural Frequency Calculation</h3>
+            <p>A machine component has a mass of 5 kg and is supported by a spring with stiffness 8000 N/m. Calculate:</p>
+            <ol type="a">
+                <li>The natural frequency in rad/s</li>
+                <li>The natural frequency in Hz</li>
+                <li>The period of oscillation</li>
+            </ol>
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>a) The natural frequency in rad/s:</p>
+                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{8000}{5}} = \sqrt{1600} = 40\) rad/s</p>
+
+                <p>b) The natural frequency in Hz:</p>
+                <p>\(f_n = \frac{\omega_n}{2\pi} = \frac{40}{2\pi} = 6.37\) Hz</p>
+
+                <p>c) The period of oscillation:</p>
+                <p>\(T = \frac{1}{f_n} = \frac{1}{6.37} = 0.157\) seconds</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Damping Ratio Determination</h3>
+            <p>A vibrating system with mass 2 kg and spring stiffness 1800 N/m has a logarithmic decrement of 0.5. Calculate:</p>
+            <ol type="a">
+                <li>The damping ratio</li>
+                <li>The damping coefficient</li>
+                <li>The critical damping coefficient</li>
+                <li>Classify the system as underdamped, critically damped, or overdamped</li>
+            </ol>
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>a) The damping ratio:</p>
+                <p>The logarithmic decrement \(\delta = 0.5\)</p>
+                <p>\(\zeta = \frac{\delta}{\sqrt{4\pi^2 + \delta^2}} = \frac{0.5}{\sqrt{4\pi^2 + 0.5^2}} = \frac{0.5}{\sqrt{39.74}} = \frac{0.5}{6.3} = 0.079\)</p>
+
+                <p>b) The damping coefficient:</p>
+                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{1800}{2}} = 30\) rad/s</p>
+                <p>\(c = 2\zeta\omega_n m = 2 \times 0.079 \times 30 \times 2 = 9.48\) Ns/m</p>
+
+                <p>c) The critical damping coefficient:</p>
+                <p>\(c_{critical} = 2m\omega_n = 2 \times 2 \times 30 = 120\) Ns/m</p>
+
+                <p>d) Since \(\zeta = 0.079 < 1\), the system is <strong>underdamped</strong>.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Resonance and Amplitude</h3>
+            <p>A machine with mass 100 kg is mounted on a spring with stiffness \(k = 4 \times 10^5\) N/m and a damper with damping coefficient \(c = 1000\) Ns/m. The machine is subjected to a harmonic force with amplitude \(F_0 = 5000\) N. Calculate:</p>
+            <ol type="a">
+                <li>The natural frequency</li>
+                <li>The amplitude of vibration at resonance</li>
+                <li>The amplitude of vibration when the forcing frequency is 10 Hz</li>
+            </ol>
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>a) The natural frequency:</p>
+                <p>\(\omega_n = \sqrt{\frac{k}{m}} = \sqrt{\frac{4 \times 10^5}{100}} = \sqrt{4000} = 63.25\) rad/s</p>
+                <p>\(f_n = \frac{\omega_n}{2\pi} = \frac{63.25}{2\pi} = 10.07\) Hz</p>
+
+                <p>b) The amplitude of vibration at resonance:</p>
+                <p>First, calculate the damping ratio:</p>
+                <p>\(c_{critical} = 2m\omega_n = 2 \times 100 \times 63.25 = 12650\) Ns/m</p>
+                <p>\(\zeta = \frac{c}{c_{critical}} = \frac{1000}{12650} = 0.079\)</p>
+
+                <p>At resonance \(\omega = \omega_R\)</p>
+                <p>\(\omega_R=\omega_n\sqrt{1-2\zeta^2}=62.85\) rad/s, the amplitude is:</p>
+                <p>\(X = \frac{F_0/k}{2\zeta\sqrt{1-\zeta^2}} = \frac{5000/(4 \times 10^5)}{2 \times 0.079 \times \sqrt{1-0.079^2}} = \frac{0.0125}{0.158} = 0.079\) m (or 79 mm)</p>
+
+                <p>c) The amplitude of vibration when the forcing frequency is 10 Hz:</p>
+                <p>\(\omega = 2\pi f = 2\pi \times 10 = 62.83\) rad/s</p>
+                <p>\(\rho = \frac{\omega}{\omega_n} = \frac{62.83}{63.25} = 0.993\)</p>
+
+                <p>\(X = \frac{F_0/k}{\sqrt{[1-\rho^2]^2 + [2\zeta \rho]^2}} = \frac{0.0125}{\sqrt{[1-0.993^2]^2 + [2 \times 0.079 \times 0.993]^2}}\)</p>
+                <p>\(X = \frac{0.0125}{\sqrt{[0.014]^2 + [0.157]^2}} = \frac{0.0125}{0.158} = 0.079\) m (or 79 mm)</p>
+
+                <p>Note: Since 10 Hz is very close to the resonant frequency (10.07 Hz), the amplitude is nearly the same as at exact resonance.</p>
+            </div>
         </div>
     </div>
 
@@ -477,84 +480,6 @@
             <div id="quiz-results"></div>
         </div>
     </div>
-    
-    <div class="content-section">
-        <h2>Summary: Key Equations Reference</h2>
-        
-        <div class="equation-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>Equation</th>
-                        <th>Variables</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Equation of Motion</td>
-                        <td>\(m\ddot{x}+c\dot{x}+kx=F_0\cos(\omega t)\)</td>
-                        <td>\(m\) = mass<br>\(c\) = damping coefficient<br>\(k\) = spring stiffness<br>\(F_0\) = force amplitude<br>\(\omega\) = forcing frequency</td>
-                    </tr>
-                    <tr>
-                        <td>Natural Frequency</td>
-                        <td>\(\omega_n = \sqrt{\frac{k}{m}}\)</td>
-                        <td>\(\omega_n\) = natural angular frequency [rad/s]</td>
-                    </tr>
-                    <tr>
-                        <td>Damping Ratio</td>
-                        <td>\(\zeta = \frac{c}{c_{c}} = \frac{c}{2\sqrt{km}}\)</td>
-                        <td>\(\zeta\) = damping ratio<br>\(c_{c}\) = critical damping coefficient</td>
-                    </tr>
-                    <tr>
-                        <td>Damped Natural Frequency</td>
-                        <td>\(\omega_d = \omega_n\sqrt{1-\zeta^2}\)</td>
-                        <td>\(\omega_d\) = damped natural frequency [rad/s]</td>
-                    </tr>
-                    <tr>
-                        <td>Underdamped Free Response</td>
-                        <td>\(x(t) = Ae^{-\zeta \omega_n t}\cos(\omega_d t - \phi)\)</td>
-                        <td>\(A\) = amplitude<br>\(\phi\) = phase angle</td>
-                    </tr>
-                    <tr>
-                        <td>Forced Response Amplitude</td>
-                        <td>\(X = \frac{F_0/k}{\sqrt{[1-(\omega_f/\omega_n)^2]^2 + [2\zeta(\omega_f/\omega_n)]^2}}\)</td>
-                        <td>\(X\) = amplitude of steady-state response<br>\(\omega_f\) = forcing frequency</td>
-                    </tr>
-                    <tr>
-                        <td>Phase Angle</td>
-                        <td>\(\phi = \tan^{-1}\left(\frac{2\zeta(\omega_f/\omega_n)}{1-(\omega_f/\omega_n)^2}\right)\)</td>
-                        <td>\(\phi\) = phase angle between force and displacement</td>
-                    </tr>
-                    <tr>
-                        <td>Resonant Amplitude</td>
-                        <td>\(X_{\text{res}} \approx \frac{F_0/k}{2\zeta}\) (for small \(\zeta\))</td>
-                        <td>\(X_{\text{res}}\) = amplitude at resonance</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="key-point">
-            <h3>Conclusion</h3>
-            <p>Single Degree of Freedom vibration is a foundational concept in mechanical and structural engineering. Understanding the relationship between mass, stiffness, and damping helps engineers to:</p>
-            <ol>
-                <li>Predict how structures and machines will respond to various inputs</li>
-                <li>Design systems to avoid resonance or harmful vibrations</li>
-                <li>Develop appropriate damping mechanisms to control vibration</li>
-                <li>Create isolation systems to protect sensitive equipment</li>
-                <li>Analyze and troubleshoot vibration problems in existing systems</li>
-            </ol>
-            <p>These principles form the foundation for understanding more complex multi-degree of freedom systems and continuous systems that are encountered in advanced engineering applications.</p>
-        </div>
-    </div>
-
-    <footer>
-        <p>&copy; Dr. Arnaldo Delli Carri Ph.D. CEng MIMechE SFHEA</p>
-        <p>Coventry University, United Kingdom</p>
-        <a class="back-link" href="../index.html">Return to Explorable Explanations Home</a>
-        <p>Found a bug? <a href="mailto:ac4213@coventry.ac.uk?subject=a bug in your applet">Let me know!</a></p>
-    </footer>
 
     <script>
 // toggleSolution function now loaded from /assets/common/problems.js
@@ -679,8 +604,5 @@
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
-
-    <!-- Main simulation script - load last to ensure DOM and libraries are ready -->
-    <script src="SDOFvib.js"></script>
 </body>
 </html>

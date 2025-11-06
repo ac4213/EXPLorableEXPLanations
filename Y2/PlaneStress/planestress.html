@@ -261,14 +261,6 @@
                 <input type="number" id="test-s2" value="50" step="10">
             </div>
         </div>
-        
-        <div class="results-panel">
-            <h4>Safety Factors</h4>
-            <p><strong>Rankine (Brittle):</strong> FS = <span id="fs-rankine">2.67</span></p>
-            <p><strong>Tresca (Ductile):</strong> FS = <span id="fs-tresca">2.50</span></p>
-            <p><strong>Von Mises (Ductile):</strong> FS = <span id="fs-vonmises">1.93</span></p>
-            <p id="safety-status" style="font-weight: bold; color: green;">Component is SAFE</p>
-        </div>
     </div>
 
     <div class="content-section">
@@ -351,6 +343,81 @@
 
     <div class="content-section">
         <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Stress Transformation (Normal)</td>
+                    <td>\(\sigma_{x'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} + \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) + \tau_{xy}\sin(2\theta)\)</td>
+                    <td>Normal stress on rotated plane</td>
+                </tr>
+                <tr>
+                    <td>Stress Transformation (Shear)</td>
+                    <td>\(\tau_{x'y'} = -\frac{\sigma_{xx} - \sigma_{yy}}{2}\sin(2\theta) + \tau_{xy}\cos(2\theta)\)</td>
+                    <td>Shear stress on rotated plane</td>
+                </tr>
+                <tr>
+                    <td>Principal Stresses</td>
+                    <td>\(\sigma_{1,2} = \frac{\sigma_{xx} + \sigma_{yy}}{2} \pm \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\)</td>
+                    <td>Maximum and minimum normal stresses</td>
+                </tr>
+                <tr>
+                    <td>Principal Angle</td>
+                    <td>\(\tan(2\theta_p) = \frac{2\tau_{xy}}{\sigma_{xx} - \sigma_{yy}}\)</td>
+                    <td>Orientation of principal planes</td>
+                </tr>
+                <tr>
+                    <td>Maximum Shear Stress</td>
+                    <td>\(\tau_{max} = \frac{\sigma_1 - \sigma_2}{2} = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\)</td>
+                    <td>Maximum in-plane shear stress</td>
+                </tr>
+                <tr>
+                    <td>Max Shear Angle</td>
+                    <td>\(\tan(2\theta_s) = -\frac{\sigma_{xx} - \sigma_{yy}}{2\tau_{xy}}\)</td>
+                    <td>Orientation of max shear planes (45° from principal)</td>
+                </tr>
+                <tr>
+                    <td>Mohr's Circle Center</td>
+                    <td>\(\sigma_{avg} = \frac{\sigma_{xx} + \sigma_{yy}}{2}\)</td>
+                    <td>Center of Mohr's circle on σ axis</td>
+                </tr>
+                <tr>
+                    <td>Mohr's Circle Radius</td>
+                    <td>\(R = \sqrt{\left(\frac{\sigma_{xx} - \sigma_{yy}}{2}\right)^2 + \tau_{xy}^2}\)</td>
+                    <td>Radius of Mohr's circle</td>
+                </tr>
+                <tr>
+                    <td>Rankine Criterion</td>
+                    <td>\(\sigma_{eq} = \max(\sigma_1, |\sigma_2|)\)</td>
+                    <td>Maximum principal stress (brittle materials)</td>
+                </tr>
+                <tr>
+                    <td>Tresca Criterion</td>
+                    <td>\(\sigma_{eq} = \sigma_1 - \sigma_2\)</td>
+                    <td>Maximum shear stress (ductile materials)</td>
+                </tr>
+                <tr>
+                    <td>Von Mises Criterion</td>
+                    <td>\(\sigma_{eq} = \sqrt{\sigma_1^2 - \sigma_1\sigma_2 + \sigma_2^2}\)</td>
+                    <td>Distortion energy (ductile materials)</td>
+                </tr>
+                <tr>
+                    <td>Von Mises (Components)</td>
+                    <td>\(\sigma_{eq} = \sqrt{\sigma_{xx}^2 - \sigma_{xx}\sigma_{yy} + \sigma_{yy}^2 + 3\tau_{xy}^2}\)</td>
+                    <td>Von Mises in stress components</td>
+                </tr>
+                <tr>
+                    <td>Factor of Safety</td>
+                    <td>\(FS = \frac{\sigma_{failure}}{\sigma_{equivalent}}\)</td>
+                    <td>Safety margin (FS > 1 for safe design)</td>
+                </tr>
+            </table>
+        </div>
+
         <div class="key-point">
             <h3>Key Takeaways</h3>
             <ol>
@@ -469,10 +536,6 @@
             </div>
         </div>
     </div>
-
-    <footer>
-        <script src="/assets/common/footer.js"></script>
-    </footer>
     
     <script>
         // Tab functionality
@@ -498,9 +561,8 @@
 
 <!-- QUIZ SECTION -->
 <div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
     <div class="quiz-container">
-        <h2>Knowledge Check Quiz</h2>
-
         <div class="quiz-question">
             <h3>Question 1: What are principal stresses?</h3>
             <div class="quiz-options">
@@ -597,5 +659,9 @@ document.getElementById('submit-quiz').addEventListener('click', function() {
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
 </body>
+
 </html>

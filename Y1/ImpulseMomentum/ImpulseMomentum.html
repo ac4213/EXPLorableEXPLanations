@@ -221,41 +221,47 @@
             <button id="reset-billiards">Reset</button>
             <button id="run-collision">Run Collision</button>
             <button id="toggle-vectors">Toggle Vectors</button>
-            
-            <div class="control-group">
-                <label for="mass-ratio">Mass Ratio (White/Blue):</label>
-                <input type="range" id="mass-ratio" min="0.5" max="3" step="0.1" value="1">
-                <span id="mass-ratio-value">1.0</span>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="mass-ratio">Mass Ratio (White/Blue):</label>
+                    <input type="range" id="mass-ratio" min="0.5" max="3" step="0.1" value="1">
+                    <span id="mass-ratio-value">1.0</span>
+                </div>
+
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="y-pos-white">Impact Offset (White Ball):</label>
+                    <input type="range" id="y-pos-white" min="50" max="350" step="5" value="200">
+                    <span id="y-pos-white-value">200</span>
+                </div>
             </div>
-            
-            <div class="control-group">
-                <label for="y-pos-white">Impact Offset (White Ball):</label>
-                <input type="range" id="y-pos-white" min="50" max="350" step="5" value="200">
-                <span id="y-pos-white-value">200</span>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="speed-white">White Ball Speed (m/s):</label>
+                    <input type="range" id="speed-white" min="0" max="10" step="0.5" value="1">
+                    <span id="speed-white-value">1.0</span>
+                </div>
+
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="speed-blue">Blue Ball Speed (m/s):</label>
+                    <input type="range" id="speed-blue" min="0" max="10" step="0.5" value="1">
+                    <span id="speed-blue-value">1.0</span>
+                </div>
             </div>
-            
-            <div class="control-group">
-                <label for="speed-white">White Ball Speed (m/s):</label>
-                <input type="range" id="speed-white" min="0" max="10" step="0.5" value="5">
-                <span id="speed-white-value">5.0</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="speed-blue">Blue Ball Speed (m/s):</label>
-                <input type="range" id="speed-blue" min="0" max="10" step="0.5" value="2">
-                <span id="speed-blue-value">2.0</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="restitution">Coefficient of Restitution:</label>
-                <input type="range" id="restitution" min="0" max="1" step="0.1" value="0.9">
-                <span id="restitution-value">0.9</span>
-            </div>
-            
-            <div class="control-group">
-                <label for="time-scale">Animation Speed:</label>
-                <input type="range" id="time-scale" min="0.1" max="1" step="0.05" value="0.15">
-                <span id="time-scale-value">15%</span>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="restitution">Coefficient of Restitution:</label>
+                    <input type="range" id="restitution" min="0" max="1" step="0.1" value="1">
+                    <span id="restitution-value">1.0</span>
+                </div>
+
+                <div class="control-group" style="flex: 1; min-width: 250px;">
+                    <label for="time-scale">Animation Speed:</label>
+                    <input type="range" id="time-scale" min="0.01" max="0.1" step="0.01" value="0.01">
+                    <span id="time-scale-value">1%</span>
+                </div>
             </div>
         </div>
 
@@ -396,12 +402,26 @@
             <li><strong>Helicopters:</strong> Tail rotors counteract the torque from the main rotor to prevent the fuselage from spinning.</li>
         </ul>
 
+        <h2>Summary of Key Equations</h2>
+        <div class="key-point">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Impulse-Momentum Theorem:</strong> \(\vec{J} = \Delta\vec{p}\quad\) Impulse equals change in momentum</li>
+                <li><strong>Conservation of Momentum:</strong> In isolated systems, total momentum is conserved</li>
+                <li><strong>Angular Analogue:</strong> \(\vec{J}_\theta = \Delta\vec{L}\quad\) Angular impulse equals change in angular momentum</li>
+                <li><strong>Conservation of Angular Momentum:</strong> Without external torques, angular momentum is conserved</li>
+                <li><strong>Practical Applications:</strong> These principles are crucial for collision analysis, propulsion systems, and rotational dynamics</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
-        
+
         <div class="practice-problems">
             <h3>Problem 1: Head-on Collision</h3>
             <p>Two cars collide head-on. Car A (1500 kg) travels at 20 m/s east, whilst Car B (1200 kg) travels at 15 m/s west. If they stick together after collision, find their final velocity.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
             <div id="solution1" class="hidden">
                 <p>Define east as positive direction.</p>
@@ -415,7 +435,7 @@
         <div class="practice-problems">
             <h3>Problem 2: Figure Skater</h3>
             <p>A figure skater with arms extended has a moment of inertia of 2.5 kg·m² and rotates at 3 rad/s. When pulling arms in, the moment of inertia reduces to 1.0 kg·m². Find the new angular velocity.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
             <div id="solution2" class="hidden">
                 <p>By conservation of angular momentum:</p>
@@ -430,7 +450,7 @@
         <div class="practice-problems">
             <h3>Problem 3: Impulse and Force</h3>
             <p>A 0.15 kg cricket ball travelling at 40 m/s is struck by a bat and leaves at 50 m/s in the opposite direction. If contact time is 0.003 s, find the average force on the ball.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
             <div id="solution3" class="hidden">
                 <p>Define initial direction as positive:</p>
@@ -441,18 +461,6 @@
                 <p>\(F_{avg} = \frac{-13.5}{0.003} = -4500 \text{ N}\)</p>
                 <p>The force is 4500 N in the opposite direction to initial motion.</p>
             </div>
-        </div>
-
-        <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li><strong>Impulse-Momentum Theorem:</strong> \(\vec{J} = \Delta\vec{p}\quad\) Impulse equals change in momentum</li>
-                <li><strong>Conservation of Momentum:</strong> In isolated systems, total momentum is conserved</li>
-                <li><strong>Angular Analogue:</strong> \(\vec{J}_\theta = \Delta\vec{L}\quad\) Angular impulse equals change in angular momentum</li>
-                <li><strong>Conservation of Angular Momentum:</strong> Without external torques, angular momentum is conserved</li>
-                <li><strong>Practical Applications:</strong> These principles are crucial for collision analysis, propulsion systems, and rotational dynamics</li>
-            </ol>
         </div>
     </div>
 

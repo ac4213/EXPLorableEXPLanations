@@ -25,6 +25,7 @@ const STRESS_ARROW_SCALE = 6.0; // ← master scale for ALL stress arrows (norma
 // Global state
 // ------------------------------
 let cube;
+let axesSketch; // Reference for the axes canvas
 let angle = 0;
 let angleY = 0; // Store Y rotation for manual control
 let angleX = 0; // Store X rotation for manual control
@@ -74,6 +75,9 @@ function setup() {
   calculatePrincipalStresses();
   calculateFailureCriteria();
   updateDisplay();
+
+  // Create the axes reference frame sketch
+  createAxesSketch();
 }
 
 function draw() {
@@ -82,6 +86,8 @@ function draw() {
   // FLAT look: disable lighting entirely so fills/lines are constant
   noLights();
 
+  // Apply 3D transformations for the cube
+  push();
   // Orbit-like rotation
   if (mouseIsPressed && mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     // User is dragging - update stored angles based on mouse position
@@ -103,6 +109,11 @@ function draw() {
   }
 
   cube.display();
+  pop();
+
+  // Draw 2D infoboxes in screen space (outside 3D transformations)
+  cube.drawStressStateInfobox();
+  cube.drawFailureCriteriaInfobox();
 }
 
 // ------------------------------
@@ -389,6 +400,69 @@ class StressCube {
     }
     pop();
   }
+
+  drawStressStateInfobox() {
+    // Update HTML overlay instead of drawing in WEBGL
+    const s = stressComponents;
+
+    // Stress Tensor
+    const tensorHTML = `[${s.xx.toFixed(0).padStart(5)} ${s.xy.toFixed(0).padStart(5)} ${s.xz.toFixed(0).padStart(5)}]
+[${s.xy.toFixed(0).padStart(5)} ${s.yy.toFixed(0).padStart(5)} ${s.yz.toFixed(0).padStart(5)}]
+[${s.xz.toFixed(0).padStart(5)} ${s.yz.toFixed(0).padStart(5)} ${s.zz.toFixed(0).padStart(5)}]`;
+
+    const tensorEl = document.getElementById('stress-tensor-display');
+    if (tensorEl) tensorEl.textContent = tensorHTML;
+
+    // Principal Stresses
+    const principalHTML = `σ₁: ${principalStresses.s1.toFixed(1)} MPa<br>σ₂: ${principalStresses.s2.toFixed(1)} MPa<br>σ₃: ${principalStresses.s3.toFixed(1)} MPa`;
+    const principalEl = document.getElementById('principal-stresses-display');
+    if (principalEl) principalEl.innerHTML = principalHTML;
+
+    // Principal Directions
+    if (principalStresses.v1 && principalStresses.v2 && principalStresses.v3) {
+      const v1 = principalStresses.v1;
+      const v2 = principalStresses.v2;
+      const v3 = principalStresses.v3;
+      const directionsHTML = `[${v1[0].toFixed(2).padStart(5)} ${v1[1].toFixed(2).padStart(5)} ${v1[2].toFixed(2).padStart(5)}]
+[${v2[0].toFixed(2).padStart(5)} ${v2[1].toFixed(2).padStart(5)} ${v2[2].toFixed(2).padStart(5)}]
+[${v3[0].toFixed(2).padStart(5)} ${v3[1].toFixed(2).padStart(5)} ${v3[2].toFixed(2).padStart(5)}]`;
+      const directionsEl = document.getElementById('principal-directions-display');
+      if (directionsEl) directionsEl.textContent = directionsHTML;
+    }
+  }
+
+  drawFailureCriteriaInfobox() {
+    // Update HTML overlay instead of drawing in WEBGL
+    const trescaStatus = failureCriteria.tresca.status;
+    const vmStatus = failureCriteria.vonMises.status;
+    const trescaColor = trescaStatus === 'Safe' ? 'rgb(0,150,0)' : 'rgb(220,20,60)';
+    const vmColor = vmStatus === 'Safe' ? 'rgb(0,150,0)' : 'rgb(220,20,60)';
+
+    const criteriaHTML = `
+      <div style="margin-bottom: 8px;">
+        <strong>Tresca:</strong> ${failureCriteria.tresca.value.toFixed(1)} MPa
+        <span style="color: ${trescaColor}; font-weight: bold; margin-left: 10px;">${trescaStatus}</span>
+      </div>
+      <div>
+        <strong>Von Mises:</strong> ${failureCriteria.vonMises.value.toFixed(1)} MPa
+        <span style="color: ${vmColor}; font-weight: bold; margin-left: 10px;">${vmStatus}</span>
+      </div>
+    `;
+
+    const criteriaEl = document.getElementById('failure-criteria-display');
+    if (criteriaEl) criteriaEl.innerHTML = criteriaHTML;
+
+    // Overall status
+    const overallSafe = failureCriteria.tresca.status === 'Safe' && failureCriteria.vonMises.status === 'Safe';
+    const overallColor = overallSafe ? 'rgb(0,150,0)' : 'rgb(220,20,60)';
+    const overallText = overallSafe ? 'MATERIAL IS SAFE' : 'MATERIAL FAILS';
+
+    const statusEl = document.getElementById('overall-status-display');
+    if (statusEl) {
+      statusEl.textContent = overallText;
+      statusEl.style.color = overallColor;
+    }
+  }
 }
 
 // ------------------------------
@@ -660,6 +734,90 @@ function toggleSolution(id) {
     solution.style.display = "none";
     button.textContent = "Show Solution";
   }
+}
+
+// ------------------------------
+// Reference Axes Sketch (top-right corner)
+// ------------------------------
+function createAxesSketch() {
+  const axesSketchFunc = function(p) {
+    p.setup = function() {
+      const canvas = p.createCanvas(100, 100, p.WEBGL);
+      canvas.parent('axes-holder');
+    };
+
+    p.draw = function() {
+      p.background(240);
+      p.noLights();
+
+      // Match the rotation of the main cube
+      p.rotateY(angleY);
+      p.rotateX(angleX);
+
+      // Draw X axis (red)
+      p.push();
+      p.stroke(255, 0, 0);
+      p.strokeWeight(3);
+      p.line(0, 0, 0, 30, 0, 0);
+      // Arrow head
+      p.translate(30, 0, 0);
+      p.rotateZ(-p.HALF_PI);
+      p.fill(255, 0, 0);
+      p.noStroke();
+      p.cone(3, 8);
+      p.pop();
+
+      // Draw Y axis (blue)
+      p.push();
+      p.stroke(0, 96, 255);
+      p.strokeWeight(3);
+      p.line(0, 0, 0, 0, 30, 0);
+      // Arrow head
+      p.translate(0, 30, 0);
+      p.fill(0, 96, 255);
+      p.noStroke();
+      p.cone(3, 8);
+      p.pop();
+
+      // Draw Z axis (green)
+      p.push();
+      p.stroke(0, 176, 0);
+      p.strokeWeight(3);
+      p.line(0, 0, 0, 0, 0, 30);
+      // Arrow head
+      p.translate(0, 0, 30);
+      p.rotateX(p.HALF_PI);
+      p.fill(0, 176, 0);
+      p.noStroke();
+      p.cone(3, 8);
+      p.pop();
+
+      // Draw labels (in screen space)
+      p.push();
+      p.camera(0, 0, (100/2.0) / p.tan(p.PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
+      p.ortho(-50, 50, -50, 50, 0, 1000);
+
+      // Transform back to get label positions
+      let xPos = p.createVector(35, 0, 0);
+      let yPos = p.createVector(0, 35, 0);
+      let zPos = p.createVector(0, 0, 35);
+
+      p.fill(255, 0, 0);
+      p.noStroke();
+      p.textSize(14);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.text('x', xPos.x, xPos.y, xPos.z);
+
+      p.fill(0, 96, 255);
+      p.text('y', yPos.x, yPos.y, yPos.z);
+
+      p.fill(0, 176, 0);
+      p.text('z', zPos.x, zPos.y, zPos.z);
+      p.pop();
+    };
+  };
+
+  axesSketch = new p5(axesSketchFunc);
 }
 
 // ------------------------------

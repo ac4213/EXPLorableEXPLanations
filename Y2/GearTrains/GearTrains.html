@@ -102,13 +102,44 @@
 
         <h3>Key Concepts</h3>
         <div class="equation-box">
-            <p>Gear Ratio: \(GR = \frac{N_{driven}}{N_{driver}} = \frac{\omega_{driver}}{\omega_{driven}} = \frac{T_{driven}}{T_{driver}}\)</p>
+            <p>Gear Ratio: \(\eta = \frac{\omega_{driver}}{\omega_{driven}} = \frac{T_{driven}}{T_{driver}} = \frac{N_{driven}}{N_{driver}}\)</p>
             <p>Where:</p>
             <ul>
                 <li>\(N\) = Number of teeth</li>
                 <li>\(\omega\) = Angular velocity</li>
                 <li>\(T\) = Torque</li>
             </ul>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>ISO Standards for Gears</h2>
+
+        <h3>ISO Module Series</h3>
+        <p>The module is the fundamental parameter in metric gear design. ISO 54:1996 specifies preferred modules:</p>
+
+        <div class="equation-box">
+            <p><strong>Series 1 (Preferred):</strong> 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 32, 40, 50 mm</p>
+            <p><strong>Series 2:</strong> 0.55, 0.7, 0.9, 1.125, 1.375, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 7, 9, 11, 14, 18, 22, 28, 36, 45 mm</p>
+        </div>
+
+        <h3>Standard Pressure Angles</h3>
+        <ul>
+            <li><strong>20°</strong> - Standard pressure angle (ISO 53:1998)</li>
+            <li><strong>25°</strong> - For heavy-duty applications</li>
+            <li><strong>14.5°</strong> - Older standard, still used in some applications</li>
+        </ul>
+
+        <h3>Gear Geometry Formulas (ISO Standard)</h3>
+        <div class="equation-box">
+            <p>Pitch Diameter: \(d = m \times z\)</p>
+            <p>Base Circle Diameter: \(d_b = d \times \cos(\alpha)\)</p>
+            <p>Addendum: \(h_a = 1.0 \times m\)</p>
+            <p>Dedendum: \(h_f = 1.25 \times m\)</p>
+            <p>Clearance: \(c = 0.25 \times m\)</p>
+            <p>Outside Diameter: \(d_a = d + 2h_a = m(z + 2)\)</p>
+            <p>Root Diameter: \(d_f = d - 2h_f = m(z - 2.5)\)</p>
+            <p>Where: \(m\) = module, \(z\) = number of teeth, \(\alpha\) = pressure angle</p>
         </div>
     </div>
 
@@ -146,17 +177,6 @@
                 <button id="reset-involute">Reset Animation</button>
                 <button id="pause-involute">Pause</button>
             </div>
-        </div>
-
-        <div class="iso-note">
-            <strong>ISO Standards Applied:</strong>
-            <ul style="margin: 5px 0; padding-left: 20px;">
-                <li>Module values per ISO 54:1996</li>
-                <li>Addendum = 1.0 × module</li>
-                <li>Dedendum = 1.25 × module</li>
-                <li>Clearance = 0.25 × module</li>
-                <li>Pressure angles per ISO 53:1998</li>
-            </ul>
         </div>
 
         <div class="key-point">
@@ -232,7 +252,7 @@
 
         <div class="equation-box">
             <p>For compound gear trains:</p>
-            <p>\(GR_{total} = GR_1 \times GR_2 \times ... \times GR_n\)</p>
+            <p>\(\eta_{1n} = \eta_{12} \times \eta_{23}\times \ldots \times\eta_{n-1,n}\)</p>
         </div>
     </div>
 
@@ -281,37 +301,6 @@
     </div>
 
     <div class="content-section">
-        <h2>ISO Standards for Gears</h2>
-        
-        <h3>ISO Module Series</h3>
-        <p>The module is the fundamental parameter in metric gear design. ISO 54:1996 specifies preferred modules:</p>
-        
-        <div class="equation-box">
-            <p><strong>Series 1 (Preferred):</strong> 0.5, 0.8, 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 32, 40, 50 mm</p>
-            <p><strong>Series 2:</strong> 0.55, 0.7, 0.9, 1.125, 1.375, 1.75, 2.25, 2.75, 3.5, 4.5, 5.5, 7, 9, 11, 14, 18, 22, 28, 36, 45 mm</p>
-        </div>
-        
-        <h3>Standard Pressure Angles</h3>
-        <ul>
-            <li><strong>20°</strong> - Standard pressure angle (ISO 53:1998)</li>
-            <li><strong>25°</strong> - For heavy-duty applications</li>
-            <li><strong>14.5°</strong> - Older standard, still used in some applications</li>
-        </ul>
-        
-        <h3>Gear Geometry Formulas (ISO Standard)</h3>
-        <div class="equation-box">
-            <p>Pitch Diameter: \(d = m \times z\)</p>
-            <p>Base Circle Diameter: \(d_b = d \times \cos(\alpha)\)</p>
-            <p>Addendum: \(h_a = 1.0 \times m\)</p>
-            <p>Dedendum: \(h_f = 1.25 \times m\)</p>
-            <p>Clearance: \(c = 0.25 \times m\)</p>
-            <p>Outside Diameter: \(d_a = d + 2h_a = m(z + 2)\)</p>
-            <p>Root Diameter: \(d_f = d - 2h_f = m(z - 2.5)\)</p>
-            <p>Where: \(m\) = module, \(z\) = number of teeth, \(\alpha\) = pressure angle</p>
-        </div>
-    </div>
-
-    <div class="content-section">
         <h2>Engineering Applications</h2>
         <p>Gear trains are ubiquitous in mechanical power transmission systems:</p>
         <ul>
@@ -325,8 +314,36 @@
     </div>
 
     <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-box">
+            <table>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Gear Ratio</td>
+                    <td>\(\eta = \frac{\omega_{in}}{\omega_{out}}=\frac{T_{out}}{T_{in}}=\frac{N_{out}}{N_{in}}\)</td>
+                    <td>Speed ratio between gears</td>
+                </tr>
+                <tr>
+                    <td>Pitch Diameter</td>
+                    <td>\(d = mN\)</td>
+                    <td>Diameter at tooth pitch circle</td>
+                </tr>
+                <tr>
+                    <td>Willis Equation</td>
+                    <td>\(\frac{\omega_s - \omega_c}{\omega_r - \omega_c} = -\frac{N_r}{N_s}\)</td>
+                    <td>For Epicyclic Gear Trains</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
         <h2>Practice Problems</h2>
-        
+
         <div class="practice-problems">
             <h3>Problem 1: ISO Standard Gear Design</h3>
             <p>Design a gear pair with a ratio of 3:1 using ISO standard modules. The pinion should have 20 teeth with module 4 mm and 20° pressure angle. Calculate:</p>
@@ -335,7 +352,7 @@
                 <li>Centre distance</li>
                 <li>Base circle diameters</li>
             </ol>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
             <div id="solution1" class="hidden">
                 <p>1. Wheel specifications:</p>
@@ -351,11 +368,11 @@
                 <p>   - Wheel: d_b2 = 240 × cos(20°) = 225.53 mm</p>
             </div>
         </div>
-        
+
         <div class="practice-problems">
             <h3>Problem 2: Module Selection</h3>
             <p>A gear needs a pitch diameter of approximately 100 mm with 25 teeth. Select the appropriate ISO standard module and calculate the exact pitch diameter.</p>
-            
+
             <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
             <div id="solution2" class="hidden">
                 <p>Required module: m = d/z = 100/25 = 4.0 mm</p>
@@ -384,7 +401,7 @@
 
             <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
             <div id="solution3" class="hidden">
-                
+
                 <p><strong>(a) Overall gear ratio:</strong></p>
                 <p>For a compound gear train, the overall ratio is the product of individual ratios:</p>
                 <p>\[i_{total} = \frac{N_2}{N_1} \times \frac{N_4}{N_3} = \frac{60}{20} \times \frac{45}{15} = 3 \times 3 = 9\]</p>
@@ -405,49 +422,10 @@
         </div>
     </div>
 
-    <div class="content-section">
-        <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
-            <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
-                <tr>
-                    <td>Gear Ratio</td>
-                    <td>\(GR = \frac{N_{out}}{N_{in}} = \frac{z_{driven}}{z_{driver}}\)</td>
-                    <td>Speed ratio between gears</td>
-                </tr>
-                <tr>
-                    <td>Pitch Diameter</td>
-                    <td>\(d = mz\)</td>
-                    <td>Diameter at tooth pitch circle</td>
-                </tr>
-                <tr>
-                    <td>Center Distance</td>
-                    <td>\(C = \frac{d_1 + d_2}{2} = \frac{m(z_1 + z_2)}{2}\)</td>
-                    <td>Distance between gear centers</td>
-                </tr>
-                <tr>
-                    <td>Velocity Ratio</td>
-                    <td>\(VR = \frac{\omega_{out}}{\omega_{in}} = \frac{z_{in}}{z_{out}}\)</td>
-                    <td>Angular velocity ratio</td>
-                </tr>
-                <tr>
-                    <td>Torque Ratio</td>
-                    <td>\(TR = \frac{T_{out}}{T_{in}} = \frac{z_{out}}{z_{in}}\)</td>
-                    <td>Torque multiplication ratio</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
     <!-- QUIZ SECTION -->
     <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container">
-            <h2>Knowledge Check Quiz</h2>
-
             <div class="quiz-question">
                 <h3>Question 1: What is the module (m) of a gear?</h3>
                 <div class="quiz-options">
