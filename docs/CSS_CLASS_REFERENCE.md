@@ -1346,6 +1346,18 @@
 - Margin: 20px 0
 - Box-shadow: Standard
 
+**Important:** Do NOT add `id="quiz"` to this element. The ID is not used by any CSS or JavaScript and should be omitted.
+
+**Usage:**
+```html
+<div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
+    <div class="quiz-container">
+        <!-- Quiz questions here -->
+    </div>
+</div>
+```
+
 ---
 
 #### `.quiz-question`

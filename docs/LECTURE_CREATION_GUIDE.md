@@ -208,12 +208,29 @@ Start with the template structure (see next section) and customize for your topi
     <!-- Section 4: Summary of Key Equations -->
     <div class="content-section">
         <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Key Takeaways</h3>
-            <ol>
-                <li><strong>Equation 1:</strong> \(F = ma\)</li>
-                <li><strong>Equation 2:</strong> Description...</li>
-            </ol>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Newton's Second Law</td>
+                        <td>\(F = ma\)</td>
+                        <td>Force equals mass times acceleration</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy</td>
+                        <td>\(E_k = \frac{1}{2}mv^2\)</td>
+                        <td>Energy due to motion</td>
+                    </tr>
+                    <!-- Add more rows as needed -->
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -234,19 +251,21 @@ Start with the template structure (see next section) and customize for your topi
     </div>
 
     <!-- Section 6: Knowledge Check Quiz -->
-    <div class="quiz-container">
+    <div class="content-section">
         <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the formula for force?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) F = mv</label>
+                    <label><input type="radio" name="q1" value="b"> b) F = ma</label>
+                    <label><input type="radio" name="q1" value="c"> c) F = m/a</label>
+                </div>
+            </div>
 
-        <div class="quiz-question">
-            <p><strong>Question 1:</strong> What is the formula for force?</p>
-            <label><input type="radio" name="q1" value="a"> F = mv</label><br>
-            <label><input type="radio" name="q1" value="b"> F = ma</label><br>
-            <label><input type="radio" name="q1" value="c"> F = m/a</label><br>
-            <p id="q1-feedback" class="feedback"></p>
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
         </div>
-
-        <button id="submit-quiz">Submit Quiz</button>
-        <div id="quiz-results"></div>
     </div>
 
     <!-- Footer (auto-generated) -->
@@ -1162,32 +1181,35 @@ let sketch = new p5(function(p) {
 ### Quiz Structure
 
 ```html
-<div class="quiz-container">
+<div class="content-section">
     <h2>Knowledge Check Quiz</h2>
+    <div class="quiz-container">
+        <!-- Question 1 -->
+        <div class="quiz-question">
+            <h3>Question 1: Newton's second law states that:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> a) F = mv</label>
+                <label><input type="radio" name="q1" value="b"> b) F = ma</label>
+                <label><input type="radio" name="q1" value="c"> c) F = m/a</label>
+                <label><input type="radio" name="q1" value="d"> d) F = a/m</label>
+            </div>
+        </div>
 
-    <!-- Question 1 -->
-    <div class="quiz-question">
-        <p><strong>Question 1:</strong> Newton's second law states that:</p>
-        <label><input type="radio" name="q1" value="a"> F = mv</label><br>
-        <label><input type="radio" name="q1" value="b"> F = ma</label><br>
-        <label><input type="radio" name="q1" value="c"> F = m/a</label><br>
-        <label><input type="radio" name="q1" value="d"> F = a/m</label><br>
-        <p id="q1-feedback" class="feedback"></p>
+        <!-- Question 2 -->
+        <div class="quiz-question">
+            <h3>Question 2: If force doubles and mass stays constant, acceleration:</h3>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> a) Stays the same</label>
+                <label><input type="radio" name="q2" value="b"> b) Doubles</label>
+                <label><input type="radio" name="q2" value="c"> c) Halves</label>
+                <label><input type="radio" name="q2" value="d"> d) Quadruples</label>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="submit-quiz">Submit Quiz</button>
+        <div id="quiz-results"></div>
     </div>
-
-    <!-- Question 2 -->
-    <div class="quiz-question">
-        <p><strong>Question 2:</strong> If force doubles and mass stays constant, acceleration:</p>
-        <label><input type="radio" name="q2" value="a"> Stays the same</label><br>
-        <label><input type="radio" name="q2" value="b"> Doubles</label><br>
-        <label><input type="radio" name="q2" value="c"> Halves</label><br>
-        <label><input type="radio" name="q2" value="d"> Quadruples</label><br>
-        <p id="q2-feedback" class="feedback"></p>
-    </div>
-
-    <!-- Submit Button -->
-    <button id="submit-quiz">Submit Quiz</button>
-    <div id="quiz-results"></div>
 </div>
 
 <!-- Include quizzes.js -->
