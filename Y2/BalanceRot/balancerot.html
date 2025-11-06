@@ -258,6 +258,7 @@
 </div>
 </div>
 <div class="simulation-container">
+  <div class="simulation-section">
 <h2>Interactive Simulations</h2>
 <div class="tab-navigation">
 <button class="tab-button active" onclick="switchTab(event,'single')">Single Plane Balancing</button>
@@ -514,6 +515,7 @@
 </div>
 </div>
 </div>
+  </div>
 </div>
 <div class="content-section">
 <h2>Balancing Procedure</h2>
@@ -621,13 +623,16 @@
 
     <div class="content-section">
         <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
+        <div class="equation-table">
             <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td>Static Balance</td>
                     <td>\(\sum m_i r_i = 0\)</td>
@@ -653,6 +658,7 @@
                     <td>\(\theta_b = \arctan\left(\frac{\sum m_i r_i \sin\theta_i}{\sum m_i r_i \cos\theta_i}\right)\)</td>
                     <td>Angular position of balancing mass</td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </div>

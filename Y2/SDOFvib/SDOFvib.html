@@ -13,16 +13,12 @@
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
-    <!-- Import MathJax for LaTeX rendering (async for progressive rendering) -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
     <!-- Import libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
-    <!-- Main simulation script - load last to ensure DOM and libraries are ready -->
-    <script src="SDOFvib.js"></script>
+    <!-- Import MathJax for LaTeX rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
         /* Page-specific styles */
@@ -293,13 +289,16 @@
 
     <div class="content-section">
         <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
+        <div class="equation-table">
             <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td>Natural Frequency</td>
                     <td>\(\omega_n = \sqrt{\frac{k}{m}}\)</td>
@@ -322,14 +321,15 @@
                 </tr>
                 <tr>
                     <td>Forced Response</td>
-                    <td>\(X = \frac{F_0/k}{\sqrt{(1-r^2)^2+(2\zeta r)^2}}\)</td>
+                    <td>\(X = \frac{F_0/k}{\sqrt{(1-\rho^2)^2+(2\zeta \rho)^2}}\)</td>
                     <td>Steady-state amplitude</td>
                 </tr>
                 <tr>
                     <td>Frequency Ratio</td>
-                    <td>\(r = \frac{\omega}{\omega_n}\)</td>
+                    <td>\(\rho = \frac{\omega}{\omega_n}\)</td>
                     <td>Excitation to natural frequency</td>
                 </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -423,8 +423,8 @@
     </div>
 
     <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container">
-            <h2>Knowledge Check Quiz</h2>
 
             <div class="quiz-question">
                 <h3>Question 1: What happens to the natural frequency of a SDOF system if the mass is doubled while keeping the spring stiffness constant?</h3>
@@ -576,23 +576,25 @@
                 const mass = parseFloat(massSlider.value);
                 const stiffness = parseFloat(stiffnessSlider.value);
                 const criticalDamping = 2 * Math.sqrt(stiffness * mass);
-                
-                // Update critical damping marker
+
+                // Update critical damping marker (if it exists)
                 const criticalMarker = document.getElementById('critical-damping-marker');
-                const dampingSlider = document.getElementById('damping-slider');
-                
-                // Calculate position as percentage of slider width
-                const sliderMin = parseFloat(dampingSlider.min);
-                const sliderMax = parseFloat(dampingSlider.max);
-                const percentage = ((criticalDamping - sliderMin) / (sliderMax - sliderMin)) * 100;
-                
-                // Ensure the marker stays within the slider bounds
-                const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
-                
-                // Position the marker
-                criticalMarker.style.left = `${clampedPercentage}%`;
+                if (criticalMarker) {
+                    const dampingSlider = document.getElementById('damping-slider');
+
+                    // Calculate position as percentage of slider width
+                    const sliderMin = parseFloat(dampingSlider.min);
+                    const sliderMax = parseFloat(dampingSlider.max);
+                    const percentage = ((criticalDamping - sliderMin) / (sliderMax - sliderMin)) * 100;
+
+                    // Ensure the marker stays within the slider bounds
+                    const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+
+                    // Position the marker
+                    criticalMarker.style.left = `${clampedPercentage}%`;
+                }
             }
-            
+
             // Initialize marker position
             updateCriticalDampingMarker();
         });
@@ -604,5 +606,8 @@
     <!-- Common JavaScript functions -->
     <script src="/assets/common/problems.js"></script>
     <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Main simulation script - load last to ensure DOM and libraries are ready -->
+    <script src="SDOFvib.js"></script>
 </body>
 </html>

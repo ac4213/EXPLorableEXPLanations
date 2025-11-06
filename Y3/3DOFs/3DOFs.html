@@ -499,6 +499,7 @@
     </div>
 
     <div class="simulation-container">
+        <div class="simulation-section">
         <h2>Interactive 3-DOF Vibration Simulation</h2>
         <p>Explore how changing masses, spring stiffnesses, and initial conditions affects the vibrational behavior. Observe both modal and physical responses.</p>
 
@@ -1345,19 +1346,73 @@
 
 <div class="content-section">
     <h2>Summary of Key Equations</h2>
-    <div class="key-point">
-        <h3>Key Takeaways</h3>
-        <ol>
-            <li><strong>Equations of Motion:</strong> Undamped MDOF systems are governed by \(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\), with mass and stiffness matrices derived from free-body diagrams</li>
-            <li><strong>Natural Frequencies:</strong> 3-DOF systems have three natural frequencies found by solving the eigenvalue problem \((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</li>
-            <li><strong>Mode Shapes:</strong> Each natural frequency has an associated mode shape (eigenvector) representing the pattern of vibration</li>
-            <li><strong>Orthogonality:</strong> Mode shapes satisfy \(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) and \(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\), enabling modal decomposition</li>
-            <li><strong>Modal Decomposition:</strong> Coupled physical equations transform into independent modal equations: \(\ddot{q}_i + \omega_i^2 q_i = 0\)</li>
-            <li><strong>Proportional Damping:</strong> Rayleigh damping \(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\) preserves modal decoupling with damping ratios \(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</li>
-            <li><strong>Forced Response:</strong> External forces are projected onto modal coordinates via \(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\), allowing each mode to be solved independently</li>
-            <li><strong>Resonance:</strong> Large amplitude responses occur when forcing frequency approaches a natural frequency, emphasizing the importance of knowing system eigenvalues</li>
-            <li><strong>Modal Superposition:</strong> Total response is the sum of all modal contributions: \(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</li>
-        </ol>
+    <div class="equation-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Equations of motion (undamped)</td>
+                    <td>\(\mathbf{M}\ddot{\mathbf{x}} + \mathbf{K}\mathbf{x} = \mathbf{0}\)</td>
+                    <td>\(\mathbf{M}\) = mass matrix; \(\mathbf{K}\) = stiffness matrix; \(\mathbf{x}\) = displacement vector</td>
+                </tr>
+                <tr>
+                    <td>Eigenvalue problem</td>
+                    <td>\((\mathbf{K} - \omega^2\mathbf{M})\mathbf{\Phi} = \mathbf{0}\)</td>
+                    <td>\(\omega\) = natural frequency; \(\mathbf{\Phi}\) = mode shape (eigenvector)</td>
+                </tr>
+                <tr>
+                    <td>Mass orthogonality condition</td>
+                    <td>\(\mathbf{\Phi}_i^T\mathbf{M}\mathbf{\Phi}_j = 0\) for \(i \neq j\)</td>
+                    <td>Mode shapes are orthogonal with respect to mass matrix</td>
+                </tr>
+                <tr>
+                    <td>Stiffness orthogonality condition</td>
+                    <td>\(\mathbf{\Phi}_i^T\mathbf{K}\mathbf{\Phi}_j = 0\) for \(i \neq j\)</td>
+                    <td>Mode shapes are orthogonal with respect to stiffness matrix</td>
+                </tr>
+                <tr>
+                    <td>Modal transformation</td>
+                    <td>\(\mathbf{x}(t) = \mathbf{\Phi}\mathbf{q}(t)\)</td>
+                    <td>\(\mathbf{q}(t)\) = modal coordinates; \(\mathbf{\Phi}\) = modal matrix</td>
+                </tr>
+                <tr>
+                    <td>Uncoupled modal equation</td>
+                    <td>\(\ddot{q}_i + \omega_i^2 q_i = 0\)</td>
+                    <td>Each mode behaves as independent SDOF system</td>
+                </tr>
+                <tr>
+                    <td>Rayleigh damping matrix</td>
+                    <td>\(\mathbf{C} = \alpha\mathbf{M} + \beta\mathbf{K}\)</td>
+                    <td>\(\alpha, \beta\) = Rayleigh damping coefficients</td>
+                </tr>
+                <tr>
+                    <td>Modal damping ratio</td>
+                    <td>\(\zeta_i = \frac{\alpha}{2\omega_i} + \frac{\beta\omega_i}{2}\)</td>
+                    <td>\(\zeta_i\) = damping ratio for mode \(i\)</td>
+                </tr>
+                <tr>
+                    <td>Damped modal equation</td>
+                    <td>\(\ddot{q}_i + 2\zeta_i\omega_i\dot{q}_i + \omega_i^2 q_i = 0\)</td>
+                    <td>Each damped mode as damped SDOF system</td>
+                </tr>
+                <tr>
+                    <td>Modal force (forced vibration)</td>
+                    <td>\(Q_i(t) = \mathbf{\Phi}_i^T\mathbf{f}(t)\)</td>
+                    <td>\(\mathbf{f}(t)\) = external force vector; \(Q_i(t)\) = modal force</td>
+                </tr>
+                <tr>
+                    <td>Modal superposition</td>
+                    <td>\(\mathbf{x}(t) = \sum_{i=1}^{3} \mathbf{\Phi}_i q_i(t)\)</td>
+                    <td>Total response is sum of all modal contributions</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -1465,6 +1520,7 @@
             <p><strong>Answer:</strong> The amplitude is 0.319 m or 319 mm. Note that this is a significant amplitude because the forcing frequency (32 rad/s) is very close to the second natural frequency (30 rad/s), creating a near-resonance condition.</p>
         </div>
     </div>
+        </div>
 </div>
 
 <div class="content-section">

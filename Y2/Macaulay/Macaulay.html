@@ -200,15 +200,53 @@
 
 <div class="content-section">
   <h2>Summary of Key Equations</h2>
-  <div class="key-point">
-    <h3>Key Takeaways</h3>
-    <ol>
-      <li>Macaulay's method uses bracket notation to handle discontinuities in beam loading</li>
-      <li>A single equation can describe bending moment over the entire beam length</li>
-      <li>The method is particularly efficient for beams with multiple point loads</li>
-      <li>Boundary conditions are applied after integration to find constants</li>
-      <li>For indeterminate beams, the stiffness (compatibility) method is required</li>
-    </ol>
+  <div class="equation-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Concept</th>
+          <th>Equation</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Macaulay bracket definition</td>
+          <td>\(\langle x - a \rangle^n = \begin{cases}(x-a)^n & \text{if } x \geq a \\ 0 & \text{if } x < a\end{cases}\)</td>
+          <td>\(a\) = discontinuity position; \(n\) = exponent</td>
+        </tr>
+        <tr>
+          <td>Concentrated moment contribution to M(x)</td>
+          <td>\(M_0\langle x - a \rangle^0\)</td>
+          <td>\(M_0\) = applied moment at position \(a\)</td>
+        </tr>
+        <tr>
+          <td>Point load contribution to M(x)</td>
+          <td>\(P\langle x - a \rangle^1\)</td>
+          <td>\(P\) = point load at position \(a\)</td>
+        </tr>
+        <tr>
+          <td>UDL contribution to M(x)</td>
+          <td>\(\frac{w}{2}\langle x - a \rangle^2\)</td>
+          <td>\(w\) = UDL intensity starting at position \(a\)</td>
+        </tr>
+        <tr>
+          <td>Beam curvature equation</td>
+          <td>\(EI\frac{d^2v}{dx^2} = M(x)\)</td>
+          <td>\(E\) = Young's modulus; \(I\) = second moment of area; \(v\) = deflection</td>
+        </tr>
+        <tr>
+          <td>Slope equation (first integration)</td>
+          <td>\(EI\frac{dv}{dx} = \int M \, dx + C_1\)</td>
+          <td>\(C_1\) = integration constant from boundary conditions</td>
+        </tr>
+        <tr>
+          <td>Deflection equation (second integration)</td>
+          <td>\(EIv = \int\int M \, dx^2 + C_1x + C_2\)</td>
+          <td>\(C_2\) = integration constant from boundary conditions</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
 

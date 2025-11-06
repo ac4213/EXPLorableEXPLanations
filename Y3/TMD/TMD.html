@@ -126,6 +126,7 @@
     </div>
 
     <div class="simulation-container">
+        <div class="simulation-section">
         <h2>Interactive TMD Simulation</h2>
         <p>Compare the unprotected and TMD-protected systems. Adjust the TMD mass ratio, damping, and forcing frequency to observe their effects on vibration amplitude.</p>
 
@@ -485,6 +486,7 @@
     </script>
 
 </div> <!-- End app-container -->
+        </div>
 </div> <!-- End simulation-container -->
 
 <div class="content-section">
@@ -587,46 +589,50 @@
 </div>
 
 <div class="content-section">
-    <h2>Summary of Key Equations</h2>
-    <div class="equation-box">
-        <table>
+<h2>Summary of Key Equations</h2>
+<div class="equation-table">
+    <table>
+        <thead>
             <tr>
                 <th>Concept</th>
                 <th>Equation</th>
                 <th>Description</th>
             </tr>
-            <tr>
-                <td>Mass Ratio</td>
-                <td>\(\mu = \frac{m_{TMD}}{m_{structure}}\)</td>
-                <td>Ratio of TMD mass to primary structure mass (typically 1-5%)</td>
-            </tr>
-            <tr>
-                <td>Optimal Frequency Ratio</td>
-                <td>\(f_{opt} = \frac{1}{1 + \mu}\)</td>
-                <td>Ratio of TMD frequency to structure frequency for optimal tuning</td>
-            </tr>
-            <tr>
-                <td>Optimal Damping Ratio</td>
-                <td>\(\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}}\)</td>
-                <td>Damping ratio that minimizes peak response</td>
-            </tr>
-            <tr>
-                <td>TMD Natural Frequency</td>
-                <td>\(\omega_{TMD} = \sqrt{\frac{k_{TMD}}{m_{TMD}}}\)</td>
-                <td>Natural frequency of the TMD subsystem</td>
-            </tr>
-            <tr>
-                <td>Vibration Reduction</td>
-                <td>\(\text{Reduction} \approx \frac{\mu}{1 + \mu}\)</td>
-                <td>Approximate amplitude reduction at resonance (up to 90% possible)</td>
-            </tr>
-        </table>
-    </div>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Mass Ratio</td>
+            <td>\(\mu = \frac{m_{TMD}}{m_{structure}}\)</td>
+            <td>Ratio of TMD mass to primary structure mass (typically 1-5%)</td>
+        </tr>
+        <tr>
+            <td>Optimal Frequency Ratio</td>
+            <td>\(f_{opt} = \frac{1}{1 + \mu}\)</td>
+            <td>Ratio of TMD frequency to structure frequency for optimal tuning</td>
+        </tr>
+        <tr>
+            <td>Optimal Damping Ratio</td>
+            <td>\(\zeta_{opt} = \sqrt{\frac{3\mu}{8(1+\mu)^3}}\)</td>
+            <td>Damping ratio that minimizes peak response</td>
+        </tr>
+        <tr>
+            <td>TMD Natural Frequency</td>
+            <td>\(\omega_{TMD} = \sqrt{\frac{k_{TMD}}{m_{TMD}}}\)</td>
+            <td>Natural frequency of the TMD subsystem</td>
+        </tr>
+        <tr>
+            <td>Vibration Reduction</td>
+            <td>\(\text{Reduction} \approx \frac{\mu}{1 + \mu}\)</td>
+            <td>Approximate amplitude reduction at resonance (up to 90% possible)</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </div>
 
 <div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
     <div class="quiz-container">
-        <h2>Knowledge Check Quiz</h2>
 
         <div class="quiz-question">
             <h3>Question 1: What is the primary purpose of a Tuned Mass Damper?</h3>

@@ -250,15 +250,48 @@
 
 <div class="content-section">
     <h2>Summary of Key Equations</h2>
-    <ul>
-        <li>Beam analysis starts with identifying support conditions and applied loads</li>
-        <li>Static equilibrium equations help determine the reaction forces</li>
-        <li>Shear force and bending moment diagrams reveal the internal loads throughout the beam</li>
-        <li>The relationship between load, shear, and moment helps in understanding beam behaviour</li>
-    </ul>
-
-    <div class="key-point">
-        <p>Experiment with the interactive simulations to develop an intuitive understanding of beam behaviour under various loading conditions.</p>
+    <div class="equation-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Concept</th>
+                    <th>Equation</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Vertical force equilibrium</td>
+                    <td>\(\sum F_y = 0\)</td>
+                    <td>\(F_y\) = vertical forces</td>
+                </tr>
+                <tr>
+                    <td>Moment equilibrium</td>
+                    <td>\(\sum M = 0\)</td>
+                    <td>\(M\) = moments about any point</td>
+                </tr>
+                <tr>
+                    <td>Shear force at section x</td>
+                    <td>\(V(x) = \sum \text{forces to the left of } x\)</td>
+                    <td>\(V(x)\) = shear force at position x</td>
+                </tr>
+                <tr>
+                    <td>Bending moment at section x</td>
+                    <td>\(M(x) = \sum \text{moments to the left of } x\)</td>
+                    <td>\(M(x)\) = bending moment at position x</td>
+                </tr>
+                <tr>
+                    <td>Derivative of bending moment</td>
+                    <td>\(\frac{dM(x)}{dx} = V(x)\)</td>
+                    <td>Shear force equals slope of moment diagram</td>
+                </tr>
+                <tr>
+                    <td>Derivative of shear force</td>
+                    <td>\(\frac{dV(x)}{dx} = -q(x)\)</td>
+                    <td>\(q(x)\) = distributed load intensity</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -365,8 +398,8 @@
 
 <!-- QUIZ SECTION -->
 <div class="content-section">
+    <h2>Knowledge Check Quiz</h2>
     <div class="quiz-container">
-        <h2>Knowledge Check Quiz</h2>
 
         <div class="quiz-question">
             <h3>Question 1: In a simply supported beam, which of the following is true about the reaction forces when a central point load is applied?</h3>

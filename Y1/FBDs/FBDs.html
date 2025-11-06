@@ -44,7 +44,9 @@
             <p><strong>Key Principle:</strong> A free body diagram shows a body isolated from its surroundings with all external forces and moments acting upon it.</p>
             <p>Internal forces and kinematic quantities such as displacements, velocities, accelerations are NEVER shown on FBDs.</p>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Active Forces</h2>
         <p>Active forces are externally applied loads that act on a structure or body. These include:</p>
 
@@ -75,7 +77,9 @@
             <p>Always acts vertically downward</p>
             <p>Magnitude: \(W = mg\) where \(g = 9.81 \text{ m/s}^2\)</p>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Reactive Forces (Support Reactions)</h2>
         <p>Reactive forces are the forces that develop at supports or constraints in response to applied loads. Understanding these is crucial for structural analysis.</p>
 
@@ -287,7 +291,9 @@
                 <li><strong>Label everything:</strong> Add clear labels and coordinate system</li>
             </ol>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Equilibrium Equations</h2>
         <p>For a body in static equilibrium, the following conditions must be satisfied:</p>
         
@@ -298,7 +304,9 @@
             <p><strong>Moment Equilibrium:</strong></p>
             <p>\(\sum M_O = 0\) (Sum of moments about any point O = 0)</p>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Common Mistakes to Avoid</h2>
         <ul>
             <li><strong>Missing forces:</strong> Forgetting weight or applied loads</li>
@@ -307,7 +315,9 @@
             <li><strong>Incorrect friction direction:</strong> Friction opposes relative motion</li>
             <li><strong>Cable compression:</strong> Cables can only be in tension</li>
         </ul>
+    </div>
 
+    <div class="content-section">
         <h2>Advanced Topics</h2>
 
         <h3>Two-Force Members</h3>
@@ -339,7 +349,9 @@
             <p>If DSI > 0: Statically indeterminate (requires additional compatibility equations)</p>
             <p>If DSI < 0: Mechanism (unstable structure)</p>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Engineering Applications</h2>
         <p>Free body diagrams are fundamental tools used across all branches of engineering and physics:</p>
         <ul>
@@ -350,71 +362,73 @@
             <li><strong>Vehicle Dynamics:</strong> Analyzing suspension systems, braking forces, and cornering behavior. FBDs help optimize handling, safety, and comfort.</li>
             <li><strong>Robotics:</strong> Determining actuator requirements and joint forces in robotic arms and mobile robots. FBDs ensure robots can perform required tasks safely.</li>
         </ul>
+    </div>
 
+    <div class="content-section">
         <h2>Summary of Key Equations</h2>
-        <div class="key-point">
-            <h3>Essential Concepts</h3>
-            <p>Free Body Diagrams are fundamental tools in engineering mechanics that allow us to systematically analyze forces and achieve equilibrium. Here are the key takeaways from this lecture:</p>
-
-            <h4>1. What is a Free Body Diagram?</h4>
-            <ul>
-                <li>A graphical representation showing a body isolated from its surroundings</li>
-                <li>Shows ALL external forces and moments acting on the body</li>
-                <li>Does NOT show internal forces, velocities, or accelerations</li>
-            </ul>
-
-            <h4>2. Types of Forces</h4>
-            <ul>
-                <li><strong>Active Forces:</strong> Externally applied loads (point forces, moments, distributed loads, weight)</li>
-                <li><strong>Reactive Forces:</strong> Forces from supports and constraints (normal forces, friction, support reactions)</li>
-                <li><strong>Special Forces:</strong> Cables (tension only), springs (Hooke's Law: F = kΔx), normal forces (perpendicular to surface)</li>
-            </ul>
-
-            <h4>3. Support Types (2D)</h4>
-            <ul>
-                <li><strong>Roller:</strong> 1 reaction (perpendicular to surface), allows translation and rotation</li>
-                <li><strong>Pin:</strong> 2 reactions (horizontal and vertical), allows rotation</li>
-                <li><strong>Fixed:</strong> 2 reactions + 1 moment, prevents all movement and rotation</li>
-                <li><strong>Collar:</strong> 1 reaction + 1 moment, allows translation along guide</li>
-            </ul>
-
-            <h4>4. Contact Conditions</h4>
-            <ul>
-                <li><strong>Smooth Contact:</strong> Frictionless surface providing only normal force perpendicular to surface</li>
-                <li><strong>Rough Contact:</strong> Surface with friction providing both normal and friction forces (f ≤ μN)</li>
-            </ul>
-
-            <h4>5. Equilibrium Conditions (2D)</h4>
-            <p>For a body in static equilibrium, three equations must be satisfied:</p>
-            <ul>
-                <li>\(\sum F_x = 0\) - Sum of horizontal forces equals zero</li>
-                <li>\(\sum F_y = 0\) - Sum of vertical forces equals zero</li>
-                <li>\(\sum M_O = 0\) - Sum of moments about any point O equals zero</li>
-            </ul>
-
-            <h4>6. Systematic FBD Drawing Procedure</h4>
-            <ol>
-                <li>Isolate the body of interest from its surroundings</li>
-                <li>Draw the body's outline or simplified representation</li>
-                <li>Add all active forces (applied loads, weight, moments)</li>
-                <li>Replace supports with their reaction forces/moments</li>
-                <li>Add coordinate system and label all forces clearly</li>
-                <li>Apply equilibrium equations to solve for unknowns</li>
-            </ol>
-
-            <h4>7. Key Principles to Remember</h4>
-            <ul>
-                <li>Distributed loads can be replaced by their resultant at the centroid</li>
-                <li>Massless cables have constant tension throughout</li>
-                <li>Pulleys redirect cable forces but maintain tension (if massless and frictionless)</li>
-                <li>Two-force members have equal, opposite, collinear forces</li>
-                <li>Three-force members have concurrent or parallel forces</li>
-                <li>Check static determinacy: compare unknowns vs. available equations</li>
-            </ul>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Horizontal force equilibrium</td>
+                        <td>\(\sum F_x = 0\)</td>
+                        <td>\(F_x\) = horizontal forces</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical force equilibrium</td>
+                        <td>\(\sum F_y = 0\)</td>
+                        <td>\(F_y\) = vertical forces</td>
+                    </tr>
+                    <tr>
+                        <td>Moment equilibrium</td>
+                        <td>\(\sum M_O = 0\)</td>
+                        <td>\(M_O\) = moments about point O</td>
+                    </tr>
+                    <tr>
+                        <td>Gravitational force (weight)</td>
+                        <td>\(W = mg\)</td>
+                        <td>\(m\) = mass; \(g = 9.81\) m/s²</td>
+                    </tr>
+                    <tr>
+                        <td>UDL resultant force</td>
+                        <td>\(F = w \cdot L\)</td>
+                        <td>\(w\) = load intensity; \(L\) = length</td>
+                    </tr>
+                    <tr>
+                        <td>Static friction (maximum)</td>
+                        <td>\(f_s \leq \mu_s N\)</td>
+                        <td>\(\mu_s\) = coefficient of static friction; \(N\) = normal force</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic friction</td>
+                        <td>\(f_k = \mu_k N\)</td>
+                        <td>\(\mu_k\) = coefficient of kinetic friction</td>
+                    </tr>
+                    <tr>
+                        <td>Spring force (Hooke's Law)</td>
+                        <td>\(F = k \Delta x\)</td>
+                        <td>\(k\) = spring constant; \(\Delta x\) = extension/compression</td>
+                    </tr>
+                    <tr>
+                        <td>Degree of static indeterminacy</td>
+                        <td>\(\text{DSI} = \text{unknowns} - \text{equations}\)</td>
+                        <td>DSI = 0 (determinate); DSI > 0 (indeterminate)</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
+    <div class="content-section">
         <h2>Practice Problems</h2>
-        
+
         <div class="practice-problems">
             <h3>Problem 1: Simply Supported Beam</h3>
             <p>A 6-metre beam is simply supported at both ends. It carries a uniformly distributed load of 10 kN/m and a point load of 20 kN at 2 metres from the left support. Draw the free body diagram and calculate the support reactions.</p>
@@ -594,7 +608,10 @@
                 <p>Cable 2 tension: 220.0 N</p>
             </div>
         </div>
+    </div>
+    </div>
 
+    <div class="content-section">
         <h2>Knowledge Check Quiz</h2>
         <div class="quiz-container" id="quiz">
             <div class="quiz-question">

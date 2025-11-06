@@ -188,7 +188,7 @@
         </ol>
     </div>
 
-    <div class="simulation-wrapper">
+    <div class="simulation-section">
         <h2>Interactive Stress Transformation Simulation</h2>
         <p>Explore how stress components change with orientation. The left panel shows the stress element, while the right panel displays the corresponding Mohr's circle.</p>
         
@@ -234,7 +234,7 @@
         </div>
     </div>
 
-    <div class="simulation-wrapper">
+    <div class="simulation-section">
         <h2>Failure Criteria Visualisation</h2>
         <p>This diagram shows the failure envelopes for different criteria on the principal stress plane. Points inside the envelope are safe; points on or outside indicate failure.</p>
         
@@ -343,13 +343,16 @@
 
     <div class="content-section">
         <h2>Summary of Key Equations</h2>
-        <div class="equation-box">
+        <div class="equation-table">
             <table>
-                <tr>
-                    <th>Concept</th>
-                    <th>Equation</th>
-                    <th>Description</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
                 <tr>
                     <td>Stress Transformation (Normal)</td>
                     <td>\(\sigma_{x'} = \frac{\sigma_{xx} + \sigma_{yy}}{2} + \frac{\sigma_{xx} - \sigma_{yy}}{2}\cos(2\theta) + \tau_{xy}\sin(2\theta)\)</td>
@@ -415,6 +418,7 @@
                     <td>\(FS = \frac{\sigma_{failure}}{\sigma_{equivalent}}\)</td>
                     <td>Safety margin (FS > 1 for safe design)</td>
                 </tr>
+                </tbody>
             </table>
         </div>
 

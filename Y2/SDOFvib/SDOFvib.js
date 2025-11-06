@@ -11,6 +11,8 @@ var OVERDAMPED = false; // System state flags
 var TIMEHISTORY, FRFAMP, FRFPHASE; // Chart containers
 var forcingEnabled = false; // Toggle for forcing
 
+console.log('SDOFvib.js loaded, waiting for p5.js setup() to run...');
+
 // Mass object constructor
 function Mass(x, y, wdth, hght) {
     this.x = x;
@@ -433,7 +435,7 @@ function updateParameters() {
         c: parseFloat(document.getElementById('damping-slider').value),
         F0: forcingEnabled ? 5000 : 0, // Fixed forcing amplitude when enabled
         ff: parseFloat(document.getElementById('frequency-slider').value),
-        Ttot: mypars.Ttot
+        Ttot: mypars ? mypars.Ttot : 2 // Keep existing Ttot or default to 2
     };
     
     // Recalculate the system with new parameters
@@ -945,11 +947,13 @@ function windowResized() {
     }
 
     // Redraw Plotly charts to fit new container size
-    setTimeout(function() {
-        Plotly.Plots.resize('TimeHistory');
-        if (mypars.F0 > 0) {
-            Plotly.Plots.resize('FRFamp');
-            Plotly.Plots.resize('FRFphase');
-        }
-    }, 100);
+    if (typeof Plotly !== 'undefined') {
+        setTimeout(function() {
+            Plotly.Plots.resize('TimeHistory');
+            if (mypars && mypars.F0 > 0) {
+                Plotly.Plots.resize('FRFamp');
+                Plotly.Plots.resize('FRFphase');
+            }
+        }, 100);
+    }
 }
