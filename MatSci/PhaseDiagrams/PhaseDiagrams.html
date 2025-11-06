@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase Diagrams & Microstructure - Interactive Lecture</title>
+
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .phase-label {
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 3px;
+            margin: 2px;
+            display: inline-block;
+        }
+        .alpha-phase { background-color: #ffcccb; }
+        .beta-phase { background-color: #add8e6; }
+        .liquid-phase { background-color: #ffffcc; }
+        .two-phase { background-color: #e6e6fa; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Phase Diagrams & Microstructure</h1>
+        <p class="subtitle">Understanding Material Phases and Transformations - Interactive Lecture</p>
+    </header>
+
+    <div class="content-section">
+        <h2>What are Phase Diagrams?</h2>
+        <div class="key-point">
+            <p><strong>Phase diagrams</strong> are graphical representations that show the relationships between temperature, composition, and the phases present in a material system at equilibrium. They are essential tools for understanding and predicting material behavior during processing and use.</p>
+        </div>
+
+        <p>A <strong>phase</strong> is a physically distinct and chemically homogeneous portion of a material system that has uniform physical and chemical characteristics.</p>
+
+        <h3>Key Concepts:</h3>
+        <ul>
+            <li><strong>Components:</strong> Chemically distinct constituents (e.g., Cu and Ni in a Cu-Ni alloy)</li>
+            <li><strong>Phases:</strong> Physically distinct regions (e.g., liquid, solid, different crystal structures)</li>
+            <li><strong>Equilibrium:</strong> The stable state at constant temperature and pressure over time</li>
+            <li><strong>Microstructure:</strong> The arrangement of phases at the microscopic scale</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Fundamental Concepts</h2>
+
+        <h3>1. The Gibbs Phase Rule</h3>
+        <div class="equation-box">
+            <p>The <strong>Gibbs Phase Rule</strong> determines the number of degrees of freedom in a system:</p>
+            <p>\(F = C - P + 2\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(F\) = degrees of freedom (variables that can be changed independently)</li>
+                <li>\(C\) = number of components</li>
+                <li>\(P\) = number of phases present</li>
+                <li>The "2" represents temperature and pressure</li>
+            </ul>
+            <p>For constant pressure (isobaric systems): \(F = C - P + 1\)</p>
+        </div>
+
+        <h3>2. Binary Phase Diagram Regions</h3>
+        <div class="key-point">
+            <p>Binary phase diagrams show the phase relationships for two-component systems:</p>
+            <ul>
+                <li><strong>Single-phase regions:</strong> Only one phase exists (e.g., all liquid, all solid solution)</li>
+                <li><strong>Two-phase regions:</strong> Two phases coexist in equilibrium</li>
+                <li><strong>Phase boundaries:</strong> Lines separating different phase regions</li>
+                <li><strong>Liquidus line:</strong> Above this line, the material is completely liquid</li>
+                <li><strong>Solidus line:</strong> Below this line, the material is completely solid</li>
+            </ul>
+        </div>
+
+        <h3>3. The Lever Rule</h3>
+        <div class="equation-box">
+            <p>The <strong>Lever Rule</strong> calculates the relative amounts of phases in a two-phase region:</p>
+            <p>\(W_\alpha = \frac{C_0 - C_L}{C_\alpha - C_L} \times 100\%\)</p>
+            <p>\(W_L = \frac{C_\alpha - C_0}{C_\alpha - C_L} \times 100\%\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(W_\alpha\) = weight fraction of solid phase α</li>
+                <li>\(W_L\) = weight fraction of liquid phase</li>
+                <li>\(C_0\) = overall composition</li>
+                <li>\(C_\alpha\) = composition of α phase</li>
+                <li>\(C_L\) = composition of liquid phase</li>
+            </ul>
+        </div>
+
+        <h3>4. Important Phase Diagram Types</h3>
+        <ul>
+            <li><strong>Isomorphous:</strong> Complete solid solubility (e.g., Cu-Ni)</li>
+            <li><strong>Eutectic:</strong> Forms a low-melting point mixture (e.g., Pb-Sn)</li>
+            <li><strong>Peritectic:</strong> Solid + Liquid → Different Solid</li>
+            <li><strong>Eutectoid:</strong> Solid → Two different solids (e.g., Fe-C at 727°C)</li>
+        </ul>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Binary Phase Diagram Explorer</h2>
+        <p>Explore a binary phase diagram! Adjust temperature and composition to see which phases are present and their relative amounts.</p>
+
+        <div id="sketch-holder-phase-diagram"></div>
+
+        <div class="simulation-controls">
+            <div class="control-row">
+                <div class="control-column">
+                    <div class="slider-container">
+                        <label>Temperature: <span id="temp-value" class="slider-value">1200</span> °C</label>
+                        <input type="range" id="temp-slider" min="600" max="1600" step="10" value="1200">
+                    </div>
+                    <div class="slider-container">
+                        <label>Composition: <span id="comp-value" class="slider-value">40</span> wt% B</label>
+                        <input type="range" id="comp-slider" min="0" max="100" step="1" value="40">
+                    </div>
+                </div>
+                <div class="control-column">
+                    <div class="slider-container">
+                        <label>Diagram Type:</label>
+                        <select id="diagram-type">
+                            <option value="eutectic">Eutectic System</option>
+                            <option value="isomorphous">Isomorphous System</option>
+                        </select>
+                    </div>
+                    <div id="phase-info" style="padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                        <h4 style="margin-top: 0;">Phase Information:</h4>
+                        <div id="phase-details"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Microstructure Formation</h2>
+        <p>Watch how microstructure evolves during cooling. See grain formation and phase separation in real-time!</p>
+
+        <div id="sketch-holder-microstructure"></div>
+
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Cooling Rate: <span id="cooling-rate-value" class="slider-value">5</span> °C/s</label>
+                <input type="range" id="cooling-rate-slider" min="1" max="20" step="1" value="5">
+            </div>
+            <div class="slider-container">
+                <label>Composition: <span id="micro-comp-value" class="slider-value">30</span> wt% B</label>
+                <input type="range" id="micro-comp-slider" min="10" max="90" step="5" value="30">
+            </div>
+            <div style="text-align: center; margin: 10px 0;">
+                <button id="start-cooling">START COOLING</button>
+                <button id="reset-micro">RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Alloy Design and Selection</h3>
+        <ul>
+            <li><strong>Aerospace:</strong> Designing aluminum and titanium alloys with specific strength-to-weight ratios</li>
+            <li><strong>Steel Manufacturing:</strong> Using Fe-C phase diagrams to control carbon content for desired properties</li>
+            <li><strong>Electronics:</strong> Developing solder alloys (Pb-Sn, Sn-Ag-Cu) with appropriate melting temperatures</li>
+        </ul>
+
+        <h3>Heat Treatment Design</h3>
+        <ul>
+            <li><strong>Annealing:</strong> Heating to single-phase region, then slow cooling for softness</li>
+            <li><strong>Quenching:</strong> Rapid cooling to trap non-equilibrium phases for hardness</li>
+            <li><strong>Tempering:</strong> Reheating quenched steel to improve toughness</li>
+            <li><strong>Solution Treatment:</strong> Dissolving precipitates for age-hardening alloys</li>
+        </ul>
+
+        <h3>Welding and Joining</h3>
+        <ul>
+            <li><strong>Fusion Welding:</strong> Understanding solidification and heat-affected zones</li>
+            <li><strong>Brazing:</strong> Selecting filler metals using phase diagrams</li>
+            <li><strong>Avoiding Hot Cracking:</strong> Controlling composition to minimize solidification range</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> Phase diagrams assume equilibrium conditions, but real processes often involve non-equilibrium cooling. Understanding TTT (Time-Temperature-Transformation) and CCT (Continuous-Cooling-Transformation) diagrams is crucial for predicting actual microstructures in manufacturing.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Gibbs Phase Rule</td>
+                    <td>\(F = C - P + 2\)</td>
+                    <td>Degrees of freedom in phase equilibrium</td>
+                </tr>
+                <tr>
+                    <td>Isobaric Phase Rule</td>
+                    <td>\(F = C - P + 1\)</td>
+                    <td>At constant pressure</td>
+                </tr>
+                <tr>
+                    <td>Lever Rule (α phase)</td>
+                    <td>\(W_\alpha = \frac{C_0 - C_L}{C_\alpha - C_L}\)</td>
+                    <td>Weight fraction of solid phase</td>
+                </tr>
+                <tr>
+                    <td>Lever Rule (L phase)</td>
+                    <td>\(W_L = \frac{C_\alpha - C_0}{C_\alpha - C_L}\)</td>
+                    <td>Weight fraction of liquid phase</td>
+                </tr>
+                <tr>
+                    <td>Phase Conservation</td>
+                    <td>\(W_\alpha + W_L = 1\)</td>
+                    <td>Total mass conservation</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Applying the Lever Rule</h3>
+            <p>A Cu-Ni alloy with 35 wt% Ni is at 1250°C in a two-phase region. At this temperature, the liquidus composition is 32 wt% Ni and the solidus composition is 43 wt% Ni. Calculate:</p>
+            <ol>
+                <li>The weight fraction of liquid phase</li>
+                <li>The weight fraction of solid phase</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(C_0 = 35\) wt% Ni, \(C_L = 32\) wt% Ni, \(C_\alpha = 43\) wt% Ni</p>
+
+                <p><strong>a) Weight fraction of liquid:</strong></p>
+                <p>\(W_L = \displaystyle \frac{C_\alpha - C_0}{C_\alpha - C_L} = \frac{43 - 35}{43 - 32} = \frac{8}{11} = 0.727\) (72.7%)</p>
+
+                <p><strong>b) Weight fraction of solid:</strong></p>
+                <p>\(W_\alpha = \displaystyle \frac{C_0 - C_L}{C_\alpha - C_L} = \frac{35 - 32}{43 - 32} = \frac{3}{11} = 0.273\) (27.3%)</p>
+
+                <p>Check: \(W_L + W_\alpha = 0.727 + 0.273 = 1.0\) ✓</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Gibbs Phase Rule Application</h3>
+            <p>For a binary alloy system (2 components) at constant pressure:</p>
+            <ol>
+                <li>How many degrees of freedom exist in a single-phase region?</li>
+                <li>How many degrees of freedom exist at the eutectic point (3 phases)?</li>
+                <li>What does this mean practically for controlling the system?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Using \(F = C - P + 1\) (constant pressure)</p>
+
+                <p><strong>a) Single-phase region:</strong></p>
+                <p>\(F = 2 - 1 + 1 = 2\) degrees of freedom</p>
+                <p>Both temperature and composition can be varied independently.</p>
+
+                <p><strong>b) Eutectic point (3 phases):</strong></p>
+                <p>\(F = 2 - 3 + 1 = 0\) degrees of freedom</p>
+                <p>The eutectic point has fixed temperature and composition.</p>
+
+                <p><strong>c) Practical meaning:</strong></p>
+                <p>In single-phase regions, you can control both T and composition. At the eutectic point, the system is invariant - you cannot change T or composition without losing one of the three phases.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Microstructure Prediction</h3>
+            <p>A Pb-Sn alloy with 40 wt% Sn is slowly cooled from 250°C to room temperature. The eutectic composition is 61.9 wt% Sn at 183°C. Describe the microstructure that forms and estimate the relative amounts of phases at room temperature. (Assume maximum solubilities: α ≈ 19 wt% Sn, β ≈ 97 wt% Sn)</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Cooling sequence:</strong></p>
+                <p>1. Above liquidus: Single liquid phase</p>
+                <p>2. Entering α + L region: Primary α grains start forming</p>
+                <p>3. At 183°C (eutectic temperature): Remaining liquid solidifies as eutectic (α + β mixture)</p>
+                <p>4. Below eutectic: Two-phase α + β microstructure</p>
+
+                <p><strong>Final microstructure:</strong></p>
+                <p>Primary α grains surrounded by eutectic (lamellar α + β)</p>
+
+                <p><strong>Phase amounts at room temperature (using lever rule):</strong></p>
+                <p>\(C_0 = 40\) wt% Sn, \(C_\alpha \approx 19\) wt% Sn, \(C_\beta \approx 97\) wt% Sn</p>
+                <p>\(W_\alpha = \displaystyle \frac{97 - 40}{97 - 19} = \frac{57}{78} = 0.731\) (73.1% α phase)</p>
+                <p>\(W_\beta = \displaystyle \frac{40 - 19}{97 - 19} = \frac{21}{78} = 0.269\) (26.9% β phase)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does the liquidus line represent on a phase diagram?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The temperature below which the material is completely solid</label>
+                    <label><input type="radio" name="q1" value="b"> b) The temperature above which the material is completely liquid</label>
+                    <label><input type="radio" name="q1" value="c"> c) The eutectic temperature</label>
+                    <label><input type="radio" name="q1" value="d"> d) The melting point of the pure components</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In the Lever Rule, what do the "lever arms" represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Temperature differences</label>
+                    <label><input type="radio" name="q2" value="b"> b) Composition differences</label>
+                    <label><input type="radio" name="q2" value="c"> c) Phase amounts</label>
+                    <label><input type="radio" name="q2" value="d"> d) Grain sizes</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: At the eutectic point, how many phases coexist in equilibrium?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) One</label>
+                    <label><input type="radio" name="q3" value="b"> b) Two</label>
+                    <label><input type="radio" name="q3" value="c"> c) Three</label>
+                    <label><input type="radio" name="q3" value="d"> d) Four</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Which type of phase diagram shows complete solid solubility across all compositions?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Eutectic</label>
+                    <label><input type="radio" name="q4" value="b"> b) Isomorphous</label>
+                    <label><input type="radio" name="q4" value="c"> c) Peritectic</label>
+                    <label><input type="radio" name="q4" value="d"> d) Monotectic</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: For a binary system at constant pressure with two phases present, how many degrees of freedom are there?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 0</label>
+                    <label><input type="radio" name="q5" value="b"> b) 1</label>
+                    <label><input type="radio" name="q5" value="c"> c) 2</label>
+                    <label><input type="radio" name="q5" value="d"> d) 3</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- p5.js sketches -->
+    <script>
+        // Phase Diagram Explorer
+        let phaseDiagramSketch = function(p) {
+            let temperature = 1200;
+            let composition = 40;
+            let diagramType = 'eutectic';
+
+            // Eutectic system parameters (Pb-Sn like)
+            const eutecticData = {
+                eutecticTemp: 900,
+                eutecticComp: 62,
+                maxSolubilityA: 18,
+                maxSolubilityB: 95,
+                meltingA: 1500,
+                meltingB: 1300
+            };
+
+            // Isomorphous system parameters (Cu-Ni like)
+            const isomorphousData = {
+                meltingA: 1500,
+                meltingB: 1100
+            };
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 500);
+                canvas.parent('sketch-holder-phase-diagram');
+                p.textFont('Arial');
+            };
+
+            p.draw = function() {
+                p.background(250);
+
+                if (diagramType === 'eutectic') {
+                    drawEutecticDiagram();
+                } else {
+                    drawIsomorphousDiagram();
+                }
+
+                // Draw current point
+                let x = p.map(composition, 0, 100, 100, 700);
+                let y = p.map(temperature, 600, 1600, 450, 50);
+
+                p.fill(255, 0, 0);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.ellipse(x, y, 15, 15);
+
+                // Crosshairs
+                p.stroke(255, 0, 0, 100);
+                p.strokeWeight(1);
+                p.line(x, 50, x, 450);
+                p.line(100, y, 700, y);
+
+                updatePhaseInfo();
+            };
+
+            function drawEutecticDiagram() {
+                const e = eutecticData;
+
+                // Draw axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(100, 450, 700, 450); // x-axis
+                p.line(100, 450, 100, 50);  // y-axis
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Composition (wt% B)', 400, 490);
+                p.push();
+                p.translate(30, 250);
+                p.rotate(-p.PI/2);
+                p.text('Temperature (°C)', 0, 0);
+                p.pop();
+
+                // Tick marks and labels
+                p.textSize(12);
+                for (let i = 0; i <= 100; i += 20) {
+                    let x = p.map(i, 0, 100, 100, 700);
+                    p.line(x, 450, x, 455);
+                    p.text(i, x, 470);
+                }
+                for (let t = 600; t <= 1600; t += 200) {
+                    let y = p.map(t, 600, 1600, 450, 50);
+                    p.line(95, y, 100, y);
+                    p.text(t, 70, y + 5);
+                }
+
+                // Draw phase boundaries
+                p.noFill();
+                p.stroke(0, 0, 200);
+                p.strokeWeight(3);
+
+                // Liquidus lines
+                p.beginShape();
+                p.vertex(p.map(0, 0, 100, 100, 700), p.map(e.meltingA, 600, 1600, 450, 50));
+                p.vertex(p.map(e.eutecticComp, 0, 100, 100, 700), p.map(e.eutecticTemp, 600, 1600, 450, 50));
+                p.vertex(p.map(100, 0, 100, 100, 700), p.map(e.meltingB, 600, 1600, 450, 50));
+                p.endShape();
+
+                // Solidus lines
+                let eutX = p.map(e.eutecticComp, 0, 100, 100, 700);
+                let eutY = p.map(e.eutecticTemp, 600, 1600, 450, 50);
+
+                // Left solidus
+                p.line(p.map(0, 0, 100, 100, 700), p.map(e.meltingA, 600, 1600, 450, 50),
+                       eutX, eutY);
+
+                // Right solidus
+                p.line(p.map(100, 0, 100, 100, 700), p.map(e.meltingB, 600, 1600, 450, 50),
+                       eutX, eutY);
+
+                // Eutectic horizontal line
+                p.line(100, eutY, 700, eutY);
+
+                // Solvus lines
+                p.stroke(0, 150, 0);
+                p.strokeWeight(2);
+                p.line(p.map(0, 0, 100, 100, 700), p.map(e.meltingA, 600, 1600, 450, 50),
+                       p.map(e.maxSolubilityA, 0, 100, 100, 700), eutY);
+                p.line(p.map(100, 0, 100, 100, 700), p.map(e.meltingB, 600, 1600, 450, 50),
+                       p.map(e.maxSolubilityB, 0, 100, 100, 700), eutY);
+
+                // Phase region labels
+                p.fill(0);
+                p.textSize(16);
+                p.textStyle(p.BOLD);
+                p.text('L', 400, 120);
+                p.text('α', 150, 350);
+                p.text('β', 650, 350);
+                p.text('α + L', 250, 200);
+                p.text('β + L', 550, 200);
+                p.text('α + β', 400, 350);
+                p.textStyle(p.NORMAL);
+            }
+
+            function drawIsomorphousDiagram() {
+                const iso = isomorphousData;
+
+                // Draw axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(100, 450, 700, 450);
+                p.line(100, 450, 100, 50);
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Composition (wt% B)', 400, 490);
+                p.push();
+                p.translate(30, 250);
+                p.rotate(-p.PI/2);
+                p.text('Temperature (°C)', 0, 0);
+                p.pop();
+
+                // Tick marks
+                p.textSize(12);
+                for (let i = 0; i <= 100; i += 20) {
+                    let x = p.map(i, 0, 100, 100, 700);
+                    p.line(x, 450, x, 455);
+                    p.text(i, x, 470);
+                }
+                for (let t = 600; t <= 1600; t += 200) {
+                    let y = p.map(t, 600, 1600, 450, 50);
+                    p.line(95, y, 100, y);
+                    p.text(t, 70, y + 5);
+                }
+
+                // Draw phase boundaries
+                p.noFill();
+                p.stroke(0, 0, 200);
+                p.strokeWeight(3);
+
+                // Liquidus line (curved)
+                p.beginShape();
+                for (let c = 0; c <= 100; c += 5) {
+                    let temp = iso.meltingA - (iso.meltingA - iso.meltingB) * (c / 100);
+                    let x = p.map(c, 0, 100, 100, 700);
+                    let y = p.map(temp, 600, 1600, 450, 50);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Solidus line (curved)
+                p.beginShape();
+                for (let c = 0; c <= 100; c += 5) {
+                    let temp = iso.meltingA - (iso.meltingA - iso.meltingB) * (c / 100) - 200;
+                    let x = p.map(c, 0, 100, 100, 700);
+                    let y = p.map(temp, 600, 1600, 450, 50);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Phase region labels
+                p.fill(0);
+                p.textSize(16);
+                p.textStyle(p.BOLD);
+                p.text('L (Liquid)', 400, 120);
+                p.text('α (Solid Solution)', 400, 400);
+                p.text('α + L', 400, 250);
+                p.textStyle(p.NORMAL);
+            }
+
+            function updatePhaseInfo() {
+                let phaseText = '';
+
+                if (diagramType === 'eutectic') {
+                    const e = eutecticData;
+                    let liquidusTemp = getLiquidusTemp(composition, e);
+                    let solidusTemp = getSolidusTemp(composition, e);
+
+                    if (temperature > liquidusTemp) {
+                        phaseText = '<span class="phase-label liquid-phase">Liquid (L)</span><br>';
+                        phaseText += 'Single phase: 100% liquid';
+                    } else if (temperature > e.eutecticTemp && temperature <= liquidusTemp) {
+                        if (composition < e.eutecticComp) {
+                            phaseText = '<span class="phase-label alpha-phase">α</span> + ';
+                            phaseText += '<span class="phase-label liquid-phase">L</span><br>';
+                        } else {
+                            phaseText = '<span class="phase-label beta-phase">β</span> + ';
+                            phaseText += '<span class="phase-label liquid-phase">L</span><br>';
+                        }
+                        phaseText += 'Two-phase region';
+                    } else {
+                        if (composition < e.maxSolubilityA) {
+                            phaseText = '<span class="phase-label alpha-phase">α (solid solution)</span><br>';
+                            phaseText += 'Single phase';
+                        } else if (composition > e.maxSolubilityB) {
+                            phaseText = '<span class="phase-label beta-phase">β (solid solution)</span><br>';
+                            phaseText += 'Single phase';
+                        } else {
+                            phaseText = '<span class="phase-label alpha-phase">α</span> + ';
+                            phaseText += '<span class="phase-label beta-phase">β</span><br>';
+                            phaseText += 'Two-phase mixture';
+                        }
+                    }
+                } else {
+                    const iso = isomorphousData;
+                    let liquidusTemp = iso.meltingA - (iso.meltingA - iso.meltingB) * (composition / 100);
+                    let solidusTemp = liquidusTemp - 200;
+
+                    if (temperature > liquidusTemp) {
+                        phaseText = '<span class="phase-label liquid-phase">Liquid (L)</span><br>';
+                        phaseText += 'Single phase: 100% liquid';
+                    } else if (temperature > solidusTemp) {
+                        phaseText = '<span class="phase-label alpha-phase">α</span> + ';
+                        phaseText += '<span class="phase-label liquid-phase">L</span><br>';
+                        phaseText += 'Two-phase region';
+                    } else {
+                        phaseText = '<span class="phase-label alpha-phase">α (solid solution)</span><br>';
+                        phaseText += 'Single phase: Completely solid';
+                    }
+                }
+
+                document.getElementById('phase-details').innerHTML = phaseText;
+            }
+
+            function getLiquidusTemp(comp, e) {
+                if (comp < e.eutecticComp) {
+                    return e.meltingA - (e.meltingA - e.eutecticTemp) * (comp / e.eutecticComp);
+                } else {
+                    return e.meltingB - (e.meltingB - e.eutecticTemp) * ((100 - comp) / (100 - e.eutecticComp));
+                }
+            }
+
+            function getSolidusTemp(comp, e) {
+                return e.eutecticTemp;
+            }
+
+            window.updateTemperature = function(val) {
+                temperature = parseFloat(val);
+            };
+
+            window.updateComposition = function(val) {
+                composition = parseFloat(val);
+            };
+
+            window.updateDiagramType = function(type) {
+                diagramType = type;
+            };
+        };
+
+        // Microstructure Formation Simulation
+        let microstructureSketch = function(p) {
+            let grains = [];
+            let cooling = false;
+            let currentTemp = 1400;
+            let coolingRate = 5;
+            let targetComp = 30;
+            let nucleationSites = [];
+
+            class Grain {
+                constructor(x, y, phase, size) {
+                    this.x = x;
+                    this.y = y;
+                    this.phase = phase;
+                    this.size = size;
+                    this.growth = 0;
+                }
+
+                update() {
+                    if (this.growth < this.size) {
+                        this.growth += 0.5;
+                    }
+                }
+
+                display() {
+                    p.push();
+                    if (this.phase === 'alpha') {
+                        p.fill(255, 180, 180, 200);
+                        p.stroke(200, 100, 100);
+                    } else {
+                        p.fill(180, 180, 255, 200);
+                        p.stroke(100, 100, 200);
+                    }
+                    p.strokeWeight(2);
+                    p.ellipse(this.x, this.y, this.growth * 2, this.growth * 2);
+                    p.pop();
+                }
+            }
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-microstructure');
+                initializeNucleationSites();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Temperature display
+                p.fill(0);
+                p.noStroke();
+                p.textSize(16);
+                p.textAlign(p.LEFT);
+                p.text(`Temperature: ${currentTemp.toFixed(0)}°C`, 10, 25);
+                p.text(`Phase: ${getPhaseAtTemp(currentTemp)}`, 10, 50);
+
+                // Update cooling
+                if (cooling && currentTemp > 700) {
+                    currentTemp -= coolingRate * 0.1;
+
+                    // Nucleate grains at certain temperatures
+                    if (currentTemp < 1200 && currentTemp > 1190 && grains.length === 0) {
+                        nucleateGrains('alpha', 5);
+                    }
+                    if (targetComp > 50 && currentTemp < 1000 && currentTemp > 990) {
+                        nucleateGrains('beta', 3);
+                    }
+                }
+
+                // Update and display grains
+                for (let grain of grains) {
+                    grain.update();
+                    grain.display();
+                }
+
+                // Draw grain boundaries
+                if (grains.length > 0 && grains[0].growth >= grains[0].size) {
+                    drawGrainBoundaries();
+                }
+
+                // Legend
+                p.textAlign(p.RIGHT);
+                p.fill(255, 180, 180);
+                p.stroke(200, 100, 100);
+                p.strokeWeight(2);
+                p.rect(p.width - 120, 10, 30, 20);
+                p.fill(0);
+                p.noStroke();
+                p.text('α phase', p.width - 10, 25);
+
+                p.fill(180, 180, 255);
+                p.stroke(100, 100, 200);
+                p.strokeWeight(2);
+                p.rect(p.width - 120, 40, 30, 20);
+                p.fill(0);
+                p.noStroke();
+                p.text('β phase', p.width - 10, 55);
+            };
+
+            function initializeNucleationSites() {
+                nucleationSites = [];
+                for (let i = 0; i < 8; i++) {
+                    nucleationSites.push({
+                        x: p.random(50, p.width - 50),
+                        y: p.random(80, p.height - 20)
+                    });
+                }
+            }
+
+            function nucleateGrains(phase, count) {
+                for (let i = 0; i < count && i < nucleationSites.length; i++) {
+                    let site = nucleationSites[i];
+                    let size = p.random(40, 80);
+                    grains.push(new Grain(site.x, site.y, phase, size));
+                }
+            }
+
+            function drawGrainBoundaries() {
+                p.stroke(50);
+                p.strokeWeight(3);
+                p.noFill();
+                for (let i = 0; i < grains.length - 1; i++) {
+                    for (let j = i + 1; j < grains.length; j++) {
+                        let d = p.dist(grains[i].x, grains[i].y, grains[j].x, grains[j].y);
+                        if (d < grains[i].size + grains[j].size) {
+                            let mx = (grains[i].x + grains[j].x) / 2;
+                            let my = (grains[i].y + grains[j].y) / 2;
+                            p.ellipse(mx, my, 5, 5);
+                        }
+                    }
+                }
+            }
+
+            function getPhaseAtTemp(temp) {
+                if (temp > 1200) return 'Liquid';
+                if (temp > 900) return 'Liquid + α';
+                if (targetComp > 50 && temp > 800) return 'α + β';
+                return 'α (Solid)';
+            }
+
+            window.startCooling = function() {
+                cooling = true;
+            };
+
+            window.resetMicrostructure = function() {
+                cooling = false;
+                currentTemp = 1400;
+                grains = [];
+                initializeNucleationSites();
+            };
+
+            window.updateCoolingRate = function(rate) {
+                coolingRate = parseFloat(rate);
+            };
+
+            window.updateMicroComp = function(comp) {
+                targetComp = parseFloat(comp);
+            };
+        };
+
+        // Create p5 instances
+        new p5(phaseDiagramSketch);
+        new p5(microstructureSketch);
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Phase diagram controls
+            const tempSlider = document.getElementById('temp-slider');
+            const compSlider = document.getElementById('comp-slider');
+            const diagramType = document.getElementById('diagram-type');
+
+            tempSlider.addEventListener('input', e => {
+                document.getElementById('temp-value').textContent = e.target.value;
+                window.updateTemperature(e.target.value);
+            });
+
+            compSlider.addEventListener('input', e => {
+                document.getElementById('comp-value').textContent = e.target.value;
+                window.updateComposition(e.target.value);
+            });
+
+            diagramType.addEventListener('change', e => {
+                window.updateDiagramType(e.target.value);
+            });
+
+            // Microstructure controls
+            const coolingSlider = document.getElementById('cooling-rate-slider');
+            const microCompSlider = document.getElementById('micro-comp-slider');
+
+            coolingSlider.addEventListener('input', e => {
+                document.getElementById('cooling-rate-value').textContent = e.target.value;
+                window.updateCoolingRate(e.target.value);
+            });
+
+            microCompSlider.addEventListener('input', e => {
+                document.getElementById('micro-comp-value').textContent = e.target.value;
+                window.updateMicroComp(e.target.value);
+            });
+
+            document.getElementById('start-cooling').addEventListener('click', window.startCooling);
+            document.getElementById('reset-micro').addEventListener('click', window.resetMicrostructure);
+
+            // Quiz
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                const answers = {
+                    q1: 'b',
+                    q2: 'b',
+                    q3: 'c',
+                    q4: 'b',
+                    q5: 'b'
+                };
+
+                let score = 0;
+                let totalQuestions = Object.keys(answers).length;
+                let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                for (let question in answers) {
+                    const selected = document.querySelector(`input[name="${question}"]:checked`);
+                    const correctAnswer = answers[question];
+
+                    if (selected) {
+                        if (selected.value === correctAnswer) {
+                            score++;
+                            resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct!</p>`;
+                        } else {
+                            resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect</p>`;
+                        }
+                    } else {
+                        resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                    }
+                }
+
+                const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                document.getElementById('quiz-results').innerHTML = resultsHTML;
+            });
+        });
+    </script>
+</body>
+</html>

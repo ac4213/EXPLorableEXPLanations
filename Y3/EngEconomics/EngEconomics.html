@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineering Economics & Optimization - Interactive Lecture</title>
+
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+
+    <!-- Plotly library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Common styles -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .info-box {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .info-box-golden {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box-golden h4 {
+            color: #b38600;
+        }
+
+        .info-box-blue {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        .info-box-green {
+            background-color: #e6ffe6;
+            border-left: 4px solid #28a745;
+        }
+
+        .plot-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            overflow: visible;
+            margin: 10px 0;
+        }
+
+        .simulation-display {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            .plot-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Engineering Economics & Optimization</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2 id="intro">Introduction to Engineering Economics</h2>
+        <p>Engineering economics applies economic principles to engineering decision-making. Engineers must not only design technically sound solutions but also economically viable ones. This discipline provides systematic methods for evaluating alternatives, considering the time value of money, and making optimal decisions under resource constraints.</p>
+
+        <div class="key-point">
+            <p><strong>Core principles of engineering economics:</strong></p>
+            <ul>
+                <li><strong>Time value of money:</strong> A dollar today is worth more than a dollar tomorrow</li>
+                <li><strong>Opportunity cost:</strong> The value of the next best alternative forgone</li>
+                <li><strong>Marginal analysis:</strong> Decisions based on incremental changes</li>
+                <li><strong>Sunk costs:</strong> Past expenditures that should not influence future decisions</li>
+            </ul>
+        </div>
+
+        <h3>Types of Engineering Economic Decisions</h3>
+        <ul>
+            <li><strong>Equipment Selection:</strong> Choosing between different machines or technologies</li>
+            <li><strong>Make vs. Buy:</strong> Deciding whether to manufacture in-house or outsource</li>
+            <li><strong>Replacement Analysis:</strong> Determining when to replace aging equipment</li>
+            <li><strong>Project Selection:</strong> Prioritizing capital investments with limited budgets</li>
+        </ul>
+
+        <p>This interactive module covers time value of money calculations, economic analysis methods (NPV, IRR, B/C ratio), and optimization techniques essential for engineering decision-making.</p>
+    </div>
+
+    <div class="content-section">
+        <h2 id="tvm">Time Value of Money</h2>
+
+        <h3>Fundamental Concepts</h3>
+        <p>Money has time value because of its earning potential. Given the opportunity to earn interest, money available today is worth more than the same amount in the future. This fundamental concept underlies all engineering economic analysis.</p>
+
+        <div class="equation-box">
+            <p><strong>Future Value (Single Payment):</strong></p>
+            <p>\[F = P(1 + i)^n\]</p>
+
+            <p><strong>Present Value (Single Payment):</strong></p>
+            <p>\[P = \frac{F}{(1 + i)^n} = F(1 + i)^{-n}\]</p>
+
+            <p><strong>Future Value (Uniform Series):</strong></p>
+            <p>\[F = A\left[\frac{(1+i)^n - 1}{i}\right]\]</p>
+
+            <p><strong>Present Value (Uniform Series):</strong></p>
+            <p>\[P = A\left[\frac{(1+i)^n - 1}{i(1+i)^n}\right]\]</p>
+
+            <p><strong>Annual Worth (Capital Recovery):</strong></p>
+            <p>\[A = P\left[\frac{i(1+i)^n}{(1+i)^n - 1}\right]\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(P\) = Present value</li>
+                <li>\(F\) = Future value</li>
+                <li>\(A\) = Uniform annual amount</li>
+                <li>\(i\) = Interest rate per period</li>
+                <li>\(n\) = Number of periods</li>
+            </ul>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Investment Parameters</h3>
+
+                <div class="slider-container">
+                    <label for="interest-rate">Interest Rate \(i\) (%):</label>
+                    <input type="range" id="interest-rate" min="0" max="20" value="8" step="0.5">
+                    <span id="interest-rate-value" class="slider-value">8.0</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="time-period">Time Period \(n\) (years):</label>
+                    <input type="range" id="time-period" min="1" max="30" value="10" step="1">
+                    <span id="time-period-value" class="slider-value">10</span>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <h4>Cash Flow Type:</h4>
+                    <select id="cashflow-type" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="single">Single Payment</option>
+                        <option value="uniform">Uniform Series</option>
+                        <option value="gradient">Arithmetic Gradient</option>
+                    </select>
+                </div>
+
+                <div class="info-box info-box-blue" id="single-payment-inputs">
+                    <h4>Single Payment:</h4>
+                    <div class="slider-container">
+                        <label for="present-value">Present Value \(P\) ($1000s):</label>
+                        <input type="range" id="present-value" min="1" max="100" value="10" step="1">
+                        <span id="present-value-value" class="slider-value">10</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden" id="uniform-series-inputs" style="display:none;">
+                    <h4>Uniform Series:</h4>
+                    <div class="slider-container">
+                        <label for="annual-payment">Annual Payment \(A\) ($1000s):</label>
+                        <input type="range" id="annual-payment" min="0.5" max="10" value="2" step="0.5">
+                        <span id="annual-payment-value" class="slider-value">2.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Time Value Calculations</h3>
+                <div id="tvm-results" class="info-box info-box-green">
+                    <h4>Calculated Values:</h4>
+                    <p><strong>Future Value:</strong> $<span id="future-value">0</span>k</p>
+                    <p><strong>Present Value:</strong> $<span id="present-value-result">0</span>k</p>
+                    <p><strong>Equivalent Annual Worth:</strong> $<span id="annual-worth">0</span>k/year</p>
+                </div>
+                <div id="cashflow-diagram" class="plot-container"></div>
+                <div id="growth-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="analysis">Economic Analysis Methods</h2>
+
+        <h3>Comparing Investment Alternatives</h3>
+        <p>When evaluating multiple investment options, engineers use several metrics to determine the most economically attractive alternative. Each method has advantages and appropriate applications.</p>
+
+        <div class="equation-box">
+            <p><strong>Net Present Value (NPV):</strong></p>
+            <p>\[NPV = \sum_{t=0}^{n} \frac{CF_t}{(1+i)^t}\]</p>
+            <p>Decision rule: Accept if \(NPV > 0\); select alternative with highest NPV</p>
+
+            <p><strong>Internal Rate of Return (IRR):</strong></p>
+            <p>\[0 = \sum_{t=0}^{n} \frac{CF_t}{(1+IRR)^t}\]</p>
+            <p>Decision rule: Accept if \(IRR > MARR\) (Minimum Attractive Rate of Return)</p>
+
+            <p><strong>Benefit-Cost Ratio:</strong></p>
+            <p>\[B/C = \frac{PV(\text{Benefits})}{PV(\text{Costs})}\]</p>
+            <p>Decision rule: Accept if \(B/C > 1\)</p>
+
+            <p><strong>Payback Period:</strong></p>
+            <p>Time required to recover initial investment from net cash flows</p>
+            <p>Simple but ignores time value of money (use discounted payback for accuracy)</p>
+
+            <p><strong>Annual Worth (AW):</strong></p>
+            <p>\[AW = NPV \times \frac{i(1+i)^n}{(1+i)^n - 1}\]</p>
+            <p>Useful for comparing alternatives with different lifespans</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Project Parameters</h3>
+
+                <div class="info-box info-box-blue">
+                    <h4>Initial Investment:</h4>
+                    <div class="slider-container">
+                        <label for="initial-cost">Initial Cost ($1000s):</label>
+                        <input type="range" id="initial-cost" min="10" max="200" value="100" step="10">
+                        <span id="initial-cost-value" class="slider-value">100</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Annual Cash Flows:</h4>
+                    <div class="slider-container">
+                        <label for="annual-revenue">Annual Revenue ($1000s):</label>
+                        <input type="range" id="annual-revenue" min="10" max="80" value="40" step="5">
+                        <span id="annual-revenue-value" class="slider-value">40</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="annual-cost">Annual Operating Cost ($1000s):</label>
+                        <input type="range" id="annual-cost" min="5" max="40" value="15" step="5">
+                        <span id="annual-cost-value" class="slider-value">15</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="salvage-value">Salvage Value ($1000s):</label>
+                    <input type="range" id="salvage-value" min="0" max="50" value="10" step="5">
+                    <span id="salvage-value-value" class="slider-value">10</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="project-life">Project Life (years):</label>
+                    <input type="range" id="project-life" min="3" max="20" value="10" step="1">
+                    <span id="project-life-value" class="slider-value">10</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="marr">MARR (%):</label>
+                    <input type="range" id="marr" min="5" max="20" value="10" step="1">
+                    <span id="marr-value" class="slider-value">10</span>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Economic Analysis Results</h3>
+                <div id="npv-results" class="info-box info-box-blue">
+                    <h4>Decision Metrics:</h4>
+                    <p><strong>Net Present Value:</strong> $<span id="npv-calc">0</span>k (<span id="npv-decision">Accept</span>)</p>
+                    <p><strong>Internal Rate of Return:</strong> <span id="irr-calc">0</span>% (<span id="irr-decision">Accept</span>)</p>
+                    <p><strong>Benefit-Cost Ratio:</strong> <span id="bc-calc">0</span> (<span id="bc-decision">Accept</span>)</p>
+                    <p><strong>Simple Payback Period:</strong> <span id="payback-calc">0</span> years</p>
+                    <p><strong>Annual Worth:</strong> $<span id="aw-calc">0</span>k/year</p>
+                </div>
+                <div id="cashflow-timeline" class="plot-container"></div>
+                <div id="npv-profile" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="breakeven">Break-Even and Sensitivity Analysis</h2>
+
+        <h3>Understanding Break-Even Points</h3>
+        <p>Break-even analysis determines the production volume or time at which total revenues equal total costs, resulting in zero profit. This is critical for capacity planning and pricing decisions.</p>
+
+        <div class="equation-box">
+            <p><strong>Break-Even Volume:</strong></p>
+            <p>\[Q_{BE} = \frac{FC}{p - VC}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(Q_{BE}\) = Break-even quantity</li>
+                <li>\(FC\) = Fixed costs</li>
+                <li>\(p\) = Price per unit</li>
+                <li>\(VC\) = Variable cost per unit</li>
+            </ul>
+
+            <p><strong>Total Cost Function:</strong></p>
+            <p>\[TC(Q) = FC + VC \times Q\]</p>
+
+            <p><strong>Total Revenue Function:</strong></p>
+            <p>\[TR(Q) = p \times Q\]</p>
+
+            <p><strong>Profit Function:</strong></p>
+            <p>\[\pi(Q) = TR(Q) - TC(Q) = (p - VC) \times Q - FC\]</p>
+
+            <p><strong>Sensitivity Analysis:</strong> Examines how changes in key parameters affect economic outcomes. Identifies critical variables requiring accurate estimation.</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Cost Structure</h3>
+
+                <div class="slider-container">
+                    <label for="fixed-cost">Fixed Costs ($1000s):</label>
+                    <input type="range" id="fixed-cost" min="10" max="200" value="50" step="10">
+                    <span id="fixed-cost-value" class="slider-value">50</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="variable-cost">Variable Cost per Unit ($):</label>
+                    <input type="range" id="variable-cost" min="5" max="50" value="20" step="5">
+                    <span id="variable-cost-value" class="slider-value">20</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="unit-price">Selling Price per Unit ($):</label>
+                    <input type="range" id="unit-price" min="20" max="100" value="50" step="5">
+                    <span id="unit-price-value" class="slider-value">50</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="production-volume">Production Volume (units):</label>
+                    <input type="range" id="production-volume" min="0" max="5000" value="2000" step="100">
+                    <span id="production-volume-value" class="slider-value">2000</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Comparison Scenario:</h4>
+                    <label style="display: block; margin: 10px 0;">
+                        <input type="checkbox" id="enable-comparison" style="margin-right: 8px;">
+                        Compare with Alternative Technology
+                    </label>
+                    <div id="alternative-inputs" style="display:none;">
+                        <div class="slider-container">
+                            <label for="alt-fixed">Alt. Fixed Cost ($1000s):</label>
+                            <input type="range" id="alt-fixed" min="10" max="200" value="80" step="10">
+                            <span id="alt-fixed-value" class="slider-value">80</span>
+                        </div>
+                        <div class="slider-container">
+                            <label for="alt-variable">Alt. Variable Cost ($):</label>
+                            <input type="range" id="alt-variable" min="5" max="50" value="15" step="5">
+                            <span id="alt-variable-value" class="slider-value">15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Break-Even Analysis</h3>
+                <div id="breakeven-plot" class="plot-container"></div>
+                <div id="breakeven-results" class="info-box info-box-blue">
+                    <h4>Analysis Results:</h4>
+                    <p><strong>Break-Even Volume:</strong> <span id="be-volume">0</span> units</p>
+                    <p><strong>Break-Even Revenue:</strong> $<span id="be-revenue">0</span>k</p>
+                    <p><strong>Current Profit:</strong> $<span id="current-profit">0</span>k</p>
+                    <p><strong>Profit Margin:</strong> <span id="profit-margin">0</span>%</p>
+                    <p id="comparison-result" style="display:none;"><strong>Crossover Volume:</strong> <span id="crossover-vol">0</span> units</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="optimization">Optimization Techniques</h2>
+
+        <h3>Linear Programming</h3>
+        <p>Linear programming (LP) is a mathematical method for determining optimal resource allocation. It's widely used when objectives and constraints can be expressed as linear equations.</p>
+
+        <div class="equation-box">
+            <p><strong>Standard LP Form:</strong></p>
+            <p>Maximize (or minimize): \(Z = c_1x_1 + c_2x_2 + \cdots + c_nx_n\)</p>
+            <p>Subject to:</p>
+            <p>\[a_{11}x_1 + a_{12}x_2 + \cdots + a_{1n}x_n \leq b_1\]</p>
+            <p>\[a_{21}x_1 + a_{22}x_2 + \cdots + a_{2n}x_n \leq b_2\]</p>
+            <p>\[\vdots\]</p>
+            <p>\[x_1, x_2, \ldots, x_n \geq 0\]</p>
+
+            <p><strong>Two-Variable LP (Graphical Method):</strong></p>
+            <p>Maximize: \(Z = c_1x_1 + c_2x_2\)</p>
+            <p>Subject to constraints forming a feasible region</p>
+            <p>Optimal solution occurs at a corner point of the feasible region</p>
+
+            <p><strong>Applications:</strong></p>
+            <ul>
+                <li>Production planning (maximizing profit)</li>
+                <li>Resource allocation (minimizing cost)</li>
+                <li>Transportation problems (minimizing shipping costs)</li>
+                <li>Diet optimization (minimizing cost while meeting nutrition requirements)</li>
+            </ul>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">LP Problem: Product Mix</h3>
+
+                <div class="info-box info-box-blue">
+                    <h4>Objective Function (Profit):</h4>
+                    <p>Maximize: \(Z = c_1 x_1 + c_2 x_2\)</p>
+                    <div class="slider-container">
+                        <label for="profit1">Product 1 Profit \(c_1\) ($/unit):</label>
+                        <input type="range" id="profit1" min="10" max="100" value="40" step="5">
+                        <span id="profit1-value" class="slider-value">40</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="profit2">Product 2 Profit \(c_2\) ($/unit):</label>
+                        <input type="range" id="profit2" min="10" max="100" value="30" step="5">
+                        <span id="profit2-value" class="slider-value">30</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Constraints:</h4>
+                    <p><strong>Labor Hours:</strong> \(a_1 x_1 + a_2 x_2 \leq L\)</p>
+                    <div class="slider-container">
+                        <label for="labor1">Product 1 (hrs/unit):</label>
+                        <input type="range" id="labor1" min="1" max="10" value="2" step="0.5">
+                        <span id="labor1-value" class="slider-value">2.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="labor2">Product 2 (hrs/unit):</label>
+                        <input type="range" id="labor2" min="1" max="10" value="3" step="0.5">
+                        <span id="labor2-value" class="slider-value">3.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="labor-avail">Available Hours:</label>
+                        <input type="range" id="labor-avail" min="100" max="1000" value="240" step="20">
+                        <span id="labor-avail-value" class="slider-value">240</span>
+                    </div>
+
+                    <p><strong>Material (kg):</strong> \(b_1 x_1 + b_2 x_2 \leq M\)</p>
+                    <div class="slider-container">
+                        <label for="material1">Product 1 (kg/unit):</label>
+                        <input type="range" id="material1" min="1" max="10" value="4" step="0.5">
+                        <span id="material1-value" class="slider-value">4.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="material2">Product 2 (kg/unit):</label>
+                        <input type="range" id="material2" min="1" max="10" value="2" step="0.5">
+                        <span id="material2-value" class="slider-value">2.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="material-avail">Available Material (kg):</label>
+                        <input type="range" id="material-avail" min="100" max="1000" value="320" step="20">
+                        <span id="material-avail-value" class="slider-value">320</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Feasible Region and Optimal Solution</h3>
+                <div id="lp-plot" class="plot-container"></div>
+                <div id="lp-results" class="info-box info-box-green">
+                    <h4>Optimal Solution:</h4>
+                    <p><strong>Product 1:</strong> <span id="optimal-x1">0</span> units</p>
+                    <p><strong>Product 2:</strong> <span id="optimal-x2">0</span> units</p>
+                    <p><strong>Maximum Profit:</strong> $<span id="max-profit">0</span></p>
+                    <p><strong>Labor Utilization:</strong> <span id="labor-util">0</span>% (<span id="labor-slack">0</span> hrs slack)</p>
+                    <p><strong>Material Utilization:</strong> <span id="material-util">0</span>% (<span id="material-slack">0</span> kg slack)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Engineering economics and optimization principles are essential across all engineering disciplines:</p>
+        <ul>
+            <li><strong>Manufacturing:</strong> Production planning uses LP to determine optimal product mix given resource constraints. Toyota's production system minimizes inventory costs while maximizing throughput. Break-even analysis guides capacity expansion decisions.</li>
+            <li><strong>Energy Systems:</strong> Power plant investment decisions evaluated using NPV and IRR. Wind farm economics require careful analysis of capital costs, O&M expenses, and revenue from power sales. Energy storage optimization balances cost and performance.</li>
+            <li><strong>Transportation:</strong> Highway projects justified using benefit-cost analysis comparing construction costs to travel time savings and accident reduction. Fleet replacement timing optimized using economic life analysis.</li>
+            <li><strong>Construction:</strong> Project scheduling optimized to minimize time-cost trade-offs. Equipment lease vs. purchase decisions based on NPV analysis. Value engineering identifies cost-reduction opportunities while maintaining functionality.</li>
+            <li><strong>Chemical Engineering:</strong> Process design optimization balances capital investment in equipment vs. operating costs. Plant capacity decisions based on break-even and sensitivity analysis of feedstock and product prices.</li>
+            <li><strong>Software Engineering:</strong> Build vs. buy decisions for software components. Cloud computing cost optimization through resource allocation. Development team sizing optimized against project deadlines and budgets.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Future Value</td>
+                    <td>\(F = P(1 + i)^n\)</td>
+                    <td>Compound interest formula</td>
+                </tr>
+                <tr>
+                    <td>Present Value</td>
+                    <td>\(P = F(1 + i)^{-n}\)</td>
+                    <td>Discounting future cash flows</td>
+                </tr>
+                <tr>
+                    <td>Net Present Value</td>
+                    <td>\(NPV = \sum_{t=0}^{n} \frac{CF_t}{(1+i)^t}\)</td>
+                    <td>Accept if NPV > 0</td>
+                </tr>
+                <tr>
+                    <td>Break-Even Volume</td>
+                    <td>\(Q_{BE} = \frac{FC}{p - VC}\)</td>
+                    <td>Volume where profit = 0</td>
+                </tr>
+                <tr>
+                    <td>LP Objective</td>
+                    <td>\(Z = \sum c_i x_i\)</td>
+                    <td>Maximize/minimize subject to constraints</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="problems">Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Present Value Calculation</h3>
+            <p>An engineering project will generate annual revenues of $50,000 for 8 years. If the interest rate is 10% per year, what is the present value of this revenue stream?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using the uniform series present worth formula:</p>
+                <p>\[P = A\left[\frac{(1+i)^n - 1}{i(1+i)^n}\right]\]</p>
+                <p>where \(A = \$50,000\), \(i = 0.10\), \(n = 8\)</p>
+                <p>\[P = 50,000\left[\frac{(1.10)^8 - 1}{0.10(1.10)^8}\right]\]</p>
+                <p>\[P = 50,000\left[\frac{2.1436 - 1}{0.10 \times 2.1436}\right]\]</p>
+                <p>\[P = 50,000\left[\frac{1.1436}{0.21436}\right] = 50,000 \times 5.3349\]</p>
+                <p>\[P = \$266,745\]</p>
+                <p><strong>Answer: Present value = $266,745</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Break-Even Analysis</h3>
+            <p>A company has fixed costs of $120,000 per year. Variable costs are $25 per unit, and the selling price is $45 per unit. Calculate the break-even volume and the profit if 8,000 units are produced.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Part 1: Break-even volume</strong></p>
+                <p>\[Q_{BE} = \frac{FC}{p - VC} = \frac{120,000}{45 - 25} = \frac{120,000}{20} = 6,000 \text{ units}\]</p>
+
+                <p><strong>Part 2: Profit at 8,000 units</strong></p>
+                <p>\[\pi = (p - VC) \times Q - FC\]</p>
+                <p>\[\pi = (45 - 25) \times 8,000 - 120,000\]</p>
+                <p>\[\pi = 20 \times 8,000 - 120,000 = 160,000 - 120,000 = \$40,000\]</p>
+
+                <p><strong>Answer: Break-even = 6,000 units; Profit at 8,000 units = $40,000</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: NPV Comparison</h3>
+            <p>Two machines are being considered. Machine A costs $80,000 with annual operating costs of $15,000. Machine B costs $120,000 with annual operating costs of $8,000. Both have 10-year lives with no salvage value. Using MARR = 12%, which machine should be selected?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Calculate NPV of costs for each machine (negative cash flows):</p>
+
+                <p><strong>Machine A:</strong></p>
+                <p>\[NPV_A = -80,000 - 15,000\left[\frac{(1.12)^{10} - 1}{0.12(1.12)^{10}}\right]\]</p>
+                <p>\[NPV_A = -80,000 - 15,000 \times 5.6502 = -80,000 - 84,753 = -\$164,753\]</p>
+
+                <p><strong>Machine B:</strong></p>
+                <p>\[NPV_B = -120,000 - 8,000\left[\frac{(1.12)^{10} - 1}{0.12(1.12)^{10}}\right]\]</p>
+                <p>\[NPV_B = -120,000 - 8,000 \times 5.6502 = -120,000 - 45,202 = -\$165,202\]</p>
+
+                <p><strong>Decision:</strong> Select Machine A (less negative NPV = lower cost)</p>
+                <p><strong>Answer: Choose Machine A; saves $449 in present value terms</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Why does money have time value?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Inflation only</label>
+                    <label><input type="radio" name="q1" value="b"> b) Earning potential through interest</label>
+                    <label><input type="radio" name="q1" value="c"> c) Currency exchange rates</label>
+                    <label><input type="radio" name="q1" value="d"> d) Government regulation</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A project with NPV > 0 should be:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Rejected</label>
+                    <label><input type="radio" name="q2" value="b"> b) Accepted</label>
+                    <label><input type="radio" name="q2" value="c"> c) Requires more analysis</label>
+                    <label><input type="radio" name="q2" value="d"> d) NPV is irrelevant</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Break-even occurs when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Revenue equals fixed costs</label>
+                    <label><input type="radio" name="q3" value="b"> b) Total revenue equals total costs</label>
+                    <label><input type="radio" name="q3" value="c"> c) Profit is maximized</label>
+                    <label><input type="radio" name="q3" value="d"> d) Variable costs equal price</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: In linear programming, the optimal solution occurs:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a> Anywhere in the feasible region</label>
+                    <label><input type="radio" name="q4" value="b"> b) Always at the origin</label>
+                    <label><input type="radio" name="q4" value="c"> c) At a corner point of the feasible region</label>
+                    <label><input type="radio" name="q4" value="d"> d) Outside the feasible region</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Internal Rate of Return (IRR) is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) The interest rate that makes NPV = 0</label>
+                    <label><input type="radio" name="q5" value="b"> b) Always equal to MARR</label>
+                    <label><input type="radio" name="q5" value="c"> c) The same as payback period</label>
+                    <label><input type="radio" name="q5" value="d"> d) Independent of cash flows</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Engineering economics simulation code
+
+        // Initialize sliders
+        function initializeSliders() {
+            const sliders = [
+                'interest-rate', 'time-period', 'present-value', 'annual-payment',
+                'initial-cost', 'annual-revenue', 'annual-cost', 'salvage-value', 'project-life', 'marr',
+                'fixed-cost', 'variable-cost', 'unit-price', 'production-volume', 'alt-fixed', 'alt-variable',
+                'profit1', 'profit2', 'labor1', 'labor2', 'labor-avail', 'material1', 'material2', 'material-avail'
+            ];
+
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    const valueSpan = document.getElementById(id + '-value');
+                    slider.addEventListener('input', function() {
+                        valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                        updateSimulations();
+                    });
+                }
+            });
+        }
+
+        // Time value of money calculations
+        function updateTVM() {
+            const i = parseFloat(document.getElementById('interest-rate').value) / 100;
+            const n = parseFloat(document.getElementById('time-period').value);
+            const type = document.getElementById('cashflow-type').value;
+            const P = parseFloat(document.getElementById('present-value').value);
+            const A = parseFloat(document.getElementById('annual-payment').value);
+
+            let futureValue, presentValue, annualWorth;
+
+            if (type === 'single') {
+                futureValue = P * Math.pow(1 + i, n);
+                presentValue = P;
+                annualWorth = P * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1);
+            } else if (type === 'uniform') {
+                futureValue = A * ((Math.pow(1 + i, n) - 1) / i);
+                presentValue = A * ((Math.pow(1 + i, n) - 1) / (i * Math.pow(1 + i, n)));
+                annualWorth = A;
+            }
+
+            document.getElementById('future-value').textContent = futureValue.toFixed(2);
+            document.getElementById('present-value-result').textContent = presentValue.toFixed(2);
+            document.getElementById('annual-worth').textContent = annualWorth.toFixed(2);
+
+            // Plot growth over time
+            const years = [];
+            const values = [];
+
+            for (let t = 0; t <= n; t++) {
+                years.push(t);
+                if (type === 'single') {
+                    values.push(P * Math.pow(1 + i, t));
+                } else {
+                    values.push(t > 0 ? A * ((Math.pow(1 + i, t) - 1) / i) : 0);
+                }
+            }
+
+            const trace = {
+                x: years,
+                y: values,
+                mode: 'lines+markers',
+                line: { color: '#1890ff', width: 3 },
+                marker: { size: 8 }
+            };
+
+            const layout = {
+                title: 'Future Value Over Time',
+                xaxis: { title: 'Year' },
+                yaxis: { title: 'Value ($1000s)' }
+            };
+
+            Plotly.newPlot('growth-plot', [trace], layout, {responsive: true});
+        }
+
+        // Economic analysis
+        function updateEconomicAnalysis() {
+            const initialCost = parseFloat(document.getElementById('initial-cost').value);
+            const revenue = parseFloat(document.getElementById('annual-revenue').value);
+            const opCost = parseFloat(document.getElementById('annual-cost').value);
+            const salvage = parseFloat(document.getElementById('salvage-value').value);
+            const life = parseFloat(document.getElementById('project-life').value);
+            const marr = parseFloat(document.getElementById('marr').value) / 100;
+
+            const netAnnual = revenue - opCost;
+
+            // Calculate NPV
+            let npv = -initialCost;
+            for (let t = 1; t <= life; t++) {
+                npv += netAnnual / Math.pow(1 + marr, t);
+            }
+            npv += salvage / Math.pow(1 + marr, life);
+
+            // Calculate IRR (Newton-Raphson approximation)
+            let irr = 0.15; // Initial guess
+            for (let iter = 0; iter < 20; iter++) {
+                let f = -initialCost;
+                let df = 0;
+                for (let t = 1; t <= life; t++) {
+                    f += netAnnual / Math.pow(1 + irr, t);
+                    df += -t * netAnnual / Math.pow(1 + irr, t + 1);
+                }
+                f += salvage / Math.pow(1 + irr, life);
+                df += -life * salvage / Math.pow(1 + irr, life + 1);
+
+                const delta = f / df;
+                irr -= delta;
+                if (Math.abs(delta) < 0.0001) break;
+            }
+
+            // Calculate B/C ratio
+            let pvBenefits = 0;
+            let pvCosts = initialCost;
+            for (let t = 1; t <= life; t++) {
+                pvBenefits += revenue / Math.pow(1 + marr, t);
+                pvCosts += opCost / Math.pow(1 + marr, t);
+            }
+            pvBenefits += salvage / Math.pow(1 + marr, life);
+            const bcRatio = pvBenefits / pvCosts;
+
+            // Calculate payback
+            let payback = initialCost / netAnnual;
+
+            // Calculate annual worth
+            const aw = npv * (marr * Math.pow(1 + marr, life)) / (Math.pow(1 + marr, life) - 1);
+
+            // Update display
+            document.getElementById('npv-calc').textContent = npv.toFixed(1);
+            document.getElementById('npv-decision').textContent = npv > 0 ? 'Accept' : 'Reject';
+            document.getElementById('npv-decision').style.color = npv > 0 ? 'green' : 'red';
+
+            document.getElementById('irr-calc').textContent = (irr * 100).toFixed(2);
+            document.getElementById('irr-decision').textContent = irr > marr ? 'Accept' : 'Reject';
+            document.getElementById('irr-decision').style.color = irr > marr ? 'green' : 'red';
+
+            document.getElementById('bc-calc').textContent = bcRatio.toFixed(3);
+            document.getElementById('bc-decision').textContent = bcRatio > 1 ? 'Accept' : 'Reject';
+            document.getElementById('bc-decision').style.color = bcRatio > 1 ? 'green' : 'red';
+
+            document.getElementById('payback-calc').textContent = payback.toFixed(2);
+            document.getElementById('aw-calc').textContent = aw.toFixed(1);
+
+            // Plot NPV profile
+            const rates = [];
+            const npvValues = [];
+
+            for (let r = 0; r <= 30; r += 1) {
+                const rate = r / 100;
+                let npv_temp = -initialCost;
+                for (let t = 1; t <= life; t++) {
+                    npv_temp += netAnnual / Math.pow(1 + rate, t);
+                }
+                npv_temp += salvage / Math.pow(1 + rate, life);
+
+                rates.push(r);
+                npvValues.push(npv_temp);
+            }
+
+            const trace1 = {
+                x: rates,
+                y: npvValues,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const trace2 = {
+                x: [irr * 100],
+                y: [0],
+                mode: 'markers',
+                name: 'IRR',
+                marker: { size: 12, color: 'red' }
+            };
+
+            const trace3 = {
+                x: [marr * 100],
+                y: [npv],
+                mode: 'markers',
+                name: 'MARR',
+                marker: { size: 12, color: 'green' }
+            };
+
+            const layout = {
+                title: 'NPV Profile',
+                xaxis: { title: 'Discount Rate (%)' },
+                yaxis: { title: 'NPV ($1000s)' },
+                shapes: [{
+                    type: 'line',
+                    x0: 0, x1: 30,
+                    y0: 0, y1: 0,
+                    line: { color: 'gray', dash: 'dash' }
+                }]
+            };
+
+            Plotly.newPlot('npv-profile', [trace1, trace2, trace3], layout, {responsive: true});
+        }
+
+        // Break-even analysis
+        function updateBreakEven() {
+            const FC = parseFloat(document.getElementById('fixed-cost').value);
+            const VC = parseFloat(document.getElementById('variable-cost').value);
+            const price = parseFloat(document.getElementById('unit-price').value);
+            const Q = parseFloat(document.getElementById('production-volume').value);
+            const enableComp = document.getElementById('enable-comparison').checked;
+
+            const QBE = FC / (price - VC);
+            const currentProfit = (price - VC) * Q - FC;
+            const profitMargin = (currentProfit / (price * Q)) * 100;
+
+            document.getElementById('be-volume').textContent = QBE.toFixed(0);
+            document.getElementById('be-revenue').textContent = (QBE * price / 1000).toFixed(1);
+            document.getElementById('current-profit').textContent = (currentProfit / 1000).toFixed(1);
+            document.getElementById('profit-margin').textContent = profitMargin.toFixed(1);
+
+            // Generate plot data
+            const quantities = [];
+            const revenue = [];
+            const totalCost = [];
+            const profit = [];
+
+            for (let q = 0; q <= 5000; q += 100) {
+                quantities.push(q);
+                revenue.push(price * q / 1000);
+                totalCost.push((FC + VC * q) / 1000);
+                profit.push(((price - VC) * q - FC) / 1000);
+            }
+
+            const traces = [
+                {
+                    x: quantities,
+                    y: revenue,
+                    mode: 'lines',
+                    name: 'Revenue',
+                    line: { color: 'green', width: 3 }
+                },
+                {
+                    x: quantities,
+                    y: totalCost,
+                    mode: 'lines',
+                    name: 'Total Cost',
+                    line: { color: 'red', width: 3 }
+                },
+                {
+                    x: [QBE],
+                    y: [QBE * price / 1000],
+                    mode: 'markers',
+                    name: 'Break-Even',
+                    marker: { size: 15, color: 'orange', symbol: 'star' }
+                },
+                {
+                    x: [Q],
+                    y: [Q * price / 1000],
+                    mode: 'markers',
+                    name: 'Current',
+                    marker: { size: 12, color: 'blue' }
+                }
+            ];
+
+            if (enableComp) {
+                const altFC = parseFloat(document.getElementById('alt-fixed').value);
+                const altVC = parseFloat(document.getElementById('alt-variable').value);
+                const altCost = [];
+
+                for (let q = 0; q <= 5000; q += 100) {
+                    altCost.push((altFC + altVC * q) / 1000);
+                }
+
+                traces.push({
+                    x: quantities,
+                    y: altCost,
+                    mode: 'lines',
+                    name: 'Alt. Total Cost',
+                    line: { color: 'purple', width: 3, dash: 'dash' }
+                });
+
+                // Find crossover
+                const crossover = (altFC - FC) / (VC - altVC);
+                document.getElementById('comparison-result').style.display = 'block';
+                document.getElementById('crossover-vol').textContent = crossover.toFixed(0);
+            } else {
+                document.getElementById('comparison-result').style.display = 'none';
+            }
+
+            const layout = {
+                title: 'Break-Even Analysis',
+                xaxis: { title: 'Quantity (units)' },
+                yaxis: { title: 'Cost/Revenue ($1000s)' }
+            };
+
+            Plotly.newPlot('breakeven-plot', traces, layout, {responsive: true});
+        }
+
+        // Linear programming
+        function updateLP() {
+            const c1 = parseFloat(document.getElementById('profit1').value);
+            const c2 = parseFloat(document.getElementById('profit2').value);
+            const a1 = parseFloat(document.getElementById('labor1').value);
+            const a2 = parseFloat(document.getElementById('labor2').value);
+            const L = parseFloat(document.getElementById('labor-avail').value);
+            const b1 = parseFloat(document.getElementById('material1').value);
+            const b2 = parseFloat(document.getElementById('material2').value);
+            const M = parseFloat(document.getElementById('material-avail').value);
+
+            // Find corner points
+            const corners = [
+                {x1: 0, x2: 0},
+                {x1: L/a1, x2: 0},
+                {x1: 0, x2: Math.min(L/a2, M/b2)},
+                {x1: M/b1, x2: 0}
+            ];
+
+            // Intersection of labor and material constraints
+            const det = a1*b2 - a2*b1;
+            if (Math.abs(det) > 0.001) {
+                const x1_int = (L*b2 - M*a2) / det;
+                const x2_int = (M*a1 - L*b1) / det;
+                if (x1_int >= 0 && x2_int >= 0) {
+                    corners.push({x1: x1_int, x2: x2_int});
+                }
+            }
+
+            // Evaluate objective at each feasible corner
+            let maxProfit = -Infinity;
+            let optimalX1 = 0;
+            let optimalX2 = 0;
+
+            corners.forEach(point => {
+                // Check feasibility
+                if (point.x1 >= 0 && point.x2 >= 0 &&
+                    a1*point.x1 + a2*point.x2 <= L + 0.1 &&
+                    b1*point.x1 + b2*point.x2 <= M + 0.1) {
+
+                    const profit = c1*point.x1 + c2*point.x2;
+                    if (profit > maxProfit) {
+                        maxProfit = profit;
+                        optimalX1 = point.x1;
+                        optimalX2 = point.x2;
+                    }
+                }
+            });
+
+            // Calculate resource utilization
+            const laborUsed = a1*optimalX1 + a2*optimalX2;
+            const materialUsed = b1*optimalX1 + b2*optimalX2;
+
+            document.getElementById('optimal-x1').textContent = optimalX1.toFixed(1);
+            document.getElementById('optimal-x2').textContent = optimalX2.toFixed(1);
+            document.getElementById('max-profit').textContent = maxProfit.toFixed(0);
+            document.getElementById('labor-util').textContent = ((laborUsed/L)*100).toFixed(1);
+            document.getElementById('labor-slack').textContent = (L - laborUsed).toFixed(1);
+            document.getElementById('material-util').textContent = ((materialUsed/M)*100).toFixed(1);
+            document.getElementById('material-slack').textContent = (M - materialUsed).toFixed(1);
+
+            // Plot feasible region
+            const x1Array = [];
+            const laborBound = [];
+            const materialBound = [];
+
+            for (let x1 = 0; x1 <= Math.max(L/a1, M/b1); x1 += 1) {
+                x1Array.push(x1);
+                laborBound.push((L - a1*x1) / a2);
+                materialBound.push((M - b1*x1) / b2);
+            }
+
+            const traces = [
+                {
+                    x: x1Array,
+                    y: laborBound,
+                    mode: 'lines',
+                    name: 'Labor Constraint',
+                    line: { color: 'red', width: 2 }
+                },
+                {
+                    x: x1Array,
+                    y: materialBound,
+                    mode: 'lines',
+                    name: 'Material Constraint',
+                    line: { color: 'blue', width: 2 }
+                },
+                {
+                    x: corners.map(p => p.x1),
+                    y: corners.map(p => p.x2),
+                    mode: 'markers',
+                    name: 'Corner Points',
+                    marker: { size: 10, color: 'gray' }
+                },
+                {
+                    x: [optimalX1],
+                    y: [optimalX2],
+                    mode: 'markers',
+                    name: 'Optimal',
+                    marker: { size: 15, color: 'green', symbol: 'star' }
+                }
+            ];
+
+            const layout = {
+                title: 'LP Feasible Region',
+                xaxis: { title: 'Product 1 (x₁)', range: [0, Math.max(L/a1, M/b1) * 1.1] },
+                yaxis: { title: 'Product 2 (x₂)', range: [0, Math.max(L/a2, M/b2) * 1.1] }
+            };
+
+            Plotly.newPlot('lp-plot', traces, layout, {responsive: true});
+        }
+
+        // Update all simulations
+        function updateSimulations() {
+            updateTVM();
+            updateEconomicAnalysis();
+            updateBreakEven();
+            updateLP();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            updateSimulations();
+
+            // Cash flow type selector
+            document.getElementById('cashflow-type').addEventListener('change', function() {
+                if (this.value === 'uniform') {
+                    document.getElementById('single-payment-inputs').style.display = 'none';
+                    document.getElementById('uniform-series-inputs').style.display = 'block';
+                } else {
+                    document.getElementById('single-payment-inputs').style.display = 'block';
+                    document.getElementById('uniform-series-inputs').style.display = 'none';
+                }
+                updateTVM();
+            });
+
+            // Comparison toggle
+            document.getElementById('enable-comparison').addEventListener('change', function() {
+                document.getElementById('alternative-inputs').style.display = this.checked ? 'block' : 'none';
+                updateBreakEven();
+            });
+        });
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'b',
+                q4: 'c',
+                q5: 'a'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

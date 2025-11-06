@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Systems: Transfer Functions & Block Diagrams - Interactive Lecture</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/problems.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Control Systems: Transfer Functions & Block Diagrams</h1>
+        <p class="small-caps">Interactive Lecture on System Analysis and Design</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+
+    <!-- SECTION 1: TEACHING CONTENT -->
+    <div class="content-section">
+        <h2>Understanding Control Systems</h2>
+        <p>Control systems are fundamental to modern engineering, governing everything from aircraft autopilots to temperature controllers in your home. A control system manages, commands, directs, or regulates the behavior of other devices or systems using control loops.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> Control systems use feedback to continuously measure the actual output, compare it with the desired output (reference), and adjust the system input to minimize the error. The transfer function mathematically describes how the system transforms inputs to outputs.</p>
+        </div>
+
+        <h3>Open-Loop vs. Closed-Loop Systems</h3>
+        <p><strong>Open-Loop Systems:</strong> These systems have no feedback mechanism. The output is not measured or compared to the input. Examples include a toaster timer or a washing machine on a fixed cycle.</p>
+
+        <p><strong>Closed-Loop (Feedback) Systems:</strong> These systems continuously monitor the output and adjust the input based on the error. Examples include cruise control in cars, thermostats, and autopilot systems.</p>
+
+        <h3>Transfer Functions</h3>
+        <p>A transfer function is a mathematical representation of the relationship between the input and output of a linear time-invariant (LTI) system in the Laplace domain.</p>
+
+        <div class="equation-box">
+            <p><strong>Transfer Function Definition:</strong></p>
+            <p>\[G(s) = \frac{Y(s)}{U(s)}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(G(s)\) = Transfer function</li>
+                <li>\(Y(s)\) = Laplace transform of output</li>
+                <li>\(U(s)\) = Laplace transform of input</li>
+                <li>\(s\) = Complex frequency variable</li>
+            </ul>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>General Form:</strong></p>
+            <p>\[G(s) = \frac{b_m s^m + b_{m-1} s^{m-1} + \cdots + b_1 s + b_0}{a_n s^n + a_{n-1} s^{n-1} + \cdots + a_1 s + a_0}\]</p>
+            <p>Or in factored form:</p>
+            <p>\[G(s) = K\frac{(s - z_1)(s - z_2)\cdots(s - z_m)}{(s - p_1)(s - p_2)\cdots(s - p_n)}\]</p>
+            <p>Where \(z_i\) are zeros and \(p_i\) are poles</p>
+        </div>
+
+        <h3>First-Order Systems</h3>
+        <p>A first-order system has a transfer function with a single pole:</p>
+
+        <div class="equation-box">
+            <p>\[G(s) = \frac{K}{\tau s + 1}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(K\) = Steady-state gain</li>
+                <li>\(\tau\) = Time constant (seconds)</li>
+            </ul>
+            <p><strong>Step Response:</strong></p>
+            <p>\[y(t) = K(1 - e^{-t/\tau})\]</p>
+            <p>The system reaches 63.2% of final value at \(t = \tau\)</p>
+        </div>
+
+        <h3>Second-Order Systems</h3>
+        <p>Second-order systems are the most common in control engineering:</p>
+
+        <div class="equation-box">
+            <p>\[G(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\omega_n\) = Natural frequency (rad/s)</li>
+                <li>\(\zeta\) = Damping ratio (dimensionless)</li>
+            </ul>
+            <p><strong>Damping Classification:</strong></p>
+            <ul>
+                <li>\(\zeta < 1\): Underdamped (oscillatory response)</li>
+                <li>\(\zeta = 1\): Critically damped (fastest non-oscillatory)</li>
+                <li>\(\zeta > 1\): Overdamped (slow, no oscillation)</li>
+            </ul>
+        </div>
+
+        <h3>Block Diagram Algebra</h3>
+        <p>Block diagrams provide a visual representation of control systems. Key reduction rules:</p>
+
+        <div class="equation-box">
+            <p><strong>Series Connection:</strong> \(G_{total} = G_1 \cdot G_2\)</p>
+            <p><strong>Parallel Connection:</strong> \(G_{total} = G_1 + G_2\)</p>
+            <p><strong>Feedback Loop:</strong> \(G_{total} = \frac{G}{1 \pm GH}\)</p>
+            <p>Where + is used for negative feedback and - for positive feedback</p>
+        </div>
+
+        <h3>Closed-Loop Transfer Function</h3>
+        <p>For a standard feedback control system with forward path gain G(s) and feedback path H(s):</p>
+
+        <div class="equation-box">
+            <p>\[T(s) = \frac{C(s)}{R(s)} = \frac{G(s)}{1 + G(s)H(s)}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(T(s)\) = Closed-loop transfer function</li>
+                <li>\(C(s)\) = Output (controlled variable)</li>
+                <li>\(R(s)\) = Reference input (setpoint)</li>
+                <li>\(G(s)H(s)\) = Loop transfer function</li>
+            </ul>
+        </div>
+
+        <h3>System Performance Specifications</h3>
+        <p>Control systems are evaluated based on time-domain specifications:</p>
+        <ul>
+            <li><strong>Rise Time (t<sub>r</sub>):</strong> Time to reach from 10% to 90% of final value</li>
+            <li><strong>Settling Time (t<sub>s</sub>):</strong> Time to remain within ±2% (or ±5%) of final value</li>
+            <li><strong>Peak Time (t<sub>p</sub>):</strong> Time to reach first peak overshoot</li>
+            <li><strong>Percent Overshoot (PO):</strong> \(PO = \frac{M_p - M_f}{M_f} \times 100\%\)</li>
+            <li><strong>Steady-State Error (e<sub>ss</sub>):</strong> Final difference between desired and actual output</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTERACTIVE SIMULATION -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Closed-Loop Step Response</h2>
+        <p>Explore how system parameters affect the step response. Adjust the gain, damping ratio, and natural frequency to see real-time changes in system behavior.</p>
+
+        <div class="type-selector">
+            <button class="type-button active" data-system="first-order">First Order</button>
+            <button class="type-button" data-system="second-order">Second Order</button>
+            <button class="type-button" data-system="feedback">Feedback System</button>
+        </div>
+
+        <div id="control-sketch"></div>
+
+        <div class="controls-panel">
+            <div class="control-row" id="gain-control">
+                <label>Gain (K):</label>
+                <input type="range" id="gain-slider" min="0.1" max="3.0" step="0.1" value="1.0">
+                <span id="gain-value">1.0</span>
+            </div>
+
+            <div class="control-row" id="tau-control">
+                <label>Time Constant (τ):</label>
+                <input type="range" id="tau-slider" min="0.5" max="5.0" step="0.1" value="1.0">
+                <span id="tau-value">1.0 s</span>
+            </div>
+
+            <div class="control-row" id="wn-control" style="display:none;">
+                <label>Natural Frequency (ωₙ):</label>
+                <input type="range" id="wn-slider" min="0.5" max="5.0" step="0.1" value="2.0">
+                <span id="wn-value">2.0 rad/s</span>
+            </div>
+
+            <div class="control-row" id="zeta-control" style="display:none;">
+                <label>Damping Ratio (ζ):</label>
+                <input type="range" id="zeta-slider" min="0.1" max="2.0" step="0.05" value="0.5">
+                <span id="zeta-value">0.5</span>
+            </div>
+
+            <div class="control-row">
+                <button id="reset-button">Reset Simulation</button>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <h3>Performance Metrics:</h3>
+            <p><strong>Rise Time:</strong> t<sub>r</sub> = <span id="rise-time-display">1.20</span> s</p>
+            <p><strong>Settling Time:</strong> t<sub>s</sub> = <span id="settling-time-display">4.00</span> s</p>
+            <p><strong>Overshoot:</strong> PO = <span id="overshoot-display">16.3</span>%</p>
+            <p><strong>Peak Time:</strong> t<sub>p</sub> = <span id="peak-time-display">1.81</span> s</p>
+            <p><strong>Steady-State Value:</strong> <span id="steady-state-display">1.00</span></p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: ENGINEERING APPLICATIONS -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Cruise Control Systems</h3>
+        <p>Modern automobiles use PID (Proportional-Integral-Derivative) controllers to maintain constant vehicle speed despite changes in road grade and wind resistance. The system measures actual speed, compares it to the setpoint, and adjusts the throttle accordingly.</p>
+
+        <h3>2. Aircraft Autopilot</h3>
+        <p>Aircraft autopilot systems use multiple cascaded control loops to maintain altitude, heading, and airspeed. Transfer functions model the aircraft dynamics, and feedback controllers ensure stable flight even in turbulent conditions.</p>
+
+        <h3>3. Industrial Process Control</h3>
+        <p>Chemical plants, refineries, and manufacturing facilities use distributed control systems (DCS) with hundreds of control loops managing temperature, pressure, flow rate, and composition. Transfer functions help engineers tune controllers for optimal performance.</p>
+
+        <h3>4. Robotics and Motion Control</h3>
+        <p>Robot manipulators use position and velocity feedback to achieve precise motion. Each joint has its own servo controller modeled as a second-order system, with careful tuning to avoid oscillations while maintaining fast response.</p>
+
+        <h3>5. Temperature Control Systems</h3>
+        <p>HVAC systems in buildings, incubators in hospitals, and furnaces in manufacturing all use temperature controllers. First-order transfer functions typically model thermal systems, with time constants ranging from seconds to hours.</p>
+
+        <h3>6. Power System Stabilizers</h3>
+        <p>Electrical power grids use automatic generation control (AGC) to maintain frequency at 50 or 60 Hz. Transfer functions model generator dynamics, and feedback controllers adjust power output to match demand instantaneously.</p>
+
+        <h3>7. Active Suspension Systems</h3>
+        <p>High-end vehicles use active suspension with sensors and actuators to minimize body motion. Control systems use transfer functions to model suspension dynamics and feedback to optimize ride comfort and handling.</p>
+    </div>
+
+    <!-- SECTION 4: SUMMARY OF KEY EQUATIONS -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Transfer Function</td>
+                        <td>\(G(s) = \frac{Y(s)}{U(s)}\)</td>
+                        <td>Output to input ratio in Laplace domain</td>
+                    </tr>
+                    <tr>
+                        <td>First-Order System</td>
+                        <td>\(G(s) = \frac{K}{\tau s + 1}\)</td>
+                        <td>Single pole system</td>
+                    </tr>
+                    <tr>
+                        <td>Second-Order System</td>
+                        <td>\(G(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}\)</td>
+                        <td>Standard second-order form</td>
+                    </tr>
+                    <tr>
+                        <td>Closed-Loop TF</td>
+                        <td>\(T(s) = \frac{G(s)}{1 + G(s)H(s)}\)</td>
+                        <td>Feedback system transfer function</td>
+                    </tr>
+                    <tr>
+                        <td>Series Connection</td>
+                        <td>\(G_{total} = G_1 \cdot G_2\)</td>
+                        <td>Cascaded blocks multiply</td>
+                    </tr>
+                    <tr>
+                        <td>Parallel Connection</td>
+                        <td>\(G_{total} = G_1 + G_2\)</td>
+                        <td>Parallel blocks add</td>
+                    </tr>
+                    <tr>
+                        <td>Time Constant</td>
+                        <td>\(\tau = \frac{1}{\text{pole}}\)</td>
+                        <td>First-order system response speed</td>
+                    </tr>
+                    <tr>
+                        <td>Settling Time (2%)</td>
+                        <td>\(t_s = \frac{4}{\zeta\omega_n}\)</td>
+                        <td>Time to reach ±2% of final value</td>
+                    </tr>
+                    <tr>
+                        <td>Peak Time</td>
+                        <td>\(t_p = \frac{\pi}{\omega_n\sqrt{1-\zeta^2}}\)</td>
+                        <td>Time to first peak (underdamped)</td>
+                    </tr>
+                    <tr>
+                        <td>Percent Overshoot</td>
+                        <td>\(PO = e^{-\frac{\pi\zeta}{\sqrt{1-\zeta^2}}} \times 100\%\)</td>
+                        <td>Maximum overshoot percentage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 5: PRACTICE PROBLEMS -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: First-Order System Response</h3>
+            <p>A first-order temperature control system has a transfer function \(G(s) = \frac{5}{2s + 1}\). If a unit step input is applied, calculate:</p>
+            <ol>
+                <li>The steady-state gain K</li>
+                <li>The time constant τ</li>
+                <li>The time to reach 95% of the final value</li>
+                <li>The final temperature if the input is 1°C</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong> \(G(s) = \frac{5}{2s + 1}\)</p>
+                <p><strong>Step 1: Rewrite in standard form:</strong></p>
+                <p>\[G(s) = \frac{5/2}{s + 1/2} = \frac{2.5}{s + 0.5}\]</p>
+                <p>Or: \(G(s) = \frac{5}{2s + 1} = \frac{5}{2(s + 0.5)} = \frac{2.5}{s + 0.5}\)</p>
+                <p>Standard form: \(G(s) = \frac{K}{\tau s + 1}\)</p>
+                <p><strong>(a) Steady-state gain:</strong> K = 5</p>
+                <p><strong>(b) Time constant:</strong> τ = 2 seconds</p>
+                <p><strong>(c) Time to reach 95%:</strong></p>
+                <p>For a first-order system: \(y(t) = K(1 - e^{-t/\tau})\)</p>
+                <p>At 95%: \(0.95 = 1 - e^{-t/\tau}\)</p>
+                <p>\[e^{-t/\tau} = 0.05\]</p>
+                <p>\[t = -\tau \ln(0.05) = 2 \times 2.996 = 5.99 \text{ s}\]</p>
+                <p><strong>(d) Final temperature:</strong> \(y(\infty) = K \times \text{input} = 5 \times 1 = 5°C\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Second-Order System Specifications</h3>
+            <p>A second-order control system has the transfer function:</p>
+            <p>\[G(s) = \frac{16}{s^2 + 4s + 16}\]</p>
+            <p>Determine:</p>
+            <ol>
+                <li>Natural frequency ωₙ</li>
+                <li>Damping ratio ζ</li>
+                <li>Type of damping</li>
+                <li>Percent overshoot for a unit step input</li>
+                <li>Settling time (2% criterion)</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong> \(G(s) = \frac{16}{s^2 + 4s + 16}\)</p>
+                <p>Standard form: \(G(s) = \frac{\omega_n^2}{s^2 + 2\zeta\omega_n s + \omega_n^2}\)</p>
+                <p><strong>(a) Natural frequency:</strong></p>
+                <p>\[\omega_n^2 = 16 \implies \omega_n = 4 \text{ rad/s}\]</p>
+                <p><strong>(b) Damping ratio:</strong></p>
+                <p>\[2\zeta\omega_n = 4 \implies \zeta = \frac{4}{2 \times 4} = 0.5\]</p>
+                <p><strong>(c) Type of damping:</strong></p>
+                <p>Since ζ = 0.5 < 1, the system is <strong>underdamped</strong></p>
+                <p><strong>(d) Percent overshoot:</strong></p>
+                <p>\[PO = e^{-\frac{\pi\zeta}{\sqrt{1-\zeta^2}}} \times 100\%\]</p>
+                <p>\[PO = e^{-\frac{\pi \times 0.5}{\sqrt{1-0.5^2}}} \times 100\% = e^{-\frac{\pi \times 0.5}{\sqrt{0.75}}} \times 100\%\]</p>
+                <p>\[PO = e^{-\frac{1.571}{0.866}} \times 100\% = e^{-1.814} \times 100\% = 16.3\%\]</p>
+                <p><strong>(e) Settling time (2%):</strong></p>
+                <p>\[t_s = \frac{4}{\zeta\omega_n} = \frac{4}{0.5 \times 4} = \frac{4}{2} = 2 \text{ s}\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Feedback System Analysis</h3>
+            <p>A unity feedback control system has a forward path transfer function:</p>
+            <p>\[G(s) = \frac{10}{s(s + 2)}\]</p>
+            <p>Calculate:</p>
+            <ol>
+                <li>The closed-loop transfer function</li>
+                <li>The characteristic equation</li>
+                <li>The system poles</li>
+                <li>Steady-state error for a unit step input</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong> \(G(s) = \frac{10}{s(s + 2)}\), H(s) = 1 (unity feedback)</p>
+                <p><strong>(a) Closed-loop transfer function:</strong></p>
+                <p>\[T(s) = \frac{G(s)}{1 + G(s)H(s)} = \frac{G(s)}{1 + G(s)}\]</p>
+                <p>\[T(s) = \frac{\frac{10}{s(s+2)}}{1 + \frac{10}{s(s+2)}} = \frac{10}{s(s+2) + 10} = \frac{10}{s^2 + 2s + 10}\]</p>
+                <p><strong>(b) Characteristic equation:</strong></p>
+                <p>\[1 + G(s)H(s) = 0 \implies s^2 + 2s + 10 = 0\]</p>
+                <p><strong>(c) System poles:</strong></p>
+                <p>Using quadratic formula:</p>
+                <p>\[s = \frac{-2 \pm \sqrt{4 - 40}}{2} = \frac{-2 \pm \sqrt{-36}}{2} = \frac{-2 \pm j6}{2} = -1 \pm j3\]</p>
+                <p>Poles: \(s_1 = -1 + j3\), \(s_2 = -1 - j3\) (complex conjugate pair)</p>
+                <p><strong>(d) Steady-state error for unit step:</strong></p>
+                <p>For a Type 1 system (one integrator), the steady-state error to a step input is:</p>
+                <p>\[e_{ss} = \lim_{s \to 0} \frac{sR(s)}{1 + G(s)} = \lim_{s \to 0} \frac{s \cdot \frac{1}{s}}{1 + \frac{10}{s(s+2)}}\]</p>
+                <p>For step input with unity feedback Type 1 system: \(e_{ss} = 0\)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: KNOWLEDGE CHECK QUIZ -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the main advantage of closed-loop control over open-loop control?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> Lower cost</label>
+                    <label><input type="radio" name="q1" value="b"> Simpler design</label>
+                    <label><input type="radio" name="q1" value="c"> Ability to correct for disturbances and uncertainties</label>
+                    <label><input type="radio" name="q1" value="d"> Faster response time</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In a second-order system, what happens when the damping ratio ζ = 1?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> The system oscillates indefinitely</label>
+                    <label><input type="radio" name="q2" value="b"> The system is critically damped</label>
+                    <label><input type="radio" name="q2" value="c"> The system becomes unstable</label>
+                    <label><input type="radio" name="q2" value="d"> The system has maximum overshoot</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: For two transfer functions in series, the overall transfer function is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> G₁ + G₂</label>
+                    <label><input type="radio" name="q3" value="b"> G₁ × G₂</label>
+                    <label><input type="radio" name="q3" value="c"> G₁ / G₂</label>
+                    <label><input type="radio" name="q3" value="d"> G₁ - G₂</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The time constant τ in a first-order system represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> Time to reach final value</label>
+                    <label><input type="radio" name="q4" value="b"> Time to reach 63.2% of final value</label>
+                    <label><input type="radio" name="q4" value="c"> Time to reach 50% of final value</label>
+                    <label><input type="radio" name="q4" value="d"> Peak time</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Increasing the natural frequency ωₙ in a second-order system will:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> Increase rise time</label>
+                    <label><input type="radio" name="q5" value="b"> Decrease response speed</label>
+                    <label><input type="radio" name="q5" value="c"> Make the system faster</label>
+                    <label><input type="radio" name="q5" value="d"> Increase steady-state error</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let systemType = 'first-order';
+        let gain = 1.0;
+        let tau = 1.0;
+        let wn = 2.0;
+        let zeta = 0.5;
+
+        // Time parameters
+        let timeData = [];
+        let responseData = [];
+        let maxTime = 10;
+        let dt = 0.01;
+
+        // DOM elements
+        const gainSlider = document.getElementById('gain-slider');
+        const gainValue = document.getElementById('gain-value');
+        const tauSlider = document.getElementById('tau-slider');
+        const tauValue = document.getElementById('tau-value');
+        const wnSlider = document.getElementById('wn-slider');
+        const wnValue = document.getElementById('wn-value');
+        const zetaSlider = document.getElementById('zeta-slider');
+        const zetaValue = document.getElementById('zeta-value');
+
+        // P5.js sketch
+        new p5(function(p) {
+            const canvasWidth = 700;
+            const canvasHeight = 450;
+            const margin = 60;
+            const plotWidth = canvasWidth - 2 * margin;
+            const plotHeight = canvasHeight - 2 * margin;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('control-sketch');
+                p.frameRate(30);
+
+                // Event listeners
+                gainSlider.addEventListener('input', updateParameters);
+                tauSlider.addEventListener('input', updateParameters);
+                wnSlider.addEventListener('input', updateParameters);
+                zetaSlider.addEventListener('input', updateParameters);
+
+                document.getElementById('reset-button').addEventListener('click', resetSimulation);
+
+                // System type selector
+                document.querySelectorAll('.type-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        document.querySelectorAll('.type-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        systemType = this.dataset.system;
+                        updateControlVisibility();
+                        calculateResponse();
+                    });
+                });
+
+                updateControlVisibility();
+                calculateResponse();
+            };
+
+            p.draw = function() {
+                p.background(255);
+
+                // Draw axes
+                drawAxes(p);
+
+                // Draw step input
+                drawStepInput(p);
+
+                // Draw response
+                drawResponse(p);
+
+                // Draw grid
+                drawGrid(p);
+
+                // Draw labels
+                drawLabels(p);
+
+                // Draw performance metrics
+                drawMetrics(p);
+            };
+
+            function drawAxes(p) {
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(margin, canvasHeight - margin, canvasWidth - margin, canvasHeight - margin); // x-axis
+                p.line(margin, margin, margin, canvasHeight - margin); // y-axis
+
+                // Axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Time (s)', canvasWidth / 2, canvasHeight - 20);
+
+                p.push();
+                p.translate(20, canvasHeight / 2);
+                p.rotate(-p.HALF_PI);
+                p.text('Response', 0, 0);
+                p.pop();
+
+                // Tick marks
+                p.textSize(10);
+                for (let t = 0; t <= maxTime; t += 2) {
+                    const x = mapTime(t);
+                    p.stroke(0);
+                    p.line(x, canvasHeight - margin, x, canvasHeight - margin + 5);
+                    p.noStroke();
+                    p.text(t.toFixed(0), x, canvasHeight - margin + 20);
+                }
+
+                for (let y = 0; y <= 1.5; y += 0.5) {
+                    const yPos = mapResponse(y);
+                    p.stroke(0);
+                    p.line(margin - 5, yPos, margin, yPos);
+                    p.noStroke();
+                    p.textAlign(p.RIGHT);
+                    p.text(y.toFixed(1), margin - 10, yPos + 5);
+                }
+            }
+
+            function drawGrid(p) {
+                p.stroke(220);
+                p.strokeWeight(1);
+
+                for (let t = 0; t <= maxTime; t += 1) {
+                    const x = mapTime(t);
+                    p.line(x, margin, x, canvasHeight - margin);
+                }
+
+                for (let y = 0; y <= 1.5; y += 0.25) {
+                    const yPos = mapResponse(y);
+                    p.line(margin, yPos, canvasWidth - margin, yPos);
+                }
+            }
+
+            function drawStepInput(p) {
+                p.stroke(150);
+                p.strokeWeight(2);
+                p.line(mapTime(0), mapResponse(0), mapTime(0), mapResponse(1));
+                p.line(mapTime(0), mapResponse(1), mapTime(maxTime), mapResponse(1));
+            }
+
+            function drawResponse(p) {
+                p.stroke(0, 100, 200);
+                p.strokeWeight(3);
+                p.noFill();
+
+                p.beginShape();
+                for (let i = 0; i < timeData.length; i++) {
+                    const x = mapTime(timeData[i]);
+                    const y = mapResponse(responseData[i]);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+            }
+
+            function drawLabels(p) {
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                const title = getSystemTitle();
+                p.text(title, canvasWidth / 2, 30);
+
+                // Legend
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.stroke(150);
+                p.strokeWeight(2);
+                p.line(canvasWidth - 180, 50, canvasWidth - 140, 50);
+                p.noStroke();
+                p.text('Input (Step)', canvasWidth - 135, 55);
+
+                p.stroke(0, 100, 200);
+                p.strokeWeight(3);
+                p.line(canvasWidth - 180, 70, canvasWidth - 140, 70);
+                p.noStroke();
+                p.text('Output Response', canvasWidth - 135, 75);
+            }
+
+            function drawMetrics(p) {
+                // Visual indicators for performance metrics
+                const finalValue = gain;
+                const settlingValue = finalValue * 1.02;
+
+                // Settling time indicator
+                p.stroke(255, 0, 0, 100);
+                p.strokeWeight(1);
+                p.line(margin, mapResponse(settlingValue), canvasWidth - margin, mapResponse(settlingValue));
+                p.line(margin, mapResponse(finalValue * 0.98), canvasWidth - margin, mapResponse(finalValue * 0.98));
+            }
+
+            function mapTime(t) {
+                return margin + (t / maxTime) * plotWidth;
+            }
+
+            function mapResponse(y) {
+                return canvasHeight - margin - (y / 1.5) * plotHeight;
+            }
+
+            function getSystemTitle() {
+                if (systemType === 'first-order') {
+                    return `First-Order System: G(s) = ${gain}/(${tau}s + 1)`;
+                } else if (systemType === 'second-order') {
+                    return `Second-Order System: ωₙ = ${wn} rad/s, ζ = ${zeta}`;
+                } else {
+                    return `Closed-Loop Feedback System`;
+                }
+            }
+
+            function calculateResponse() {
+                timeData = [];
+                responseData = [];
+
+                if (systemType === 'first-order') {
+                    calculateFirstOrder();
+                } else if (systemType === 'second-order') {
+                    calculateSecondOrder();
+                } else {
+                    calculateFeedback();
+                }
+
+                calculatePerformanceMetrics();
+            }
+
+            function calculateFirstOrder() {
+                for (let t = 0; t <= maxTime; t += dt) {
+                    timeData.push(t);
+                    const y = gain * (1 - Math.exp(-t / tau));
+                    responseData.push(y);
+                }
+            }
+
+            function calculateSecondOrder() {
+                const wd = wn * Math.sqrt(1 - zeta * zeta);
+
+                for (let t = 0; t <= maxTime; t += dt) {
+                    timeData.push(t);
+                    let y;
+
+                    if (zeta < 1) {
+                        // Underdamped
+                        const phi = Math.atan2(Math.sqrt(1 - zeta * zeta), zeta);
+                        y = 1 - (Math.exp(-zeta * wn * t) / Math.sqrt(1 - zeta * zeta)) *
+                            Math.sin(wd * t + phi);
+                    } else if (zeta === 1) {
+                        // Critically damped
+                        y = 1 - Math.exp(-wn * t) * (1 + wn * t);
+                    } else {
+                        // Overdamped
+                        const s1 = -zeta * wn + wn * Math.sqrt(zeta * zeta - 1);
+                        const s2 = -zeta * wn - wn * Math.sqrt(zeta * zeta - 1);
+                        y = 1 + (s1 * Math.exp(s2 * t) - s2 * Math.exp(s1 * t)) / (s1 - s2);
+                    }
+
+                    responseData.push(y * gain);
+                }
+            }
+
+            function calculateFeedback() {
+                // Simplified feedback system: G(s) = K/(s(s+1))
+                // Closed-loop becomes second-order
+                const effectiveWn = Math.sqrt(gain);
+                const effectiveZeta = 0.5 / Math.sqrt(gain);
+
+                const wd = effectiveWn * Math.sqrt(Math.abs(1 - effectiveZeta * effectiveZeta));
+
+                for (let t = 0; t <= maxTime; t += dt) {
+                    timeData.push(t);
+                    let y;
+
+                    if (effectiveZeta < 1) {
+                        const phi = Math.atan2(Math.sqrt(1 - effectiveZeta * effectiveZeta), effectiveZeta);
+                        y = 1 - (Math.exp(-effectiveZeta * effectiveWn * t) / Math.sqrt(1 - effectiveZeta * effectiveZeta)) *
+                            Math.sin(wd * t + phi);
+                    } else {
+                        y = 1 - Math.exp(-effectiveWn * t) * (1 + effectiveWn * t);
+                    }
+
+                    responseData.push(y);
+                }
+            }
+
+            function calculatePerformanceMetrics() {
+                const finalValue = responseData[responseData.length - 1];
+                let riseTime = 0;
+                let settlingTime = 0;
+                let peakTime = 0;
+                let maxValue = 0;
+                let overshoot = 0;
+
+                // Rise time (10% to 90%)
+                const target10 = finalValue * 0.1;
+                const target90 = finalValue * 0.9;
+                let idx10 = 0, idx90 = 0;
+
+                for (let i = 0; i < responseData.length; i++) {
+                    if (responseData[i] >= target10 && idx10 === 0) idx10 = i;
+                    if (responseData[i] >= target90 && idx90 === 0) {
+                        idx90 = i;
+                        break;
+                    }
+                }
+                riseTime = timeData[idx90] - timeData[idx10];
+
+                // Peak time and overshoot
+                for (let i = 0; i < responseData.length; i++) {
+                    if (responseData[i] > maxValue) {
+                        maxValue = responseData[i];
+                        peakTime = timeData[i];
+                    }
+                }
+                overshoot = ((maxValue - finalValue) / finalValue) * 100;
+                if (overshoot < 0) overshoot = 0;
+
+                // Settling time (2% criterion)
+                const upperBound = finalValue * 1.02;
+                const lowerBound = finalValue * 0.98;
+                for (let i = responseData.length - 1; i >= 0; i--) {
+                    if (responseData[i] > upperBound || responseData[i] < lowerBound) {
+                        settlingTime = timeData[i];
+                        break;
+                    }
+                }
+
+                // Update display
+                document.getElementById('rise-time-display').textContent = riseTime.toFixed(2);
+                document.getElementById('settling-time-display').textContent = settlingTime.toFixed(2);
+                document.getElementById('overshoot-display').textContent = overshoot.toFixed(1);
+                document.getElementById('peak-time-display').textContent = peakTime.toFixed(2);
+                document.getElementById('steady-state-display').textContent = finalValue.toFixed(2);
+            }
+
+            function updateParameters() {
+                gain = parseFloat(gainSlider.value);
+                gainValue.textContent = gain.toFixed(1);
+
+                tau = parseFloat(tauSlider.value);
+                tauValue.textContent = tau.toFixed(1) + ' s';
+
+                wn = parseFloat(wnSlider.value);
+                wnValue.textContent = wn.toFixed(1) + ' rad/s';
+
+                zeta = parseFloat(zetaSlider.value);
+                zetaValue.textContent = zeta.toFixed(2);
+
+                calculateResponse();
+            }
+
+            function resetSimulation() {
+                gain = 1.0;
+                tau = 1.0;
+                wn = 2.0;
+                zeta = 0.5;
+
+                gainSlider.value = gain;
+                tauSlider.value = tau;
+                wnSlider.value = wn;
+                zetaSlider.value = zeta;
+
+                updateParameters();
+            }
+        });
+
+        function updateControlVisibility() {
+            const gainControl = document.getElementById('gain-control');
+            const tauControl = document.getElementById('tau-control');
+            const wnControl = document.getElementById('wn-control');
+            const zetaControl = document.getElementById('zeta-control');
+
+            gainControl.style.display = 'none';
+            tauControl.style.display = 'none';
+            wnControl.style.display = 'none';
+            zetaControl.style.display = 'none';
+
+            if (systemType === 'first-order') {
+                gainControl.style.display = 'flex';
+                tauControl.style.display = 'flex';
+            } else if (systemType === 'second-order') {
+                gainControl.style.display = 'flex';
+                wnControl.style.display = 'flex';
+                zetaControl.style.display = 'flex';
+            } else if (systemType === 'feedback') {
+                gainControl.style.display = 'flex';
+            }
+        }
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Ability to correct for disturbances
+                q2: 'b',  // Critically damped
+                q3: 'b',  // Multiply
+                q4: 'b',  // 63.2% of final value
+                q5: 'c'   // Makes system faster
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

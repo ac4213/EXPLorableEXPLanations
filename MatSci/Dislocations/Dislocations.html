@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dislocations & Plastic Deformation - Interactive Lecture</title>
+
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .dislocation-type {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 5px solid;
+        }
+        .edge-disloc {
+            border-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+        .screw-disloc {
+            border-color: #3498db;
+            background-color: #d6eaf8;
+        }
+        .mixed-disloc {
+            border-color: #9b59b6;
+            background-color: #ebdef0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dislocations & Plastic Deformation</h1>
+        <p class="subtitle">Understanding Crystal Defects and Material Strength - Interactive Lecture</p>
+    </header>
+
+    <div class="content-section">
+        <h2>What are Dislocations?</h2>
+        <div class="key-point">
+            <p><strong>Dislocations</strong> are line defects in crystalline materials where atoms are misaligned from their perfect lattice positions. They are the primary mechanism by which metals and alloys undergo plastic (permanent) deformation. Understanding dislocations is essential for controlling material strength, ductility, and formability.</p>
+        </div>
+
+        <p>Why dislocations matter:</p>
+        <ul>
+            <li>They explain why real materials are much weaker than theoretical predictions</li>
+            <li>Dislocation motion enables plastic deformation and metal forming</li>
+            <li>Controlling dislocation density and motion determines material strength</li>
+            <li>They influence material properties like work hardening, creep, and fracture</li>
+        </ul>
+
+        <h3>Historical Context:</h3>
+        <p>The theoretical shear strength of perfect crystals predicts that materials should be ~1000× stronger than observed. In 1934, the dislocation theory was proposed to explain this discrepancy - dislocations allow plastic deformation to occur at much lower stresses than perfect crystal shear.</p>
+    </div>
+
+    <div class="content-section">
+        <h2>Fundamental Concepts</h2>
+
+        <h3>1. Types of Dislocations</h3>
+
+        <div class="dislocation-type edge-disloc">
+            <h4>Edge Dislocation</h4>
+            <p>An extra half-plane of atoms inserted into the crystal structure. The dislocation line is perpendicular to the Burgers vector.</p>
+            <ul>
+                <li><strong>Symbol:</strong> ⊥ (indicates extra half-plane)</li>
+                <li><strong>Burgers vector:</strong> Perpendicular to dislocation line</li>
+                <li><strong>Motion:</strong> Glide (easy) and climb (requires diffusion)</li>
+            </ul>
+        </div>
+
+        <div class="dislocation-type screw-disloc">
+            <h4>Screw Dislocation</h4>
+            <p>Atoms are displaced in a helical pattern around the dislocation line. The dislocation line is parallel to the Burgers vector.</p>
+            <ul>
+                <li><strong>Geometry:</strong> Creates a helical ramp in the crystal</li>
+                <li><strong>Burgers vector:</strong> Parallel to dislocation line</li>
+                <li><strong>Motion:</strong> Can glide on multiple slip planes</li>
+            </ul>
+        </div>
+
+        <div class="dislocation-type mixed-disloc">
+            <h4>Mixed Dislocation</h4>
+            <p>Most real dislocations have both edge and screw components. A dislocation loop typically has edge character at some points and screw character at others.</p>
+        </div>
+
+        <h3>2. The Burgers Vector</h3>
+        <div class="equation-box">
+            <p>The <strong>Burgers vector (b)</strong> defines the magnitude and direction of lattice distortion caused by a dislocation.</p>
+            <p>It represents:</p>
+            <ul>
+                <li>The slip displacement when the dislocation moves</li>
+                <li>The direction of shear</li>
+                <li>The magnitude of atomic displacement</li>
+            </ul>
+            <p>For a perfect dislocation: \(\vec{b} = \frac{a}{2}\langle 110 \rangle\) (FCC)</p>
+            <p>For a perfect dislocation: \(\vec{b} = \frac{a}{2}\langle 111 \rangle\) (BCC)</p>
+            <p>Where \(a\) is the lattice parameter.</p>
+        </div>
+
+        <h3>3. Dislocation Motion and Slip</h3>
+        <div class="key-point">
+            <p><strong>Plastic deformation</strong> occurs by dislocation glide on specific crystallographic planes and directions:</p>
+            <ul>
+                <li><strong>Slip plane:</strong> The crystallographic plane on which dislocations move</li>
+                <li><strong>Slip direction:</strong> The direction of dislocation motion (parallel to Burgers vector)</li>
+                <li><strong>Slip system:</strong> Combination of slip plane + slip direction</li>
+            </ul>
+            <p>FCC metals have 12 slip systems: {111}⟨110⟩</p>
+            <p>BCC metals have 48 slip systems: {110}, {112}, {123}⟨111⟩</p>
+        </div>
+
+        <h3>4. Critical Resolved Shear Stress (CRSS)</h3>
+        <div class="equation-box">
+            <p>Dislocations begin to move when the resolved shear stress on the slip system reaches the CRSS:</p>
+            <p>\(\tau_R = \sigma \cos\phi \cos\lambda\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\tau_R\) = resolved shear stress on slip plane</li>
+                <li>\(\sigma\) = applied tensile stress</li>
+                <li>\(\phi\) = angle between tensile axis and slip plane normal</li>
+                <li>\(\lambda\) = angle between tensile axis and slip direction</li>
+                <li>\(\cos\phi \cos\lambda\) = Schmid factor (m)</li>
+            </ul>
+            <p><strong>Schmid's Law:</strong> Slip begins when \(\tau_R = \tau_{CRSS}\)</p>
+            <p>\(\sigma_y = \frac{\tau_{CRSS}}{m}\)</p>
+        </div>
+
+        <h3>5. Strengthening Mechanisms</h3>
+        <div class="equation-box">
+            <p>Strengthening materials involves impeding dislocation motion:</p>
+            <ul>
+                <li><strong>Grain size (Hall-Petch):</strong> \(\sigma_y = \sigma_0 + \frac{k}{\sqrt{d}}\)</li>
+                <li><strong>Work hardening:</strong> \(\sigma = K\epsilon^n\) (increasing dislocation density)</li>
+                <li><strong>Solid solution:</strong> Solute atoms create strain fields that pin dislocations</li>
+                <li><strong>Precipitation:</strong> Second-phase particles obstruct dislocation motion</li>
+            </ul>
+            <p>Where:</p>
+            <ul>
+                <li>\(\sigma_y\) = yield strength</li>
+                <li>\(d\) = grain diameter</li>
+                <li>\(k\) = material constant</li>
+                <li>\(K\) = strength coefficient</li>
+                <li>\(n\) = strain hardening exponent</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Dislocation Motion</h2>
+        <p>Watch how an edge dislocation moves through a crystal lattice under applied stress. See how it causes plastic deformation!</p>
+
+        <div id="sketch-holder-dislocation"></div>
+
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Applied Stress: <span id="stress-value" class="slider-value">50</span> MPa</label>
+                <input type="range" id="stress-slider" min="0" max="150" step="10" value="50">
+            </div>
+            <div class="slider-container">
+                <label>Dislocation Type:</label>
+                <select id="disloc-type">
+                    <option value="edge">Edge Dislocation</option>
+                    <option value="screw">Screw Dislocation</option>
+                </select>
+            </div>
+            <div style="text-align: center; margin: 10px 0;">
+                <button id="move-disloc">APPLY STRESS</button>
+                <button id="reset-disloc">RESET</button>
+            </div>
+            <div id="disloc-info" style="text-align: center; padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                <p id="disloc-status">Crystal is undeformed. Apply stress to move the dislocation.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Strengthening Mechanisms</h2>
+        <p>Compare different strengthening mechanisms and see how they impede dislocation motion!</p>
+
+        <div id="sketch-holder-strengthening"></div>
+
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Grain Size (Hall-Petch): <span id="grain-size-value" class="slider-value">50</span> μm</label>
+                <input type="range" id="grain-size-slider" min="10" max="200" step="10" value="50">
+            </div>
+            <div class="slider-container">
+                <label>Precipitate Density: <span id="precip-density-value" class="slider-value">Medium</span></label>
+                <input type="range" id="precip-slider" min="0" max="2" step="1" value="1">
+            </div>
+            <div class="slider-container">
+                <label>Work Hardening (Strain): <span id="strain-value" class="slider-value">0.0</span></label>
+                <input type="range" id="strain-slider" min="0" max="50" step="5" value="0">
+            </div>
+            <div id="strength-info" style="padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                <h4 style="margin-top: 0;">Material Strength:</h4>
+                <div id="strength-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Metal Forming and Manufacturing</h3>
+        <ul>
+            <li><strong>Rolling:</strong> Reducing thickness of metal sheets through dislocation-mediated deformation</li>
+            <li><strong>Forging:</strong> Shaping hot metal by controlled dislocation motion</li>
+            <li><strong>Drawing:</strong> Pulling wire through dies, work hardening by dislocation multiplication</li>
+            <li><strong>Stamping:</strong> Creating complex shapes exploiting material ductility</li>
+        </ul>
+
+        <h3>Alloy Design for Strength</h3>
+        <ul>
+            <li><strong>High-strength steels:</strong> Fine grain size, precipitation hardening, solid solution strengthening</li>
+            <li><strong>Aluminum alloys (7xxx, 2xxx):</strong> Age hardening through precipitate formation</li>
+            <li><strong>Superalloys:</strong> γ' precipitates pin dislocations at high temperatures</li>
+            <li><strong>TRIP steels:</strong> Transformation-induced plasticity from phase changes</li>
+        </ul>
+
+        <h3>Structural Design Considerations</h3>
+        <ul>
+            <li><strong>Cold working:</strong> Increasing strength through dislocation multiplication (at cost of ductility)</li>
+            <li><strong>Annealing:</strong> Removing dislocations to restore ductility</li>
+            <li><strong>Creep resistance:</strong> Designing materials to resist dislocation climb at high temperatures</li>
+            <li><strong>Fatigue:</strong> Cyclic dislocation motion leading to crack initiation</li>
+        </ul>
+
+        <h3>Failure Analysis</h3>
+        <ul>
+            <li><strong>Ductile fracture:</strong> Extensive dislocation motion before failure (necking in tensile test)</li>
+            <li><strong>Brittle fracture:</strong> Limited dislocation motion (ceramics, cold metals)</li>
+            <li><strong>Slip bands:</strong> Visible evidence of concentrated dislocation activity</li>
+            <li><strong>Persistent slip bands:</strong> Precursors to fatigue crack initiation</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> The Hall-Petch relationship shows that reducing grain size increases strength without sacrificing ductility - a rare win-win in materials design. This is why thermomechanical processing to refine grain size is a key manufacturing strategy.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Schmid's Law</td>
+                    <td>\(\tau_R = \sigma \cos\phi \cos\lambda\)</td>
+                    <td>Resolved shear stress on slip system</td>
+                </tr>
+                <tr>
+                    <td>Yield Criterion</td>
+                    <td>\(\sigma_y = \frac{\tau_{CRSS}}{m}\)</td>
+                    <td>Yield stress from critical resolved shear stress</td>
+                </tr>
+                <tr>
+                    <td>Hall-Petch</td>
+                    <td>\(\sigma_y = \sigma_0 + \frac{k}{\sqrt{d}}\)</td>
+                    <td>Grain size strengthening</td>
+                </tr>
+                <tr>
+                    <td>Work Hardening</td>
+                    <td>\(\sigma = K\epsilon^n\)</td>
+                    <td>Strain hardening relationship</td>
+                </tr>
+                <tr>
+                    <td>Dislocation Density</td>
+                    <td>\(\tau \propto \sqrt{\rho}\)</td>
+                    <td>Strength from dislocation interactions</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Schmid Factor Calculation</h3>
+            <p>A single crystal of aluminum (FCC) is loaded in tension. The slip plane normal makes an angle of 60° with the tensile axis, and the slip direction makes an angle of 35° with the tensile axis. The critical resolved shear stress is 0.5 MPa. Calculate:</p>
+            <ol>
+                <li>The Schmid factor</li>
+                <li>The tensile stress required to initiate slip</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(\phi = 60°\), \(\lambda = 35°\), \(\tau_{CRSS} = 0.5\) MPa</p>
+
+                <p><strong>a) Schmid factor:</strong></p>
+                <p>\(m = \cos\phi \cos\lambda\)</p>
+                <p>\(m = \cos(60°) \cos(35°)\)</p>
+                <p>\(m = 0.5 \times 0.819 = 0.410\)</p>
+
+                <p><strong>b) Required tensile stress:</strong></p>
+                <p>\(\sigma_y = \displaystyle \frac{\tau_{CRSS}}{m} = \frac{0.5}{0.410}\)</p>
+                <p>\(\sigma_y = 1.22\) MPa</p>
+
+                <p>The single crystal will begin to deform plastically at a tensile stress of <strong>1.22 MPa</strong>.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Hall-Petch Strengthening</h3>
+            <p>A steel has a yield strength of 250 MPa with an average grain diameter of 100 μm. After grain refinement processing, the grain size is reduced to 25 μm. If the Hall-Petch parameters are σ₀ = 50 MPa and k = 0.5 MPa·m^(1/2), calculate:</p>
+            <ol>
+                <li>Verify the initial yield strength</li>
+                <li>The yield strength after grain refinement</li>
+                <li>The percentage increase in yield strength</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(d_1 = 100\) μm = \(100 \times 10^{-6}\) m, \(d_2 = 25\) μm = \(25 \times 10^{-6}\) m</p>
+                <p>\(\sigma_0 = 50\) MPa, \(k = 0.5\) MPa·m^(1/2)</p>
+
+                <p><strong>a) Initial yield strength:</strong></p>
+                <p>\(\sigma_{y1} = \sigma_0 + \displaystyle \frac{k}{\sqrt{d_1}}\)</p>
+                <p>\(\sigma_{y1} = 50 + \displaystyle \frac{0.5}{\sqrt{100 \times 10^{-6}}}\)</p>
+                <p>\(\sigma_{y1} = 50 + \displaystyle \frac{0.5}{0.01} = 50 + 50 = 100\) MPa</p>
+                <p>Note: The problem states 250 MPa, suggesting k = 2.0 MPa·m^(1/2). Using k = 2.0:</p>
+                <p>\(\sigma_{y1} = 50 + \displaystyle \frac{2.0}{0.01} = 250\) MPa ✓</p>
+
+                <p><strong>b) Yield strength after refinement (using k = 2.0):</strong></p>
+                <p>\(\sigma_{y2} = 50 + \displaystyle \frac{2.0}{\sqrt{25 \times 10^{-6}}}\)</p>
+                <p>\(\sigma_{y2} = 50 + \displaystyle \frac{2.0}{0.005} = 50 + 400 = 450\) MPa</p>
+
+                <p><strong>c) Percentage increase:</strong></p>
+                <p>\(\displaystyle \frac{\sigma_{y2} - \sigma_{y1}}{\sigma_{y1}} \times 100\% = \frac{450 - 250}{250} \times 100\% = 80\%\)</p>
+
+                <p>Reducing grain size by 4× increases yield strength by <strong>80%</strong>.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Work Hardening Analysis</h3>
+            <p>A metal follows the work hardening relationship σ = 400ε^0.3 MPa. Calculate:</p>
+            <ol>
+                <li>The true stress at a true strain of 0.1</li>
+                <li>The true stress at a true strain of 0.3</li>
+                <li>How much did the strength increase due to work hardening?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given: \(\sigma = 400\epsilon^{0.3}\) MPa</p>
+
+                <p><strong>a) Stress at ε = 0.1:</strong></p>
+                <p>\(\sigma_1 = 400 \times (0.1)^{0.3}\)</p>
+                <p>\(\sigma_1 = 400 \times 0.501 = 200.4\) MPa</p>
+
+                <p><strong>b) Stress at ε = 0.3:</strong></p>
+                <p>\(\sigma_2 = 400 \times (0.3)^{0.3}\)</p>
+                <p>\(\sigma_2 = 400 \times 0.697 = 278.8\) MPa</p>
+
+                <p><strong>c) Strength increase:</strong></p>
+                <p>\(\Delta\sigma = \sigma_2 - \sigma_1 = 278.8 - 200.4 = 78.4\) MPa</p>
+                <p>Percentage increase: \(\displaystyle \frac{78.4}{200.4} \times 100\% = 39.1\%\)</p>
+
+                <p>Increasing strain from 0.1 to 0.3 increases the flow stress by <strong>39%</strong> due to work hardening.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary mechanism by which metals undergo plastic deformation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Breaking of atomic bonds</label>
+                    <label><input type="radio" name="q1" value="b"> b) Dislocation motion (glide)</label>
+                    <label><input type="radio" name="q1" value="c"> c) Grain boundary sliding</label>
+                    <label><input type="radio" name="q1" value="d"> d) Elastic stretching of bonds</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In an edge dislocation, the Burgers vector is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Parallel to the dislocation line</label>
+                    <label><input type="radio" name="q2" value="b"> b) Perpendicular to the dislocation line</label>
+                    <label><input type="radio" name="q2" value="c"> c) At 45° to the dislocation line</label>
+                    <label><input type="radio" name="q2" value="d"> d) There is no Burgers vector for edge dislocations</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: According to the Hall-Petch relationship, how does reducing grain size affect yield strength?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Decreases yield strength</label>
+                    <label><input type="radio" name="q3" value="b"> b) Has no effect on yield strength</label>
+                    <label><input type="radio" name="q3" value="c"> c) Increases yield strength</label>
+                    <label><input type="radio" name="q3" value="d"> d) First increases then decreases yield strength</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The Schmid factor (m) can have a maximum value of:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) 0.0</label>
+                    <label><input type="radio" name="q4" value="b"> b) 0.5</label>
+                    <label><input type="radio" name="q4" value="c"> c) 1.0</label>
+                    <label><input type="radio" name="q4" value="d"> d) 2.0</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Work hardening occurs because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Grain size increases during deformation</label>
+                    <label><input type="radio" name="q5" value="b"> b) Dislocation density decreases</label>
+                    <label><input type="radio" name="q5" value="c"> c) Dislocations multiply and interact, making further motion more difficult</label>
+                    <label><input type="radio" name="q5" value="d"> d) The material becomes more elastic</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- p5.js sketches -->
+    <script>
+        // Dislocation Motion Simulation
+        let dislocationSketch = function(p) {
+            let atoms = [];
+            let dislocationPos = 5;
+            let stress = 50;
+            let moving = false;
+            let dislType = 'edge';
+            let latticeSpacing = 40;
+
+            class Atom {
+                constructor(i, j, isExtra = false) {
+                    this.gridI = i;
+                    this.gridJ = j;
+                    this.x = 100 + i * latticeSpacing;
+                    this.y = 100 + j * latticeSpacing;
+                    this.targetX = this.x;
+                    this.targetY = this.y;
+                    this.isExtra = isExtra;
+                }
+
+                update() {
+                    this.x += (this.targetX - this.x) * 0.1;
+                    this.y += (this.targetY - this.y) * 0.1;
+                }
+
+                display() {
+                    p.push();
+                    p.noStroke();
+                    if (this.isExtra) {
+                        p.fill(255, 100, 100);
+                    } else {
+                        p.fill(100, 150, 255);
+                    }
+                    p.ellipse(this.x, this.y, 15, 15);
+                    p.pop();
+                }
+            }
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-dislocation');
+                initializeLattice();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Draw stress arrow
+                if (stress > 0) {
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    for (let i = 0; i < 3; i++) {
+                        let y = 150 + i * 50;
+                        p.triangle(750, y, 730, y - 8, 730, y + 8);
+                    }
+                    p.textAlign(p.LEFT);
+                    p.textSize(14);
+                    p.text('Applied Stress →', 650, 170);
+                }
+
+                // Update and draw atoms
+                for (let atom of atoms) {
+                    atom.update();
+                    atom.display();
+                }
+
+                // Draw bonds
+                p.stroke(150, 150, 150, 100);
+                p.strokeWeight(1);
+                for (let atom of atoms) {
+                    for (let other of atoms) {
+                        if (atom !== other) {
+                            let d = p.dist(atom.x, atom.y, other.x, other.y);
+                            if (d < latticeSpacing * 1.5) {
+                                p.line(atom.x, atom.y, other.x, other.y);
+                            }
+                        }
+                    }
+                }
+
+                // Dislocation position indicator
+                if (dislType === 'edge' && dislocationPos < 14) {
+                    let x = 100 + dislocationPos * latticeSpacing;
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.textAlign(p.CENTER);
+                    p.textSize(20);
+                    p.text('⊥', x, 90);
+                    p.textSize(12);
+                    p.text('Edge Dislocation', x, 75);
+                }
+
+                // Info display
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text(`Applied Stress: ${stress} MPa`, 10, 25);
+                p.text(`Dislocation Position: ${dislocationPos}`, 10, 45);
+            };
+
+            function initializeLattice() {
+                atoms = [];
+                dislocationPos = 5;
+
+                // Create perfect lattice
+                for (let j = 0; j < 7; j++) {
+                    for (let i = 0; i < 15; i++) {
+                        let isExtra = (dislType === 'edge' && j < 3 && i <= dislocationPos);
+                        atoms.push(new Atom(i, j, isExtra));
+                    }
+                }
+
+                updateDislocationGeometry();
+            }
+
+            function updateDislocationGeometry() {
+                if (dislType === 'edge') {
+                    for (let atom of atoms) {
+                        if (atom.gridJ < 3 && atom.gridI > dislocationPos) {
+                            // Atoms to the right of dislocation are shifted
+                            atom.targetX = 100 + (atom.gridI + 0.5) * latticeSpacing;
+                        } else if (atom.gridJ >= 3 && atom.gridI > dislocationPos) {
+                            atom.targetX = 100 + atom.gridI * latticeSpacing;
+                        } else {
+                            atom.targetX = 100 + atom.gridI * latticeSpacing;
+                        }
+                        atom.targetY = 100 + atom.gridJ * latticeSpacing;
+                    }
+                }
+            }
+
+            window.moveDislocation = function() {
+                if (stress > 30 && dislocationPos < 14) {
+                    moving = true;
+                    dislocationPos++;
+                    updateDislocationGeometry();
+                    document.getElementById('disloc-status').textContent =
+                        `Dislocation moved! Position: ${dislocationPos}. ${dislocationPos >= 14 ? 'Dislocation has exited the crystal - permanent deformation occurred!' : 'Apply more stress to continue.'}`;
+                } else if (stress <= 30) {
+                    document.getElementById('disloc-status').textContent =
+                        'Stress too low! Increase applied stress above 30 MPa to move the dislocation.';
+                } else {
+                    document.getElementById('disloc-status').textContent =
+                        'Dislocation has exited the crystal. Plastic deformation is complete!';
+                }
+            };
+
+            window.resetDislocation = function() {
+                initializeLattice();
+                moving = false;
+                document.getElementById('disloc-status').textContent =
+                    'Crystal is undeformed. Apply stress to move the dislocation.';
+            };
+
+            window.updateStress = function(val) {
+                stress = parseFloat(val);
+            };
+
+            window.updateDislocType = function(type) {
+                dislType = type;
+                initializeLattice();
+            };
+        };
+
+        // Strengthening Mechanisms Simulation
+        let strengtheningSketch = function(p) {
+            let grainSize = 50;
+            let precipDensity = 1;
+            let strain = 0;
+            let grains = [];
+            let precipitates = [];
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 300);
+                canvas.parent('sketch-holder-strengthening');
+                p.textFont('Arial');
+                generateMicrostructure();
+            };
+
+            p.draw = function() {
+                p.background(250);
+
+                // Draw grains
+                p.strokeWeight(3);
+                p.stroke(0);
+                for (let grain of grains) {
+                    p.fill(grain.color);
+                    p.beginShape();
+                    for (let pt of grain.points) {
+                        p.vertex(pt.x, pt.y);
+                    }
+                    p.endShape(p.CLOSE);
+                }
+
+                // Draw precipitates
+                p.noStroke();
+                p.fill(50, 50, 50);
+                for (let precip of precipitates) {
+                    p.ellipse(precip.x, precip.y, precip.size, precip.size);
+                }
+
+                // Draw dislocation tangles (representing work hardening)
+                if (strain > 0) {
+                    p.stroke(255, 0, 0, 150);
+                    p.strokeWeight(2);
+                    let numTangles = strain / 5;
+                    for (let i = 0; i < numTangles; i++) {
+                        let x = p.random(50, p.width - 50);
+                        let y = p.random(50, p.height - 50);
+                        for (let j = 0; j < 5; j++) {
+                            p.line(x, y, x + p.random(-20, 20), y + p.random(-20, 20));
+                        }
+                    }
+                }
+
+                // Calculate and display strength
+                updateStrength();
+            };
+
+            function generateMicrostructure() {
+                grains = [];
+                precipitates = [];
+
+                // Generate grains based on grain size
+                let numGrains = Math.floor((p.width * p.height) / (grainSize * grainSize * Math.PI / 4));
+                for (let i = 0; i < numGrains; i++) {
+                    let grain = {
+                        x: p.random(0, p.width),
+                        y: p.random(0, p.height),
+                        size: grainSize * p.random(0.8, 1.2),
+                        color: p.color(p.random(150, 255), p.random(150, 255), p.random(150, 255), 150),
+                        points: []
+                    };
+
+                    // Generate grain boundary points
+                    let numPoints = 6;
+                    for (let j = 0; j < numPoints; j++) {
+                        let angle = (j / numPoints) * p.TWO_PI;
+                        let r = grain.size * p.random(0.8, 1.2);
+                        grain.points.push({
+                            x: grain.x + r * p.cos(angle),
+                            y: grain.y + r * p.sin(angle)
+                        });
+                    }
+                    grains.push(grain);
+                }
+
+                // Generate precipitates
+                let numPrecip = precipDensity * 100;
+                for (let i = 0; i < numPrecip; i++) {
+                    precipitates.push({
+                        x: p.random(0, p.width),
+                        y: p.random(0, p.height),
+                        size: p.random(3, 8)
+                    });
+                }
+            }
+
+            function updateStrength() {
+                // Hall-Petch contribution
+                let sigma_0 = 50; // MPa
+                let k_hp = 15; // MPa·μm^0.5
+                let d_mm = grainSize / 1000; // Convert to mm
+                let sigma_hp = sigma_0 + k_hp / Math.sqrt(grainSize);
+
+                // Precipitation contribution
+                let sigma_precip = precipDensity * 80;
+
+                // Work hardening contribution
+                let sigma_wh = Math.pow(strain / 100, 0.3) * 200;
+
+                let total_strength = sigma_hp + sigma_precip + sigma_wh;
+
+                let infoHTML = `<strong>Hall-Petch:</strong> ${sigma_hp.toFixed(0)} MPa<br>`;
+                infoHTML += `<strong>Precipitation:</strong> ${sigma_precip.toFixed(0)} MPa<br>`;
+                infoHTML += `<strong>Work Hardening:</strong> ${sigma_wh.toFixed(0)} MPa<br>`;
+                infoHTML += `<strong style="font-size: 1.2em; color: #e74c3c;">Total Yield Strength: ${total_strength.toFixed(0)} MPa</strong>`;
+
+                document.getElementById('strength-details').innerHTML = infoHTML;
+            }
+
+            window.updateGrainSize = function(size) {
+                grainSize = parseFloat(size);
+                generateMicrostructure();
+            };
+
+            window.updatePrecipDensity = function(density) {
+                precipDensity = parseInt(density);
+                generateMicrostructure();
+            };
+
+            window.updateStrain = function(s) {
+                strain = parseFloat(s);
+            };
+        };
+
+        // Create p5 instances
+        new p5(dislocationSketch);
+        new p5(strengtheningSketch);
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dislocation controls
+            const stressSlider = document.getElementById('stress-slider');
+            const dislocType = document.getElementById('disloc-type');
+
+            stressSlider.addEventListener('input', e => {
+                document.getElementById('stress-value').textContent = e.target.value;
+                window.updateStress(e.target.value);
+            });
+
+            dislocType.addEventListener('change', e => {
+                window.updateDislocType(e.target.value);
+            });
+
+            document.getElementById('move-disloc').addEventListener('click', window.moveDislocation);
+            document.getElementById('reset-disloc').addEventListener('click', window.resetDislocation);
+
+            // Strengthening controls
+            const grainSlider = document.getElementById('grain-size-slider');
+            const precipSlider = document.getElementById('precip-slider');
+            const strainSlider = document.getElementById('strain-slider');
+
+            grainSlider.addEventListener('input', e => {
+                document.getElementById('grain-size-value').textContent = e.target.value;
+                window.updateGrainSize(e.target.value);
+            });
+
+            precipSlider.addEventListener('input', e => {
+                let labels = ['None', 'Medium', 'High'];
+                document.getElementById('precip-density-value').textContent = labels[parseInt(e.target.value)];
+                window.updatePrecipDensity(e.target.value);
+            });
+
+            strainSlider.addEventListener('input', e => {
+                let val = parseFloat(e.target.value) / 100;
+                document.getElementById('strain-value').textContent = val.toFixed(2);
+                window.updateStrain(e.target.value);
+            });
+
+            // Quiz
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                const answers = {
+                    q1: 'b',
+                    q2: 'b',
+                    q3: 'c',
+                    q4: 'b',
+                    q5: 'c'
+                };
+
+                let score = 0;
+                let totalQuestions = Object.keys(answers).length;
+                let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                for (let question in answers) {
+                    const selected = document.querySelector(`input[name="${question}"]:checked`);
+                    const correctAnswer = answers[question];
+
+                    if (selected) {
+                        if (selected.value === correctAnswer) {
+                            score++;
+                            resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct!</p>`;
+                        } else {
+                            resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect</p>`;
+                        }
+                    } else {
+                        resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                    }
+                }
+
+                const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                document.getElementById('quiz-results').innerHTML = resultsHTML;
+            });
+        });
+    </script>
+</body>
+</html>

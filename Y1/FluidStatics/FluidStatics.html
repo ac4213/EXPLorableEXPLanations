@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluid Statics & Pressure - Interactive Lecture</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Fluid Statics & Pressure</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Fluid Statics</h2>
+        <p>Fluid statics, also known as hydrostatics, is the branch of fluid mechanics that studies fluids at rest. The fundamental principle is that pressure in a stationary fluid varies only with depth and is independent of the shape of the container.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Pressure at any point in a static fluid depends only on the vertical depth below the free surface. This principle explains why dams are thicker at the bottom and why submarines must withstand enormous pressure at great depths.</p>
+        </div>
+
+        <h3>Pressure Definition</h3>
+        <p>Pressure is defined as the normal force per unit area exerted by a fluid on a surface:</p>
+
+        <div class="equation-box">
+            <p>\[p = \frac{F}{A}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(p\) = Pressure (Pa or N/m²)</li>
+                <li>\(F\) = Normal force (N)</li>
+                <li>\(A\) = Area (m²)</li>
+            </ul>
+        </div>
+
+        <h3>Hydrostatic Pressure</h3>
+        <p>In a fluid at rest, pressure increases linearly with depth due to the weight of the fluid above:</p>
+
+        <div class="equation-box">
+            <p>\[p = p_0 + \rho g h\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(p\) = Absolute pressure at depth (Pa)</li>
+                <li>\(p_0\) = Atmospheric pressure at surface (Pa) ≈ 101,325 Pa</li>
+                <li>\(\rho\) = Fluid density (kg/m³)</li>
+                <li>\(g\) = Gravitational acceleration (m/s²) ≈ 9.81 m/s²</li>
+                <li>\(h\) = Depth below surface (m)</li>
+            </ul>
+        </div>
+
+        <h3>Gauge Pressure vs Absolute Pressure</h3>
+        <p>There are two common ways to express pressure:</p>
+        <ul>
+            <li><strong>Absolute Pressure:</strong> Measured relative to perfect vacuum (zero pressure)</li>
+            <li><strong>Gauge Pressure:</strong> Measured relative to atmospheric pressure</li>
+        </ul>
+
+        <div class="equation-box">
+            <p>\[p_{\text{absolute}} = p_{\text{gauge}} + p_{\text{atm}}\]</p>
+            <p>\[p_{\text{gauge}} = \rho g h\]</p>
+        </div>
+
+        <h3>Pascal's Law</h3>
+        <p>A pressure change at any point in a confined incompressible fluid is transmitted equally to all points in the fluid:</p>
+
+        <div class="key-point">
+            <p><strong>Pascal's Principle:</strong> This principle is the basis for hydraulic systems, where a small force applied over a small area creates a large force over a larger area.</p>
+        </div>
+
+        <div class="equation-box">
+            <p>\[\frac{F_1}{A_1} = \frac{F_2}{A_2}\]</p>
+            <p>Therefore: \[F_2 = F_1 \times \frac{A_2}{A_1}\]</p>
+        </div>
+
+        <h3>Pressure on Submerged Surfaces</h3>
+        <p>The total force on a submerged planar surface is the product of the pressure at the centroid and the surface area:</p>
+
+        <div class="equation-box">
+            <p>\[F = p_c \times A = \rho g h_c \times A\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(h_c\) = Depth to centroid of surface (m)</li>
+                <li>\(A\) = Surface area (m²)</li>
+            </ul>
+        </div>
+
+        <h3>Buoyancy and Archimedes' Principle</h3>
+        <p>When an object is immersed in a fluid, it experiences an upward buoyant force equal to the weight of the fluid displaced:</p>
+
+        <div class="equation-box">
+            <p>\[F_b = \rho_{\text{fluid}} g V_{\text{displaced}}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(F_b\) = Buoyant force (N)</li>
+                <li>\(V_{\text{displaced}}\) = Volume of fluid displaced (m³)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive Pressure Simulation</h2>
+        <p>Adjust the fluid depth and observe how pressure changes. The simulation shows the pressure distribution in a container and the force on a submerged plate.</p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="depth">Fluid Depth (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="depth" min="1" max="10" value="5" step="0.5">
+                        <span id="depth-value" class="value-display">5</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="density">Fluid Density (kg/m³):</label>
+                    <div class="slider-row">
+                        <input type="range" id="density" min="800" max="1200" value="1000" step="50">
+                        <span id="density-value" class="value-display">1000</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="plateDepth">Plate Depth (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="plateDepth" min="1" max="10" value="3" step="0.5">
+                        <span id="plateDepth-value" class="value-display">3</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <p><strong>Pressure at Bottom:</strong> <span id="pressure-bottom">0</span> kPa</p>
+            <p><strong>Gauge Pressure:</strong> <span id="pressure-gauge">0</span> kPa</p>
+            <p><strong>Force on Plate:</strong> <span id="force-plate">0</span> kN</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="diagram-legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(0, 100, 255, 0.5);"></div>
+                <span>Fluid</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(150, 150, 150, 1);"></div>
+                <span>Submerged Plate</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: rgba(255, 0, 0, 0.7);"></div>
+                <span>Pressure Arrows</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li><strong>Dam Design:</strong> Hydrostatic pressure calculations are critical for designing dams and retaining walls. The pressure increases linearly with depth, requiring dams to be thicker at the base to resist the enormous forces.</li>
+            <li><strong>Submarine Design:</strong> Submarines must withstand crushing pressures at depth. At 300m depth, the pressure is approximately 30 atmospheres (3 MPa), requiring thick-walled pressure hulls made of high-strength steel or titanium.</li>
+            <li><strong>Hydraulic Systems:</strong> Pascal's Law enables hydraulic jacks, brakes, and presses to multiply forces. A small input force on a small piston creates a large output force on a larger piston.</li>
+            <li><strong>Water Supply Systems:</strong> Water towers use hydrostatic pressure to distribute water. The height of the tower determines the water pressure in the distribution system without the need for pumps.</li>
+            <li><strong>Oil Storage Tanks:</strong> Large oil storage tanks must be designed to withstand the hydrostatic pressure of the stored fluid, especially at the base where pressure is maximum.</li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Pressure Definition</td>
+                        <td>\(p = \frac{F}{A}\)</td>
+                        <td>Force per unit area</td>
+                    </tr>
+                    <tr>
+                        <td>Hydrostatic Pressure</td>
+                        <td>\(p = p_0 + \rho g h\)</td>
+                        <td>Pressure at depth h</td>
+                    </tr>
+                    <tr>
+                        <td>Gauge Pressure</td>
+                        <td>\(p_{\text{gauge}} = \rho g h\)</td>
+                        <td>Pressure above atmospheric</td>
+                    </tr>
+                    <tr>
+                        <td>Pascal's Law</td>
+                        <td>\(\frac{F_1}{A_1} = \frac{F_2}{A_2}\)</td>
+                        <td>Pressure transmission in fluids</td>
+                    </tr>
+                    <tr>
+                        <td>Buoyant Force</td>
+                        <td>\(F_b = \rho_f g V_d\)</td>
+                        <td>Archimedes' Principle</td>
+                    </tr>
+                    <tr>
+                        <td>Force on Surface</td>
+                        <td>\(F = \rho g h_c A\)</td>
+                        <td>Total force on submerged surface</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Pressure in a Water Tank</h3>
+            <p>A water tank is filled to a depth of 8 meters. Calculate the gauge pressure and absolute pressure at the bottom of the tank. Use \(\rho_{\text{water}} = 1000\) kg/m³, \(g = 9.81\) m/s², and \(p_{\text{atm}} = 101.325\) kPa.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Depth: h = 8 m</li>
+                    <li>Density: ρ = 1000 kg/m³</li>
+                    <li>Gravity: g = 9.81 m/s²</li>
+                    <li>Atmospheric pressure: p₀ = 101.325 kPa</li>
+                </ul>
+
+                <p><strong>Calculate Gauge Pressure:</strong></p>
+                <p>\[p_{\text{gauge}} = \rho g h = 1000 \times 9.81 \times 8\]</p>
+                <p>\[p_{\text{gauge}} = 78,480 \text{ Pa} = 78.48 \text{ kPa}\]</p>
+
+                <p><strong>Calculate Absolute Pressure:</strong></p>
+                <p>\[p_{\text{absolute}} = p_{\text{gauge}} + p_{\text{atm}}\]</p>
+                <p>\[p_{\text{absolute}} = 78.48 + 101.325 = 179.805 \text{ kPa}\]</p>
+
+                <p><strong>Answer:</strong> Gauge pressure = 78.48 kPa, Absolute pressure = 179.81 kPa</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Hydraulic Lift</h3>
+            <p>A hydraulic lift has a small piston with diameter 5 cm and a large piston with diameter 25 cm. If a force of 200 N is applied to the small piston, what force can be lifted on the large piston?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Small piston diameter: d₁ = 5 cm = 0.05 m</li>
+                    <li>Large piston diameter: d₂ = 25 cm = 0.25 m</li>
+                    <li>Input force: F₁ = 200 N</li>
+                </ul>
+
+                <p><strong>Calculate Areas:</strong></p>
+                <p>\[A_1 = \frac{\pi d_1^2}{4} = \frac{\pi (0.05)^2}{4} = 1.963 \times 10^{-3} \text{ m}^2\]</p>
+                <p>\[A_2 = \frac{\pi d_2^2}{4} = \frac{\pi (0.25)^2}{4} = 4.909 \times 10^{-2} \text{ m}^2\]</p>
+
+                <p><strong>Apply Pascal's Law:</strong></p>
+                <p>\[F_2 = F_1 \times \frac{A_2}{A_1} = 200 \times \frac{4.909 \times 10^{-2}}{1.963 \times 10^{-3}}\]</p>
+                <p>\[F_2 = 200 \times 25 = 5000 \text{ N} = 5 \text{ kN}\]</p>
+
+                <p><strong>Answer:</strong> The hydraulic lift can lift a force of 5000 N (5 kN), which is 25 times the input force.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Buoyancy of a Cube</h3>
+            <p>A solid cube with side length 0.5 m and density 800 kg/m³ is fully submerged in water (density 1000 kg/m³). Calculate the buoyant force and determine if the cube will float or sink.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Cube side: a = 0.5 m</li>
+                    <li>Cube density: ρ_cube = 800 kg/m³</li>
+                    <li>Water density: ρ_water = 1000 kg/m³</li>
+                </ul>
+
+                <p><strong>Calculate Volume:</strong></p>
+                <p>\[V = a^3 = (0.5)^3 = 0.125 \text{ m}^3\]</p>
+
+                <p><strong>Calculate Weight of Cube:</strong></p>
+                <p>\[W = \rho_{\text{cube}} g V = 800 \times 9.81 \times 0.125 = 981 \text{ N}\]</p>
+
+                <p><strong>Calculate Buoyant Force:</strong></p>
+                <p>\[F_b = \rho_{\text{water}} g V = 1000 \times 9.81 \times 0.125 = 1226.25 \text{ N}\]</p>
+
+                <p><strong>Compare Forces:</strong></p>
+                <p>Since \(F_b = 1226.25 \text{ N} > W = 981 \text{ N}\), the buoyant force exceeds the weight.</p>
+
+                <p><strong>Answer:</strong> The buoyant force is 1226.25 N. Since this is greater than the weight, the cube will float.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Gauge pressure is measured relative to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Perfect vacuum</label>
+                    <label><input type="radio" name="q1" value="b"> b) Atmospheric pressure</label>
+                    <label><input type="radio" name="q1" value="c"> c) The pressure at the bottom of a container</label>
+                    <label><input type="radio" name="q1" value="d"> d) Sea level pressure</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In a static fluid, pressure increases with depth because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Fluids become denser with depth</label>
+                    <label><input type="radio" name="q2" value="b"> b) Of the weight of the fluid above</label>
+                    <label><input type="radio" name="q2" value="c"> c) Temperature decreases with depth</label>
+                    <label><input type="radio" name="q2" value="d"> d) Viscosity increases with depth</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Pascal's Law states that:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Pressure decreases exponentially with depth</label>
+                    <label><input type="radio" name="q3" value="b"> b) Pressure change is transmitted equally throughout a confined fluid</label>
+                    <label><input type="radio" name="q3" value="c"> c) Buoyant force equals weight of displaced fluid</label>
+                    <label><input type="radio" name="q3" value="d"> d) Pressure depends on container shape</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: If you double the depth in a fluid, the gauge pressure:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Stays the same</label>
+                    <label><input type="radio" name="q4" value="b"> b) Doubles</label>
+                    <label><input type="radio" name="q4" value="c"> c) Quadruples</label>
+                    <label><input type="radio" name="q4" value="d"> d) Increases exponentially</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: An object will float in a fluid if:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Its density is greater than the fluid</label>
+                    <label><input type="radio" name="q5" value="b"> b) Its density is less than the fluid</label>
+                    <label><input type="radio" name="q5" value="c"> c) Its volume is large</label>
+                    <label><input type="radio" name="q5" value="d"> d) The buoyant force is zero</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Fluid statics simulation using p5.js
+        let sketch = new p5(function(p) {
+            let depth = 5; // meters
+            let density = 1000; // kg/m³
+            let plateDepth = 3; // meters
+            let g = 9.81; // m/s²
+            let scale = 40; // pixels per meter
+
+            p.setup = function() {
+                let canvasWidth = Math.min(700, p.windowWidth - 40);
+                p.createCanvas(canvasWidth, 500);
+                setupControls();
+                updateCalculations();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Draw container
+                p.stroke(100);
+                p.strokeWeight(4);
+                p.noFill();
+                p.rect(100, 50, 300, depth * scale);
+
+                // Draw fluid
+                p.noStroke();
+                p.fill(0, 100, 255, 127);
+                p.rect(100, 50, 300, depth * scale);
+
+                // Draw water surface line
+                p.stroke(0, 50, 200);
+                p.strokeWeight(2);
+                p.line(100, 50, 400, 50);
+
+                // Draw depth markers
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                for (let i = 0; i <= depth; i++) {
+                    let y = 50 + i * scale;
+                    p.text(i + " m", 50, y + 4);
+                    p.stroke(150);
+                    p.strokeWeight(1);
+                    p.line(90, y, 100, y);
+                }
+
+                // Draw submerged plate
+                if (plateDepth <= depth) {
+                    p.fill(150, 150, 150);
+                    p.noStroke();
+                    let plateY = 50 + plateDepth * scale;
+                    p.rect(180, plateY - 30, 80, 60);
+                    p.stroke(0);
+                    p.strokeWeight(1);
+                    p.noFill();
+                    p.rect(180, plateY - 30, 80, 60);
+
+                    // Draw pressure arrows on plate
+                    drawPressureArrows(plateDepth);
+                }
+
+                // Draw pressure gradient visualization
+                drawPressureGradient();
+
+                // Draw labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text("Fluid Container", 250, 35);
+            };
+
+            function drawPressureArrows(depth_m) {
+                let pressure = density * g * depth_m;
+                let arrowLength = p.map(pressure, 0, density * g * 10, 0, 50);
+
+                p.stroke(255, 0, 0, 180);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0, 180);
+
+                let plateY = 50 + depth_m * scale;
+
+                // Draw arrows pointing towards plate
+                for (let i = 0; i < 3; i++) {
+                    let x = 120 + i * 30;
+                    p.line(x, plateY, x + arrowLength, plateY);
+                    p.triangle(x + arrowLength, plateY,
+                              x + arrowLength - 5, plateY - 3,
+                              x + arrowLength - 5, plateY + 3);
+                }
+            }
+
+            function drawPressureGradient() {
+                p.textAlign(p.RIGHT);
+                p.textSize(11);
+                p.fill(0);
+                p.noStroke();
+
+                let steps = 5;
+                for (let i = 0; i <= steps; i++) {
+                    let d = (depth / steps) * i;
+                    let pressure = (density * g * d / 1000).toFixed(1); // kPa
+                    let y = 50 + d * scale;
+                    p.text(pressure + " kPa", 480, y + 4);
+                }
+            }
+
+            function setupControls() {
+                document.getElementById("depth").addEventListener("input", function() {
+                    depth = parseFloat(this.value);
+                    document.getElementById("depth-value").textContent = depth;
+                    updateCalculations();
+                });
+
+                document.getElementById("density").addEventListener("input", function() {
+                    density = parseFloat(this.value);
+                    document.getElementById("density-value").textContent = density;
+                    updateCalculations();
+                });
+
+                document.getElementById("plateDepth").addEventListener("input", function() {
+                    plateDepth = parseFloat(this.value);
+                    document.getElementById("plateDepth-value").textContent = plateDepth;
+                    updateCalculations();
+                });
+            }
+
+            function updateCalculations() {
+                // Pressure at bottom
+                let pressureBottom = (density * g * depth) / 1000; // kPa
+
+                // Gauge pressure at plate
+                let gaugePress = (density * g * plateDepth) / 1000; // kPa
+
+                // Force on plate (assume 1m² area)
+                let area = 1.5 * 0.8; // m² (plate dimensions)
+                let forcePlate = (density * g * plateDepth * area) / 1000; // kN
+
+                document.getElementById("pressure-bottom").textContent = pressureBottom.toFixed(2);
+                document.getElementById("pressure-gauge").textContent = gaugePress.toFixed(2);
+                document.getElementById("force-plate").textContent = forcePlate.toFixed(2);
+            }
+
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'b',
+                q4: 'b',
+                q5: 'b'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let feedback = "";
+            if (percentage >= 80) {
+                feedback = "Excellent work! You have a strong understanding of fluid statics.";
+            } else if (percentage >= 60) {
+                feedback = "Good job! Review the concepts you missed to strengthen your understanding.";
+            } else {
+                feedback = "Keep studying! Review the lecture content and try the practice problems again.";
+            }
+
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p><p>${feedback}</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

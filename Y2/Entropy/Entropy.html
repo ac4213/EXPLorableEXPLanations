@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entropy and the Second Law of Thermodynamics - Interactive Lecture</title>
+
+    <!-- External CSS (always in this order) -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Entropy and the Second Law of Thermodynamics</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Entropy</h2>
+        <p>Entropy is one of the most profound and far-reaching concepts in thermodynamics, with implications extending from engineering to information theory and cosmology. At its core, entropy represents a measure of disorder, randomness, or the unavailability of energy to do useful work.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Entropy is a state function that quantifies the degree of disorder in a system. In any real (irreversible) process, the total entropy of an isolated system always increases, establishing a fundamental arrow of time in nature.</p>
+        </div>
+
+        <h3>What is Entropy?</h3>
+        <p>Entropy can be understood from multiple perspectives:</p>
+        <ul>
+            <li><strong>Thermodynamic Perspective:</strong> A measure of energy dispersal or unavailability</li>
+            <li><strong>Statistical Perspective:</strong> A measure of the number of microscopic configurations (microstates) corresponding to a thermodynamic state</li>
+            <li><strong>Information Perspective:</strong> A measure of uncertainty or missing information about the detailed state of a system</li>
+        </ul>
+
+        <p>The statistical definition, introduced by Ludwig Boltzmann, provides deep insight:</p>
+
+        <div class="equation-box">
+            <p>\[S = k_B \ln(\Omega)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(S\) = Entropy (J/K)</li>
+                <li>\(k_B\) = Boltzmann constant = \(1.381 \times 10^{-23}\) J/K</li>
+                <li>\(\Omega\) = Number of accessible microstates</li>
+            </ul>
+            <p>This equation is so fundamental that it's engraved on Boltzmann's tombstone!</p>
+        </div>
+
+        <h3>The Second Law of Thermodynamics</h3>
+        <p>The Second Law can be stated in several equivalent ways:</p>
+
+        <div class="equation-box">
+            <p><strong>Clausius Statement:</strong> Heat cannot spontaneously flow from a colder body to a hotter body.</p>
+            <p><strong>Kelvin-Planck Statement:</strong> It is impossible to construct a heat engine that operates in a cycle and produces no effect other than the absorption of heat from a reservoir and the performance of an equal amount of work.</p>
+            <p><strong>Entropy Statement:</strong> The entropy of an isolated system never decreases; it either increases (irreversible process) or remains constant (reversible process).</p>
+            <p>\[\Delta S_{universe} \geq 0\]</p>
+        </div>
+
+        <h3>Entropy Change Calculations</h3>
+        <p>For a reversible process, the entropy change is defined as:</p>
+
+        <div class="equation-box">
+            <p>\[dS = \frac{\delta Q_{rev}}{T}\]</p>
+            <p>For a finite reversible process:</p>
+            <p>\[\Delta S = \int_1^2 \frac{\delta Q_{rev}}{T}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\delta Q_{rev}\) = Infinitesimal heat transfer in a reversible process (J)</li>
+                <li>\(T\) = Absolute temperature (K)</li>
+            </ul>
+        </div>
+
+        <p>For specific processes:</p>
+
+        <div class="equation-box">
+            <p><strong>Isothermal Process (constant T):</strong></p>
+            <p>\[\Delta S = \frac{Q}{T}\]</p>
+
+            <p><strong>Isobaric Process (ideal gas):</strong></p>
+            <p>\[\Delta S = m c_p \ln\left(\frac{T_2}{T_1}\right)\]</p>
+
+            <p><strong>Isochoric Process (ideal gas):</strong></p>
+            <p>\[\Delta S = m c_v \ln\left(\frac{T_2}{T_1}\right)\]</p>
+
+            <p><strong>General Process (ideal gas):</strong></p>
+            <p>\[\Delta S = m c_v \ln\left(\frac{T_2}{T_1}\right) + m R \ln\left(\frac{V_2}{V_1}\right)\]</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation 1 - Carnot Cycle -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation 1: Carnot Cycle and Heat Engine</h2>
+        <p>Explore the ideal reversible heat engine operating between two thermal reservoirs. The Carnot cycle represents the maximum possible efficiency for any heat engine and demonstrates fundamental principles of entropy.</p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="thot">Hot Reservoir Temperature (K):</label>
+                    <div class="slider-row">
+                        <input type="range" id="thot" min="400" max="1000" value="600">
+                        <span id="thot-value" class="value-display">600</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="tcold">Cold Reservoir Temperature (K):</label>
+                    <div class="slider-row">
+                        <input type="range" id="tcold" min="200" max="400" value="300">
+                        <span id="tcold-value" class="value-display">300</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="carnot-sketch"></div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <p><strong>Carnot Efficiency:</strong> <span id="carnot-efficiency">50.0</span>%</p>
+            <p><strong>Heat Input (Q<sub>H</sub>):</strong> <span id="qh-display">1000</span> J</p>
+            <p><strong>Heat Rejected (Q<sub>C</sub>):</strong> <span id="qc-display">500</span> J</p>
+            <p><strong>Work Output (W):</strong> <span id="w-display">500</span> J</p>
+            <p><strong>Entropy Change (Cycle):</strong> <span id="ds-cycle">0</span> J/K (for complete cycle)</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Key Observation:</strong> The Carnot efficiency depends only on the temperatures of the hot and cold reservoirs: \(\eta_{Carnot} = 1 - \frac{T_C}{T_H}\). No real heat engine can exceed this efficiency!</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Interactive Simulation 2 - Entropy Generation -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation 2: Entropy Generation in Irreversible Processes</h2>
+        <p>Compare reversible and irreversible heat transfer processes. Move the slider to see how temperature gradients lead to entropy generation.</p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="t1">Initial Temperature (K):</label>
+                    <div class="slider-row">
+                        <input type="range" id="t1" min="300" max="800" value="600">
+                        <span id="t1-value" class="value-display">600</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="t2">Final Temperature (K):</label>
+                    <div class="slider-row">
+                        <input type="range" id="t2" min="300" max="800" value="400">
+                        <span id="t2-value" class="value-display">400</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="heat-transfer">Heat Transfer (J):</label>
+                    <div class="slider-row">
+                        <input type="range" id="heat-transfer" min="100" max="5000" step="100" value="1000">
+                        <span id="heat-value" class="value-display">1000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="entropy-sketch"></div>
+
+        <!-- Results Panel -->
+        <div class="results-panel-blue">
+            <p><strong>Reversible Process (through intermediate reservoirs):</strong></p>
+            <p>Entropy Change: <span id="ds-rev">0.00</span> J/K</p>
+            <p><strong>Irreversible Process (direct heat transfer):</strong></p>
+            <p>Entropy Generated: <span id="ds-irrev">0.00</span> J/K</p>
+            <p class="status-error" id="irrev-status"><strong>Irreversibility always generates entropy!</strong></p>
+        </div>
+    </div>
+
+    <!-- Section 4: Interactive Simulation 3 - Gas Expansion -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation 3: Free Expansion and Entropy Increase</h2>
+        <p>Observe how a gas spontaneously expands into a vacuum, increasing entropy even though no heat is transferred.</p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="v-ratio">Volume Ratio (V<sub>final</sub>/V<sub>initial</sub>):</label>
+                    <div class="slider-row">
+                        <input type="range" id="v-ratio" min="1" max="10" step="0.5" value="2">
+                        <span id="v-ratio-value" class="value-display">2.0</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="num-particles">Number of Particles:</label>
+                    <div class="slider-row">
+                        <input type="range" id="num-particles" min="10" max="100" step="10" value="50">
+                        <span id="particles-value" class="value-display">50</span>
+                    </div>
+                </div>
+            </div>
+            <div id="button-container">
+                <button id="expand-btn" class="control-button">Remove Partition</button>
+                <button id="reset-expansion-btn" class="control-button">Reset</button>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="expansion-sketch"></div>
+
+        <!-- Results Panel -->
+        <div class="results-panel-green">
+            <p><strong>Entropy Change per Mole:</strong></p>
+            <p>\(\Delta S = nR\ln(V_2/V_1) = \) <span id="entropy-expansion">0.00</span> J/(mol·K)</p>
+            <p><strong>This process is spontaneous and irreversible!</strong></p>
+        </div>
+    </div>
+
+    <!-- Section 5: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Understanding entropy and the Second Law is crucial across many engineering disciplines:</p>
+
+        <h3>1. Power Generation</h3>
+        <ul>
+            <li><strong>Thermal Power Plants:</strong> The Carnot efficiency sets an upper limit for steam turbine cycles. Real power plants achieve 30-45% efficiency, while Carnot efficiency might be 60-70% for typical operating temperatures.</li>
+            <li><strong>Combined Cycle Plants:</strong> Use multiple cycles at different temperature levels to approach Carnot efficiency more closely, achieving up to 60% efficiency.</li>
+            <li><strong>Cogeneration:</strong> Simultaneous production of electricity and useful heat increases overall exergy utilization.</li>
+        </ul>
+
+        <h3>2. Refrigeration and Air Conditioning</h3>
+        <ul>
+            <li><strong>Coefficient of Performance (COP):</strong> The Second Law limits the COP of refrigerators and heat pumps. Carnot COP for refrigeration: \(COP_{Carnot} = \frac{T_C}{T_H - T_C}\)</li>
+            <li><strong>HVAC Design:</strong> Minimizing entropy generation through proper insulation and reduced temperature differences improves system efficiency.</li>
+        </ul>
+
+        <h3>3. Chemical Engineering</h3>
+        <ul>
+            <li><strong>Reaction Spontaneity:</strong> The Gibbs free energy \(G = H - TS\) determines whether reactions occur spontaneously. Processes proceed if \(\Delta G < 0\).</li>
+            <li><strong>Separation Processes:</strong> Distillation, crystallization, and other separations require energy input because they reduce entropy locally.</li>
+            <li><strong>Process Optimization:</strong> Pinch analysis uses entropy concepts to minimize energy consumption in heat exchanger networks.</li>
+        </ul>
+
+        <h3>4. Materials Engineering</h3>
+        <ul>
+            <li><strong>Phase Transitions:</strong> At equilibrium, phases coexist when their Gibbs free energies are equal. Entropy favors disordered phases at high temperatures.</li>
+            <li><strong>Alloy Design:</strong> Configurational entropy stabilizes solid solutions and high-entropy alloys.</li>
+            <li><strong>Metallurgy:</strong> Heat treatment processes exploit entropy changes to control microstructure.</li>
+        </ul>
+
+        <h3>5. Environmental Engineering</h3>
+        <ul>
+            <li><strong>Energy Quality:</strong> Entropy distinguishes between high-quality (low entropy) and low-quality (high entropy) energy. Waste heat is high entropy.</li>
+            <li><strong>Sustainability:</strong> Exergy analysis (available energy analysis) helps identify where useful energy is lost as increased entropy.</li>
+            <li><strong>Pollution:</strong> Dispersed pollutants represent high entropy states that require energy to reverse.</li>
+        </ul>
+
+        <h3>6. Automotive Engineering</h3>
+        <ul>
+            <li><strong>Internal Combustion Engines:</strong> Otto and Diesel cycle efficiencies are constrained by the Second Law. Real engines have 25-35% thermal efficiency.</li>
+            <li><strong>Turbochargers:</strong> Recover waste heat energy from exhaust gases, improving overall system efficiency.</li>
+            <li><strong>Hybrid Vehicles:</strong> Use regenerative braking to recover kinetic energy that would otherwise increase entropy through friction.</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Practical Insight:</strong> Every real engineering process generates entropy. Minimizing entropy generation is equivalent to minimizing energy waste and improving efficiency. This principle guides the design of everything from power plants to microprocessors.</p>
+        </div>
+    </div>
+
+    <!-- Section 6: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Boltzmann Entropy</td>
+                        <td>\(S = k_B \ln(\Omega)\)</td>
+                        <td>Statistical definition of entropy</td>
+                    </tr>
+                    <tr>
+                        <td>Entropy Change (Reversible)</td>
+                        <td>\(dS = \frac{\delta Q_{rev}}{T}\)</td>
+                        <td>Differential entropy change</td>
+                    </tr>
+                    <tr>
+                        <td>Second Law</td>
+                        <td>\(\Delta S_{universe} \geq 0\)</td>
+                        <td>Entropy never decreases in isolated system</td>
+                    </tr>
+                    <tr>
+                        <td>Carnot Efficiency</td>
+                        <td>\(\eta_{Carnot} = 1 - \frac{T_C}{T_H}\)</td>
+                        <td>Maximum heat engine efficiency</td>
+                    </tr>
+                    <tr>
+                        <td>Isothermal Process</td>
+                        <td>\(\Delta S = \frac{Q}{T}\)</td>
+                        <td>Entropy change at constant temperature</td>
+                    </tr>
+                    <tr>
+                        <td>Isobaric (Ideal Gas)</td>
+                        <td>\(\Delta S = mc_p\ln(T_2/T_1)\)</td>
+                        <td>Constant pressure process</td>
+                    </tr>
+                    <tr>
+                        <td>Isochoric (Ideal Gas)</td>
+                        <td>\(\Delta S = mc_v\ln(T_2/T_1)\)</td>
+                        <td>Constant volume process</td>
+                    </tr>
+                    <tr>
+                        <td>Free Expansion</td>
+                        <td>\(\Delta S = nR\ln(V_2/V_1)\)</td>
+                        <td>Entropy increase in free expansion</td>
+                    </tr>
+                    <tr>
+                        <td>Gibbs Free Energy</td>
+                        <td>\(G = H - TS\)</td>
+                        <td>Determines spontaneity at constant T, P</td>
+                    </tr>
+                    <tr>
+                        <td>Heat Engine Efficiency</td>
+                        <td>\(\eta = \frac{W}{Q_H} = 1 - \frac{Q_C}{Q_H}\)</td>
+                        <td>Actual heat engine efficiency</td>
+                    </tr>
+                    <tr>
+                        <td>COP (Refrigerator)</td>
+                        <td>\(COP_R = \frac{Q_C}{W} = \frac{Q_C}{Q_H - Q_C}\)</td>
+                        <td>Coefficient of Performance</td>
+                    </tr>
+                    <tr>
+                        <td>Clausius Inequality</td>
+                        <td>\(\oint \frac{\delta Q}{T} \leq 0\)</td>
+                        <td>For any cyclic process</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 7: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Carnot Engine Efficiency</h3>
+            <p>A Carnot heat engine operates between a hot reservoir at 800 K and a cold reservoir at 300 K. Calculate:</p>
+            <p>a) The thermal efficiency of the engine</p>
+            <p>b) If the engine absorbs 2000 J of heat from the hot reservoir per cycle, how much work does it produce?</p>
+            <p>c) How much heat is rejected to the cold reservoir?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+
+                <p><strong>Part a) Thermal Efficiency:</strong></p>
+                <p>The Carnot efficiency is given by:</p>
+                <p>\[\eta_{Carnot} = 1 - \frac{T_C}{T_H} = 1 - \frac{300}{800} = 1 - 0.375 = 0.625\]</p>
+                <p><strong>Answer:</strong> \(\eta = 62.5\%\)</p>
+
+                <p><strong>Part b) Work Output:</strong></p>
+                <p>\[W = \eta \times Q_H = 0.625 \times 2000 = 1250 \text{ J}\]</p>
+                <p><strong>Answer:</strong> W = 1250 J</p>
+
+                <p><strong>Part c) Heat Rejected:</strong></p>
+                <p>From energy conservation: \(Q_H = W + Q_C\)</p>
+                <p>\[Q_C = Q_H - W = 2000 - 1250 = 750 \text{ J}\]</p>
+                <p>Alternatively: \(Q_C = (1-\eta) \times Q_H = 0.375 \times 2000 = 750\) J</p>
+                <p><strong>Answer:</strong> Q<sub>C</sub> = 750 J</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Entropy Change in Heating</h3>
+            <p>A 2 kg block of copper (c<sub>p</sub> = 385 J/(kg·K)) is heated from 20°C to 120°C at constant pressure. Calculate the entropy change of the copper block.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Mass: m = 2 kg</li>
+                    <li>Specific heat: c<sub>p</sub> = 385 J/(kg·K)</li>
+                    <li>Initial temperature: T₁ = 20°C = 293 K</li>
+                    <li>Final temperature: T₂ = 120°C = 393 K</li>
+                </ul>
+
+                <p><strong>Formula:</strong> For a constant pressure process:</p>
+                <p>\[\Delta S = mc_p\ln\left(\frac{T_2}{T_1}\right)\]</p>
+
+                <p><strong>Calculation:</strong></p>
+                <p>\[\Delta S = 2 \times 385 \times \ln\left(\frac{393}{293}\right)\]</p>
+                <p>\[\Delta S = 770 \times \ln(1.341) = 770 \times 0.2939\]</p>
+                <p>\[\Delta S = 226.3 \text{ J/K}\]</p>
+
+                <p><strong>Answer:</strong> The entropy change is approximately <strong>226 J/K</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Entropy Generation in Heat Transfer</h3>
+            <p>Two identical blocks of aluminum (mass = 1 kg each, c<sub>p</sub> = 900 J/(kg·K)) are initially at 400 K and 300 K respectively. They are brought into thermal contact in an insulated container until they reach thermal equilibrium. Calculate:</p>
+            <p>a) The final equilibrium temperature</p>
+            <p>b) The total entropy change of the system</p>
+            <p>c) Is this process reversible or irreversible?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+
+                <p><strong>Part a) Final Temperature:</strong></p>
+                <p>Energy conservation (insulated system, no heat loss):</p>
+                <p>\[m c_p (T_f - T_1) + m c_p (T_f - T_2) = 0\]</p>
+                <p>\[2 T_f = T_1 + T_2\]</p>
+                <p>\[T_f = \frac{400 + 300}{2} = 350 \text{ K}\]</p>
+                <p><strong>Answer:</strong> T<sub>f</sub> = 350 K</p>
+
+                <p><strong>Part b) Total Entropy Change:</strong></p>
+                <p>For block 1 (cooling from 400 K to 350 K):</p>
+                <p>\[\Delta S_1 = mc_p\ln\left(\frac{350}{400}\right) = 1 \times 900 \times \ln(0.875) = -120.1 \text{ J/K}\]</p>
+
+                <p>For block 2 (heating from 300 K to 350 K):</p>
+                <p>\[\Delta S_2 = mc_p\ln\left(\frac{350}{300}\right) = 1 \times 900 \times \ln(1.167) = 139.2 \text{ J/K}\]</p>
+
+                <p>Total entropy change:</p>
+                <p>\[\Delta S_{total} = \Delta S_1 + \Delta S_2 = -120.1 + 139.2 = 19.1 \text{ J/K}\]</p>
+                <p><strong>Answer:</strong> ΔS<sub>total</sub> = 19.1 J/K</p>
+
+                <p><strong>Part c) Reversible or Irreversible?</strong></p>
+                <p>Since \(\Delta S_{total} > 0\), the process is <strong>irreversible</strong>. Heat spontaneously flows from hot to cold, generating entropy. This is consistent with the Second Law.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Free Expansion of Gas</h3>
+            <p>One mole of an ideal gas initially occupies 0.01 m³ at 300 K. It undergoes free expansion into an evacuated chamber, doubling its volume. The process is adiabatic. Calculate:</p>
+            <p>a) The final temperature</p>
+            <p>b) The work done by the gas</p>
+            <p>c) The entropy change</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p><strong>Solution:</strong></p>
+
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>n = 1 mol</li>
+                    <li>V₁ = 0.01 m³</li>
+                    <li>V₂ = 0.02 m³ (doubled)</li>
+                    <li>T₁ = 300 K</li>
+                    <li>R = 8.314 J/(mol·K)</li>
+                </ul>
+
+                <p><strong>Part a) Final Temperature:</strong></p>
+                <p>In free expansion, no work is done against external pressure (W = 0).</p>
+                <p>Since the process is adiabatic (Q = 0) and W = 0:</p>
+                <p>From the First Law: \(\Delta U = Q - W = 0\)</p>
+                <p>For an ideal gas, internal energy depends only on temperature.</p>
+                <p>Therefore: <strong>T₂ = T₁ = 300 K</strong> (temperature remains constant!)</p>
+
+                <p><strong>Part b) Work Done:</strong></p>
+                <p><strong>W = 0</strong> (no work done against external pressure)</p>
+
+                <p><strong>Part c) Entropy Change:</strong></p>
+                <p>Even though Q = 0, entropy still increases because the process is irreversible:</p>
+                <p>\[\Delta S = nR\ln\left(\frac{V_2}{V_1}\right) = 1 \times 8.314 \times \ln(2)\]</p>
+                <p>\[\Delta S = 8.314 \times 0.693 = 5.76 \text{ J/K}\]</p>
+                <p><strong>Answer:</strong> ΔS = 5.76 J/K</p>
+
+                <p><strong>Key Insight:</strong> Free expansion is spontaneous and irreversible. Entropy increases even though no heat is transferred!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 8: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Which statement correctly describes entropy?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Entropy is always conserved in any process</label>
+                    <label><input type="radio" name="q1" value="b"> b) Entropy is a measure of the order in a system</label>
+                    <label><input type="radio" name="q1" value="c"> c) Entropy is a measure of disorder or energy dispersal</label>
+                    <label><input type="radio" name="q1" value="d"> d) Entropy can only increase in reversible processes</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The Second Law of Thermodynamics states that:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Energy is always conserved</label>
+                    <label><input type="radio" name="q2" value="b"> b) The entropy of an isolated system never decreases</label>
+                    <label><input type="radio" name="q2" value="c"> c) Heat flows spontaneously from cold to hot</label>
+                    <label><input type="radio" name="q2" value="d"> d) Work can be completely converted to heat</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A Carnot engine operates between 600 K and 300 K. Its efficiency is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 25%</label>
+                    <label><input type="radio" name="q3" value="b"> b) 50%</label>
+                    <label><input type="radio" name="q3" value="c"> c) 75%</label>
+                    <label><input type="radio" name="q3" value="d"> d) 100%</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: In a reversible adiabatic process:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Entropy increases</label>
+                    <label><input type="radio" name="q4" value="b"> b) Entropy decreases</label>
+                    <label><input type="radio" name="q4" value="c"> c) Entropy remains constant</label>
+                    <label><input type="radio" name="q4" value="d"> d) Temperature remains constant</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Which process generates the most entropy?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Reversible isothermal expansion</label>
+                    <label><input type="radio" name="q5" value="b"> b) Free expansion into vacuum</label>
+                    <label><input type="radio" name="q5" value="c"> c) Reversible adiabatic compression</label>
+                    <label><input type="radio" name="q5" value="d"> d) All generate the same entropy</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: If a heat engine has an efficiency greater than the Carnot efficiency:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) It is very well designed</label>
+                    <label><input type="radio" name="q6" value="b"> b) It violates the Second Law of Thermodynamics</label>
+                    <label><input type="radio" name="q6" value="c"> c) It must be operating reversibly</label>
+                    <label><input type="radio" name="q6" value="d"> d) It requires perfect insulation</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 7: The entropy change in an irreversible process is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> a) Always zero</label>
+                    <label><input type="radio" name="q7" value="b"> b) Always negative</label>
+                    <label><input type="radio" name="q7" value="c"> c) Always positive</label>
+                    <label><input type="radio" name="q7" value="d"> d) Can be positive or negative</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer (auto-generated) -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // ============================================
+        // SIMULATION 1: CARNOT CYCLE
+        // ============================================
+        let carnotSketch = new p5(function(p) {
+            let Thot = 600;
+            let Tcold = 300;
+            let animationPhase = 0;
+            let animating = false;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 500);
+                canvas.parent('carnot-sketch');
+                p.frameRate(30);
+
+                // Setup sliders
+                p.select('#thot').input(function() {
+                    Thot = parseFloat(this.value());
+                    p.select('#thot-value').html(Thot.toFixed(0));
+                    updateCarnotResults();
+                });
+
+                p.select('#tcold').input(function() {
+                    Tcold = parseFloat(this.value());
+                    if (Tcold >= Thot) {
+                        Tcold = Thot - 10;
+                        this.value(Tcold);
+                    }
+                    p.select('#tcold-value').html(Tcold.toFixed(0));
+                    updateCarnotResults();
+                });
+
+                updateCarnotResults();
+            };
+
+            p.draw = function() {
+                p.background(245);
+
+                // Draw hot reservoir
+                p.fill(255, 100, 100);
+                p.rect(50, 50, 200, 80);
+                p.fill(0);
+                p.textAlign(p.CENTER, p.CENTER);
+                p.textSize(16);
+                p.text('Hot Reservoir', 150, 70);
+                p.text(Thot + ' K', 150, 110);
+
+                // Draw cold reservoir
+                p.fill(100, 100, 255);
+                p.rect(50, 370, 200, 80);
+                p.fill(0);
+                p.text('Cold Reservoir', 150, 390);
+                p.text(Tcold + ' K', 150, 430);
+
+                // Draw engine
+                p.fill(255, 215, 0);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.ellipse(150, 250, 120, 120);
+                p.fill(0);
+                p.noStroke();
+                p.text('Heat', 150, 240);
+                p.text('Engine', 150, 260);
+
+                // Draw heat flow arrows
+                drawArrow(p, 150, 130, 150, 190, 'red', 'Q_H');
+                drawArrow(p, 150, 310, 150, 370, 'blue', 'Q_C');
+                drawArrow(p, 210, 250, 300, 250, 'green', 'W');
+
+                // Draw PV diagram
+                drawPVDiagram(p);
+            };
+
+            function drawArrow(p, x1, y1, x2, y2, col, label) {
+                p.push();
+                p.stroke(col);
+                p.strokeWeight(3);
+                p.fill(col);
+
+                // Arrow line
+                p.line(x1, y1, x2, y2);
+
+                // Arrow head
+                let angle = p.atan2(y2 - y1, x2 - x1);
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.triangle(-10, -5, -10, 5, 0, 0);
+
+                p.pop();
+
+                // Label
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                if (x1 === x2) { // vertical
+                    p.text(label, x1 + 25, (y1 + y2) / 2);
+                } else { // horizontal
+                    p.text(label, (x1 + x2) / 2, y1 - 10);
+                }
+            }
+
+            function drawPVDiagram(p) {
+                let x0 = 450;
+                let y0 = 400;
+                let w = 300;
+                let h = 250;
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(x0, y0, x0 + w, y0); // V axis
+                p.line(x0, y0, x0, y0 - h); // P axis
+
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text('Volume', x0 + w/2, y0 + 30);
+                p.push();
+                p.translate(x0 - 40, y0 - h/2);
+                p.rotate(-p.HALF_PI);
+                p.text('Pressure', 0, 0);
+                p.pop();
+
+                // Draw Carnot cycle
+                let V1 = 50, V2 = 150, V3 = 250, V4 = 120;
+                let P1 = 200, P2 = 100, P3 = 30, P4 = 60;
+
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.noFill();
+
+                // 1->2: Isothermal expansion (hot)
+                p.beginShape();
+                for (let i = 0; i <= 20; i++) {
+                    let t = i / 20;
+                    let V = p.lerp(V1, V2, t);
+                    let P = P1 * V1 / V;
+                    p.vertex(x0 + V, y0 - P);
+                }
+                p.endShape();
+
+                // 2->3: Adiabatic expansion
+                p.stroke(0, 150, 0);
+                p.beginShape();
+                for (let i = 0; i <= 20; i++) {
+                    let t = i / 20;
+                    let V = p.lerp(V2, V3, t);
+                    let P = P2 * p.pow(V2 / V, 1.4);
+                    p.vertex(x0 + V, y0 - P);
+                }
+                p.endShape();
+
+                // 3->4: Isothermal compression (cold)
+                p.stroke(0, 0, 255);
+                p.beginShape();
+                for (let i = 0; i <= 20; i++) {
+                    let t = i / 20;
+                    let V = p.lerp(V3, V4, t);
+                    let P = P3 * V3 / V;
+                    p.vertex(x0 + V, y0 - P);
+                }
+                p.endShape();
+
+                // 4->1: Adiabatic compression
+                p.stroke(0, 150, 0);
+                p.beginShape();
+                for (let i = 0; i <= 20; i++) {
+                    let t = i / 20;
+                    let V = p.lerp(V4, V1, t);
+                    let P = P4 * p.pow(V4 / V, 1.4);
+                    p.vertex(x0 + V, y0 - P);
+                }
+                p.endShape();
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.text('1', x0 + V1, y0 - P1 - 10);
+                p.text('2', x0 + V2, y0 - P2 - 10);
+                p.text('3', x0 + V3, y0 - P3 + 15);
+                p.text('4', x0 + V4, y0 - P4 + 15);
+            }
+
+            function updateCarnotResults() {
+                let efficiency = (1 - Tcold / Thot) * 100;
+                let QH = 1000;
+                let W = efficiency / 100 * QH;
+                let QC = QH - W;
+
+                document.getElementById('carnot-efficiency').textContent = efficiency.toFixed(1);
+                document.getElementById('qh-display').textContent = QH.toFixed(0);
+                document.getElementById('qc-display').textContent = QC.toFixed(0);
+                document.getElementById('w-display').textContent = W.toFixed(0);
+                document.getElementById('ds-cycle').textContent = '0.00';
+            }
+        }, 'carnot-sketch');
+
+        // ============================================
+        // SIMULATION 2: ENTROPY GENERATION
+        // ============================================
+        let entropySketch = new p5(function(p) {
+            let T1 = 600;
+            let T2 = 400;
+            let Q = 1000;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 400);
+                canvas.parent('entropy-sketch');
+
+                // Setup sliders
+                p.select('#t1').input(function() {
+                    T1 = parseFloat(this.value());
+                    p.select('#t1-value').html(T1.toFixed(0));
+                    updateEntropyResults();
+                });
+
+                p.select('#t2').input(function() {
+                    T2 = parseFloat(this.value());
+                    p.select('#t2-value').html(T2.toFixed(0));
+                    updateEntropyResults();
+                });
+
+                p.select('#heat-transfer').input(function() {
+                    Q = parseFloat(this.value());
+                    p.select('#heat-value').html(Q.toFixed(0));
+                    updateEntropyResults();
+                });
+
+                updateEntropyResults();
+            };
+
+            p.draw = function() {
+                p.background(245);
+
+                let centerY = p.height / 2;
+
+                // Draw two bodies
+                p.fill(255, p.map(T1, 300, 800, 100, 255), 100);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(100, centerY - 60, 120, 120);
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER, p.CENTER);
+                p.text('Body 1', 160, centerY - 30);
+                p.text(T1 + ' K', 160, centerY);
+
+                p.fill(100, p.map(T2, 300, 800, 255, 100), 255);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(580, centerY - 60, 120, 120);
+                p.fill(0);
+                p.noStroke();
+                p.text('Body 2', 640, centerY - 30);
+                p.text(T2 + ' K', 640, centerY);
+
+                // Draw heat transfer arrow
+                if (T1 > T2) {
+                    drawHeatArrow(p, 220, centerY, 580, centerY);
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.textSize(14);
+                    p.text('Q = ' + Q + ' J', 400, centerY - 30);
+                    p.fill(0);
+                    p.text('Heat flows from hot to cold', 400, centerY + 100);
+                } else if (T2 > T1) {
+                    drawHeatArrow(p, 580, centerY, 220, centerY);
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.textSize(14);
+                    p.text('Q = ' + Q + ' J', 400, centerY - 30);
+                    p.fill(0);
+                    p.text('Heat flows from hot to cold', 400, centerY + 100);
+                } else {
+                    p.fill(0);
+                    p.noStroke();
+                    p.text('Thermal Equilibrium - No heat transfer', 400, centerY + 100);
+                }
+            };
+
+            function drawHeatArrow(p, x1, y1, x2, y2) {
+                p.push();
+                p.stroke(255, 0, 0);
+                p.strokeWeight(4);
+                p.fill(255, 0, 0);
+
+                // Wavy line to represent heat
+                p.noFill();
+                p.beginShape();
+                let steps = 20;
+                for (let i = 0; i <= steps; i++) {
+                    let t = i / steps;
+                    let x = p.lerp(x1, x2, t);
+                    let y = y1 + p.sin(t * p.PI * 4) * 10;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Arrow head
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.triangle(x2, y2, x2 - 15, y2 - 8, x2 - 15, y2 + 8);
+
+                p.pop();
+            }
+
+            function updateEntropyResults() {
+                // Reversible process (isothermal at average temperature)
+                let Tavg = (T1 + T2) / 2;
+                let dS_rev = 0; // For complete cycle
+
+                // Irreversible process (direct heat transfer)
+                let dS1 = -Q / T1; // Body 1 loses heat
+                let dS2 = Q / T2;  // Body 2 gains heat
+                let dS_irrev = dS1 + dS2;
+
+                document.getElementById('ds-rev').textContent = dS_rev.toFixed(2);
+                document.getElementById('ds-irrev').textContent = dS_irrev.toFixed(2);
+            }
+        }, 'entropy-sketch');
+
+        // ============================================
+        // SIMULATION 3: FREE EXPANSION
+        // ============================================
+        let expansionSketch = new p5(function(p) {
+            let particles = [];
+            let numParticles = 50;
+            let volumeRatio = 2.0;
+            let partitionRemoved = false;
+            let partitionX;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 400);
+                canvas.parent('expansion-sketch');
+
+                partitionX = p.width / volumeRatio;
+                initializeParticles();
+
+                // Setup sliders
+                p.select('#v-ratio').input(function() {
+                    volumeRatio = parseFloat(this.value());
+                    p.select('#v-ratio-value').html(volumeRatio.toFixed(1));
+                    resetExpansion();
+                    updateExpansionResults();
+                });
+
+                p.select('#num-particles').input(function() {
+                    numParticles = parseInt(this.value());
+                    p.select('#particles-value').html(numParticles);
+                    resetExpansion();
+                });
+
+                // Setup buttons
+                p.select('#expand-btn').mousePressed(function() {
+                    partitionRemoved = true;
+                });
+
+                p.select('#reset-expansion-btn').mousePressed(function() {
+                    resetExpansion();
+                });
+
+                updateExpansionResults();
+            };
+
+            p.draw = function() {
+                p.background(255);
+
+                // Draw container walls
+                p.stroke(0);
+                p.strokeWeight(4);
+                p.noFill();
+                p.rect(10, 10, p.width - 20, p.height - 20);
+
+                // Draw partition if not removed
+                if (!partitionRemoved) {
+                    p.stroke(100);
+                    p.strokeWeight(3);
+                    p.line(partitionX, 10, partitionX, p.height - 10);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textSize(14);
+                    p.textAlign(p.CENTER);
+                    p.text('Partition', partitionX, p.height - 25);
+                    p.text('Gas', partitionX / 2, p.height / 2);
+                    p.text('Vacuum', (partitionX + p.width) / 2, p.height / 2);
+                }
+
+                // Update and draw particles
+                for (let particle of particles) {
+                    particle.update();
+                    particle.checkBounds();
+                    particle.display();
+                }
+
+                // Draw labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.text('Initial Volume: V₁', 15, 30);
+                p.text('Final Volume: V₂ = ' + volumeRatio.toFixed(1) + ' × V₁', 15, 50);
+            };
+
+            function initializeParticles() {
+                particles = [];
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push(new Particle(p));
+                }
+            }
+
+            function resetExpansion() {
+                partitionRemoved = false;
+                partitionX = p.width / volumeRatio;
+                initializeParticles();
+            }
+
+            function updateExpansionResults() {
+                let R = 8.314; // J/(mol·K)
+                let deltaS = R * p.log(volumeRatio);
+                document.getElementById('entropy-expansion').textContent = deltaS.toFixed(2);
+            }
+
+            class Particle {
+                constructor(p) {
+                    this.p = p;
+                    this.x = p.random(15, partitionX - 5);
+                    this.y = p.random(15, p.height - 15);
+                    this.vx = p.random(-2, 2);
+                    this.vy = p.random(-2, 2);
+                    this.r = 4;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                }
+
+                checkBounds() {
+                    // Left wall
+                    if (this.x - this.r < 10) {
+                        this.x = 10 + this.r;
+                        this.vx *= -1;
+                    }
+
+                    // Right wall
+                    if (this.x + this.r > this.p.width - 10) {
+                        this.x = this.p.width - 10 - this.r;
+                        this.vx *= -1;
+                    }
+
+                    // Top wall
+                    if (this.y - this.r < 10) {
+                        this.y = 10 + this.r;
+                        this.vy *= -1;
+                    }
+
+                    // Bottom wall
+                    if (this.y + this.r > this.p.height - 10) {
+                        this.y = this.p.height - 10 - this.r;
+                        this.vy *= -1;
+                    }
+
+                    // Partition (if present)
+                    if (!partitionRemoved) {
+                        if (this.x + this.r > partitionX && this.vx > 0) {
+                            this.x = partitionX - this.r;
+                            this.vx *= -1;
+                        }
+                    }
+                }
+
+                display() {
+                    this.p.fill(0, 100, 255);
+                    this.p.noStroke();
+                    this.p.ellipse(this.x, this.y, this.r * 2);
+                }
+            }
+        }, 'expansion-sketch');
+
+        // ============================================
+        // QUIZ FUNCTIONALITY
+        // ============================================
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Entropy is a measure of disorder
+                q2: 'b',  // Entropy never decreases in isolated system
+                q3: 'b',  // 50% efficiency
+                q4: 'c',  // Entropy constant in reversible adiabatic
+                q5: 'b',  // Free expansion generates most entropy
+                q6: 'b',  // Violates Second Law
+                q7: 'c'   // Always positive for irreversible
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let feedback = '';
+            if (percentage >= 85) {
+                feedback = 'Excellent work! You have a strong understanding of entropy!';
+            } else if (percentage >= 70) {
+                feedback = 'Good job! Review the concepts you missed.';
+            } else if (percentage >= 50) {
+                feedback = 'Fair attempt. Consider reviewing the lecture material.';
+            } else {
+                feedback = 'Keep studying! Entropy is challenging but important.';
+            }
+
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p><p>${feedback}</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

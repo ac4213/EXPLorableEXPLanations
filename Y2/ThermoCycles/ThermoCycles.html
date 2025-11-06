@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermodynamic Cycles - Interactive Lecture</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/problems.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Thermodynamic Cycles</h1>
+        <p class="small-caps">Interactive Lecture on Power and Refrigeration Cycles</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+
+    <!-- SECTION 1: TEACHING CONTENT -->
+    <div class="content-section">
+        <h2>Understanding Thermodynamic Cycles</h2>
+        <p>A thermodynamic cycle is a series of thermodynamic processes that returns a system to its initial state. These cycles are fundamental to understanding how engines, refrigerators, and heat pumps work. The system undergoes various processes (heating, cooling, expansion, compression) and ultimately returns to its starting point, ready to repeat the cycle.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> In a complete thermodynamic cycle, all state properties return to their initial values. The net change in internal energy is zero (\(\Delta U_{cycle} = 0\)), and the net work output equals the net heat input: \(W_{net} = Q_{in} - Q_{out}\)</p>
+        </div>
+
+        <h3>Classification of Thermodynamic Cycles</h3>
+        <p>Thermodynamic cycles can be classified into two main categories:</p>
+        <ul>
+            <li><strong>Power Cycles:</strong> Produce net work output by receiving heat from a high-temperature source and rejecting heat to a low-temperature sink (e.g., Otto, Diesel, Rankine, Brayton cycles)</li>
+            <li><strong>Refrigeration Cycles:</strong> Require net work input to transfer heat from a low-temperature region to a high-temperature region (e.g., vapor-compression refrigeration cycle, heat pump cycle)</li>
+        </ul>
+
+        <h3>The Carnot Cycle</h3>
+        <p>The Carnot cycle is the most efficient thermodynamic cycle operating between two temperature limits. It consists of four reversible processes:</p>
+
+        <div class="equation-box">
+            <p><strong>Carnot Cycle Processes:</strong></p>
+            <ol>
+                <li><strong>Process 1-2:</strong> Reversible isothermal expansion at \(T_H\) (heat addition \(Q_H\))</li>
+                <li><strong>Process 2-3:</strong> Reversible adiabatic expansion (\(Q = 0\))</li>
+                <li><strong>Process 3-4:</strong> Reversible isothermal compression at \(T_C\) (heat rejection \(Q_C\))</li>
+                <li><strong>Process 4-1:</strong> Reversible adiabatic compression (\(Q = 0\))</li>
+            </ol>
+            <p><strong>Carnot Efficiency:</strong></p>
+            <p>\[\eta_{Carnot} = 1 - \frac{T_C}{T_H}\]</p>
+            <p>Where \(T_H\) and \(T_C\) are absolute temperatures (Kelvin)</p>
+        </div>
+
+        <h3>The Otto Cycle (Spark Ignition Engines)</h3>
+        <p>The Otto cycle is an idealized model for spark-ignition (gasoline) engines. It consists of four processes:</p>
+
+        <div class="equation-box">
+            <p><strong>Otto Cycle Processes:</strong></p>
+            <ol>
+                <li><strong>Process 1-2:</strong> Isentropic compression</li>
+                <li><strong>Process 2-3:</strong> Constant-volume heat addition (combustion)</li>
+                <li><strong>Process 3-4:</strong> Isentropic expansion (power stroke)</li>
+                <li><strong>Process 4-1:</strong> Constant-volume heat rejection (exhaust)</li>
+            </ol>
+            <p><strong>Otto Cycle Efficiency:</strong></p>
+            <p>\[\eta_{Otto} = 1 - \frac{1}{r^{\gamma - 1}}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(r = \frac{V_1}{V_2}\) is the compression ratio</li>
+                <li>\(\gamma = \frac{C_p}{C_v}\) is the specific heat ratio (≈1.4 for air)</li>
+            </ul>
+        </div>
+
+        <h3>The Diesel Cycle (Compression Ignition Engines)</h3>
+        <p>The Diesel cycle models compression-ignition engines where fuel is injected and burns at constant pressure:</p>
+
+        <div class="equation-box">
+            <p><strong>Diesel Cycle Processes:</strong></p>
+            <ol>
+                <li><strong>Process 1-2:</strong> Isentropic compression</li>
+                <li><strong>Process 2-3:</strong> Constant-pressure heat addition</li>
+                <li><strong>Process 3-4:</strong> Isentropic expansion</li>
+                <li><strong>Process 4-1:</strong> Constant-volume heat rejection</li>
+            </ol>
+            <p><strong>Diesel Cycle Efficiency:</strong></p>
+            <p>\[\eta_{Diesel} = 1 - \frac{1}{r^{\gamma - 1}} \cdot \frac{r_c^{\gamma} - 1}{\gamma(r_c - 1)}\]</p>
+            <p>Where \(r_c = \frac{V_3}{V_2}\) is the cutoff ratio</p>
+        </div>
+
+        <h3>The Rankine Cycle (Steam Power Plants)</h3>
+        <p>The Rankine cycle is used in steam power plants and involves phase changes of the working fluid:</p>
+
+        <div class="equation-box">
+            <p><strong>Rankine Cycle Processes:</strong></p>
+            <ol>
+                <li><strong>Process 1-2:</strong> Isentropic compression in pump (liquid)</li>
+                <li><strong>Process 2-3:</strong> Constant-pressure heat addition in boiler</li>
+                <li><strong>Process 3-4:</strong> Isentropic expansion in turbine</li>
+                <li><strong>Process 4-1:</strong> Constant-pressure heat rejection in condenser</li>
+            </ol>
+            <p><strong>Rankine Cycle Efficiency:</strong></p>
+            <p>\[\eta_{Rankine} = \frac{W_{turbine} - W_{pump}}{Q_{in}} = \frac{(h_3 - h_4) - (h_2 - h_1)}{h_3 - h_2}\]</p>
+        </div>
+
+        <h3>Thermal Efficiency</h3>
+        <p>For any power cycle, thermal efficiency is defined as:</p>
+
+        <div class="equation-box">
+            <p>\[\eta_{th} = \frac{W_{net}}{Q_{in}} = \frac{Q_{in} - Q_{out}}{Q_{in}} = 1 - \frac{Q_{out}}{Q_{in}}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(W_{net}\) = Net work output</li>
+                <li>\(Q_{in}\) = Heat input to the system</li>
+                <li>\(Q_{out}\) = Heat rejected from the system</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- SECTION 2: INTERACTIVE SIMULATION -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Thermodynamic Cycle Comparison</h2>
+        <p>Explore different thermodynamic cycles on a P-V diagram. Select a cycle type and adjust parameters to see how they affect efficiency and performance.</p>
+
+        <div class="type-selector">
+            <button class="type-button active" data-cycle="otto">Otto Cycle</button>
+            <button class="type-button" data-cycle="diesel">Diesel Cycle</button>
+            <button class="type-button" data-cycle="carnot">Carnot Cycle</button>
+            <button class="type-button" data-cycle="rankine">Rankine Cycle</button>
+        </div>
+
+        <div id="cycle-sketch"></div>
+
+        <div class="controls-panel">
+            <div class="control-row" id="compression-control">
+                <label>Compression Ratio (r):</label>
+                <input type="range" id="compression-slider" min="4" max="12" step="0.5" value="8">
+                <span id="compression-value">8.0</span>
+            </div>
+
+            <div class="control-row" id="cutoff-control" style="display:none;">
+                <label>Cutoff Ratio (rₑ):</label>
+                <input type="range" id="cutoff-slider" min="1.5" max="3.0" step="0.1" value="2.0">
+                <span id="cutoff-value">2.0</span>
+            </div>
+
+            <div class="control-row" id="temp-high-control" style="display:none;">
+                <label>High Temperature (K):</label>
+                <input type="range" id="temp-high-slider" min="400" max="1000" step="10" value="600">
+                <span id="temp-high-value">600 K</span>
+            </div>
+
+            <div class="control-row" id="temp-low-control" style="display:none;">
+                <label>Low Temperature (K):</label>
+                <input type="range" id="temp-low-slider" min="250" max="400" step="10" value="300">
+                <span id="temp-low-value">300 K</span>
+            </div>
+
+            <div class="control-row">
+                <label>Specific Heat Ratio (γ):</label>
+                <input type="range" id="gamma-slider" min="1.2" max="1.67" step="0.01" value="1.4">
+                <span id="gamma-value">1.40</span>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <h3>Cycle Performance:</h3>
+            <p><strong>Thermal Efficiency:</strong> η = <span id="efficiency-display">56.5</span>%</p>
+            <p><strong>Work Output:</strong> W = <span id="work-display">120</span> kJ/kg</p>
+            <p><strong>Heat Input:</strong> Q<sub>in</sub> = <span id="heat-in-display">212</span> kJ/kg</p>
+            <p><strong>Heat Rejected:</strong> Q<sub>out</sub> = <span id="heat-out-display">92</span> kJ/kg</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: ENGINEERING APPLICATIONS -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Automotive Engines (Otto Cycle)</h3>
+        <p>Gasoline engines in cars, motorcycles, and small aircraft follow the Otto cycle. Modern engines achieve compression ratios of 8:1 to 12:1, with thermal efficiencies around 25-30% in practice (lower than ideal due to friction and heat losses).</p>
+
+        <h3>2. Diesel Engines (Diesel Cycle)</h3>
+        <p>Heavy-duty trucks, ships, trains, and large generators use diesel engines. Higher compression ratios (14:1 to 25:1) result in better efficiency (typically 35-45%) compared to gasoline engines, making them ideal for applications requiring high torque and fuel economy.</p>
+
+        <h3>3. Steam Power Plants (Rankine Cycle)</h3>
+        <p>Coal, nuclear, and concentrated solar power plants use the Rankine cycle to generate electricity. Modern supercritical steam plants can achieve thermal efficiencies of 40-45%, with combined cycle plants reaching over 60%.</p>
+
+        <h3>4. Gas Turbine Engines (Brayton Cycle)</h3>
+        <p>Jet engines and gas turbine power plants operate on the Brayton cycle. Aircraft engines optimize for thrust, while stationary gas turbines optimize for electrical power generation.</p>
+
+        <h3>5. Refrigeration and Air Conditioning</h3>
+        <p>Refrigerators, air conditioners, and heat pumps use reversed thermodynamic cycles to transfer heat from cold to hot regions. The coefficient of performance (COP) measures their efficiency.</p>
+
+        <h3>6. Combined Cycle Power Plants</h3>
+        <p>Modern power plants combine gas turbines (Brayton cycle) with steam turbines (Rankine cycle), using waste heat from the gas turbine to generate steam. This maximizes overall efficiency by utilizing energy at multiple temperature levels.</p>
+
+        <h3>7. Automotive Performance Tuning</h3>
+        <p>Understanding the Otto and Diesel cycles helps engineers optimize engine performance through turbocharging, supercharging, variable valve timing, and direct injection technologies.</p>
+    </div>
+
+    <!-- SECTION 4: SUMMARY OF KEY EQUATIONS -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Thermal Efficiency</td>
+                        <td>\(\eta = \frac{W_{net}}{Q_{in}} = 1 - \frac{Q_{out}}{Q_{in}}\)</td>
+                        <td>General efficiency for power cycles</td>
+                    </tr>
+                    <tr>
+                        <td>Carnot Efficiency</td>
+                        <td>\(\eta_{Carnot} = 1 - \frac{T_C}{T_H}\)</td>
+                        <td>Maximum possible efficiency between two temperatures</td>
+                    </tr>
+                    <tr>
+                        <td>Otto Efficiency</td>
+                        <td>\(\eta_{Otto} = 1 - \frac{1}{r^{\gamma-1}}\)</td>
+                        <td>Ideal spark-ignition engine efficiency</td>
+                    </tr>
+                    <tr>
+                        <td>Diesel Efficiency</td>
+                        <td>\(\eta_{Diesel} = 1 - \frac{1}{r^{\gamma-1}} \cdot \frac{r_c^{\gamma}-1}{\gamma(r_c-1)}\)</td>
+                        <td>Ideal compression-ignition engine efficiency</td>
+                    </tr>
+                    <tr>
+                        <td>Compression Ratio</td>
+                        <td>\(r = \frac{V_{max}}{V_{min}}\)</td>
+                        <td>Ratio of maximum to minimum cylinder volume</td>
+                    </tr>
+                    <tr>
+                        <td>Specific Heat Ratio</td>
+                        <td>\(\gamma = \frac{C_p}{C_v}\)</td>
+                        <td>Ratio of specific heats (≈1.4 for air)</td>
+                    </tr>
+                    <tr>
+                        <td>Isentropic Process</td>
+                        <td>\(PV^{\gamma} = \text{const}\) or \(TV^{\gamma-1} = \text{const}\)</td>
+                        <td>Adiabatic reversible process</td>
+                    </tr>
+                    <tr>
+                        <td>Ideal Gas Law</td>
+                        <td>\(PV = nRT\) or \(PV = mRT\)</td>
+                        <td>Equation of state for ideal gases</td>
+                    </tr>
+                    <tr>
+                        <td>Work (Isothermal)</td>
+                        <td>\(W = nRT\ln\frac{V_2}{V_1}\)</td>
+                        <td>Work during constant temperature process</td>
+                    </tr>
+                    <tr>
+                        <td>Heat (Constant Volume)</td>
+                        <td>\(Q = nC_v\Delta T\)</td>
+                        <td>Heat transfer at constant volume</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 5: PRACTICE PROBLEMS -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Otto Cycle Efficiency</h3>
+            <p>An Otto cycle engine has a compression ratio of 9:1 and operates with air as the working fluid (γ = 1.4). Calculate the thermal efficiency of the engine.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Compression ratio: r = 9</li>
+                    <li>Specific heat ratio: γ = 1.4</li>
+                </ul>
+                <p><strong>Formula:</strong></p>
+                <p>\[\eta_{Otto} = 1 - \frac{1}{r^{\gamma-1}}\]</p>
+                <p><strong>Calculation:</strong></p>
+                <p>\[\eta_{Otto} = 1 - \frac{1}{9^{1.4-1}} = 1 - \frac{1}{9^{0.4}}\]</p>
+                <p>\[\eta_{Otto} = 1 - \frac{1}{2.408} = 1 - 0.415 = 0.585\]</p>
+                <p><strong>Answer:</strong> The thermal efficiency is 58.5%</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Carnot Cycle Maximum Efficiency</h3>
+            <p>A Carnot engine operates between a hot reservoir at 800 K and a cold reservoir at 300 K. Calculate:</p>
+            <ol>
+                <li>The thermal efficiency of the engine</li>
+                <li>The heat rejected per unit of heat input</li>
+                <li>If the engine produces 100 kJ of work, how much heat is absorbed from the hot reservoir?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Hot reservoir temperature: T<sub>H</sub> = 800 K</li>
+                    <li>Cold reservoir temperature: T<sub>C</sub> = 300 K</li>
+                    <li>Work output (part c): W = 100 kJ</li>
+                </ul>
+                <p><strong>(a) Thermal Efficiency:</strong></p>
+                <p>\[\eta_{Carnot} = 1 - \frac{T_C}{T_H} = 1 - \frac{300}{800} = 1 - 0.375 = 0.625 = 62.5\%\]</p>
+                <p><strong>(b) Heat Rejected Ratio:</strong></p>
+                <p>\[\frac{Q_{out}}{Q_{in}} = \frac{T_C}{T_H} = \frac{300}{800} = 0.375 = 37.5\%\]</p>
+                <p><strong>(c) Heat Absorbed:</strong></p>
+                <p>From \(\eta = \frac{W}{Q_{in}}\), we get:</p>
+                <p>\[Q_{in} = \frac{W}{\eta} = \frac{100}{0.625} = 160 \text{ kJ}\]</p>
+                <p><strong>Answers:</strong></p>
+                <ul>
+                    <li>(a) Thermal efficiency = 62.5%</li>
+                    <li>(b) Heat rejected = 37.5% of heat input</li>
+                    <li>(c) Heat absorbed = 160 kJ</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Comparing Otto and Diesel Cycles</h3>
+            <p>Compare the thermal efficiency of an Otto cycle and a Diesel cycle, both operating with:</p>
+            <ul>
+                <li>Compression ratio r = 18</li>
+                <li>Specific heat ratio γ = 1.4</li>
+                <li>Diesel cycle cutoff ratio r<sub>c</sub> = 2.0</li>
+            </ul>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Compression ratio: r = 18</li>
+                    <li>Specific heat ratio: γ = 1.4</li>
+                    <li>Cutoff ratio (Diesel): r<sub>c</sub> = 2.0</li>
+                </ul>
+                <p><strong>Otto Cycle Efficiency:</strong></p>
+                <p>\[\eta_{Otto} = 1 - \frac{1}{r^{\gamma-1}} = 1 - \frac{1}{18^{0.4}} = 1 - \frac{1}{3.179} = 0.685 = 68.5\%\]</p>
+                <p><strong>Diesel Cycle Efficiency:</strong></p>
+                <p>\[\eta_{Diesel} = 1 - \frac{1}{r^{\gamma-1}} \cdot \frac{r_c^{\gamma}-1}{\gamma(r_c-1)}\]</p>
+                <p>\[\eta_{Diesel} = 1 - \frac{1}{18^{0.4}} \cdot \frac{2^{1.4}-1}{1.4(2-1)}\]</p>
+                <p>\[\eta_{Diesel} = 1 - \frac{1}{3.179} \cdot \frac{2.639-1}{1.4}\]</p>
+                <p>\[\eta_{Diesel} = 1 - 0.3147 \cdot \frac{1.639}{1.4} = 1 - 0.3147 \cdot 1.171 = 1 - 0.368 = 0.632 = 63.2\%\]</p>
+                <p><strong>Comparison:</strong></p>
+                <ul>
+                    <li>Otto cycle efficiency: 68.5%</li>
+                    <li>Diesel cycle efficiency: 63.2%</li>
+                    <li>The Otto cycle has higher efficiency for the same compression ratio, but Diesel engines can achieve higher compression ratios in practice</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: KNOWLEDGE CHECK QUIZ -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the defining characteristic of a thermodynamic cycle?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> It produces maximum work output</label>
+                    <label><input type="radio" name="q1" value="b"> The system returns to its initial state</label>
+                    <label><input type="radio" name="q1" value="c"> It operates at constant temperature</label>
+                    <label><input type="radio" name="q1" value="d"> It requires no energy input</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The Carnot cycle represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> A practical engine design</label>
+                    <label><input type="radio" name="q2" value="b"> The most efficient cycle between two temperature limits</label>
+                    <label><input type="radio" name="q2" value="c"> An irreversible process</label>
+                    <label><input type="radio" name="q2" value="d"> A refrigeration cycle only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: In the Otto cycle, heat addition occurs at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> Constant pressure</label>
+                    <label><input type="radio" name="q3" value="b"> Constant volume</label>
+                    <label><input type="radio" name="q3" value="c"> Constant temperature</label>
+                    <label><input type="radio" name="q3" value="d"> Adiabatically</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Increasing the compression ratio in an Otto cycle will:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> Decrease thermal efficiency</label>
+                    <label><input type="radio" name="q4" value="b"> Increase thermal efficiency</label>
+                    <label><input type="radio" name="q4" value="c"> Not affect thermal efficiency</label>
+                    <label><input type="radio" name="q4" value="d"> Make the cycle reversible</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The main difference between Otto and Diesel cycles is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> The compression ratio</label>
+                    <label><input type="radio" name="q5" value="b"> The working fluid</label>
+                    <label><input type="radio" name="q5" value="c"> The heat addition process (constant volume vs. constant pressure)</label>
+                    <label><input type="radio" name="q5" value="d"> The number of processes in the cycle</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let currentCycle = 'otto';
+        let compressionRatio = 8.0;
+        let cutoffRatio = 2.0;
+        let tempHigh = 600;
+        let tempLow = 300;
+        let gamma = 1.4;
+
+        // DOM elements
+        const compressionSlider = document.getElementById('compression-slider');
+        const compressionValue = document.getElementById('compression-value');
+        const cutoffSlider = document.getElementById('cutoff-slider');
+        const cutoffValue = document.getElementById('cutoff-value');
+        const tempHighSlider = document.getElementById('temp-high-slider');
+        const tempHighValue = document.getElementById('temp-high-value');
+        const tempLowSlider = document.getElementById('temp-low-slider');
+        const tempLowValue = document.getElementById('temp-low-value');
+        const gammaSlider = document.getElementById('gamma-slider');
+        const gammaValue = document.getElementById('gamma-value');
+
+        // P5.js sketch
+        new p5(function(p) {
+            const canvasWidth = 700;
+            const canvasHeight = 500;
+            const margin = 60;
+            const plotWidth = canvasWidth - 2 * margin;
+            const plotHeight = canvasHeight - 2 * margin;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('cycle-sketch');
+                p.frameRate(30);
+
+                // Event listeners
+                compressionSlider.addEventListener('input', updateParameters);
+                cutoffSlider.addEventListener('input', updateParameters);
+                tempHighSlider.addEventListener('input', updateParameters);
+                tempLowSlider.addEventListener('input', updateParameters);
+                gammaSlider.addEventListener('input', updateParameters);
+
+                // Cycle selector buttons
+                document.querySelectorAll('.type-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        document.querySelectorAll('.type-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        currentCycle = this.dataset.cycle;
+                        updateControlVisibility();
+                        updateDisplay();
+                    });
+                });
+
+                updateControlVisibility();
+                updateDisplay();
+            };
+
+            p.draw = function() {
+                p.background(255);
+
+                // Draw axes
+                drawAxes(p);
+
+                // Draw cycle based on type
+                if (currentCycle === 'otto') {
+                    drawOttoCycle(p);
+                } else if (currentCycle === 'diesel') {
+                    drawDieselCycle(p);
+                } else if (currentCycle === 'carnot') {
+                    drawCarnotCycle(p);
+                } else if (currentCycle === 'rankine') {
+                    drawRankineCycle(p);
+                }
+
+                // Draw labels
+                drawLabels(p);
+            };
+
+            function drawAxes(p) {
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(margin, canvasHeight - margin, canvasWidth - margin, canvasHeight - margin); // x-axis
+                p.line(margin, margin, margin, canvasHeight - margin); // y-axis
+
+                // Axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text('Volume (V)', canvasWidth / 2, canvasHeight - 20);
+
+                p.push();
+                p.translate(20, canvasHeight / 2);
+                p.rotate(-p.HALF_PI);
+                p.text('Pressure (P)', 0, 0);
+                p.pop();
+            }
+
+            function drawOttoCycle(p) {
+                const r = compressionRatio;
+                const V1 = 4.0; // Arbitrary units
+                const V2 = V1 / r;
+                const P1 = 1.0;
+                const P2 = P1 * Math.pow(r, gamma);
+                const P3 = P2 * 2.5; // Heat addition ratio
+                const P4 = P3 / Math.pow(r, gamma);
+
+                const points = [
+                    {V: V1, P: P1, label: '1'},
+                    {V: V2, P: P2, label: '2'},
+                    {V: V2, P: P3, label: '3'},
+                    {V: V1, P: P4, label: '4'}
+                ];
+
+                // Draw processes
+                p.stroke(0, 100, 200);
+                p.strokeWeight(3);
+                p.noFill();
+
+                // Process 1-2: Isentropic compression
+                p.beginShape();
+                for (let V = V1; V >= V2; V -= 0.01) {
+                    const P = P1 * Math.pow(V1 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 2-3: Constant volume heat addition
+                p.line(mapVolume(V2), mapPressure(P2), mapVolume(V2), mapPressure(P3));
+
+                // Process 3-4: Isentropic expansion
+                p.beginShape();
+                for (let V = V2; V <= V1; V += 0.01) {
+                    const P = P3 * Math.pow(V2 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 4-1: Constant volume heat rejection
+                p.line(mapVolume(V1), mapPressure(P4), mapVolume(V1), mapPressure(P1));
+
+                // Draw state points
+                drawStatePoints(p, points);
+
+                // Calculate and display efficiency
+                const efficiency = (1 - 1 / Math.pow(r, gamma - 1)) * 100;
+                const workOutput = 120; // Approximate
+                const heatIn = workOutput / (efficiency / 100);
+                const heatOut = heatIn - workOutput;
+
+                updateResults(efficiency, workOutput, heatIn, heatOut);
+            }
+
+            function drawDieselCycle(p) {
+                const r = compressionRatio;
+                const rc = cutoffRatio;
+                const V1 = 4.0;
+                const V2 = V1 / r;
+                const V3 = V2 * rc;
+                const P1 = 1.0;
+                const P2 = P1 * Math.pow(r, gamma);
+                const P3 = P2;
+                const P4 = P3 * Math.pow(rc / r, gamma);
+
+                // Draw processes
+                p.stroke(200, 100, 0);
+                p.strokeWeight(3);
+                p.noFill();
+
+                // Process 1-2: Isentropic compression
+                p.beginShape();
+                for (let V = V1; V >= V2; V -= 0.01) {
+                    const P = P1 * Math.pow(V1 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 2-3: Constant pressure heat addition
+                p.line(mapVolume(V2), mapPressure(P2), mapVolume(V3), mapPressure(P3));
+
+                // Process 3-4: Isentropic expansion
+                p.beginShape();
+                for (let V = V3; V <= V1; V += 0.01) {
+                    const P = P3 * Math.pow(V3 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 4-1: Constant volume heat rejection
+                p.line(mapVolume(V1), mapPressure(P4), mapVolume(V1), mapPressure(P1));
+
+                // Draw state points
+                const points = [
+                    {V: V1, P: P1, label: '1'},
+                    {V: V2, P: P2, label: '2'},
+                    {V: V3, P: P3, label: '3'},
+                    {V: V1, P: P4, label: '4'}
+                ];
+                drawStatePoints(p, points);
+
+                // Calculate efficiency
+                const term1 = 1 / Math.pow(r, gamma - 1);
+                const term2 = (Math.pow(rc, gamma) - 1) / (gamma * (rc - 1));
+                const efficiency = (1 - term1 * term2) * 100;
+                const workOutput = 135;
+                const heatIn = workOutput / (efficiency / 100);
+                const heatOut = heatIn - workOutput;
+
+                updateResults(efficiency, workOutput, heatIn, heatOut);
+            }
+
+            function drawCarnotCycle(p) {
+                const TH = tempHigh;
+                const TC = tempLow;
+                const V1 = 1.0;
+                const V2 = 2.5;
+                const V3 = 4.0;
+                const V4 = V1 * Math.pow(V3/V2, gamma/(gamma-1));
+                const P1 = TH / V1;
+                const P2 = TH / V2;
+                const P3 = TC / V3;
+                const P4 = TC / V4;
+
+                // Draw processes
+                p.stroke(100, 200, 100);
+                p.strokeWeight(3);
+                p.noFill();
+
+                // Process 1-2: Isothermal expansion at TH
+                p.beginShape();
+                for (let V = V1; V <= V2; V += 0.01) {
+                    const P = TH / V;
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 2-3: Adiabatic expansion
+                p.beginShape();
+                for (let V = V2; V <= V3; V += 0.01) {
+                    const P = P2 * Math.pow(V2 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 3-4: Isothermal compression at TC
+                p.beginShape();
+                for (let V = V3; V >= V4; V -= 0.01) {
+                    const P = TC / V;
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 4-1: Adiabatic compression
+                p.beginShape();
+                for (let V = V4; V >= V1; V -= 0.01) {
+                    const P = P4 * Math.pow(V4 / V, gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(P);
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Draw state points
+                const points = [
+                    {V: V1, P: P1, label: '1'},
+                    {V: V2, P: P2, label: '2'},
+                    {V: V3, P: P3, label: '3'},
+                    {V: V4, P: P4, label: '4'}
+                ];
+                drawStatePoints(p, points);
+
+                // Calculate efficiency
+                const efficiency = (1 - TC / TH) * 100;
+                const workOutput = 100;
+                const heatIn = workOutput / (efficiency / 100);
+                const heatOut = heatIn - workOutput;
+
+                updateResults(efficiency, workOutput, heatIn, heatOut);
+            }
+
+            function drawRankineCycle(p) {
+                // Simplified representation
+                const V1 = 0.5; // Liquid state (low volume)
+                const V2 = 0.52; // After pump (slight increase)
+                const V3 = 3.5; // Vapor state (high volume)
+                const V4 = V3; // After turbine
+                const P1 = 0.5;
+                const P2 = 4.0;
+                const P3 = P2;
+                const P4 = P1;
+
+                // Draw processes
+                p.stroke(150, 50, 150);
+                p.strokeWeight(3);
+                p.noFill();
+
+                // Process 1-2: Pump (vertical line, slight volume increase)
+                p.line(mapVolume(V1), mapPressure(P1), mapVolume(V2), mapPressure(P2));
+
+                // Process 2-3: Boiler (constant pressure, volume increases)
+                p.line(mapVolume(V2), mapPressure(P2), mapVolume(V3), mapPressure(P3));
+
+                // Process 3-4: Turbine (isentropic expansion)
+                p.beginShape();
+                for (let V = V3; V >= V4; V -= 0.01) {
+                    const P = P3 * Math.pow(V3 / Math.max(V, 0.01), gamma);
+                    const x = mapVolume(V);
+                    const y = mapPressure(Math.max(P, P4));
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Process 4-1: Condenser (constant pressure)
+                p.line(mapVolume(V4), mapPressure(P4), mapVolume(V1), mapPressure(P1));
+
+                // Draw state points
+                const points = [
+                    {V: V1, P: P1, label: '1'},
+                    {V: V2, P: P2, label: '2'},
+                    {V: V3, P: P3, label: '3'},
+                    {V: V4, P: P4, label: '4'}
+                ];
+                drawStatePoints(p, points);
+
+                // Approximate efficiency for Rankine cycle
+                const efficiency = 35; // Typical value
+                const workOutput = 140;
+                const heatIn = workOutput / (efficiency / 100);
+                const heatOut = heatIn - workOutput;
+
+                updateResults(efficiency, workOutput, heatIn, heatOut);
+            }
+
+            function drawStatePoints(p, points) {
+                p.fill(255, 0, 0);
+                p.noStroke();
+                for (let point of points) {
+                    const x = mapVolume(point.V);
+                    const y = mapPressure(point.P);
+                    p.ellipse(x, y, 10, 10);
+                    p.fill(0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(14);
+                    p.text(point.label, x + 15, y - 10);
+                    p.fill(255, 0, 0);
+                }
+            }
+
+            function drawLabels(p) {
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text(`${getCycleName(currentCycle)}`, canvasWidth / 2, 30);
+            }
+
+            function mapVolume(V) {
+                // Map volume to x-coordinate (log scale for better visualization)
+                const minV = 0.3;
+                const maxV = 5.0;
+                return margin + ((V - minV) / (maxV - minV)) * plotWidth;
+            }
+
+            function mapPressure(P) {
+                // Map pressure to y-coordinate (log scale)
+                const minP = 0.3;
+                const maxP = 8.0;
+                return canvasHeight - margin - ((P - minP) / (maxP - minP)) * plotHeight;
+            }
+
+            function updateParameters() {
+                compressionRatio = parseFloat(compressionSlider.value);
+                compressionValue.textContent = compressionRatio.toFixed(1);
+
+                cutoffRatio = parseFloat(cutoffSlider.value);
+                cutoffValue.textContent = cutoffRatio.toFixed(1);
+
+                tempHigh = parseFloat(tempHighSlider.value);
+                tempHighValue.textContent = tempHigh.toFixed(0) + ' K';
+
+                tempLow = parseFloat(tempLowSlider.value);
+                tempLowValue.textContent = tempLow.toFixed(0) + ' K';
+
+                gamma = parseFloat(gammaSlider.value);
+                gammaValue.textContent = gamma.toFixed(2);
+
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                // Trigger redraw
+                p.redraw();
+            }
+
+            function getCycleName(cycle) {
+                const names = {
+                    'otto': 'Otto Cycle (Gasoline Engine)',
+                    'diesel': 'Diesel Cycle (Compression Ignition)',
+                    'carnot': 'Carnot Cycle (Ideal Maximum Efficiency)',
+                    'rankine': 'Rankine Cycle (Steam Power Plant)'
+                };
+                return names[cycle] || 'Thermodynamic Cycle';
+            }
+        });
+
+        function updateControlVisibility() {
+            const compressionControl = document.getElementById('compression-control');
+            const cutoffControl = document.getElementById('cutoff-control');
+            const tempHighControl = document.getElementById('temp-high-control');
+            const tempLowControl = document.getElementById('temp-low-control');
+
+            // Reset all to hidden
+            compressionControl.style.display = 'none';
+            cutoffControl.style.display = 'none';
+            tempHighControl.style.display = 'none';
+            tempLowControl.style.display = 'none';
+
+            // Show controls based on cycle
+            if (currentCycle === 'otto') {
+                compressionControl.style.display = 'flex';
+            } else if (currentCycle === 'diesel') {
+                compressionControl.style.display = 'flex';
+                cutoffControl.style.display = 'flex';
+            } else if (currentCycle === 'carnot') {
+                tempHighControl.style.display = 'flex';
+                tempLowControl.style.display = 'flex';
+            } else if (currentCycle === 'rankine') {
+                // Rankine has different controls, but we'll keep it simple
+                compressionControl.style.display = 'flex';
+            }
+        }
+
+        function updateResults(efficiency, work, heatIn, heatOut) {
+            document.getElementById('efficiency-display').textContent = efficiency.toFixed(1);
+            document.getElementById('work-display').textContent = work.toFixed(0);
+            document.getElementById('heat-in-display').textContent = heatIn.toFixed(0);
+            document.getElementById('heat-out-display').textContent = heatOut.toFixed(0);
+        }
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Returns to initial state
+                q2: 'b',  // Most efficient between two temps
+                q3: 'b',  // Constant volume
+                q4: 'b',  // Increases efficiency
+                q5: 'c'   // Heat addition process
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

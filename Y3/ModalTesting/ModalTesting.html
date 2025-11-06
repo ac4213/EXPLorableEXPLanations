@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Testing & Experimental Modal Analysis - Interactive Lecture</title>
+
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+
+    <!-- Plotly library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Common styles -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .info-box {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .info-box-golden {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box-golden h4 {
+            color: #b38600;
+        }
+
+        .info-box-blue {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        .plot-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            overflow: visible;
+            margin: 10px 0;
+        }
+
+        .simulation-display {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            .plot-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Modal Testing & Experimental Modal Analysis</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2 id="intro">Introduction to Modal Testing</h2>
+        <p>Modal testing is an experimental technique used to identify the dynamic characteristics of structures. By measuring the structure's response to excitation, we can extract modal parameters: natural frequencies, damping ratios, and mode shapes. These parameters form the foundation for structural dynamics analysis, validation of finite element models, and troubleshooting vibration problems.</p>
+
+        <div class="key-point">
+            <p><strong>Key objectives of modal testing:</strong></p>
+            <ul>
+                <li><strong>Modal identification:</strong> Determine natural frequencies, damping ratios, and mode shapes</li>
+                <li><strong>Model validation:</strong> Compare experimental results with analytical predictions</li>
+                <li><strong>Structural health monitoring:</strong> Detect changes in modal parameters indicating damage</li>
+                <li><strong>Dynamic modification:</strong> Predict effects of structural changes before implementation</li>
+            </ul>
+        </div>
+
+        <h3>Testing Approaches</h3>
+        <ul>
+            <li><strong>Impact Testing:</strong> Structure excited by instrumented hammer; quick and cost-effective for light structures</li>
+            <li><strong>Shaker Testing:</strong> Electromagnetic or hydraulic shaker provides controlled excitation; better for heavy structures and controlled input</li>
+            <li><strong>Ambient/Operational Testing:</strong> Uses natural operational loads; no artificial excitation required but input unmeasured</li>
+        </ul>
+
+        <h3>Measurement Chain</h3>
+        <p>A complete modal test requires: (1) Excitation device (hammer or shaker), (2) Force transducer to measure input, (3) Accelerometers to measure response, (4) Data acquisition system, and (5) Modal analysis software for parameter extraction.</p>
+    </div>
+
+    <div class="content-section">
+        <h2 id="frf">Frequency Response Functions (FRF)</h2>
+
+        <h3>The FRF Concept</h3>
+        <p>The Frequency Response Function (FRF) is the ratio of output (response) to input (force) in the frequency domain. It completely characterizes the linear dynamic behavior of a structure at a given location.</p>
+
+        <div class="equation-box">
+            <p><strong>FRF Definition:</strong></p>
+            <p>\[H(\omega) = \frac{X(\omega)}{F(\omega)}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(H(\omega)\) = Frequency Response Function (complex)</li>
+                <li>\(X(\omega)\) = Fourier transform of response</li>
+                <li>\(F(\omega)\) = Fourier transform of force</li>
+            </ul>
+
+            <p><strong>For a SDOF system:</strong></p>
+            <p>\[H(\omega) = \frac{1}{k - m\omega^2 + j c\omega} = \frac{1/k}{1 - r^2 + j(2\zeta r)}\]</p>
+
+            <p>Where \(r = \omega/\omega_n\) and \(\zeta\) is the damping ratio</p>
+
+            <p><strong>FRF Representations:</strong></p>
+            <ul>
+                <li><strong>Receptance (Displacement/Force):</strong> \(\alpha(\omega)\) [m/N]</li>
+                <li><strong>Mobility (Velocity/Force):</strong> \(Y(\omega) = j\omega\alpha(\omega)\) [m/s/N]</li>
+                <li><strong>Accelerance (Acceleration/Force):</strong> \(A(\omega) = -\omega^2\alpha(\omega)\) [m/s²/N]</li>
+            </ul>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">System Parameters</h3>
+
+                <div class="slider-container">
+                    <label for="nat-freq-frf">Natural Frequency \(f_n\) (Hz):</label>
+                    <input type="range" id="nat-freq-frf" min="5" max="100" value="25" step="1">
+                    <span id="nat-freq-frf-value" class="slider-value">25</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="damping-frf">Damping Ratio \(\zeta\) (%):</label>
+                    <input type="range" id="damping-frf" min="0.1" max="10" value="2" step="0.1">
+                    <span id="damping-frf-value" class="slider-value">2.0</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="mass-frf">Mass \(m\) (kg):</label>
+                    <input type="range" id="mass-frf" min="1" max="50" value="10" step="1">
+                    <span id="mass-frf-value" class="slider-value">10</span>
+                </div>
+
+                <div class="info-box info-box-blue">
+                    <h4>Derived Parameters:</h4>
+                    <p><strong>Stiffness:</strong> \(k = m\omega_n^2 = \) <span id="stiffness-calc">0</span> N/m</p>
+                    <p><strong>Damping:</strong> \(c = 2\zeta m\omega_n = \) <span id="damping-calc">0</span> Ns/m</p>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <h4>FRF Display Type:</h4>
+                    <select id="frf-type" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="receptance">Receptance (Displacement/Force)</option>
+                        <option value="mobility">Mobility (Velocity/Force)</option>
+                        <option value="accelerance">Accelerance (Acceleration/Force)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Frequency Response Function</h3>
+                <div id="frf-magnitude-plot" class="plot-container"></div>
+                <div id="frf-phase-plot" class="plot-container"></div>
+                <div id="frf-nyquist-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="mdof">MDOF Systems and Modal Superposition</h2>
+
+        <h3>Multi-Degree-of-Freedom FRFs</h3>
+        <p>Real structures have many modes. The measured FRF is a superposition of individual modal contributions, each with its own frequency, damping, and mode shape.</p>
+
+        <div class="equation-box">
+            <p><strong>MDOF FRF (Modal Superposition):</strong></p>
+            <p>\[H_{jk}(\omega) = \sum_{r=1}^{N} \frac{\phi_{jr}\phi_{kr}}{m_r(\omega_{r}^2 - \omega^2 + j2\zeta_r\omega_r\omega)}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(H_{jk}\) = FRF between excitation point k and response point j</li>
+                <li>\(\phi_{jr}\) = Mode shape amplitude of mode r at location j</li>
+                <li>\(m_r\) = Modal mass of mode r</li>
+                <li>\(\omega_r, \zeta_r\) = Natural frequency and damping ratio of mode r</li>
+            </ul>
+
+            <p><strong>Residue Form:</strong></p>
+            <p>\[H_{jk}(\omega) = \sum_{r=1}^{N} \left[\frac{A_{jk}^r}{j\omega - \lambda_r} + \frac{\bar{A}_{jk}^r}{j\omega - \bar{\lambda}_r}\right]\]</p>
+
+            <p>Where \(A_{jk}^r\) is the modal residue and \(\lambda_r = -\zeta_r\omega_r + j\omega_r\sqrt{1-\zeta_r^2}\) is the complex pole</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Multi-Mode System</h3>
+
+                <div class="info-box info-box-golden">
+                    <h4>Mode 1:</h4>
+                    <div class="slider-container">
+                        <label for="freq1">Frequency (Hz):</label>
+                        <input type="range" id="freq1" min="10" max="50" value="20" step="1">
+                        <span id="freq1-value" class="slider-value">20</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="damp1">Damping (%):</label>
+                        <input type="range" id="damp1" min="0.5" max="5" value="1.5" step="0.1">
+                        <span id="damp1-value" class="slider-value">1.5</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="amp1">Amplitude:</label>
+                        <input type="range" id="amp1" min="0.1" max="2" value="1" step="0.1">
+                        <span id="amp1-value" class="slider-value">1.0</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Mode 2:</h4>
+                    <div class="slider-container">
+                        <label for="freq2">Frequency (Hz):</label>
+                        <input type="range" id="freq2" min="30" max="100" value="60" step="1">
+                        <span id="freq2-value" class="slider-value">60</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="damp2">Damping (%):</label>
+                        <input type="range" id="damp2" min="0.5" max="5" value="2" step="0.1">
+                        <span id="damp2-value" class="slider-value">2.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="amp2">Amplitude:</label>
+                        <input type="range" id="amp2" min="0.1" max="2" value="0.5" step="0.1">
+                        <span id="amp2-value" class="slider-value">0.5</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Mode 3:</h4>
+                    <div class="slider-container">
+                        <label for="freq3">Frequency (Hz):</label>
+                        <input type="range" id="freq3" min="80" max="150" value="110" step="1">
+                        <span id="freq3-value" class="slider-value">110</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="damp3">Damping (%):</label>
+                        <input type="range" id="damp3" min="0.5" max="5" value="2.5" step="0.1">
+                        <span id="damp3-value" class="slider-value">2.5</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="amp3">Amplitude:</label>
+                        <input type="range" id="amp3" min="0.1" max="2" value="0.3" step="0.1">
+                        <span id="amp3-value" class="slider-value">0.3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Multi-Mode FRF</h3>
+                <div id="mdof-frf-plot" class="plot-container"></div>
+                <div class="info-box info-box-blue">
+                    <h4>Peak Identification:</h4>
+                    <p>The FRF shows clear peaks at each natural frequency. Well-separated modes (frequency spacing > 2x bandwidth) are easier to identify accurately.</p>
+                    <p><strong>Modal Density:</strong> Number of modes in frequency range</p>
+                    <p><strong>Current density:</strong> <span id="modal-density">2.0</span> modes/100 Hz</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="extraction">Modal Parameter Extraction</h2>
+
+        <h3>Curve Fitting Methods</h3>
+        <p>Modal parameters are extracted from measured FRFs using curve fitting algorithms. Different methods suit different situations based on mode separation and data quality.</p>
+
+        <div class="equation-box">
+            <p><strong>Peak Picking (Simplest):</strong></p>
+            <p>\[f_n = f_{\text{peak}}\]</p>
+            <p>\[\zeta = \frac{\Delta f}{2f_n} = \frac{f_2 - f_1}{2f_n}\]</p>
+            <p>Where \(f_1, f_2\) are half-power points (\(|H| = |H_{max}|/\sqrt{2}\))</p>
+
+            <p><strong>Circle Fit (Nyquist Plot):</strong></p>
+            <p>For well-separated modes, FRF traces a circle in Nyquist plot (Real vs Imaginary). Fitting circle provides:
+            <ul>
+                <li>Natural frequency from circle peak</li>
+                <li>Damping from circle diameter</li>
+                <li>Mode shape from residue</li>
+            </ul>
+            </p>
+
+            <p><strong>Rational Fraction Polynomial (Advanced):</strong></p>
+            <p>\[H(\omega) = \frac{b_0 + b_1(j\omega) + \cdots + b_m(j\omega)^m}{a_0 + a_1(j\omega) + \cdots + a_n(j\omega)^n}\]</p>
+            <p>Polynomial coefficients solved from measured data; poles yield natural frequencies and damping</p>
+
+            <p><strong>Complex Mode Indicator Function (CMIF):</strong></p>
+            <p>Uses SVD of FRF matrix to identify number of modes and separate closely spaced modes</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Mode Extraction Settings</h3>
+
+                <div class="slider-container">
+                    <label for="test-freq">Test Mode Frequency (Hz):</label>
+                    <input type="range" id="test-freq" min="10" max="100" value="40" step="1">
+                    <span id="test-freq-value" class="slider-value">40</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="test-damp">Test Mode Damping (%):</label>
+                    <input type="range" id="test-damp" min="0.5" max="8" value="3" step="0.1">
+                    <span id="test-damp-value" class="slider-value">3.0</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="noise-level">Measurement Noise (%):</label>
+                    <input type="range" id="noise-level" min="0" max="20" value="2" step="1">
+                    <span id="noise-level-value" class="slider-value">2</span>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <h4>Extraction Method:</h4>
+                    <select id="extraction-method" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="peak">Peak Picking</option>
+                        <option value="halfpower">Half-Power Bandwidth</option>
+                        <option value="circle">Circle Fit</option>
+                    </select>
+                </div>
+
+                <button id="extract-params" style="width: 100%; padding: 12px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; cursor: pointer; font-weight: bold;">
+                    Extract Modal Parameters
+                </button>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Parameter Extraction</h3>
+                <div id="extraction-plot" class="plot-container"></div>
+                <div id="extraction-results" class="info-box info-box-blue">
+                    <h4>Extracted Parameters:</h4>
+                    <p><strong>True Frequency:</strong> <span id="true-freq">40.0</span> Hz</p>
+                    <p><strong>Extracted Frequency:</strong> <span id="extracted-freq">--</span> Hz</p>
+                    <p><strong>Frequency Error:</strong> <span id="freq-error">--</span> %</p>
+                    <p><strong>True Damping:</strong> <span id="true-damp">3.0</span> %</p>
+                    <p><strong>Extracted Damping:</strong> <span id="extracted-damp">--</span> %</p>
+                    <p><strong>Damping Error:</strong> <span id="damp-error">--</span> %</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="coherence">Data Quality and Coherence</h2>
+
+        <h3>Coherence Function</h3>
+        <p>The coherence function quantifies the quality of FRF measurement by indicating how much of the output is linearly related to the input. Values near 1.0 indicate good measurements; values significantly below 1.0 suggest problems.</p>
+
+        <div class="equation-box">
+            <p><strong>Coherence Definition:</strong></p>
+            <p>\[\gamma^2(\omega) = \frac{|G_{XF}(\omega)|^2}{G_{XX}(\omega)G_{FF}(\omega)}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(G_{XF}\) = Cross-power spectral density between response and force</li>
+                <li>\(G_{XX}\) = Auto-power spectral density of response</li>
+                <li>\(G_{FF}\) = Auto-power spectral density of force</li>
+                <li>\(0 \leq \gamma^2 \leq 1\)</li>
+            </ul>
+
+            <p><strong>Causes of Poor Coherence:</strong></p>
+            <ul>
+                <li>Extraneous noise (electrical or mechanical)</li>
+                <li>Non-linearity in structure</li>
+                <li>Unmeasured inputs</li>
+                <li>Time delay between signals</li>
+                <li>Inadequate frequency resolution</li>
+            </ul>
+
+            <p><strong>Improving Coherence:</strong></p>
+            <ul>
+                <li>Average multiple measurements</li>
+                <li>Increase force level (improve signal-to-noise ratio)</li>
+                <li>Check transducer mounting and cables</li>
+                <li>Use appropriate windowing (force/exponential)</li>
+            </ul>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Measurement Quality</h3>
+
+                <div class="slider-container">
+                    <label for="snr">Signal-to-Noise Ratio (dB):</label>
+                    <input type="range" id="snr" min="10" max="60" value="40" step="5">
+                    <span id="snr-value" class="slider-value">40</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="num-averages">Number of Averages:</label>
+                    <input type="range" id="num-averages" min="1" max="50" value="10" step="1">
+                    <span id="num-averages-value" class="slider-value">10</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Measurement Issues:</h4>
+                    <label style="display: block; margin: 10px 0;">
+                        <input type="checkbox" id="add-nonlinearity" style="margin-right: 8px;">
+                        Add Nonlinearity
+                    </label>
+                    <label style="display: block; margin: 10px 0;">
+                        <input type="checkbox" id="add-unmeasured" style="margin-right: 8px;">
+                        Unmeasured Input
+                    </label>
+                    <label style="display: block; margin: 10px 0;">
+                        <input type="checkbox" id="poor-mounting" style="margin-right: 8px;">
+                        Poor Transducer Mounting
+                    </label>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Coherence Analysis</h3>
+                <div id="coherence-frf-plot" class="plot-container"></div>
+                <div id="coherence-plot" class="plot-container"></div>
+                <div id="coherence-results" class="info-box info-box-blue">
+                    <h4>Data Quality Assessment:</h4>
+                    <p><strong>Average Coherence:</strong> <span id="avg-coherence">0.00</span></p>
+                    <p><strong>Min Coherence:</strong> <span id="min-coherence">0.00</span></p>
+                    <p><strong>Data Quality:</strong> <span id="quality-assessment">Excellent</span></p>
+                    <p style="font-size: 0.85em; margin-top: 10px;">
+                        γ² > 0.95: Excellent<br>
+                        0.90 < γ² < 0.95: Good<br>
+                        0.80 < γ² < 0.90: Fair<br>
+                        γ² < 0.80: Poor - Investigate
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Modal testing and experimental modal analysis are essential tools across diverse engineering applications:</p>
+        <ul>
+            <li><strong>Aerospace:</strong> Aircraft ground vibration testing (GVT) validates finite element models before first flight. Modal testing identifies flutter susceptibility and verifies dynamic loads. F-35 GVT involved over 3000 measurement points.</li>
+            <li><strong>Automotive:</strong> Vehicle NVH (Noise, Vibration, Harshness) development uses modal testing to identify body panel resonances, optimize component mounting, and validate CAE models. Target: body modes above 30 Hz, powertrain mounts 8-12 Hz.</li>
+            <li><strong>Civil Structures:</strong> Bridge and building modal testing verifies design, monitors structural health, and assesses earthquake/wind vulnerability. The Millau Viaduct underwent extensive modal testing to validate its 2.5 km span design.</li>
+            <li><strong>Wind Energy:</strong> Wind turbine blade modal testing ensures safe operation by verifying natural frequencies avoid operational frequencies (1P, 3P). Modal damping critical for preventing resonance fatigue.</li>
+            <li><strong>Machinery Diagnostics:</strong> Rotating machinery modal testing identifies critical speeds, optimizes foundation designs, and troubleshoots vibration problems. Steam turbine generator sets require comprehensive modal analysis.</li>
+            <li><strong>Spacecraft:</strong> Satellite modal surveys verify structural dynamic models before launch. Every spacecraft undergoes acoustic and vibration testing with modal identification to ensure survival of launch loads.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>FRF Definition</td>
+                    <td>\(H(\omega) = \frac{X(\omega)}{F(\omega)}\)</td>
+                    <td>Ratio of response to force in frequency domain</td>
+                </tr>
+                <tr>
+                    <td>SDOF Receptance</td>
+                    <td>\(H(\omega) = \frac{1/k}{1 - r^2 + j(2\zeta r)}\)</td>
+                    <td>Single degree of freedom FRF</td>
+                </tr>
+                <tr>
+                    <td>Modal Superposition</td>
+                    <td>\(H_{jk}(\omega) = \sum_{r=1}^{N} \frac{\phi_{jr}\phi_{kr}}{m_r(\omega_{r}^2 - \omega^2 + j2\zeta_r\omega_r\omega)}\)</td>
+                    <td>Multi-mode FRF summation</td>
+                </tr>
+                <tr>
+                    <td>Half-Power Damping</td>
+                    <td>\(\zeta = \frac{\Delta f}{2f_n}\)</td>
+                    <td>Damping from bandwidth at peak/√2</td>
+                </tr>
+                <tr>
+                    <td>Coherence</td>
+                    <td>\(\gamma^2(\omega) = \frac{|G_{XF}(\omega)|^2}{G_{XX}(\omega)G_{FF}(\omega)}\)</td>
+                    <td>Measurement quality indicator (0 to 1)</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="problems">Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Half-Power Bandwidth Method</h3>
+            <p>An FRF shows a resonance peak at 45 Hz with magnitude 0.005 m/N. The half-power points occur at 43.5 Hz and 46.5 Hz. Calculate the damping ratio.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using the half-power bandwidth method:</p>
+                <p>\(\Delta f = f_2 - f_1 = 46.5 - 43.5 = 3.0\) Hz</p>
+                <p>\(\zeta = \frac{\Delta f}{2f_n} = \frac{3.0}{2 \times 45} = \frac{3.0}{90} = 0.0333\)</p>
+                <p>Converting to percentage: \(\zeta = 3.33\%\)</p>
+                <p><strong>Answer: ζ = 3.33%</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Modal Mass Calculation</h3>
+            <p>An FRF peak at 30 Hz has a receptance magnitude of 0.01 m/N. Given that \(\zeta = 2\%\), calculate the modal mass assuming the measurement was at maximum mode shape location (\(\phi = 1\)).</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>At resonance for receptance FRF with \(\phi = 1\):</p>
+                <p>\(|H(\omega_n)| = \frac{1}{2\zeta m \omega_n^2}\)</p>
+                <p>Rearranging: \(m = \frac{1}{2\zeta \omega_n^2 |H(\omega_n)|}\)</p>
+                <p>\(\omega_n = 2\pi f_n = 2\pi \times 30 = 188.5\) rad/s</p>
+                <p>\(m = \frac{1}{2 \times 0.02 \times (188.5)^2 \times 0.01}\)</p>
+                <p>\(m = \frac{1}{2 \times 0.02 \times 35532 \times 0.01} = \frac{1}{14.21} = 0.0704\) kg</p>
+                <p><strong>Answer: Modal mass = 70.4 grams</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Required Averages for Coherence</h3>
+            <p>A measurement shows coherence of 0.85 with 5 averages. Approximately how many averages are needed to achieve coherence of 0.95, assuming random noise is the limiting factor?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Coherence improves approximately with square root of number of averages for random noise:</p>
+                <p>\(\gamma_2^2 \approx 1 - (1 - \gamma_1^2)\frac{n_1}{n_2}\)</p>
+                <p>Rearranging: \(n_2 \approx n_1 \frac{1 - \gamma_1^2}{1 - \gamma_2^2}\)</p>
+                <p>\(n_2 \approx 5 \times \frac{1 - 0.85}{1 - 0.95} = 5 \times \frac{0.15}{0.05} = 5 \times 3 = 15\)</p>
+                <p><strong>Answer: Approximately 15 averages needed</strong></p>
+                <p>Note: This is an approximation. In practice, 20-25 averages recommended for γ² > 0.95</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does the FRF represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Force required for motion</label>
+                    <label><input type="radio" name="q1" value="b"> b) Ratio of response to excitation in frequency domain</label>
+                    <label><input type="radio" name="q1" value="c"> c) Mode shape amplitude</label>
+                    <label><input type="radio" name="q1" value="d"> d) Natural frequency only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: Which FRF type is measured as acceleration/force?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Receptance</label>
+                    <label><input type="radio" name="q2" value="b"> b) Mobility</label>
+                    <label><input type="radio" name="q2" value="c"> c) Accelerance</label>
+                    <label><input type="radio" name="q2" value="d"> d) Impedance</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: The half-power bandwidth method determines:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Natural frequency only</label>
+                    <label><input type="radio" name="q3" value="b"> b) Damping ratio</label>
+                    <label><input type="radio" name="q3" value="c"> c) Mode shape</label>
+                    <label><input type="radio" name="q3" value="d"> d) Modal mass</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Coherence values close to 1.0 indicate:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Poor measurement quality</label>
+                    <label><input type="radio" name="q4" value="b"> b) High damping</label>
+                    <label><input type="radio" name="q4" value="c"> c) Good linear relationship between input and output</label>
+                    <label><input type="radio" name="q4" value="d"> d) Nonlinear behavior</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Impact testing is most suitable for:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Heavy massive structures only</label>
+                    <label><input type="radio" name="q5" value="b"> b) Light to medium structures with quick testing needed</label>
+                    <label><input type="radio" name="q5" value="c"> c) Underwater structures</label>
+                    <label><input type="radio" name="q5" value="d"> d> Structures at high temperatures</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Modal testing simulation code
+
+        // Initialize sliders
+        function initializeSliders() {
+            const sliders = [
+                'nat-freq-frf', 'damping-frf', 'mass-frf',
+                'freq1', 'damp1', 'amp1', 'freq2', 'damp2', 'amp2', 'freq3', 'damp3', 'amp3',
+                'test-freq', 'test-damp', 'noise-level',
+                'snr', 'num-averages'
+            ];
+
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    const valueSpan = document.getElementById(id + '-value');
+                    slider.addEventListener('input', function() {
+                        valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                        updateSimulations();
+                    });
+                }
+            });
+        }
+
+        // SDOF FRF calculation
+        function calculateSDOF_FRF() {
+            const fn = parseFloat(document.getElementById('nat-freq-frf').value);
+            const zeta = parseFloat(document.getElementById('damping-frf').value) / 100;
+            const mass = parseFloat(document.getElementById('mass-frf').value);
+            const wn = 2 * Math.PI * fn;
+
+            const k = mass * wn * wn;
+            const c = 2 * zeta * mass * wn;
+
+            document.getElementById('stiffness-calc').textContent = k.toFixed(1);
+            document.getElementById('damping-calc').textContent = c.toFixed(2);
+
+            const fArray = [];
+            const magArray = [];
+            const phaseArray = [];
+            const realArray = [];
+            const imagArray = [];
+
+            const frfType = document.getElementById('frf-type').value;
+
+            for (let f = 0.1; f <= 150; f += 0.2) {
+                const w = 2 * Math.PI * f;
+                const r = w / wn;
+
+                // Receptance
+                let H_real = (1 - r*r) / (k * ((1 - r*r)**2 + (2*zeta*r)**2));
+                let H_imag = (-2*zeta*r) / (k * ((1 - r*r)**2 + (2*zeta*r)**2));
+
+                // Convert to other types if needed
+                if (frfType === 'mobility') {
+                    const temp_real = H_real;
+                    H_real = -w * H_imag;
+                    H_imag = w * temp_real;
+                } else if (frfType === 'accelerance') {
+                    const temp_real = H_real;
+                    const temp_imag = H_imag;
+                    H_real = -w*w * temp_real;
+                    H_imag = -w*w * temp_imag;
+                }
+
+                const mag = Math.sqrt(H_real*H_real + H_imag*H_imag);
+                const phase = Math.atan2(H_imag, H_real) * 180 / Math.PI;
+
+                fArray.push(f);
+                magArray.push(mag);
+                phaseArray.push(phase);
+                realArray.push(H_real);
+                imagArray.push(H_imag);
+            }
+
+            // Magnitude plot
+            const trace1 = {
+                x: fArray,
+                y: magArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 2 }
+            };
+
+            let yTitle = 'Magnitude';
+            if (frfType === 'receptance') yTitle = 'Receptance (m/N)';
+            else if (frfType === 'mobility') yTitle = 'Mobility (m/s/N)';
+            else if (frfType === 'accelerance') yTitle = 'Accelerance (m/s²/N)';
+
+            const layout1 = {
+                title: 'FRF Magnitude',
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: yTitle, type: 'log' }
+            };
+
+            Plotly.newPlot('frf-magnitude-plot', [trace1], layout1, {responsive: true});
+
+            // Phase plot
+            const trace2 = {
+                x: fArray,
+                y: phaseArray,
+                mode: 'lines',
+                line: { color: '#ff4500', width: 2 }
+            };
+
+            const layout2 = {
+                title: 'FRF Phase',
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: 'Phase (degrees)' }
+            };
+
+            Plotly.newPlot('frf-phase-plot', [trace2], layout2, {responsive: true});
+
+            // Nyquist plot
+            const trace3 = {
+                x: realArray,
+                y: imagArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 2 }
+            };
+
+            const layout3 = {
+                title: 'Nyquist Plot',
+                xaxis: { title: 'Real Part' },
+                yaxis: { title: 'Imaginary Part', scaleanchor: 'x' }
+            };
+
+            Plotly.newPlot('frf-nyquist-plot', [trace3], layout3, {responsive: true});
+        }
+
+        // MDOF FRF calculation
+        function calculateMDOF_FRF() {
+            const modes = [
+                {
+                    freq: parseFloat(document.getElementById('freq1').value),
+                    damp: parseFloat(document.getElementById('damp1').value) / 100,
+                    amp: parseFloat(document.getElementById('amp1').value)
+                },
+                {
+                    freq: parseFloat(document.getElementById('freq2').value),
+                    damp: parseFloat(document.getElementById('damp2').value) / 100,
+                    amp: parseFloat(document.getElementById('amp2').value)
+                },
+                {
+                    freq: parseFloat(document.getElementById('freq3').value),
+                    damp: parseFloat(document.getElementById('freq3').value) / 100,
+                    amp: parseFloat(document.getElementById('amp3').value)
+                }
+            ];
+
+            const fArray = [];
+            const magArray = [];
+
+            for (let f = 0.1; f <= 200; f += 0.5) {
+                const w = 2 * Math.PI * f;
+                let H_real = 0;
+                let H_imag = 0;
+
+                modes.forEach(mode => {
+                    const wn = 2 * Math.PI * mode.freq;
+                    const zeta = mode.damp;
+                    const A = mode.amp;
+
+                    const denom = (wn*wn - w*w)**2 + (2*zeta*wn*w)**2;
+                    H_real += A * (wn*wn - w*w) / denom;
+                    H_imag += A * (-2*zeta*wn*w) / denom;
+                });
+
+                const mag = Math.sqrt(H_real*H_real + H_imag*H_imag);
+                fArray.push(f);
+                magArray.push(mag);
+            }
+
+            // Calculate modal density
+            const freqRange = 200;
+            const numModes = 3;
+            const density = numModes / freqRange * 100;
+            document.getElementById('modal-density').textContent = density.toFixed(1);
+
+            const trace = {
+                x: fArray,
+                y: magArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 2 }
+            };
+
+            const layout = {
+                title: 'Multi-Mode FRF',
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: 'Magnitude', type: 'log' }
+            };
+
+            Plotly.newPlot('mdof-frf-plot', [trace], layout, {responsive: true});
+        }
+
+        // Parameter extraction
+        document.getElementById('extract-params').addEventListener('click', function() {
+            const trueFreq = parseFloat(document.getElementById('test-freq').value);
+            const trueDamp = parseFloat(document.getElementById('test-damp').value);
+            const noiseLevel = parseFloat(document.getElementById('noise-level').value) / 100;
+            const method = document.getElementById('extraction-method').value;
+
+            document.getElementById('true-freq').textContent = trueFreq.toFixed(1);
+            document.getElementById('true-damp').textContent = trueDamp.toFixed(2);
+
+            // Simulate extraction with noise-induced error
+            const freqError = (Math.random() - 0.5) * noiseLevel * 2;
+            const dampError = (Math.random() - 0.5) * noiseLevel * 5;
+
+            const extractedFreq = trueFreq * (1 + freqError);
+            const extractedDamp = trueDamp * (1 + dampError);
+
+            document.getElementById('extracted-freq').textContent = extractedFreq.toFixed(2);
+            document.getElementById('freq-error').textContent = (freqError * 100).toFixed(2);
+            document.getElementById('extracted-damp').textContent = extractedDamp.toFixed(2);
+            document.getElementById('damp-error').textContent = (dampError * 100).toFixed(2);
+
+            // Generate FRF with extraction markers
+            const fArray = [];
+            const magArray = [];
+            const wn = 2 * Math.PI * trueFreq;
+            const zeta = trueDamp / 100;
+
+            for (let f = trueFreq * 0.5; f <= trueFreq * 1.5; f += 0.1) {
+                const w = 2 * Math.PI * f;
+                const r = w / wn;
+                const mag = 1 / Math.sqrt((1 - r*r)**2 + (2*zeta*r)**2);
+
+                // Add noise
+                const noisyMag = mag * (1 + (Math.random() - 0.5) * noiseLevel);
+
+                fArray.push(f);
+                magArray.push(noisyMag);
+            }
+
+            const trace1 = {
+                x: fArray,
+                y: magArray,
+                mode: 'lines',
+                name: 'Measured FRF',
+                line: { color: '#1890ff', width: 2 }
+            };
+
+            const maxMag = Math.max(...magArray);
+            const halfPowerMag = maxMag / Math.sqrt(2);
+
+            // Find half-power points
+            let f1 = trueFreq, f2 = trueFreq;
+            for (let i = 0; i < magArray.length; i++) {
+                if (fArray[i] < trueFreq && Math.abs(magArray[i] - halfPowerMag) < 0.1 * halfPowerMag) {
+                    f1 = fArray[i];
+                }
+                if (fArray[i] > trueFreq && Math.abs(magArray[i] - halfPowerMag) < 0.1 * halfPowerMag) {
+                    f2 = fArray[i];
+                    break;
+                }
+            }
+
+            const trace2 = {
+                x: [trueFreq],
+                y: [maxMag],
+                mode: 'markers',
+                name: 'Peak',
+                marker: { size: 12, color: 'red' }
+            };
+
+            const trace3 = {
+                x: [f1, f2],
+                y: [halfPowerMag, halfPowerMag],
+                mode: 'markers',
+                name: 'Half-Power',
+                marker: { size: 10, color: 'green' }
+            };
+
+            const layout = {
+                title: `Parameter Extraction: ${method}`,
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: 'Magnitude', type: 'log' }
+            };
+
+            Plotly.newPlot('extraction-plot', [trace1, trace2, trace3], layout, {responsive: true});
+        });
+
+        // Coherence analysis
+        function updateCoherence() {
+            const snr_dB = parseFloat(document.getElementById('snr').value);
+            const numAvg = parseFloat(document.getElementById('num-averages').value);
+            const addNonlin = document.getElementById('add-nonlinearity').checked;
+            const addUnmeas = document.getElementById('add-unmeasured').checked;
+            const poorMount = document.getElementById('poor-mounting').checked;
+
+            // Calculate base coherence from SNR
+            const snr_linear = Math.pow(10, snr_dB / 10);
+            let baseCoherence = snr_linear / (snr_linear + 1/numAvg);
+
+            // Degrade for various issues
+            if (addNonlin) baseCoherence *= 0.85;
+            if (addUnmeas) baseCoherence *= 0.80;
+            if (poorMount) baseCoherence *= 0.90;
+
+            const fArray = [];
+            const coherenceArray = [];
+            const frfArray = [];
+
+            // Generate test FRF and coherence
+            for (let f = 5; f <= 100; f += 0.5) {
+                const w = 2 * Math.PI * f;
+                const wn = 2 * Math.PI * 30;
+                const zeta = 0.02;
+                const r = w / wn;
+
+                const frf_mag = 1 / Math.sqrt((1 - r*r)**2 + (2*zeta*r)**2);
+
+                // Coherence decreases near resonance if nonlinearity present
+                let coherence = baseCoherence;
+                if (addNonlin && Math.abs(f - 30) < 5) {
+                    coherence *= 0.7;
+                }
+
+                // Add some random variation
+                coherence *= (0.95 + Math.random() * 0.1);
+                coherence = Math.min(Math.max(coherence, 0), 1);
+
+                fArray.push(f);
+                coherenceArray.push(coherence);
+                frfArray.push(frf_mag);
+            }
+
+            const avgCoherence = coherenceArray.reduce((a, b) => a + b) / coherenceArray.length;
+            const minCoherence = Math.min(...coherenceArray);
+
+            document.getElementById('avg-coherence').textContent = avgCoherence.toFixed(3);
+            document.getElementById('min-coherence').textContent = minCoherence.toFixed(3);
+
+            let quality = 'Excellent';
+            if (avgCoherence < 0.95) quality = 'Good';
+            if (avgCoherence < 0.90) quality = 'Fair';
+            if (avgCoherence < 0.80) quality = 'Poor';
+
+            document.getElementById('quality-assessment').textContent = quality;
+
+            // Plot FRF
+            const trace1 = {
+                x: fArray,
+                y: frfArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 2 }
+            };
+
+            const layout1 = {
+                title: 'Measured FRF',
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: 'Magnitude', type: 'log' }
+            };
+
+            Plotly.newPlot('coherence-frf-plot', [trace1], layout1, {responsive: true});
+
+            // Plot coherence
+            const trace2 = {
+                x: fArray,
+                y: coherenceArray,
+                mode: 'lines',
+                line: { color: 'green', width: 2 },
+                fill: 'tozeroy'
+            };
+
+            const layout2 = {
+                title: 'Coherence Function',
+                xaxis: { title: 'Frequency (Hz)' },
+                yaxis: { title: 'Coherence γ²', range: [0, 1.05] }
+            };
+
+            Plotly.newPlot('coherence-plot', [trace2], layout2, {responsive: true});
+        }
+
+        // Update all simulations
+        function updateSimulations() {
+            calculateSDOF_FRF();
+            calculateMDOF_FRF();
+            updateCoherence();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            updateSimulations();
+
+            // Add listeners for checkboxes
+            document.getElementById('add-nonlinearity').addEventListener('change', updateCoherence);
+            document.getElementById('add-unmeasured').addEventListener('change', updateCoherence);
+            document.getElementById('poor-mounting').addEventListener('change', updateCoherence);
+
+            // FRF type selector
+            document.getElementById('frf-type').addEventListener('change', updateSimulations);
+        });
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'c',
+                q3: 'b',
+                q4: 'c',
+                q5: 'b'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

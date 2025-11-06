@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Composite Materials Mechanics - Interactive Lecture</title>
+
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+
+    <!-- Plotly library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Common styles -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .info-box {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .info-box-golden {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box-golden h4 {
+            color: #b38600;
+        }
+
+        .info-box-blue {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        .plot-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            overflow: visible;
+            margin: 10px 0;
+        }
+
+        .simulation-display {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            .plot-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Composite Materials Mechanics</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2 id="intro">Introduction to Composite Materials</h2>
+        <p>Composite materials are engineered materials made from two or more constituent materials with significantly different physical or chemical properties. When combined, they produce a material with characteristics different from the individual components, offering superior mechanical properties, reduced weight, and enhanced performance.</p>
+
+        <div class="key-point">
+            <p><strong>Key characteristics of composite materials:</strong></p>
+            <ul>
+                <li><strong>Reinforcement:</strong> Provides strength and stiffness (fibres, particles, whiskers)</li>
+                <li><strong>Matrix:</strong> Holds reinforcement in place and transfers loads (polymer, metal, ceramic)</li>
+                <li><strong>Anisotropy:</strong> Properties vary with direction</li>
+                <li><strong>Tailorability:</strong> Properties can be designed for specific applications</li>
+            </ul>
+        </div>
+
+        <h3>Types of Composite Materials</h3>
+        <ul>
+            <li><strong>Fibre-Reinforced Composites:</strong> Continuous or discontinuous fibres (carbon, glass, aramid) in a matrix</li>
+            <li><strong>Particulate Composites:</strong> Particles dispersed in a matrix (concrete, metal matrix composites)</li>
+            <li><strong>Laminar Composites:</strong> Layers of different materials bonded together (plywood, laminates)</li>
+        </ul>
+
+        <p>This interactive module explores the mechanics of fibre-reinforced composites, focusing on micromechanics, macromechanics, and laminate theory.</p>
+    </div>
+
+    <div class="content-section">
+        <h2 id="micromechanics">Micromechanics: Rule of Mixtures</h2>
+
+        <h3>Predicting Lamina Properties</h3>
+        <p>Micromechanics deals with predicting the effective properties of a composite lamina from the properties and volume fractions of its constituents. The Rule of Mixtures provides simple yet effective estimates.</p>
+
+        <div class="equation-box">
+            <p><strong>Volume Fractions:</strong></p>
+            <p>\[V_f + V_m = 1\]</p>
+            <p>Where \(V_f\) is the fibre volume fraction and \(V_m\) is the matrix volume fraction.</p>
+
+            <p><strong>Longitudinal Modulus (Parallel to fibres):</strong></p>
+            <p>\[E_1 = E_f V_f + E_m V_m\]</p>
+
+            <p><strong>Transverse Modulus (Perpendicular to fibres, Halpin-Tsai):</strong></p>
+            <p>\[E_2 = E_m \frac{1 + \xi \eta V_f}{1 - \eta V_f}\]</p>
+            <p>\[\eta = \frac{E_f/E_m - 1}{E_f/E_m + \xi}, \quad \xi \approx 2\]</p>
+
+            <p><strong>Major Poisson's Ratio:</strong></p>
+            <p>\[\nu_{12} = \nu_f V_f + \nu_m V_m\]</p>
+
+            <p><strong>In-plane Shear Modulus:</strong></p>
+            <p>\[G_{12} = G_m \frac{1 + \xi \eta V_f}{1 - \eta V_f}, \quad \eta = \frac{G_f/G_m - 1}{G_f/G_m + \xi}\]</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Constituent Properties</h3>
+
+                <div class="info-box info-box-blue">
+                    <h4>Fibre Properties</h4>
+                    <div class="slider-container">
+                        <label for="fiber-modulus">Fibre Modulus \(E_f\) (GPa):</label>
+                        <input type="range" id="fiber-modulus" min="50" max="400" value="230" step="10">
+                        <span id="fiber-modulus-value" class="slider-value">230</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="fiber-poisson">Fibre Poisson's Ratio \(\nu_f\):</label>
+                        <input type="range" id="fiber-poisson" min="0.15" max="0.35" value="0.20" step="0.01">
+                        <span id="fiber-poisson-value" class="slider-value">0.20</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Matrix Properties</h4>
+                    <div class="slider-container">
+                        <label for="matrix-modulus">Matrix Modulus \(E_m\) (GPa):</label>
+                        <input type="range" id="matrix-modulus" min="1" max="10" value="3.5" step="0.5">
+                        <span id="matrix-modulus-value" class="slider-value">3.5</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="matrix-poisson">Matrix Poisson's Ratio \(\nu_m\):</label>
+                        <input type="range" id="matrix-poisson" min="0.25" max="0.45" value="0.35" step="0.01">
+                        <span id="matrix-poisson-value" class="slider-value">0.35</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="fiber-volume">Fibre Volume Fraction \(V_f\):</label>
+                    <input type="range" id="fiber-volume" min="0.1" max="0.8" value="0.6" step="0.05">
+                    <span id="fiber-volume-value" class="slider-value">0.60</span>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <h4>Material Presets:</h4>
+                    <select id="material-preset" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="">-- Custom --</option>
+                        <option value="carbon-epoxy">Carbon/Epoxy (AS4/3501-6)</option>
+                        <option value="glass-epoxy">E-Glass/Epoxy</option>
+                        <option value="aramid-epoxy">Aramid/Epoxy (Kevlar 49)</option>
+                        <option value="boron-epoxy">Boron/Epoxy</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Effective Lamina Properties</h3>
+                <div id="rom-results" class="info-box info-box-blue">
+                    <h4>Calculated Properties:</h4>
+                    <p><strong>Longitudinal Modulus:</strong> \(E_1 = \) <span id="e1-result">139.4</span> GPa</p>
+                    <p><strong>Transverse Modulus:</strong> \(E_2 = \) <span id="e2-result">10.2</span> GPa</p>
+                    <p><strong>Major Poisson's Ratio:</strong> \(\nu_{12} = \) <span id="nu12-result">0.26</span></p>
+                    <p><strong>In-plane Shear Modulus:</strong> \(G_{12} = \) <span id="g12-result">5.5</span> GPa</p>
+                </div>
+                <div id="rom-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="macromechanics">Macromechanics: Stress-Strain Relations</h2>
+
+        <h3>Lamina Constitutive Relations</h3>
+        <p>A lamina is a single layer of composite material with fibres oriented in one direction. The stress-strain relationship depends on the coordinate system used.</p>
+
+        <div class="equation-box">
+            <p><strong>Principal Material Axes (1-2 system):</strong></p>
+            <p>\[\begin{Bmatrix} \sigma_1 \\ \sigma_2 \\ \tau_{12} \end{Bmatrix} = \begin{bmatrix} Q_{11} & Q_{12} & 0 \\ Q_{12} & Q_{22} & 0 \\ 0 & 0 & Q_{66} \end{bmatrix} \begin{Bmatrix} \varepsilon_1 \\ \varepsilon_2 \\ \gamma_{12} \end{Bmatrix}\]</p>
+
+            <p>Where the reduced stiffness matrix components are:</p>
+            <p>\[Q_{11} = \frac{E_1}{1-\nu_{12}\nu_{21}}, \quad Q_{22} = \frac{E_2}{1-\nu_{12}\nu_{21}}\]</p>
+            <p>\[Q_{12} = \frac{\nu_{12}E_2}{1-\nu_{12}\nu_{21}}, \quad Q_{66} = G_{12}\]</p>
+
+            <p><strong>Off-Axis Loading (x-y system rotated by angle \(\theta\)):</strong></p>
+            <p>\[\begin{Bmatrix} \sigma_x \\ \sigma_y \\ \tau_{xy} \end{Bmatrix} = [\bar{Q}(\theta)] \begin{Bmatrix} \varepsilon_x \\ \varepsilon_y \\ \gamma_{xy} \end{Bmatrix}\]</p>
+
+            <p>Where \([\bar{Q}] = [T]^{-1}[Q][T]^{-T}\) with transformation matrix involving \(\cos\theta\) and \(\sin\theta\).</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Loading Conditions</h3>
+
+                <div class="slider-container">
+                    <label for="fiber-angle">Fibre Orientation \(\theta\) (degrees):</label>
+                    <input type="range" id="fiber-angle" min="0" max="90" value="0" step="5">
+                    <span id="fiber-angle-value" class="slider-value">0</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="applied-stress">Applied Stress \(\sigma_x\) (MPa):</label>
+                    <input type="range" id="applied-stress" min="10" max="500" value="100" step="10">
+                    <span id="applied-stress-value" class="slider-value">100</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Lamina Properties Used:</h4>
+                    <p>\(E_1 = 140\) GPa, \(E_2 = 10\) GPa</p>
+                    <p>\(G_{12} = 5.5\) GPa, \(\nu_{12} = 0.26\)</p>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Off-Axis Response</h3>
+                <div id="offaxis-viz" style="width: 100%; height: 300px;"></div>
+                <div id="offaxis-results" class="info-box info-box-blue">
+                    <h4>Stress and Strain in Material Axes:</h4>
+                    <p><strong>Longitudinal Stress:</strong> \(\sigma_1 = \) <span id="sigma1-result">100.0</span> MPa</p>
+                    <p><strong>Transverse Stress:</strong> \(\sigma_2 = \) <span id="sigma2-result">0.0</span> MPa</p>
+                    <p><strong>Shear Stress:</strong> \(\tau_{12} = \) <span id="tau12-result">0.0</span> MPa</p>
+                    <p><strong>Longitudinal Strain:</strong> \(\varepsilon_1 = \) <span id="epsilon1-result">714.3</span> με</p>
+                    <p><strong>Transverse Strain:</strong> \(\varepsilon_2 = \) <span id="epsilon2-result">-185.7</span> με</p>
+                </div>
+                <div id="angle-stiffness-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="laminate">Classical Laminate Theory</h2>
+
+        <h3>Multi-Layer Laminates</h3>
+        <p>Real composite structures consist of multiple laminae stacked at different orientations. Classical Laminate Theory (CLT) provides a framework for analyzing these multi-layered structures.</p>
+
+        <div class="equation-box">
+            <p><strong>Force and Moment Resultants:</strong></p>
+            <p>\[\begin{Bmatrix} N_x \\ N_y \\ N_{xy} \end{Bmatrix} = [A] \begin{Bmatrix} \varepsilon_x^0 \\ \varepsilon_y^0 \\ \gamma_{xy}^0 \end{Bmatrix} + [B] \begin{Bmatrix} \kappa_x \\ \kappa_y \\ \kappa_{xy} \end{Bmatrix}\]</p>
+
+            <p>\[\begin{Bmatrix} M_x \\ M_y \\ M_{xy} \end{Bmatrix} = [B] \begin{Bmatrix} \varepsilon_x^0 \\ \varepsilon_y^0 \\ \gamma_{xy}^0 \end{Bmatrix} + [D] \begin{Bmatrix} \kappa_x \\ \kappa_y \\ \kappa_{xy} \end{Bmatrix}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\([A]\) = Extensional stiffness matrix</li>
+                <li>\([B]\) = Bending-extension coupling matrix (zero for symmetric laminates)</li>
+                <li>\([D]\) = Bending stiffness matrix</li>
+            </ul>
+
+            <p><strong>Stiffness Matrices:</strong></p>
+            <p>\[A_{ij} = \sum_{k=1}^{N} (\bar{Q}_{ij})_k (z_k - z_{k-1})\]</p>
+            <p>\[B_{ij} = \frac{1}{2}\sum_{k=1}^{N} (\bar{Q}_{ij})_k (z_k^2 - z_{k-1}^2)\]</p>
+            <p>\[D_{ij} = \frac{1}{3}\sum_{k=1}^{N} (\bar{Q}_{ij})_k (z_k^3 - z_{k-1}^3)\]</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Laminate Configuration</h3>
+
+                <div class="info-box info-box-blue">
+                    <h4>Layup Specification:</h4>
+                    <p>Enter layup angles separated by slashes (e.g., 0/45/-45/90)</p>
+                    <input type="text" id="layup-input" value="0/45/-45/90/90/-45/45/0"
+                           style="width: 100%; padding: 8px; margin: 10px 0; border-radius: 5px; border: 2px solid var(--primary-color);">
+                    <button id="update-layup" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; cursor: pointer;">
+                        Update Laminate
+                    </button>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <h4>Common Layup Presets:</h4>
+                    <select id="layup-preset" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="">-- Select Preset --</option>
+                        <option value="0/90">Cross-ply [0/90]s</option>
+                        <option value="0/45/-45/90">Quasi-isotropic [0/±45/90]s</option>
+                        <option value="45/-45">Angle-ply [±45]s</option>
+                        <option value="0/0/0/0">Unidirectional [0]8</option>
+                        <option value="30/-30/30/-30">Angle-ply [±30]2s</option>
+                    </select>
+                </div>
+
+                <div class="slider-container">
+                    <label for="ply-thickness">Ply Thickness (mm):</label>
+                    <input type="range" id="ply-thickness" min="0.125" max="0.5" value="0.125" step="0.025">
+                    <span id="ply-thickness-value" class="slider-value">0.125</span>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Laminate Stacking Sequence</h3>
+                <div id="laminate-viz" style="width: 100%; height: 350px;"></div>
+                <div id="laminate-results" class="info-box info-box-golden">
+                    <h4>Laminate Properties:</h4>
+                    <p><strong>Total Thickness:</strong> <span id="total-thickness">1.00</span> mm</p>
+                    <p><strong>Number of Plies:</strong> <span id="num-plies">8</span></p>
+                    <p><strong>Symmetric:</strong> <span id="is-symmetric">Yes</span></p>
+                    <p><strong>Balanced:</strong> <span id="is-balanced">Yes</span></p>
+                    <p><strong>A11 (Extensional Stiffness):</strong> <span id="a11-value">0</span> MN/m</p>
+                    <p><strong>D11 (Bending Stiffness):</strong> <span id="d11-value">0</span> Nm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="failure">Failure Criteria for Composites</h2>
+
+        <h3>Predicting Composite Failure</h3>
+        <p>Unlike isotropic materials, composites exhibit complex failure modes. Several failure criteria have been developed to predict the onset of failure.</p>
+
+        <div class="equation-box">
+            <p><strong>Maximum Stress Criterion:</strong></p>
+            <p>Failure occurs when any stress component exceeds its allowable value:</p>
+            <p>\[\sigma_1 < X_T, \quad \sigma_1 > -X_C, \quad \sigma_2 < Y_T, \quad \sigma_2 > -Y_C, \quad |\tau_{12}| < S\]</p>
+
+            <p><strong>Tsai-Hill Criterion:</strong></p>
+            <p>\[\left(\frac{\sigma_1}{X}\right)^2 - \frac{\sigma_1\sigma_2}{X^2} + \left(\frac{\sigma_2}{Y}\right)^2 + \left(\frac{\tau_{12}}{S}\right)^2 = 1\]</p>
+
+            <p><strong>Tsai-Wu Criterion:</strong></p>
+            <p>\[F_1\sigma_1 + F_2\sigma_2 + F_{11}\sigma_1^2 + F_{22}\sigma_2^2 + F_{66}\tau_{12}^2 + 2F_{12}\sigma_1\sigma_2 = 1\]</p>
+
+            <p>Where \(X_T, X_C\) are longitudinal tensile/compressive strengths, \(Y_T, Y_C\) are transverse strengths, and \(S\) is shear strength.</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Strength Properties</h3>
+
+                <div class="info-box info-box-blue" style="font-size: 0.9em;">
+                    <h4>Material Strengths (MPa):</h4>
+                    <div class="slider-container">
+                        <label for="xt-strength">Longitudinal Tensile \(X_T\):</label>
+                        <input type="range" id="xt-strength" min="500" max="3000" value="1500" step="100">
+                        <span id="xt-strength-value" class="slider-value">1500</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="xc-strength">Longitudinal Compressive \(X_C\):</label>
+                        <input type="range" id="xc-strength" min="500" max="2000" value="1200" step="100">
+                        <span id="xc-strength-value" class="slider-value">1200</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="yt-strength">Transverse Tensile \(Y_T\):</label>
+                        <input type="range" id="yt-strength" min="20" max="150" value="50" step="10">
+                        <span id="yt-strength-value" class="slider-value">50</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="yc-strength">Transverse Compressive \(Y_C\):</label>
+                        <input type="range" id="yc-strength" min="100" max="300" value="200" step="10">
+                        <span id="yc-strength-value" class="slider-value">200</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="s-strength">Shear Strength \(S\):</label>
+                        <input type="range" id="s-strength" min="30" max="150" value="70" step="10">
+                        <span id="s-strength-value" class="slider-value">70</span>
+                    </div>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Applied Stress State:</h4>
+                    <div class="slider-container">
+                        <label for="test-sigma1">Test \(\sigma_1\) (MPa):</label>
+                        <input type="range" id="test-sigma1" min="-500" max="1000" value="300" step="25">
+                        <span id="test-sigma1-value" class="slider-value">300</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="test-sigma2">Test \(\sigma_2\) (MPa):</label>
+                        <input type="range" id="test-sigma2" min="-200" max="100" value="20" step="10">
+                        <span id="test-sigma2-value" class="slider-value">20</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Failure Envelope</h3>
+                <div id="failure-plot" class="plot-container"></div>
+                <div id="failure-results" class="info-box info-box-blue">
+                    <h4>Failure Assessment:</h4>
+                    <p><strong>Tsai-Hill Index:</strong> <span id="tsai-hill-index">0.0</span> (<span id="tsai-hill-status">Safe</span>)</p>
+                    <p><strong>Safety Factor:</strong> <span id="safety-factor">0.0</span></p>
+                    <p style="font-size: 0.85em; margin-top: 10px;">Note: Failure Index &lt; 1 indicates safe operation. Safety Factor = 1/√(Failure Index)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Composite materials are extensively used across engineering disciplines for their exceptional strength-to-weight ratio and design flexibility:</p>
+        <ul>
+            <li><strong>Aerospace:</strong> Aircraft fuselages, wings, tail sections, and interior components use carbon fibre composites to reduce weight while maintaining structural integrity. Modern commercial aircraft like the Boeing 787 contain over 50% composite materials by weight.</li>
+            <li><strong>Automotive:</strong> High-performance vehicles employ composite body panels, chassis components, and drive shafts to improve fuel efficiency and performance. Formula 1 cars extensively use carbon fibre monocoques for safety and weight reduction.</li>
+            <li><strong>Marine:</strong> Boat hulls, masts, and propellers benefit from composites' corrosion resistance and high strength. Large wind turbine blades (up to 100m length) are manufactured from glass/carbon fibre composites.</li>
+            <li><strong>Civil Infrastructure:</strong> Bridge decks, seismic retrofitting wraps, and prestressed concrete tendons utilize composite reinforcement for durability and corrosion resistance in harsh environments.</li>
+            <li><strong>Sports Equipment:</strong> Tennis rackets, golf clubs, bicycle frames, and fishing rods leverage composites' tailorable stiffness and damping characteristics for enhanced performance.</li>
+            <li><strong>Pressure Vessels:</strong> Composite overwrapped pressure vessels (COPVs) for hydrogen storage, aerospace applications, and CNG tanks offer superior pressure containment at reduced weight.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Longitudinal Modulus</td>
+                    <td>\(E_1 = E_f V_f + E_m V_m\)</td>
+                    <td>Rule of mixtures for parallel loading</td>
+                </tr>
+                <tr>
+                    <td>Transverse Modulus</td>
+                    <td>\(E_2 = E_m \frac{1 + \xi \eta V_f}{1 - \eta V_f}\)</td>
+                    <td>Halpin-Tsai equation</td>
+                </tr>
+                <tr>
+                    <td>Reduced Stiffness</td>
+                    <td>\(Q_{11} = \frac{E_1}{1-\nu_{12}\nu_{21}}\)</td>
+                    <td>Lamina stiffness in material axes</td>
+                </tr>
+                <tr>
+                    <td>Extensional Stiffness</td>
+                    <td>\(A_{ij} = \sum_{k=1}^{N} (\bar{Q}_{ij})_k (z_k - z_{k-1})\)</td>
+                    <td>Laminate in-plane stiffness</td>
+                </tr>
+                <tr>
+                    <td>Tsai-Hill Criterion</td>
+                    <td>\(\left(\frac{\sigma_1}{X}\right)^2 - \frac{\sigma_1\sigma_2}{X^2} + \left(\frac{\sigma_2}{Y}\right)^2 + \left(\frac{\tau_{12}}{S}\right)^2 = 1\)</td>
+                    <td>Interactive failure criterion</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="problems">Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Rule of Mixtures Calculation</h3>
+            <p>A carbon/epoxy composite has a fibre volume fraction of 0.65. The carbon fibres have \(E_f = 230\) GPa and the epoxy matrix has \(E_m = 3.5\) GPa. Calculate the longitudinal modulus \(E_1\) of the lamina.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using the Rule of Mixtures for longitudinal modulus:</p>
+                <p>\(E_1 = E_f V_f + E_m V_m\)</p>
+                <p>where \(V_m = 1 - V_f = 1 - 0.65 = 0.35\)</p>
+                <p>\(E_1 = (230)(0.65) + (3.5)(0.35)\)</p>
+                <p>\(E_1 = 149.5 + 1.225 = 150.725\) GPa</p>
+                <p><strong>Answer: \(E_1 \approx 150.7\) GPa</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Off-Axis Stress Transformation</h3>
+            <p>A unidirectional lamina with fibres at 30° to the loading axis experiences an applied stress of \(\sigma_x = 200\) MPa. Calculate the stress components in the material coordinate system (\(\sigma_1, \sigma_2, \tau_{12}\)).</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using the stress transformation equations with \(\theta = 30°\):</p>
+                <p>\(\sigma_1 = \sigma_x \cos^2\theta = 200 \times \cos^2(30°) = 200 \times 0.75 = 150\) MPa</p>
+                <p>\(\sigma_2 = \sigma_x \sin^2\theta = 200 \times \sin^2(30°) = 200 \times 0.25 = 50\) MPa</p>
+                <p>\(\tau_{12} = -\sigma_x \sin\theta\cos\theta = -200 \times \sin(30°)\cos(30°) = -200 \times 0.433 = -86.6\) MPa</p>
+                <p><strong>Answer: \(\sigma_1 = 150\) MPa, \(\sigma_2 = 50\) MPa, \(\tau_{12} = -86.6\) MPa</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Tsai-Hill Failure Criterion</h3>
+            <p>A lamina with strengths \(X_T = 1500\) MPa, \(Y_T = 50\) MPa, and \(S = 70\) MPa experiences stresses \(\sigma_1 = 800\) MPa, \(\sigma_2 = 30\) MPa, and \(\tau_{12} = 40\) MPa. Determine if failure occurs using the Tsai-Hill criterion.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Tsai-Hill criterion: \(\left(\frac{\sigma_1}{X}\right)^2 - \frac{\sigma_1\sigma_2}{X^2} + \left(\frac{\sigma_2}{Y}\right)^2 + \left(\frac{\tau_{12}}{S}\right)^2 \leq 1\)</p>
+                <p>Substituting values:</p>
+                <p>\(\left(\frac{800}{1500}\right)^2 - \frac{(800)(30)}{1500^2} + \left(\frac{30}{50}\right)^2 + \left(\frac{40}{70}\right)^2\)</p>
+                <p>\(= (0.533)^2 - 0.0107 + (0.6)^2 + (0.571)^2\)</p>
+                <p>\(= 0.284 - 0.011 + 0.360 + 0.326 = 0.959\)</p>
+                <p>Since \(0.959 < 1\), the lamina is safe with a safety factor of \(1/\sqrt{0.959} = 1.021\)</p>
+                <p><strong>Answer: No failure, SF = 1.02</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary function of the matrix in a fibre-reinforced composite?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Provide all the strength</label>
+                    <label><input type="radio" name="q1" value="b"> b) Hold fibres in place and transfer loads between fibres</label>
+                    <label><input type="radio" name="q1" value="c"> c) Reduce the weight only</label>
+                    <label><input type="radio" name="q1" value="d"> d) Increase cost</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: Which property is highest in the fibre direction?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Transverse modulus \(E_2\)</label>
+                    <label><input type="radio" name="q2" value="b"> b) Longitudinal modulus \(E_1\)</label>
+                    <label><input type="radio" name="q2" value="c"> c) Both are equal</label>
+                    <label><input type="radio" name="q2" value="d"> d) Shear modulus \(G_{12}\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: In Classical Laminate Theory, what does the [B] matrix represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Extensional stiffness</label>
+                    <label><input type="radio" name="q3" value="b"> b) Bending stiffness</label>
+                    <label><input type="radio" name="q3" value="c"> c) Bending-extension coupling</label>
+                    <label><input type="radio" name="q3" value="d"> d) Shear stiffness</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: For a symmetric laminate, the [B] matrix is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Maximum</label>
+                    <label><input type="radio" name="q4" value="b"> b) Zero</label>
+                    <label><input type="radio" name="q4" value="c"> c) Equal to [A]</label>
+                    <label><input type="radio" name="q4" value="d"> d) Negative</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The Tsai-Hill failure criterion predicts failure when the failure index is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Less than 0.5</label>
+                    <label><input type="radio" name="q5" value="b"> b) Equal to or greater than 1.0</label>
+                    <label><input type="radio" name="q5" value="c"> c) Negative</label>
+                    <label><input type="radio" name="q5" value="d"> d) Between 0 and 0.5</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Composite materials simulation code
+
+        // Material presets database
+        const materialPresets = {
+            'carbon-epoxy': { Ef: 230, vf_fiber: 0.20, Em: 3.5, vm_matrix: 0.35, Vf: 0.60 },
+            'glass-epoxy': { Ef: 70, vf_fiber: 0.22, Em: 3.5, vm_matrix: 0.35, Vf: 0.55 },
+            'aramid-epoxy': { Ef: 125, vf_fiber: 0.35, Em: 3.5, vm_matrix: 0.35, Vf: 0.60 },
+            'boron-epoxy': { Ef: 400, vf_fiber: 0.20, Em: 3.5, vm_matrix: 0.35, Vf: 0.50 }
+        };
+
+        // Initialize sliders
+        function initializeSliders() {
+            const sliders = [
+                'fiber-modulus', 'fiber-poisson', 'matrix-modulus', 'matrix-poisson', 'fiber-volume',
+                'fiber-angle', 'applied-stress', 'ply-thickness',
+                'xt-strength', 'xc-strength', 'yt-strength', 'yc-strength', 's-strength',
+                'test-sigma1', 'test-sigma2'
+            ];
+
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    const valueSpan = document.getElementById(id + '-value');
+                    slider.addEventListener('input', function() {
+                        valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                        updateSimulations();
+                    });
+                }
+            });
+        }
+
+        // Material preset selector
+        document.getElementById('material-preset').addEventListener('change', function() {
+            const preset = materialPresets[this.value];
+            if (preset) {
+                document.getElementById('fiber-modulus').value = preset.Ef;
+                document.getElementById('fiber-modulus-value').textContent = preset.Ef;
+                document.getElementById('fiber-poisson').value = preset.vf_fiber;
+                document.getElementById('fiber-poisson-value').textContent = preset.vf_fiber.toFixed(2);
+                document.getElementById('matrix-modulus').value = preset.Em;
+                document.getElementById('matrix-modulus-value').textContent = preset.Em;
+                document.getElementById('matrix-poisson').value = preset.vm_matrix;
+                document.getElementById('matrix-poisson-value').textContent = preset.vm_matrix.toFixed(2);
+                document.getElementById('fiber-volume').value = preset.Vf;
+                document.getElementById('fiber-volume-value').textContent = preset.Vf.toFixed(2);
+                updateSimulations();
+            }
+        });
+
+        // Rule of Mixtures calculations
+        function calculateROM() {
+            const Ef = parseFloat(document.getElementById('fiber-modulus').value);
+            const vf = parseFloat(document.getElementById('fiber-poisson').value);
+            const Em = parseFloat(document.getElementById('matrix-modulus').value);
+            const vm = parseFloat(document.getElementById('matrix-poisson').value);
+            const Vf = parseFloat(document.getElementById('fiber-volume').value);
+            const Vm = 1 - Vf;
+
+            // Longitudinal modulus (Rule of Mixtures)
+            const E1 = Ef * Vf + Em * Vm;
+
+            // Shear moduli
+            const Gf = Ef / (2 * (1 + vf));
+            const Gm = Em / (2 * (1 + vm));
+
+            // Transverse modulus (Halpin-Tsai)
+            const xi = 2;
+            const eta_E = (Ef/Em - 1) / (Ef/Em + xi);
+            const E2 = Em * (1 + xi * eta_E * Vf) / (1 - eta_E * Vf);
+
+            // Poisson's ratio
+            const nu12 = vf * Vf + vm * Vm;
+
+            // Shear modulus (Halpin-Tsai)
+            const eta_G = (Gf/Gm - 1) / (Gf/Gm + xi);
+            const G12 = Gm * (1 + xi * eta_G * Vf) / (1 - eta_G * Vf);
+
+            // Update display
+            document.getElementById('e1-result').textContent = E1.toFixed(1);
+            document.getElementById('e2-result').textContent = E2.toFixed(1);
+            document.getElementById('nu12-result').textContent = nu12.toFixed(3);
+            document.getElementById('g12-result').textContent = G12.toFixed(1);
+
+            // Plot properties vs fiber volume fraction
+            const VfArray = [];
+            const E1Array = [];
+            const E2Array = [];
+
+            for (let v = 0.1; v <= 0.8; v += 0.02) {
+                VfArray.push(v);
+                E1Array.push(Ef * v + Em * (1 - v));
+                const eta_temp = (Ef/Em - 1) / (Ef/Em + xi);
+                E2Array.push(Em * (1 + xi * eta_temp * v) / (1 - eta_temp * v));
+            }
+
+            const trace1 = {
+                x: VfArray,
+                y: E1Array,
+                mode: 'lines',
+                name: 'E₁ (Longitudinal)',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const trace2 = {
+                x: VfArray,
+                y: E2Array,
+                mode: 'lines',
+                name: 'E₂ (Transverse)',
+                line: { color: '#ff4500', width: 3 }
+            };
+
+            const trace3 = {
+                x: [Vf],
+                y: [E1],
+                mode: 'markers',
+                name: 'Current E₁',
+                marker: { size: 12, color: '#1890ff', symbol: 'circle' },
+                showlegend: false
+            };
+
+            const trace4 = {
+                x: [Vf],
+                y: [E2],
+                mode: 'markers',
+                name: 'Current E₂',
+                marker: { size: 12, color: '#ff4500', symbol: 'circle' },
+                showlegend: false
+            };
+
+            const layout = {
+                title: 'Effective Moduli vs. Fiber Volume Fraction',
+                xaxis: { title: 'Fiber Volume Fraction V<sub>f</sub>' },
+                yaxis: { title: 'Modulus (GPa)' },
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('rom-plot', [trace1, trace2, trace3, trace4], layout, {responsive: true});
+
+            return { E1, E2, nu12, G12 };
+        }
+
+        // Off-axis response calculations
+        function calculateOffAxis() {
+            const props = calculateROM();
+            const E1 = props.E1 * 1000; // Convert to MPa
+            const E2 = props.E2 * 1000;
+            const nu12 = props.nu12;
+            const G12 = props.G12 * 1000;
+
+            const theta = parseFloat(document.getElementById('fiber-angle').value) * Math.PI / 180;
+            const sigmaX = parseFloat(document.getElementById('applied-stress').value);
+
+            const c = Math.cos(theta);
+            const s = Math.sin(theta);
+
+            // Transform stress from global to material axes
+            const sigma1 = sigmaX * c * c;
+            const sigma2 = sigmaX * s * s;
+            const tau12 = -sigmaX * s * c;
+
+            // Calculate strains
+            const nu21 = nu12 * E2 / E1;
+            const epsilon1 = (sigma1 - nu12 * sigma2) / E1;
+            const epsilon2 = (sigma2 - nu21 * sigma1) / E2;
+
+            // Update display
+            document.getElementById('sigma1-result').textContent = sigma1.toFixed(1);
+            document.getElementById('sigma2-result').textContent = sigma2.toFixed(1);
+            document.getElementById('tau12-result').textContent = tau12.toFixed(1);
+            document.getElementById('epsilon1-result').textContent = (epsilon1 * 1e6).toFixed(1);
+            document.getElementById('epsilon2-result').textContent = (epsilon2 * 1e6).toFixed(1);
+
+            // Plot effective stiffness vs angle
+            const angles = [];
+            const ExArray = [];
+
+            for (let ang = 0; ang <= 90; ang += 2) {
+                const rad = ang * Math.PI / 180;
+                const c2 = Math.cos(rad);
+                const s2 = Math.sin(rad);
+                const c4 = c2 * c2 * c2 * c2;
+                const s4 = s2 * s2 * s2 * s2;
+
+                // Transformed compliance
+                const S11 = 1 / E1;
+                const S22 = 1 / E2;
+                const S12 = -nu12 / E1;
+                const S66 = 1 / G12;
+
+                const S11_bar = c4 * S11 + s4 * S22 + (2 * S12 + S66) * c2 * c2 * s2 * s2;
+                const Ex = 1 / S11_bar;
+
+                angles.push(ang);
+                ExArray.push(Ex / 1000); // Convert to GPa
+            }
+
+            const trace = {
+                x: angles,
+                y: ExArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const marker = {
+                x: [parseFloat(document.getElementById('fiber-angle').value)],
+                y: [ExArray[Math.round(parseFloat(document.getElementById('fiber-angle').value) / 2)]],
+                mode: 'markers',
+                marker: { size: 12, color: 'red', symbol: 'circle' }
+            };
+
+            const layout = {
+                title: 'Effective Modulus vs. Fiber Orientation',
+                xaxis: { title: 'Fiber Angle θ (degrees)' },
+                yaxis: { title: 'Effective Modulus E<sub>x</sub> (GPa)' }
+            };
+
+            Plotly.newPlot('angle-stiffness-plot', [trace, marker], layout, {responsive: true});
+        }
+
+        // Laminate visualization
+        function updateLaminate() {
+            const layupString = document.getElementById('layup-input').value;
+            const angles = layupString.split('/').map(a => parseFloat(a.trim()));
+            const plyThickness = parseFloat(document.getElementById('ply-thickness').value);
+            const totalThickness = angles.length * plyThickness;
+
+            document.getElementById('total-thickness').textContent = totalThickness.toFixed(3);
+            document.getElementById('num-plies').textContent = angles.length;
+
+            // Check symmetry
+            const isSymmetric = angles.every((val, i) => val === angles[angles.length - 1 - i]);
+            document.getElementById('is-symmetric').textContent = isSymmetric ? 'Yes' : 'No';
+
+            // Check balance
+            const angleCount = {};
+            angles.forEach(a => angleCount[a] = (angleCount[a] || 0) + 1);
+            const isBalanced = Object.keys(angleCount).every(angle => {
+                const negAngle = -parseFloat(angle);
+                return angleCount[negAngle] === angleCount[angle] || angle == 0 || angle == 90;
+            });
+            document.getElementById('is-balanced').textContent = isBalanced ? 'Yes' : 'No';
+
+            // Simple A11 and D11 calculation (simplified)
+            const props = calculateROM();
+            const E1 = props.E1 * 1000; // MPa
+            let A11 = 0;
+            let D11 = 0;
+            let z = -totalThickness / 2;
+
+            angles.forEach(angle => {
+                const theta = angle * Math.PI / 180;
+                const c = Math.cos(theta);
+                const Q11_bar = E1 * c * c * c * c; // Simplified
+
+                const z_next = z + plyThickness;
+                A11 += Q11_bar * (z_next - z);
+                D11 += Q11_bar * (z_next * z_next * z_next - z * z * z) / 3;
+                z = z_next;
+            });
+
+            document.getElementById('a11-value').textContent = (A11 / 1000).toFixed(1);
+            document.getElementById('d11-value').textContent = (D11 / 1e6).toFixed(1);
+
+            // Visualize layup
+            visualizeLaminate(angles, plyThickness);
+        }
+
+        function visualizeLaminate(angles, thickness) {
+            const canvas = document.getElementById('laminate-viz');
+            if (!canvas) return;
+
+            // Create simple visualization using Plotly
+            const colors = angles.map(a => {
+                if (a === 0) return 'rgb(0, 100, 255)';
+                if (a === 90 || a === -90) return 'rgb(255, 100, 0)';
+                if (a === 45 || a === -45) return 'rgb(0, 200, 100)';
+                return 'rgb(200, 100, 200)';
+            });
+
+            const trace = {
+                x: angles.map((_, i) => i),
+                y: angles,
+                type: 'bar',
+                marker: { color: colors },
+                text: angles.map(a => a + '°'),
+                textposition: 'auto',
+                hovertemplate: 'Ply %{x}: %{y}°<extra></extra>'
+            };
+
+            const layout = {
+                title: 'Laminate Stacking Sequence',
+                xaxis: { title: 'Ply Number' },
+                yaxis: { title: 'Fiber Angle (degrees)' },
+                showlegend: false
+            };
+
+            Plotly.newPlot('laminate-viz', [trace], layout, {responsive: true});
+        }
+
+        // Layup presets
+        document.getElementById('layup-preset').addEventListener('change', function() {
+            const preset = this.value;
+            if (preset) {
+                const layups = {
+                    '0/90': '0/90/90/0',
+                    '0/45/-45/90': '0/45/-45/90/90/-45/45/0',
+                    '45/-45': '45/-45/-45/45',
+                    '0/0/0/0': '0/0/0/0/0/0/0/0',
+                    '30/-30/30/-30': '30/-30/30/-30/-30/30/-30/30'
+                };
+                document.getElementById('layup-input').value = layups[preset];
+                updateLaminate();
+            }
+        });
+
+        document.getElementById('update-layup').addEventListener('click', updateLaminate);
+
+        // Failure criteria calculations
+        function calculateFailure() {
+            const XT = parseFloat(document.getElementById('xt-strength').value);
+            const XC = parseFloat(document.getElementById('xc-strength').value);
+            const YT = parseFloat(document.getElementById('yt-strength').value);
+            const YC = parseFloat(document.getElementById('yc-strength').value);
+            const S = parseFloat(document.getElementById('s-strength').value);
+
+            const sigma1 = parseFloat(document.getElementById('test-sigma1').value);
+            const sigma2 = parseFloat(document.getElementById('test-sigma2').value);
+
+            // Tsai-Hill criterion
+            const X = sigma1 >= 0 ? XT : XC;
+            const Y = sigma2 >= 0 ? YT : YC;
+            const tau12 = 0; // Simplified for 2D display
+
+            const tsaiHill = Math.pow(sigma1/X, 2) - (sigma1*sigma2)/(X*X) + Math.pow(sigma2/Y, 2) + Math.pow(tau12/S, 2);
+            const safetyFactor = tsaiHill > 0 ? 1/Math.sqrt(tsaiHill) : 999;
+
+            document.getElementById('tsai-hill-index').textContent = tsaiHill.toFixed(3);
+            document.getElementById('tsai-hill-status').textContent = tsaiHill >= 1 ? 'FAILURE' : 'Safe';
+            document.getElementById('safety-factor').textContent = safetyFactor > 10 ? '> 10' : safetyFactor.toFixed(2);
+
+            // Plot failure envelope
+            const sigma1Array = [];
+            const sigma2Pos = [];
+            const sigma2Neg = [];
+
+            for (let s1 = -XC; s1 <= XT; s1 += 10) {
+                sigma1Array.push(s1);
+
+                // Solve for sigma2 from Tsai-Hill = 1
+                // For positive sigma2
+                const A = 1/(YT*YT);
+                const B = -s1/(XT*XT);
+                const C = (s1*s1)/(XT*XT) - 1;
+
+                const disc = B*B - 4*A*C;
+                if (disc >= 0) {
+                    sigma2Pos.push((-B + Math.sqrt(disc))/(2*A));
+                    sigma2Neg.push((-B - Math.sqrt(disc))/(2*A));
+                } else {
+                    sigma2Pos.push(null);
+                    sigma2Neg.push(null);
+                }
+            }
+
+            const trace1 = {
+                x: sigma1Array,
+                y: sigma2Pos,
+                mode: 'lines',
+                name: 'Tsai-Hill Envelope',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const trace2 = {
+                x: sigma1Array,
+                y: sigma2Neg,
+                mode: 'lines',
+                showlegend: false,
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const trace3 = {
+                x: [sigma1],
+                y: [sigma2],
+                mode: 'markers',
+                name: 'Test Point',
+                marker: { size: 15, color: tsaiHill >= 1 ? 'red' : 'green', symbol: 'x' }
+            };
+
+            const layout = {
+                title: 'Tsai-Hill Failure Envelope',
+                xaxis: { title: 'σ₁ (MPa)', zeroline: true },
+                yaxis: { title: 'σ₂ (MPa)', zeroline: true },
+                hovermode: 'closest'
+            };
+
+            Plotly.newPlot('failure-plot', [trace1, trace2, trace3], layout, {responsive: true});
+        }
+
+        // Update all simulations
+        function updateSimulations() {
+            calculateROM();
+            calculateOffAxis();
+            calculateFailure();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            updateSimulations();
+            updateLaminate();
+        });
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'c',
+                q4: 'b',
+                q5: 'b'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

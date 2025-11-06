@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fracture Mechanics - Interactive Lecture</title>
+
+    <!-- p5.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+
+    <!-- Plotly library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Common styles -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .info-box {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .info-box-golden {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        .info-box-golden h4 {
+            color: #b38600;
+        }
+
+        .info-box-blue {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+
+        .plot-container {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            overflow: visible;
+            margin: 10px 0;
+        }
+
+        .simulation-display {
+            width: 100%;
+            max-width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .simulation-container {
+                grid-template-columns: 1fr;
+            }
+            .plot-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Fracture Mechanics</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2 id="intro">Introduction to Fracture Mechanics</h2>
+        <p>Fracture mechanics is the field of study that deals with the behavior of cracked structures. Unlike traditional strength-based design, which assumes material flawlessness, fracture mechanics recognizes that all materials contain defects and provides methods to predict when these defects will cause failure.</p>
+
+        <div class="key-point">
+            <p><strong>Key principles of fracture mechanics:</strong></p>
+            <ul>
+                <li><strong>Defect-tolerant design:</strong> Assumes cracks exist and predicts their behavior</li>
+                <li><strong>Stress concentration:</strong> Cracks amplify local stresses to very high levels</li>
+                <li><strong>Critical conditions:</strong> Failure occurs when stress intensity or energy release rate reaches a critical value</li>
+                <li><strong>Crack growth:</strong> Subcritical cracks can grow under cyclic or sustained loading</li>
+            </ul>
+        </div>
+
+        <h3>Historical Context</h3>
+        <p>The Griffith criterion (1920) established the energy balance approach to fracture. Alan Arnold Griffith showed that crack propagation occurs when the energy released from crack extension exceeds the energy required to create new crack surfaces. This revolutionary concept explained why actual material strengths were much lower than theoretical predictions based on atomic bonding.</p>
+
+        <h3>Fracture Modes</h3>
+        <ul>
+            <li><strong>Mode I (Opening):</strong> Crack surfaces separate perpendicular to the crack plane</li>
+            <li><strong>Mode II (Sliding):</strong> Crack surfaces slide relative to each other in the crack plane</li>
+            <li><strong>Mode III (Tearing):</strong> Crack surfaces move out-of-plane relative to each other</li>
+        </ul>
+
+        <p>This interactive module focuses on Mode I fracture, which is the most common and critical failure mode in engineering structures.</p>
+    </div>
+
+    <div class="content-section">
+        <h2 id="lefm">Linear Elastic Fracture Mechanics (LEFM)</h2>
+
+        <h3>Stress Distribution Near a Crack Tip</h3>
+        <p>The stress field near a crack tip in an elastic material has a characteristic singularity. In polar coordinates centered at the crack tip, the stresses are:</p>
+
+        <div class="equation-box">
+            <p><strong>Mode I Stress Field:</strong></p>
+            <p>\[\sigma_{xx} = \frac{K_I}{\sqrt{2\pi r}}\cos\frac{\theta}{2}\left(1 - \sin\frac{\theta}{2}\sin\frac{3\theta}{2}\right)\]</p>
+            <p>\[\sigma_{yy} = \frac{K_I}{\sqrt{2\pi r}}\cos\frac{\theta}{2}\left(1 + \sin\frac{\theta}{2}\sin\frac{3\theta}{2}\right)\]</p>
+            <p>\[\tau_{xy} = \frac{K_I}{\sqrt{2\pi r}}\cos\frac{\theta}{2}\sin\frac{\theta}{2}\cos\frac{3\theta}{2}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(K_I\) = Mode I stress intensity factor</li>
+                <li>\(r\) = Distance from crack tip</li>
+                <li>\(\theta\) = Angle from crack plane</li>
+            </ul>
+
+            <p><strong>Key observation:</strong> Stresses approach infinity as \(r \to 0\) (crack tip singularity)</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Crack Configuration</h3>
+
+                <div class="slider-container">
+                    <label for="applied-stress-ki">Applied Stress \(\sigma\) (MPa):</label>
+                    <input type="range" id="applied-stress-ki" min="10" max="200" value="100" step="10">
+                    <span id="applied-stress-ki-value" class="slider-value">100</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="crack-length">Crack Length \(2a\) (mm):</label>
+                    <input type="range" id="crack-length" min="1" max="50" value="10" step="1">
+                    <span id="crack-length-value" class="slider-value">10</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="view-angle">View Angle \(\theta\) (degrees):</label>
+                    <input type="range" id="view-angle" min="0" max="180" value="0" step="10">
+                    <span id="view-angle-value" class="slider-value">0</span>
+                </div>
+
+                <div class="info-box info-box-blue">
+                    <h4>Stress Intensity Factor:</h4>
+                    <p>\(K_I = \sigma\sqrt{\pi a} \cdot Y\)</p>
+                    <p>For center crack: \(Y = 1.0\)</p>
+                    <p><strong>Current \(K_I\) = </strong><span id="ki-value">17.7</span> MPa√m</p>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Crack Tip Stress Field</h3>
+                <div id="crack-viz" style="width: 100%; height: 350px;"></div>
+                <div id="stress-distribution-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="sif">Stress Intensity Factor</h2>
+
+        <h3>The Stress Intensity Factor Concept</h3>
+        <p>The stress intensity factor \(K\) characterizes the magnitude of the crack tip stress field. It depends on loading, crack geometry, and component dimensions. Failure occurs when \(K\) reaches a critical value \(K_c\), the fracture toughness.</p>
+
+        <div class="equation-box">
+            <p><strong>General Form:</strong></p>
+            <p>\[K_I = Y\sigma\sqrt{\pi a}\]</p>
+
+            <p><strong>Geometry Factor \(Y\) for Common Configurations:</strong></p>
+            <ul>
+                <li><strong>Center crack in infinite plate:</strong> \(Y = 1.0\)</li>
+                <li><strong>Edge crack in semi-infinite plate:</strong> \(Y = 1.12\)</li>
+                <li><strong>Center crack in finite width plate:</strong> \(Y = \sqrt{\sec\frac{\pi a}{W}}\)</li>
+                <li><strong>Compact tension specimen:</strong> \(Y = f(a/W)\) (complex function)</li>
+            </ul>
+
+            <p><strong>Fracture Criterion:</strong></p>
+            <p>\[K_I \geq K_{IC} \quad \Rightarrow \quad \text{Unstable crack growth (failure)}\]</p>
+
+            <p>Where \(K_{IC}\) is the plane strain fracture toughness (material property)</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Configuration Parameters</h3>
+
+                <div style="margin: 15px 0;">
+                    <h4>Crack Geometry:</h4>
+                    <select id="geometry-type" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                        <option value="center">Center Crack in Infinite Plate</option>
+                        <option value="edge">Edge Crack in Semi-Infinite Plate</option>
+                        <option value="finite">Center Crack in Finite Width Plate</option>
+                        <option value="compact">Compact Tension Specimen</option>
+                    </select>
+                </div>
+
+                <div class="slider-container">
+                    <label for="stress-sif">Applied Stress \(\sigma\) (MPa):</label>
+                    <input type="range" id="stress-sif" min="10" max="300" value="150" step="10">
+                    <span id="stress-sif-value" class="slider-value">150</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="crack-sif">Crack Length \(a\) (mm):</label>
+                    <input type="range" id="crack-sif" min="0.5" max="40" value="5" step="0.5">
+                    <span id="crack-sif-value" class="slider-value">5.0</span>
+                </div>
+
+                <div class="slider-container" id="width-container">
+                    <label for="width-sif">Specimen Width \(W\) (mm):</label>
+                    <input type="range" id="width-sif" min="20" max="200" value="100" step="10">
+                    <span id="width-sif-value" class="slider-value">100</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Material Properties:</h4>
+                    <div style="margin: 15px 0;">
+                        <select id="material-type" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                            <option value="steel">High-Strength Steel (K_IC = 50 MPa√m)</option>
+                            <option value="aluminum">Aluminum 7075 (K_IC = 25 MPa√m)</option>
+                            <option value="titanium">Titanium Ti-6Al-4V (K_IC = 75 MPa√m)</option>
+                            <option value="ceramic">Alumina Ceramic (K_IC = 4 MPa√m)</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+                    <div class="slider-container" id="kic-container">
+                        <label for="kic-value-slider">Fracture Toughness \(K_{IC}\) (MPa√m):</label>
+                        <input type="range" id="kic-value-slider" min="1" max="150" value="50" step="1">
+                        <span id="kic-value-slider-value" class="slider-value">50</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Stress Intensity Factor Analysis</h3>
+                <div id="sif-results" class="info-box info-box-blue">
+                    <h4>Calculated Values:</h4>
+                    <p><strong>Geometry Factor:</strong> \(Y = \) <span id="y-factor">1.00</span></p>
+                    <p><strong>Stress Intensity:</strong> \(K_I = \) <span id="ki-calc">18.8</span> MPa√m</p>
+                    <p><strong>Fracture Toughness:</strong> \(K_{IC} = \) <span id="kic-display">50</span> MPa√m</p>
+                    <p><strong>Safety Factor:</strong> \(SF = K_{IC}/K_I = \) <span id="sf-calc">2.66</span></p>
+                    <p style="font-weight: bold; color: #28a745;"><span id="failure-status">SAFE</span></p>
+                </div>
+                <div id="ki-plot" class="plot-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="crack-growth">Energy Release Rate and Crack Growth</h2>
+
+        <h3>Griffith Energy Balance</h3>
+        <p>The energy release rate \(G\) represents the energy available for crack extension per unit crack area. Crack growth occurs when \(G\) exceeds the critical energy release rate \(G_c\).</p>
+
+        <div class="equation-box">
+            <p><strong>Energy Release Rate:</strong></p>
+            <p>\[G = \frac{\pi \sigma^2 a}{E'}\]</p>
+
+            <p>Where \(E' = E\) for plane stress, and \(E' = E/(1-\nu^2)\) for plane strain</p>
+
+            <p><strong>Relationship with Stress Intensity Factor:</strong></p>
+            <p>\[G = \frac{K_I^2}{E'}\]</p>
+
+            <p><strong>Paris Law for Fatigue Crack Growth:</strong></p>
+            <p>\[\frac{da}{dN} = C(\Delta K)^m\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(da/dN\) = Crack growth rate per cycle</li>
+                <li>\(\Delta K = K_{max} - K_{min}\) = Stress intensity range</li>
+                <li>\(C, m\) = Material constants (typically \(m \approx 2-4\))</li>
+            </ul>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Fatigue Loading Parameters</h3>
+
+                <div class="slider-container">
+                    <label for="max-stress-fatigue">Maximum Stress \(\sigma_{max}\) (MPa):</label>
+                    <input type="range" id="max-stress-fatigue" min="50" max="300" value="150" step="10">
+                    <span id="max-stress-fatigue-value" class="slider-value">150</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="stress-ratio">Stress Ratio \(R = \sigma_{min}/\sigma_{max}\):</label>
+                    <input type="range" id="stress-ratio" min="0" max="0.8" value="0.1" step="0.1">
+                    <span id="stress-ratio-value" class="slider-value">0.1</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="initial-crack">Initial Crack Size \(a_0\) (mm):</label>
+                    <input type="range" id="initial-crack" min="0.5" max="10" value="2" step="0.5">
+                    <span id="initial-crack-value" class="slider-value">2.0</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Paris Law Constants:</h4>
+                    <div class="slider-container">
+                        <label for="paris-c">Log C (mm/cycle per (MPa√m)^m):</label>
+                        <input type="range" id="paris-c" min="-14" max="-8" value="-12" step="0.5">
+                        <span id="paris-c-value" class="slider-value">-12.0</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="paris-m">Exponent m:</label>
+                        <input type="range" id="paris-m" min="2" max="5" value="3" step="0.1">
+                        <span id="paris-m-value" class="slider-value">3.0</span>
+                    </div>
+                    <p style="font-size: 0.85em; margin-top: 10px;">Typical steel: C ≈ 10⁻¹², m ≈ 3</p>
+                </div>
+
+                <div class="slider-container">
+                    <label for="critical-crack">Critical Crack Size \(a_c\) (mm):</label>
+                    <input type="range" id="critical-crack" min="10" max="50" value="25" step="1">
+                    <span id="critical-crack-value" class="slider-value">25</span>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>Fatigue Crack Growth Simulation</h3>
+                <div id="crack-growth-plot" class="plot-container"></div>
+                <div id="paris-results" class="info-box info-box-blue">
+                    <h4>Crack Growth Analysis:</h4>
+                    <p><strong>\(\Delta K\) at \(a_0\):</strong> <span id="delta-k-initial">0.0</span> MPa√m</p>
+                    <p><strong>Initial Growth Rate:</strong> <span id="dadN-initial">0.0</span> mm/cycle</p>
+                    <p><strong>Cycles to Failure:</strong> <span id="cycles-failure">0</span> cycles</p>
+                    <p><strong>Life (if 10 Hz):</strong> <span id="time-failure">0</span> hours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="r-curve">R-Curve Behavior and Ductile Fracture</h2>
+
+        <h3>Resistance Curves</h3>
+        <p>In ductile materials, fracture resistance increases with crack extension due to plastic zone development. The R-curve represents the material's resistance to crack growth as a function of crack extension.</p>
+
+        <div class="equation-box">
+            <p><strong>Plastic Zone Size (Irwin):</strong></p>
+            <p>\[r_y = \frac{1}{2\pi}\left(\frac{K_I}{\sigma_Y}\right)^2 \quad \text{(Plane Stress)}\]</p>
+            <p>\[r_y = \frac{1}{6\pi}\left(\frac{K_I}{\sigma_Y}\right)^2 \quad \text{(Plane Strain)}\]</p>
+
+            <p><strong>R-Curve Equation (Empirical):</strong></p>
+            <p>\[K_R = K_0 + \beta\sqrt{\Delta a}\]</p>
+
+            <p>Where:</p>
+            <ul>
+                <li>\(K_R\) = Resistance to crack growth</li>
+                <li>\(K_0\) = Initial toughness</li>
+                <li>\(\Delta a\) = Crack extension</li>
+                <li>\(\beta\) = Material constant</li>
+            </ul>
+
+            <p><strong>Stability Criterion:</strong></p>
+            <p>Stable crack growth occurs when: \(\frac{dK_I}{da} < \frac{dK_R}{da}\)</p>
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-controls">
+                <h3 style="margin-top:0;">Material Properties</h3>
+
+                <div class="slider-container">
+                    <label for="yield-strength">Yield Strength \(\sigma_Y\) (MPa):</label>
+                    <input type="range" id="yield-strength" min="200" max="1000" value="400" step="50">
+                    <span id="yield-strength-value" class="slider-value">400</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="initial-toughness">Initial Toughness \(K_0\) (MPa√m):</label>
+                    <input type="range" id="initial-toughness" min="20" max="100" value="50" step="5">
+                    <span id="initial-toughness-value" class="slider-value">50</span>
+                </div>
+
+                <div class="slider-container">
+                    <label for="beta-param">R-curve slope \(\beta\) (MPa√m/mm^0.5):</label>
+                    <input type="range" id="beta-param" min="0" max="20" value="5" step="1">
+                    <span id="beta-param-value" class="slider-value">5</span>
+                </div>
+
+                <div class="info-box info-box-golden">
+                    <h4>Applied Loading:</h4>
+                    <div class="slider-container">
+                        <label for="applied-stress-rcurve">Applied Stress \(\sigma\) (MPa):</label>
+                        <input type="range" id="applied-stress-rcurve" min="50" max="400" value="200" step="10">
+                        <span id="applied-stress-rcurve-value" class="slider-value">200</span>
+                    </div>
+                    <div class="slider-container">
+                        <label for="initial-crack-rcurve">Initial Crack \(a_0\) (mm):</label>
+                        <input type="range" id="initial-crack-rcurve" min="5" max="30" value="10" step="1">
+                        <span id="initial-crack-rcurve-value" class="slider-value">10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="simulation-display">
+                <h3>R-Curve Analysis</h3>
+                <div id="rcurve-plot" class="plot-container"></div>
+                <div id="rcurve-results" class="info-box info-box-blue">
+                    <h4>Stability Assessment:</h4>
+                    <p><strong>Initial K_I:</strong> <span id="ki-initial">0.0</span> MPa√m</p>
+                    <p><strong>Plastic Zone Size:</strong> <span id="plastic-zone">0.0</span> mm</p>
+                    <p><strong>Crack Status:</strong> <span id="crack-stability">Stable</span></p>
+                    <p style="font-size: 0.85em; margin-top: 10px;">Note: Unstable growth occurs when driving force curve becomes tangent to R-curve</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Fracture mechanics principles are critical across numerous engineering disciplines for ensuring structural integrity and safety:</p>
+        <ul>
+            <li><strong>Aerospace:</strong> Aircraft structural integrity programs use fracture mechanics to establish inspection intervals for fuselage cracks, preventing catastrophic failures. The Aloha Airlines Flight 243 incident (1988) highlighted the importance of fatigue crack growth analysis in aging aircraft.</li>
+            <li><strong>Nuclear Power:</strong> Pressure vessel integrity assessments rely on fracture mechanics to ensure safe operation under high temperature and neutron irradiation. Failure would have catastrophic consequences, making fracture-safe design essential.</li>
+            <li><strong>Oil and Gas:</strong> Pipeline integrity management uses fracture mechanics to assess crack-like defects and determine safe operating pressures. Stress corrosion cracking and hydrogen embrittlement are major concerns requiring fracture mechanics analysis.</li>
+            <li><strong>Civil Infrastructure:</strong> Bridge inspection protocols incorporate fracture mechanics to evaluate crack growth in steel members and determine remaining fatigue life. The I-35W bridge collapse (2007) involved fracture of gusset plates.</li>
+            <li><strong>Medical Devices:</strong> Hip implant stems and dental implants require fracture mechanics analysis to prevent catastrophic failure under cyclic physiological loads over decades of service.</li>
+            <li><strong>Marine Engineering:</strong> Ship hull crack propagation analysis prevents catastrophic brittle fracture in cold ocean environments. Liberty ship failures in WWII motivated early fracture mechanics research.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Stress Intensity Factor</td>
+                    <td>\(K_I = Y\sigma\sqrt{\pi a}\)</td>
+                    <td>Characterizes crack tip stress field</td>
+                </tr>
+                <tr>
+                    <td>Fracture Criterion</td>
+                    <td>\(K_I \geq K_{IC}\)</td>
+                    <td>Failure occurs when SIF reaches toughness</td>
+                </tr>
+                <tr>
+                    <td>Energy Release Rate</td>
+                    <td>\(G = \frac{K_I^2}{E'}\)</td>
+                    <td>Energy available for crack extension</td>
+                </tr>
+                <tr>
+                    <td>Paris Law</td>
+                    <td>\(\frac{da}{dN} = C(\Delta K)^m\)</td>
+                    <td>Fatigue crack growth rate</td>
+                </tr>
+                <tr>
+                    <td>Plastic Zone Size</td>
+                    <td>\(r_y = \frac{1}{2\pi}\left(\frac{K_I}{\sigma_Y}\right)^2\)</td>
+                    <td>Crack tip plastic deformation zone</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 id="problems">Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Stress Intensity Factor Calculation</h3>
+            <p>A large plate contains a 20 mm long center crack and is subjected to a tensile stress of 120 MPa. Calculate the stress intensity factor. The material has a fracture toughness of 50 MPa√m. Will the plate fail?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>For a center crack in an infinite plate: \(K_I = \sigma\sqrt{\pi a}\) where \(a = 10\) mm (half crack length)</p>
+                <p>\(K_I = 120 \times \sqrt{\pi \times 0.010}\)</p>
+                <p>\(K_I = 120 \times 0.1772 = 21.3\) MPa√m</p>
+                <p>Compare to fracture toughness:</p>
+                <p>\(K_I = 21.3\) MPa√m \(< K_{IC} = 50\) MPa√m</p>
+                <p>Safety Factor = \(50/21.3 = 2.35\)</p>
+                <p><strong>Answer: No failure; SF = 2.35</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Paris Law Crack Growth</h3>
+            <p>A component with an initial crack of 2 mm is subjected to cyclic loading with \(\sigma_{max} = 180\) MPa and \(R = 0.1\). The material has Paris constants \(C = 10^{-12}\) (mm/cycle, MPa√m units) and \(m = 3\). Calculate the crack growth rate at the initial crack size.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Step 1: Calculate stress range</p>
+                <p>\(\sigma_{min} = R \times \sigma_{max} = 0.1 \times 180 = 18\) MPa</p>
+                <p>\(\Delta\sigma = \sigma_{max} - \sigma_{min} = 180 - 18 = 162\) MPa</p>
+
+                <p>Step 2: Calculate \(\Delta K\)</p>
+                <p>\(\Delta K = \Delta\sigma\sqrt{\pi a} = 162\sqrt{\pi \times 0.002} = 12.83\) MPa√m</p>
+
+                <p>Step 3: Apply Paris Law</p>
+                <p>\(\frac{da}{dN} = C(\Delta K)^m = 10^{-12} \times (12.83)^3\)</p>
+                <p>\(\frac{da}{dN} = 10^{-12} \times 2113 = 2.11 \times 10^{-9}\) mm/cycle</p>
+                <p>\(\frac{da}{dN} = 2.11 \times 10^{-6}\) μm/cycle</p>
+
+                <p><strong>Answer: da/dN = 2.11 × 10⁻⁹ mm/cycle</strong></p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Plastic Zone Size</h3>
+            <p>A steel plate with yield strength of 500 MPa contains a crack with \(K_I = 45\) MPa√m. Calculate the plastic zone size under plane stress conditions.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p>Using Irwin's plastic zone size for plane stress:</p>
+                <p>\[r_y = \frac{1}{2\pi}\left(\frac{K_I}{\sigma_Y}\right)^2\]</p>
+                <p>\[r_y = \frac{1}{2\pi}\left(\frac{45}{500}\right)^2\]</p>
+                <p>\[r_y = \frac{1}{6.283} \times (0.09)^2\]</p>
+                <p>\[r_y = \frac{1}{6.283} \times 0.0081 = 0.00129\text{ m} = 1.29\text{ mm}\]</p>
+
+                <p><strong>Answer: Plastic zone size = 1.29 mm</strong></p>
+
+                <p>Note: For plane strain, the plastic zone would be 3× smaller: \(r_y = 0.43\) mm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does the stress intensity factor K characterize?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The total load on the structure</label>
+                    <label><input type="radio" name="q1" value="b"> b) The magnitude of the crack tip stress field</label>
+                    <label><input type="radio" name="q1" value="c"> c) The material's yield strength</label>
+                    <label><input type="radio" name="q1" value="d"> d) The crack length only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: Which fracture mode involves crack surfaces opening perpendicular to the crack plane?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Mode I (Opening)</label>
+                    <label><input type="radio" name="q2" value="b"> b) Mode II (Sliding)</label>
+                    <label><input type="radio" name="q2" value="c"> c) Mode III (Tearing)</label>
+                    <label><input type="radio" name="q2" value="d"> d) All modes equally</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: In the Paris Law equation, what does the exponent m typically range between?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 0 to 1</label>
+                    <label><input type="radio" name="q3" value="b"> b) 1 to 2</label>
+                    <label><input type="radio" name="q3" value="c"> c) 2 to 4</label>
+                    <label><input type="radio" name="q3" value="d"> d) 5 to 10</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: What is the relationship between energy release rate G and stress intensity factor K?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) G = K</label>
+                    <label><input type="radio" name="q4" value="b"> b) G = K²/E'</label>
+                    <label><input type="radio" name="q4" value="c"> c) G = √K</label>
+                    <label><input type="radio" name="q4" value="d"> d) No relationship exists</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Failure occurs when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) K_I < K_IC</label>
+                    <label><input type="radio" name="q5" value="b"> b) K_I ≥ K_IC</label>
+                    <label><input type="radio" name="q5" value="c"> c) K_I = 0</label>
+                    <label><input type="radio" name="q5" value="d"> d) Crack length = 0</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Fracture mechanics simulation code
+
+        // Initialize all sliders
+        function initializeSliders() {
+            const sliders = [
+                'applied-stress-ki', 'crack-length', 'view-angle',
+                'stress-sif', 'crack-sif', 'width-sif', 'kic-value-slider',
+                'max-stress-fatigue', 'stress-ratio', 'initial-crack', 'paris-c', 'paris-m', 'critical-crack',
+                'yield-strength', 'initial-toughness', 'beta-param', 'applied-stress-rcurve', 'initial-crack-rcurve'
+            ];
+
+            sliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    const valueSpan = document.getElementById(id + '-value');
+                    slider.addEventListener('input', function() {
+                        valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                        updateSimulations();
+                    });
+                }
+            });
+        }
+
+        // Crack tip stress field visualization
+        function updateCrackTipField() {
+            const sigma = parseFloat(document.getElementById('applied-stress-ki').value);
+            const crackLength = parseFloat(document.getElementById('crack-length').value);
+            const a = crackLength / 2; // half crack length
+            const theta = parseFloat(document.getElementById('view-angle').value) * Math.PI / 180;
+
+            // Calculate K_I
+            const KI = sigma * Math.sqrt(Math.PI * a / 1000); // Convert mm to m
+            document.getElementById('ki-value').textContent = KI.toFixed(2);
+
+            // Plot stress distribution along theta direction
+            const rArray = [];
+            const sigmaYYArray = [];
+
+            for (let r = 0.1; r <= 20; r += 0.2) {
+                rArray.push(r);
+                const sigmaYY = KI / Math.sqrt(2 * Math.PI * r / 1000) * Math.cos(theta/2) * (1 + Math.sin(theta/2) * Math.sin(3*theta/2));
+                sigmaYYArray.push(sigmaYY);
+            }
+
+            const trace = {
+                x: rArray,
+                y: sigmaYYArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const layout = {
+                title: `σ<sub>yy</sub> vs Distance from Crack Tip (θ = ${(theta*180/Math.PI).toFixed(0)}°)`,
+                xaxis: { title: 'Distance r (mm)', type: 'log' },
+                yaxis: { title: 'Stress σ<sub>yy</sub> (MPa)' }
+            };
+
+            Plotly.newPlot('stress-distribution-plot', [trace], layout, {responsive: true});
+
+            // Simple crack visualization
+            visualizeCrack(crackLength);
+        }
+
+        function visualizeCrack(length) {
+            // Placeholder - would use p5.js in production
+            // For now, just update the div with simple content
+        }
+
+        // SIF calculation for different geometries
+        function updateSIFAnalysis() {
+            const geometry = document.getElementById('geometry-type').value;
+            const sigma = parseFloat(document.getElementById('stress-sif').value);
+            const a = parseFloat(document.getElementById('crack-sif').value);
+            const W = parseFloat(document.getElementById('width-sif').value);
+
+            let Y;
+            if (geometry === 'center') {
+                Y = 1.0;
+            } else if (geometry === 'edge') {
+                Y = 1.12;
+            } else if (geometry === 'finite') {
+                Y = Math.sqrt(Math.tan(Math.PI * a / (2 * W)) / (Math.PI * a / (2 * W)));
+            } else { // compact
+                const ratio = a / W;
+                Y = (2 + ratio) * (0.886 + 4.64*ratio - 13.32*Math.pow(ratio,2) + 14.72*Math.pow(ratio,3) - 5.6*Math.pow(ratio,4)) / Math.pow(1-ratio, 1.5);
+            }
+
+            const KI = Y * sigma * Math.sqrt(Math.PI * a / 1000);
+
+            // Get material KIC
+            const material = document.getElementById('material-type').value;
+            let KIC;
+            if (material === 'steel') KIC = 50;
+            else if (material === 'aluminum') KIC = 25;
+            else if (material === 'titanium') KIC = 75;
+            else if (material === 'ceramic') KIC = 4;
+            else KIC = parseFloat(document.getElementById('kic-value-slider').value);
+
+            const SF = KIC / KI;
+            const status = KI >= KIC ? 'FAILURE' : 'SAFE';
+
+            document.getElementById('y-factor').textContent = Y.toFixed(3);
+            document.getElementById('ki-calc').textContent = KI.toFixed(2);
+            document.getElementById('kic-display').textContent = KIC.toFixed(1);
+            document.getElementById('sf-calc').textContent = SF.toFixed(2);
+            document.getElementById('failure-status').textContent = status;
+            document.getElementById('failure-status').style.color = status === 'SAFE' ? '#28a745' : '#dc3545';
+
+            // Plot K_I vs crack length
+            const aArray = [];
+            const KIArray = [];
+
+            for (let crack = 0.5; crack <= 50; crack += 0.5) {
+                let Y_temp;
+                if (geometry === 'center') {
+                    Y_temp = 1.0;
+                } else if (geometry === 'edge') {
+                    Y_temp = 1.12;
+                } else if (geometry === 'finite') {
+                    if (crack < W) {
+                        Y_temp = Math.sqrt(Math.tan(Math.PI * crack / (2 * W)) / (Math.PI * crack / (2 * W)));
+                    } else {
+                        Y_temp = null;
+                    }
+                } else {
+                    const r = crack / W;
+                    if (r < 0.95) {
+                        Y_temp = (2 + r) * (0.886 + 4.64*r - 13.32*Math.pow(r,2) + 14.72*Math.pow(r,3) - 5.6*Math.pow(r,4)) / Math.pow(1-r, 1.5);
+                    } else {
+                        Y_temp = null;
+                    }
+                }
+
+                aArray.push(crack);
+                if (Y_temp !== null) {
+                    KIArray.push(Y_temp * sigma * Math.sqrt(Math.PI * crack / 1000));
+                } else {
+                    KIArray.push(null);
+                }
+            }
+
+            const trace1 = {
+                x: aArray,
+                y: KIArray,
+                mode: 'lines',
+                name: 'K_I',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const trace2 = {
+                x: [0, 50],
+                y: [KIC, KIC],
+                mode: 'lines',
+                name: 'K_IC',
+                line: { color: 'red', width: 2, dash: 'dash' }
+            };
+
+            const trace3 = {
+                x: [a],
+                y: [KI],
+                mode: 'markers',
+                name: 'Current',
+                marker: { size: 12, color: status === 'SAFE' ? 'green' : 'red' }
+            };
+
+            const layout = {
+                title: 'Stress Intensity Factor vs Crack Length',
+                xaxis: { title: 'Crack Length a (mm)' },
+                yaxis: { title: 'K_I (MPa√m)' }
+            };
+
+            Plotly.newPlot('ki-plot', [trace1, trace2, trace3], layout, {responsive: true});
+        }
+
+        // Material type selector
+        document.getElementById('material-type').addEventListener('change', function() {
+            const kicSlider = document.getElementById('kic-value-slider');
+            const kicValue = document.getElementById('kic-value-slider-value');
+
+            if (this.value === 'steel') {
+                kicSlider.value = 50;
+                kicValue.textContent = '50.00';
+            } else if (this.value === 'aluminum') {
+                kicSlider.value = 25;
+                kicValue.textContent = '25.00';
+            } else if (this.value === 'titanium') {
+                kicSlider.value = 75;
+                kicValue.textContent = '75.00';
+            } else if (this.value === 'ceramic') {
+                kicSlider.value = 4;
+                kicValue.textContent = '4.00';
+            }
+
+            updateSimulations();
+        });
+
+        // Fatigue crack growth
+        function updateCrackGrowth() {
+            const sigmaMax = parseFloat(document.getElementById('max-stress-fatigue').value);
+            const R = parseFloat(document.getElementById('stress-ratio').value);
+            const a0 = parseFloat(document.getElementById('initial-crack').value);
+            const logC = parseFloat(document.getElementById('paris-c').value);
+            const C = Math.pow(10, logC);
+            const m = parseFloat(document.getElementById('paris-m').value);
+            const ac = parseFloat(document.getElementById('critical-crack').value);
+
+            const sigmaMin = R * sigmaMax;
+            const deltaSigma = sigmaMax - sigmaMin;
+
+            // Calculate initial delta K
+            const deltaK0 = deltaSigma * Math.sqrt(Math.PI * a0 / 1000);
+            const dadN0 = C * Math.pow(deltaK0, m);
+
+            document.getElementById('delta-k-initial').textContent = deltaK0.toFixed(2);
+            document.getElementById('dadN-initial').textContent = dadN0.toExponential(3);
+
+            // Integrate to find life
+            const cycles = [];
+            const aArray = [];
+            let a = a0;
+            let N = 0;
+            cycles.push(N);
+            aArray.push(a);
+
+            const da = 0.1; // mm increment
+
+            while (a < ac && N < 1e8) {
+                const deltaK = deltaSigma * Math.sqrt(Math.PI * a / 1000);
+                const dadN = C * Math.pow(deltaK, m);
+
+                if (dadN > 0) {
+                    const dN = da / dadN;
+                    N += dN;
+                    a += da;
+
+                    if (cycles.length < 1000) {
+                        cycles.push(N);
+                        aArray.push(a);
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            const Nf = N;
+            const hours = Nf / (10 * 3600); // at 10 Hz
+
+            document.getElementById('cycles-failure').textContent = Nf.toExponential(2);
+            document.getElementById('time-failure').textContent = hours.toFixed(1);
+
+            // Plot crack growth curve
+            const trace1 = {
+                x: cycles,
+                y: aArray,
+                mode: 'lines',
+                line: { color: '#1890ff', width: 3 }
+            };
+
+            const layout = {
+                title: 'Crack Growth Under Cyclic Loading',
+                xaxis: { title: 'Cycles N', type: 'log' },
+                yaxis: { title: 'Crack Length a (mm)' }
+            };
+
+            Plotly.newPlot('crack-growth-plot', [trace1], layout, {responsive: true});
+        }
+
+        // R-curve analysis
+        function updateRCurve() {
+            const sigmaY = parseFloat(document.getElementById('yield-strength').value);
+            const K0 = parseFloat(document.getElementById('initial-toughness').value);
+            const beta = parseFloat(document.getElementById('beta-param').value);
+            const sigma = parseFloat(document.getElementById('applied-stress-rcurve').value);
+            const a0 = parseFloat(document.getElementById('initial-crack-rcurve').value);
+
+            const KI0 = sigma * Math.sqrt(Math.PI * a0 / 1000);
+            const plasticZone = 1000 / (2 * Math.PI) * Math.pow(KI0 / sigmaY, 2);
+
+            document.getElementById('ki-initial').textContent = KI0.toFixed(1);
+            document.getElementById('plastic-zone').textContent = plasticZone.toFixed(2);
+
+            // Generate R-curve and driving force
+            const daArray = [];
+            const KRArray = [];
+            const KIArray = [];
+
+            for (let da = 0; da <= 20; da += 0.2) {
+                daArray.push(da);
+                const KR = K0 + beta * Math.sqrt(da);
+                KRArray.push(KR);
+
+                const a = a0 + da;
+                const KI = sigma * Math.sqrt(Math.PI * a / 1000);
+                KIArray.push(KI);
+            }
+
+            // Determine stability
+            let stable = true;
+            for (let i = 0; i < daArray.length - 1; i++) {
+                const dKI = KIArray[i+1] - KIArray[i];
+                const dKR = KRArray[i+1] - KRArray[i];
+                if (dKI > dKR && KIArray[i] > KRArray[i]) {
+                    stable = false;
+                    break;
+                }
+            }
+
+            document.getElementById('crack-stability').textContent = stable ? 'Stable' : 'Unstable';
+            document.getElementById('crack-stability').style.color = stable ? '#28a745' : '#dc3545';
+
+            const trace1 = {
+                x: daArray,
+                y: KRArray,
+                mode: 'lines',
+                name: 'K_R (Resistance)',
+                line: { color: 'green', width: 3 }
+            };
+
+            const trace2 = {
+                x: daArray,
+                y: KIArray,
+                mode: 'lines',
+                name: 'K_I (Driving Force)',
+                line: { color: 'red', width: 3 }
+            };
+
+            const layout = {
+                title: 'R-Curve Behavior',
+                xaxis: { title: 'Crack Extension Δa (mm)' },
+                yaxis: { title: 'Stress Intensity Factor (MPa√m)' }
+            };
+
+            Plotly.newPlot('rcurve-plot', [trace1, trace2], layout, {responsive: true});
+        }
+
+        // Update all simulations
+        function updateSimulations() {
+            updateCrackTipField();
+            updateSIFAnalysis();
+            updateCrackGrowth();
+            updateRCurve();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSliders();
+            updateSimulations();
+        });
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'a',
+                q3: 'c',
+                q4: 'b',
+                q5: 'b'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

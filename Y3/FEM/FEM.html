@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finite Element Method Introduction - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Finite Element Method Introduction</h1>
+        <p class="subtitle">Understanding FEM Through 1D Bar Element Analysis</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding the Finite Element Method</h2>
+
+        <h3>What is the Finite Element Method?</h3>
+        <p>The Finite Element Method (FEM) is a numerical technique for finding approximate solutions to boundary value problems for partial differential equations. It subdivides a large problem into smaller, simpler parts called finite elements, which are connected at points called nodes.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> FEM transforms complex continuous problems into discrete algebraic equations that can be solved computationally. The key is to approximate the solution using simple functions (shape functions) over small regions (elements), then assemble these into a global system.</p>
+        </div>
+
+        <h3>The 1D Bar Element</h3>
+        <p>The simplest finite element is the 1D bar element, which models axial deformation under tension or compression. Consider a uniform bar of length \(L\), cross-sectional area \(A\), and elastic modulus \(E\).</p>
+
+        <div class="equation-box">
+            <p><strong>Governing Differential Equation:</strong></p>
+            <p>\[\frac{d}{dx}\left(EA\frac{du}{dx}\right) + f(x) = 0\]</p>
+            <p>where \(u(x)\) is the axial displacement and \(f(x)\) is the distributed body force per unit length.</p>
+        </div>
+
+        <h3>Shape Functions</h3>
+        <p>For a linear bar element with two nodes (1 and 2), we approximate the displacement field using linear shape functions:</p>
+
+        <div class="equation-box">
+            <p>\[u(x) = N_1(x)u_1 + N_2(x)u_2\]</p>
+            <p>where the shape functions are:</p>
+            <p>\[N_1(x) = 1 - \frac{x}{L}, \quad N_2(x) = \frac{x}{L}\]</p>
+            <p>Properties of shape functions:</p>
+            <ul style="list-style: none;">
+                <li>\(N_1(0) = 1, \quad N_1(L) = 0\)</li>
+                <li>\(N_2(0) = 0, \quad N_2(L) = 1\)</li>
+                <li>\(N_1(x) + N_2(x) = 1\) (partition of unity)</li>
+            </ul>
+        </div>
+
+        <h3>Element Stiffness Matrix</h3>
+        <p>Using the principle of minimum potential energy or Galerkin's method, we derive the element stiffness matrix:</p>
+
+        <div class="equation-box">
+            <p>\[[k^e] = \frac{EA}{L}\begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}\]</p>
+            <p>The element equilibrium equation is:</p>
+            <p>\[[k^e]\{u^e\} = \{f^e\}\]</p>
+            <p>where \(\{u^e\} = \begin{bmatrix} u_1 \\ u_2 \end{bmatrix}\) and \(\{f^e\} = \begin{bmatrix} f_1 \\ f_2 \end{bmatrix}\)</p>
+        </div>
+
+        <h3>Assembly Process</h3>
+        <p>For multiple elements, we assemble the global stiffness matrix by adding contributions from elements sharing common nodes. This is called the <strong>direct stiffness method</strong>.</p>
+
+        <div class="key-point">
+            <p><strong>Assembly Rule:</strong> The global stiffness matrix [K] is assembled by adding element stiffness matrices at positions corresponding to their global degrees of freedom. Elements sharing a node contribute to the same entry in [K], ensuring compatibility and equilibrium.</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Global System:</strong></p>
+            <p>\[[K]\{U\} = \{F\}\]</p>
+            <p>After applying boundary conditions and solving, we obtain nodal displacements \(\{U\}\).</p>
+            <p><strong>Post-Processing:</strong> Element strains and stresses are calculated from:</p>
+            <p>\[\varepsilon = \frac{du}{dx} = \frac{u_2 - u_1}{L}\]</p>
+            <p>\[\sigma = E\varepsilon = \frac{E(u_2 - u_1)}{L}\]</p>
+        </div>
+
+        <h3>Convergence and Accuracy</h3>
+        <p>As we increase the number of elements (mesh refinement), the FEM solution converges to the exact solution. This is guaranteed if:</p>
+        <ul>
+            <li><strong>Compatibility:</strong> Shape functions ensure continuous displacement across elements</li>
+            <li><strong>Completeness:</strong> Shape functions can represent rigid body motion and constant strain</li>
+            <li><strong>Convergence:</strong> Solution improves as element size decreases (h-refinement)</li>
+        </ul>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive 1D Bar Element Simulation</h2>
+        <p>This simulation demonstrates a 1D bar divided into multiple elements. Adjust the parameters to see how the displacement, strain, and stress distributions change.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="num-elements">Number of Elements: <span id="num-elements-value">4</span></label>
+                <input type="range" id="num-elements" min="1" max="10" step="1" value="4">
+            </div>
+
+            <div class="control-group">
+                <label for="modulus">Young's Modulus E (GPa): <span id="modulus-value">200</span></label>
+                <input type="range" id="modulus" min="50" max="400" step="10" value="200">
+            </div>
+
+            <div class="control-group">
+                <label for="area">Cross-sectional Area A (mm²): <span id="area-value">100</span></label>
+                <input type="range" id="area" min="50" max="500" step="10" value="100">
+            </div>
+
+            <div class="control-group">
+                <label for="load">Applied Load P (kN): <span id="load-value">50</span></label>
+                <input type="range" id="load" min="10" max="200" step="5" value="50">
+            </div>
+
+            <div class="control-group">
+                <label for="length">Bar Length L (m): <span id="length-value">1.0</span></label>
+                <input type="range" id="length" min="0.5" max="3.0" step="0.1" value="1.0">
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let numElements = 4;
+        let E = 200; // GPa
+        let A = 100; // mm²
+        let P = 50; // kN
+        let L = 1.0; // m
+
+        // Solution arrays
+        let displacements = [];
+        let strains = [];
+        let stresses = [];
+        let positions = [];
+
+        function setupSliders() {
+            document.getElementById('num-elements').addEventListener('input', function() {
+                numElements = parseInt(this.value);
+                document.getElementById('num-elements-value').textContent = numElements;
+                solveFEM();
+            });
+
+            document.getElementById('modulus').addEventListener('input', function() {
+                E = parseFloat(this.value);
+                document.getElementById('modulus-value').textContent = E;
+                solveFEM();
+            });
+
+            document.getElementById('area').addEventListener('input', function() {
+                A = parseFloat(this.value);
+                document.getElementById('area-value').textContent = A;
+                solveFEM();
+            });
+
+            document.getElementById('load').addEventListener('input', function() {
+                P = parseFloat(this.value);
+                document.getElementById('load-value').textContent = P;
+                solveFEM();
+            });
+
+            document.getElementById('length').addEventListener('input', function() {
+                L = parseFloat(this.value);
+                document.getElementById('length-value').textContent = L.toFixed(1);
+                solveFEM();
+            });
+        }
+
+        function solveFEM() {
+            // Element length
+            let Le = L / numElements;
+
+            // Element stiffness
+            let ke = (E * 1e9 * A * 1e-6) / Le; // Convert to N/m
+
+            // Assemble global stiffness matrix (simple for uniform bar)
+            let n = numElements + 1; // Number of nodes
+            let K = Array(n).fill(0).map(() => Array(n).fill(0));
+
+            for (let i = 0; i < numElements; i++) {
+                K[i][i] += ke;
+                K[i][i+1] -= ke;
+                K[i+1][i] -= ke;
+                K[i+1][i+1] += ke;
+            }
+
+            // Apply boundary condition (u[0] = 0)
+            K[0][0] = 1e20;
+
+            // Force vector
+            let F = Array(n).fill(0);
+            F[n-1] = P * 1000; // Convert kN to N
+
+            // Solve for displacements using Gaussian elimination
+            displacements = gaussianElimination(K, F);
+
+            // Calculate strains and stresses
+            positions = [];
+            strains = [];
+            stresses = [];
+
+            for (let i = 0; i < numElements; i++) {
+                positions.push(i * Le);
+                let strain = (displacements[i+1] - displacements[i]) / Le;
+                strains.push(strain);
+                stresses.push(E * 1e9 * strain / 1e6); // Convert to MPa
+            }
+            positions.push(L);
+        }
+
+        function gaussianElimination(A, b) {
+            let n = b.length;
+            let x = Array(n).fill(0);
+
+            // Forward elimination
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    let factor = A[j][i] / A[i][i];
+                    for (let k = i; k < n; k++) {
+                        A[j][k] -= factor * A[i][k];
+                    }
+                    b[j] -= factor * b[i];
+                }
+            }
+
+            // Back substitution
+            for (let i = n - 1; i >= 0; i--) {
+                x[i] = b[i];
+                for (let j = i + 1; j < n; j++) {
+                    x[i] -= A[i][j] * x[j];
+                }
+                x[i] /= A[i][i];
+            }
+
+            return x;
+        }
+
+        function setup() {
+            let canvas = createCanvas(900, 700);
+            canvas.parent('sketch-holder');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+
+            setupSliders();
+            solveFEM();
+        }
+
+        function draw() {
+            background(255);
+
+            // Draw bar geometry
+            drawBarGeometry();
+
+            // Draw displacement plot
+            drawPlot(50, 250, 800, 120, "Displacement (mm)", positions, displacements.map(d => d * 1000));
+
+            // Draw strain plot
+            let strainPositions = positions.slice(0, -1).map((p, i) => p + (positions[i+1] - p) / 2);
+            drawPlot(50, 420, 800, 120, "Strain (µε)", strainPositions, strains.map(s => s * 1e6));
+
+            // Draw stress plot
+            drawPlot(50, 590, 800, 120, "Stress (MPa)", strainPositions, stresses);
+        }
+
+        function drawBarGeometry() {
+            push();
+            translate(50, 100);
+
+            // Title
+            fill(0);
+            textAlign(CENTER);
+            textSize(16);
+            text("Bar Element Mesh", 400, -30);
+
+            // Draw bar
+            let barWidth = 800;
+            let barHeight = 60;
+            let elementWidth = barWidth / numElements;
+
+            // Fixed support
+            fill(100);
+            rect(-20, 0, 20, barHeight);
+
+            // Elements
+            for (let i = 0; i < numElements; i++) {
+                stroke(0);
+                strokeWeight(2);
+                noFill();
+                rect(i * elementWidth, 0, elementWidth, barHeight);
+
+                // Node numbers
+                fill(0);
+                noStroke();
+                textSize(12);
+                textAlign(CENTER);
+                text(i, i * elementWidth, barHeight + 15);
+                circle(i * elementWidth, barHeight / 2, 8);
+            }
+
+            // Last node
+            text(numElements, barWidth, barHeight + 15);
+            circle(barWidth, barHeight / 2, 8);
+
+            // Applied load
+            stroke(255, 0, 0);
+            strokeWeight(3);
+            fill(255, 0, 0);
+            line(barWidth, barHeight / 2, barWidth + 50, barHeight / 2);
+            // Arrow
+            triangle(barWidth + 50, barHeight / 2, barWidth + 40, barHeight / 2 - 5, barWidth + 40, barHeight / 2 + 5);
+
+            noStroke();
+            textAlign(LEFT);
+            text("P = " + P + " kN", barWidth + 55, barHeight / 2 + 5);
+
+            // Dimensions
+            stroke(0);
+            strokeWeight(1);
+            line(0, -15, barWidth, -15);
+            line(0, -20, 0, -10);
+            line(barWidth, -20, barWidth, -10);
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            text("L = " + L + " m", barWidth / 2, -20);
+
+            pop();
+        }
+
+        function drawPlot(x, y, w, h, title, xData, yData) {
+            push();
+            translate(x, y);
+
+            // Title
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text(title, w / 2, -10);
+
+            // Background
+            fill(240);
+            noStroke();
+            rect(0, 0, w, h);
+
+            // Find data range
+            let yMin = Math.min(...yData);
+            let yMax = Math.max(...yData);
+            let yRange = yMax - yMin;
+            if (yRange < 1e-10) yRange = 1;
+            yMin -= yRange * 0.1;
+            yMax += yRange * 0.1;
+
+            // Grid
+            stroke(220);
+            strokeWeight(1);
+            for (let i = 0; i <= 10; i++) {
+                let xPos = map(i / 10, 0, 1, 0, w);
+                line(xPos, 0, xPos, h);
+            }
+            for (let i = 0; i <= 5; i++) {
+                let yPos = map(i / 5, 0, 1, h, 0);
+                line(0, yPos, w, yPos);
+            }
+
+            // Axes
+            stroke(0);
+            strokeWeight(2);
+            line(0, h, w, h);
+            line(0, 0, 0, h);
+
+            // Y-axis labels
+            fill(0);
+            noStroke();
+            textSize(10);
+            textAlign(RIGHT);
+            for (let i = 0; i <= 5; i++) {
+                let yPos = map(i / 5, 0, 1, h, 0);
+                let yVal = map(i / 5, 0, 1, yMin, yMax);
+                text(yVal.toFixed(2), -5, yPos + 3);
+            }
+
+            // X-axis labels
+            textAlign(CENTER);
+            for (let i = 0; i <= 5; i++) {
+                let xPos = map(i / 5 * L, 0, L, 0, w);
+                text((i / 5 * L).toFixed(2) + " m", xPos, h + 15);
+            }
+
+            // Plot data
+            stroke(0, 0, 255);
+            strokeWeight(2);
+            noFill();
+            beginShape();
+            for (let i = 0; i < xData.length; i++) {
+                let px = map(xData[i], 0, L, 0, w);
+                let py = map(yData[i], yMin, yMax, h, 0);
+                vertex(px, py);
+            }
+            endShape();
+
+            // Data points
+            fill(0, 0, 255);
+            noStroke();
+            for (let i = 0; i < xData.length; i++) {
+                let px = map(xData[i], 0, L, 0, w);
+                let py = map(yData[i], yMin, yMax, h, 0);
+                circle(px, py, 6);
+            }
+
+            pop();
+        }
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>The Finite Element Method is one of the most widely used numerical techniques in engineering:</p>
+        <ul>
+            <li><strong>Structural Analysis:</strong> Buildings, bridges, and aircraft structures are analyzed using FEM to predict stresses, deformations, and failure modes under various loading conditions.</li>
+            <li><strong>Heat Transfer:</strong> Thermal analysis of electronic devices, heat exchangers, and manufacturing processes relies on FEM to optimize cooling and prevent overheating.</li>
+            <li><strong>Fluid Dynamics:</strong> Computational Fluid Dynamics (CFD) uses FEM to simulate airflow over aircraft, water flow in pipes, and blood flow in vessels.</li>
+            <li><strong>Biomechanics:</strong> Bone, tissue, and prosthetic implants are designed using FEM to ensure proper load distribution and prevent failure.</li>
+            <li><strong>Geotechnical Engineering:</strong> Soil-structure interaction, foundation design, and slope stability analysis use FEM for accurate predictions.</li>
+            <li><strong>Manufacturing:</strong> Metal forming, welding simulations, and additive manufacturing processes are optimized using FEM to reduce defects and improve quality.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Governing Equation (1D Bar)</td>
+                    <td>\(\frac{d}{dx}\left(EA\frac{du}{dx}\right) + f(x) = 0\)</td>
+                    <td>Equilibrium equation for axial bar</td>
+                </tr>
+                <tr>
+                    <td>Shape Functions (Linear)</td>
+                    <td>\(N_1 = 1 - \frac{x}{L}, \quad N_2 = \frac{x}{L}\)</td>
+                    <td>Linear interpolation functions</td>
+                </tr>
+                <tr>
+                    <td>Displacement Approximation</td>
+                    <td>\(u(x) = N_1(x)u_1 + N_2(x)u_2\)</td>
+                    <td>FEM approximation of displacement</td>
+                </tr>
+                <tr>
+                    <td>Element Stiffness Matrix</td>
+                    <td>\([k^e] = \frac{EA}{L}\begin{bmatrix} 1 & -1 \\ -1 & 1 \end{bmatrix}\)</td>
+                    <td>Bar element stiffness</td>
+                </tr>
+                <tr>
+                    <td>Global System</td>
+                    <td>\([K]\{U\} = \{F\}\)</td>
+                    <td>Assembled system of equations</td>
+                </tr>
+                <tr>
+                    <td>Element Strain</td>
+                    <td>\(\varepsilon = \frac{u_2 - u_1}{L}\)</td>
+                    <td>Constant strain in element</td>
+                </tr>
+                <tr>
+                    <td>Element Stress</td>
+                    <td>\(\sigma = E\varepsilon = \frac{E(u_2 - u_1)}{L}\)</td>
+                    <td>Constant stress in element</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Two-Element Bar Analysis</h3>
+            <p>A bar of total length 2 m is divided into two elements. Element 1 has \(E_1 = 200\) GPa, \(A_1 = 100\) mm², and length 1 m. Element 2 has \(E_2 = 100\) GPa, \(A_2 = 50\) mm², and length 1 m. A force of 10 kN is applied at the free end. Calculate the nodal displacements and element stresses.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Step 1: Element stiffness matrices</strong></p>
+                <p>\([k^1] = \frac{E_1 A_1}{L_1} = \frac{200 \times 10^9 \times 100 \times 10^{-6}}{1} = 20 \times 10^6\) N/m</p>
+                <p>\([k^2] = \frac{E_2 A_2}{L_2} = \frac{100 \times 10^9 \times 50 \times 10^{-6}}{1} = 5 \times 10^6\) N/m</p>
+
+                <p><strong>Step 2: Assemble global stiffness matrix</strong></p>
+                <p>\([K] = 10^6 \begin{bmatrix} 20 & -20 & 0 \\ -20 & 25 & -5 \\ 0 & -5 & 5 \end{bmatrix}\) N/m</p>
+
+                <p><strong>Step 3: Apply boundary conditions</strong></p>
+                <p>\(u_1 = 0\) (fixed), \(F_3 = 10000\) N</p>
+
+                <p><strong>Step 4: Solve reduced system</strong></p>
+                <p>\(10^6 \begin{bmatrix} 25 & -5 \\ -5 & 5 \end{bmatrix} \begin{bmatrix} u_2 \\ u_3 \end{bmatrix} = \begin{bmatrix} 0 \\ 10000 \end{bmatrix}\)</p>
+
+                <p><strong>Solution:</strong></p>
+                <p>\(u_2 = 0.5\) mm, \(u_3 = 2.5\) mm</p>
+                <p>\(\sigma_1 = \frac{E_1(u_2 - u_1)}{L_1} = \frac{200 \times 10^9 \times 0.5 \times 10^{-3}}{1} = 100\) MPa</p>
+                <p>\(\sigma_2 = \frac{E_2(u_3 - u_2)}{L_2} = \frac{100 \times 10^9 \times 2.0 \times 10^{-3}}{1} = 200\) MPa</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Convergence Study</h3>
+            <p>For a uniform bar with \(E = 200\) GPa, \(A = 100\) mm², \(L = 1\) m, and \(P = 50\) kN, the exact tip displacement is \(u_{exact} = PL/(EA) = 2.5\) mm. Calculate the FEM solution using 1, 2, and 4 elements and discuss convergence.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>1 Element:</strong></p>
+                <p>\(k = \frac{EA}{L} = \frac{200 \times 10^9 \times 100 \times 10^{-6}}{1} = 20 \times 10^6\) N/m</p>
+                <p>\(u_{tip} = \frac{P}{k} = \frac{50000}{20 \times 10^6} = 2.5\) mm</p>
+                <p>Error = 0% (exact for uniform bar!)</p>
+
+                <p><strong>2 Elements:</strong></p>
+                <p>\(k_e = \frac{EA}{L/2} = 40 \times 10^6\) N/m</p>
+                <p>\(u_{tip} = 2.5\) mm</p>
+                <p>Error = 0%</p>
+
+                <p><strong>4 Elements:</strong></p>
+                <p>\(u_{tip} = 2.5\) mm</p>
+                <p>Error = 0%</p>
+
+                <p><strong>Conclusion:</strong> For the uniform bar under constant axial load, the linear element gives the exact solution regardless of the number of elements because the exact solution is linear. For non-uniform bars or varying loads, more elements improve accuracy.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Shape Function Properties</h3>
+            <p>Verify that the linear shape functions \(N_1(x) = 1 - x/L\) and \(N_2(x) = x/L\) satisfy the essential properties: (a) Kronecker delta property, (b) partition of unity, and (c) can represent constant strain.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>(a) Kronecker Delta Property:</strong></p>
+                <p>At node 1 (\(x = 0\)): \(N_1(0) = 1\), \(N_2(0) = 0\)</p>
+                <p>At node 2 (\(x = L\)): \(N_1(L) = 0\), \(N_2(L) = 1\)</p>
+                <p>✓ Each shape function equals 1 at its own node and 0 at other nodes.</p>
+
+                <p><strong>(b) Partition of Unity:</strong></p>
+                <p>\(N_1(x) + N_2(x) = \left(1 - \frac{x}{L}\right) + \frac{x}{L} = 1\) for all \(x\)</p>
+                <p>✓ Shape functions sum to unity everywhere, ensuring rigid body motion can be represented.</p>
+
+                <p><strong>(c) Constant Strain Representation:</strong></p>
+                <p>If \(u_1 = 0\) and \(u_2 = \varepsilon_0 L\) (constant strain \(\varepsilon_0\)):</p>
+                <p>\(u(x) = N_1(x) \cdot 0 + N_2(x) \cdot \varepsilon_0 L = \frac{x}{L} \cdot \varepsilon_0 L = \varepsilon_0 x\)</p>
+                <p>\(\varepsilon = \frac{du}{dx} = \varepsilon_0\) (constant)</p>
+                <p>✓ Linear shape functions can exactly represent constant strain states.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary advantage of the Finite Element Method?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) It gives exact analytical solutions</label>
+                    <label><input type="radio" name="q1" value="b"> b) It can handle complex geometries and boundary conditions</label>
+                    <label><input type="radio" name="q1" value="c"> c) It requires no computational resources</label>
+                    <label><input type="radio" name="q1" value="d"> d) It eliminates the need for material properties</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: For a 1D bar element, the stiffness matrix is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Diagonal</label>
+                    <label><input type="radio" name="q2" value="b"> b) Symmetric</label>
+                    <label><input type="radio" name="q2" value="c"> c) Asymmetric</label>
+                    <label><input type="radio" name="q2" value="d"> d) Identity matrix</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Shape functions must satisfy which property?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) They must be nonlinear</label>
+                    <label><input type="radio" name="q3" value="b"> b) They must sum to zero</label>
+                    <label><input type="radio" name="q3" value="c"> c) They must satisfy partition of unity (sum to one)</label>
+                    <label><input type="radio" name="q3" value="d"> d) They must be discontinuous</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: In the assembly process, what happens at shared nodes?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Element stiffnesses are averaged</label>
+                    <label><input type="radio" name="q4" value="b"> b) Element stiffnesses are added (superposed)</label>
+                    <label><input type="radio" name="q4" value="c"> c) Only the largest stiffness is kept</label>
+                    <label><input type="radio" name="q4" value="d"> d) Nodes are duplicated</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: As the number of elements increases, the FEM solution:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Becomes less accurate</label>
+                    <label><input type="radio" name="q5" value="b"> b) Remains constant</label>
+                    <label><input type="radio" name="q5" value="c"> c) Converges to the exact solution</label>
+                    <label><input type="radio" name="q5" value="d"> d) Oscillates randomly</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Complex geometries
+                        q2: 'b', // Symmetric
+                        q3: 'c', // Partition of unity
+                        q4: 'b', // Stiffnesses are added
+                        q5: 'c'  // Converges to exact solution
+                    };
+
+                    let score = 0;
+                    let totalQuestions = Object.keys(answers).length;
+                    let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        const correctAnswer = answers[question];
+
+                        if (selectedOption) {
+                            if (selectedOption.value === correctAnswer) {
+                                score++;
+                                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                            } else {
+                                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                            }
+                        } else {
+                            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                        }
+                    }
+
+                    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                    document.getElementById('quiz-results').innerHTML = resultsHTML;
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

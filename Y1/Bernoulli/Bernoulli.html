@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bernoulli's Equation - Interactive Lecture</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/problems.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Bernoulli's Equation</h1>
+        <p class="small-caps">Interactive Lecture on Fluid Dynamics</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+
+    <!-- SECTION 1: TEACHING CONTENT -->
+    <div class="content-section">
+        <h2>Understanding Bernoulli's Equation</h2>
+        <p>Bernoulli's equation is one of the most important and widely used equations in fluid mechanics. It describes the conservation of energy for flowing fluids and relates pressure, velocity, and elevation along a streamline.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> For an ideal fluid flowing along a streamline, the total mechanical energy per unit volume remains constant. This means that an increase in fluid velocity must be accompanied by a decrease in pressure or potential energy.</p>
+        </div>
+
+        <h3>Historical Context</h3>
+        <p>Daniel Bernoulli, a Swiss mathematician and physicist, published this principle in 1738 in his work "Hydrodynamica." The equation applies to incompressible, inviscid (frictionless) flow along a streamline, making it invaluable for understanding fluid behavior in many engineering applications.</p>
+
+        <h3>Derivation and Physical Meaning</h3>
+        <p>Bernoulli's equation can be derived from Newton's second law applied to a fluid element or from the principle of conservation of energy. It states that the sum of pressure energy, kinetic energy, and potential energy per unit volume remains constant along a streamline.</p>
+
+        <div class="equation-box">
+            <p><strong>Bernoulli's Equation (Energy Form):</strong></p>
+            <p>\[P + \frac{1}{2}\rho v^2 + \rho g h = \text{constant}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(P\) = Static pressure (Pa)</li>
+                <li>\(\rho\) = Fluid density (kg/m³)</li>
+                <li>\(v\) = Flow velocity (m/s)</li>
+                <li>\(g\) = Gravitational acceleration (9.81 m/s²)</li>
+                <li>\(h\) = Elevation above reference level (m)</li>
+            </ul>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Alternative Form (Head Form):</strong></p>
+            <p>\[\frac{P}{\rho g} + \frac{v^2}{2g} + h = \text{constant}\]</p>
+            <p>Where each term represents:</p>
+            <ul>
+                <li>\(\frac{P}{\rho g}\) = Pressure head (m)</li>
+                <li>\(\frac{v^2}{2g}\) = Velocity head (m)</li>
+                <li>\(h\) = Elevation head (m)</li>
+            </ul>
+        </div>
+
+        <h3>Energy Components</h3>
+        <p>Each term in Bernoulli's equation represents a different form of energy per unit volume:</p>
+        <ul>
+            <li><strong>Pressure Energy (P):</strong> The energy due to fluid pressure, also called static pressure</li>
+            <li><strong>Kinetic Energy (\(\frac{1}{2}\rho v^2\)):</strong> The energy due to fluid motion, also called dynamic pressure</li>
+            <li><strong>Potential Energy (\(\rho g h\)):</strong> The energy due to elevation above a reference level</li>
+        </ul>
+
+        <h3>Assumptions and Limitations</h3>
+        <p>Bernoulli's equation is valid under the following conditions:</p>
+        <ul>
+            <li>Steady flow (flow properties do not change with time)</li>
+            <li>Incompressible fluid (constant density)</li>
+            <li>Inviscid flow (no viscous friction losses)</li>
+            <li>Flow along a streamline</li>
+            <li>No shaft work (no pumps or turbines between points)</li>
+            <li>No heat transfer</li>
+        </ul>
+    </div>
+
+    <!-- SECTION 2: INTERACTIVE SIMULATION -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Venturi Tube</h2>
+        <p>Explore how fluid velocity and pressure change through a converging-diverging tube (Venturi effect). Adjust the inlet velocity and tube geometry to see how Bernoulli's equation describes the flow behavior.</p>
+
+        <div id="bernoulli-sketch"></div>
+
+        <div class="controls-panel">
+            <div class="control-row">
+                <label>Inlet Velocity (v₁):</label>
+                <input type="range" id="velocity-slider" min="1" max="20" step="0.5" value="5">
+                <span id="velocity-value">5.0 m/s</span>
+            </div>
+
+            <div class="control-row">
+                <label>Throat Diameter Ratio:</label>
+                <input type="range" id="diameter-slider" min="0.3" max="0.8" step="0.05" value="0.5">
+                <span id="diameter-value">0.50</span>
+            </div>
+
+            <div class="control-row">
+                <label>Fluid Density:</label>
+                <input type="range" id="density-slider" min="800" max="1200" step="10" value="1000">
+                <span id="density-value">1000 kg/m³</span>
+            </div>
+
+            <div class="control-row">
+                <button id="animate-button">Start Animation</button>
+                <button id="reset-button">Reset</button>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <h3>Flow Conditions:</h3>
+            <p><strong>Inlet (Section 1):</strong></p>
+            <p>Velocity v₁ = <span id="v1-display">5.00</span> m/s | Pressure P₁ = <span id="p1-display">101325</span> Pa</p>
+            <p><strong>Throat (Section 2):</strong></p>
+            <p>Velocity v₂ = <span id="v2-display">20.00</span> m/s | Pressure P₂ = <span id="p2-display">91575</span> Pa</p>
+            <p><strong>Pressure Drop:</strong> ΔP = <span id="dp-display">9750</span> Pa</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: ENGINEERING APPLICATIONS -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Aircraft Wing Lift</h3>
+        <p>Bernoulli's principle explains how airplane wings generate lift. Air flows faster over the curved upper surface of the wing than the flatter lower surface, creating lower pressure above the wing and higher pressure below, resulting in an upward lift force.</p>
+
+        <h3>2. Venturi Meters and Flow Measurement</h3>
+        <p>Venturi tubes are used to measure flow rates in pipes. By measuring the pressure difference between the wide and narrow sections, engineers can calculate the flow velocity and volumetric flow rate using Bernoulli's equation.</p>
+
+        <h3>3. Carburetors in Engines</h3>
+        <p>Traditional carburetors use the Venturi effect to draw fuel into the air stream. As air flows through a constriction, its velocity increases and pressure decreases, creating suction that draws fuel from the fuel bowl.</p>
+
+        <h3>4. Atomizers and Spray Bottles</h3>
+        <p>Spray bottles and perfume atomizers use Bernoulli's principle. When you squeeze the bulb or trigger, air flows rapidly over a tube, creating low pressure that draws liquid up and atomizes it into a fine spray.</p>
+
+        <h3>5. Pitot Tubes for Speed Measurement</h3>
+        <p>Aircraft use pitot tubes to measure airspeed. The device measures both static pressure and stagnation pressure (where velocity is zero). The difference between these pressures, combined with Bernoulli's equation, gives the aircraft's velocity.</p>
+
+        <h3>6. Pipeline Flow and Pressure Distribution</h3>
+        <p>In hydraulic systems and pipelines, engineers use Bernoulli's equation to analyze pressure changes due to elevation changes, pipe diameter variations, and flow velocities, helping design efficient piping systems.</p>
+
+        <h3>7. Chimney and Ventilation Design</h3>
+        <p>The "chimney effect" or "stack effect" in buildings is partially explained by Bernoulli's principle. Wind flowing over the top of a chimney creates lower pressure, helping draw smoke and gases upward.</p>
+    </div>
+
+    <!-- SECTION 4: SUMMARY OF KEY EQUATIONS -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Bernoulli's Equation (Energy)</td>
+                        <td>\(P + \frac{1}{2}\rho v^2 + \rho g h = \text{const}\)</td>
+                        <td>Conservation of energy along streamline</td>
+                    </tr>
+                    <tr>
+                        <td>Bernoulli's Equation (Head)</td>
+                        <td>\(\frac{P}{\rho g} + \frac{v^2}{2g} + h = \text{const}\)</td>
+                        <td>Head form for hydraulic calculations</td>
+                    </tr>
+                    <tr>
+                        <td>Static Pressure</td>
+                        <td>\(P\)</td>
+                        <td>Pressure energy per unit volume</td>
+                    </tr>
+                    <tr>
+                        <td>Dynamic Pressure</td>
+                        <td>\(\frac{1}{2}\rho v^2\)</td>
+                        <td>Kinetic energy per unit volume</td>
+                    </tr>
+                    <tr>
+                        <td>Hydrostatic Pressure</td>
+                        <td>\(\rho g h\)</td>
+                        <td>Potential energy per unit volume</td>
+                    </tr>
+                    <tr>
+                        <td>Continuity Equation</td>
+                        <td>\(A_1 v_1 = A_2 v_2\)</td>
+                        <td>Mass conservation for incompressible flow</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity from Pressure</td>
+                        <td>\(v = \sqrt{\frac{2(P_1 - P_2)}{\rho}}\)</td>
+                        <td>Velocity from pressure difference (same height)</td>
+                    </tr>
+                    <tr>
+                        <td>Pressure Head</td>
+                        <td>\(h_p = \frac{P}{\rho g}\)</td>
+                        <td>Equivalent height of fluid column</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity Head</td>
+                        <td>\(h_v = \frac{v^2}{2g}\)</td>
+                        <td>Height equivalent to kinetic energy</td>
+                    </tr>
+                    <tr>
+                        <td>Stagnation Pressure</td>
+                        <td>\(P_0 = P + \frac{1}{2}\rho v^2\)</td>
+                        <td>Total pressure when flow is brought to rest</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 5: PRACTICE PROBLEMS -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Water Tank Discharge</h3>
+            <p>A large open water tank has a small hole at a depth of 4 meters below the water surface. Calculate the velocity of water exiting the hole. Assume atmospheric pressure at both the surface and the hole exit.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Height difference: h = 4 m</li>
+                    <li>Pressure at surface (P₁) = Atmospheric pressure</li>
+                    <li>Pressure at hole exit (P₂) = Atmospheric pressure</li>
+                    <li>Velocity at surface (v₁) ≈ 0 (large tank)</li>
+                </ul>
+                <p><strong>Apply Bernoulli's Equation:</strong></p>
+                <p>\[P_1 + \frac{1}{2}\rho v_1^2 + \rho g h_1 = P_2 + \frac{1}{2}\rho v_2^2 + \rho g h_2\]</p>
+                <p>Since P₁ = P₂ and v₁ ≈ 0:</p>
+                <p>\[\rho g h_1 = \frac{1}{2}\rho v_2^2 + \rho g h_2\]</p>
+                <p>\[g(h_1 - h_2) = \frac{1}{2}v_2^2\]</p>
+                <p>\[v_2 = \sqrt{2gh} = \sqrt{2 \times 9.81 \times 4} = \sqrt{78.48} = 8.86 \text{ m/s}\]</p>
+                <p><strong>Answer:</strong> The exit velocity is approximately 8.86 m/s (Torricelli's theorem)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Venturi Meter Calculation</h3>
+            <p>Water flows through a horizontal Venturi meter with an inlet diameter of 200 mm and a throat diameter of 100 mm. If the pressure at the inlet is 300 kPa and at the throat is 200 kPa, calculate the flow velocity at the throat and the volumetric flow rate. (Density of water = 1000 kg/m³)</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Inlet diameter: D₁ = 200 mm = 0.2 m, A₁ = π(0.1)² = 0.0314 m²</li>
+                    <li>Throat diameter: D₂ = 100 mm = 0.1 m, A₂ = π(0.05)² = 0.00785 m²</li>
+                    <li>Inlet pressure: P₁ = 300 kPa = 300,000 Pa</li>
+                    <li>Throat pressure: P₂ = 200 kPa = 200,000 Pa</li>
+                    <li>Density: ρ = 1000 kg/m³</li>
+                </ul>
+                <p><strong>Step 1: Apply Continuity Equation:</strong></p>
+                <p>\[A_1 v_1 = A_2 v_2\]</p>
+                <p>\[v_1 = v_2 \frac{A_2}{A_1} = v_2 \frac{0.00785}{0.0314} = 0.25 v_2\]</p>
+                <p><strong>Step 2: Apply Bernoulli's Equation (horizontal, so h₁ = h₂):</strong></p>
+                <p>\[P_1 + \frac{1}{2}\rho v_1^2 = P_2 + \frac{1}{2}\rho v_2^2\]</p>
+                <p>\[300000 + \frac{1}{2}(1000)(0.25v_2)^2 = 200000 + \frac{1}{2}(1000)v_2^2\]</p>
+                <p>\[100000 = 500v_2^2 - 500(0.0625)v_2^2\]</p>
+                <p>\[100000 = 500v_2^2(1 - 0.0625) = 468.75v_2^2\]</p>
+                <p>\[v_2 = \sqrt{\frac{100000}{468.75}} = 14.61 \text{ m/s}\]</p>
+                <p><strong>Step 3: Calculate volumetric flow rate:</strong></p>
+                <p>\[Q = A_2 v_2 = 0.00785 \times 14.61 = 0.115 \text{ m}^3\text{/s} = 115 \text{ L/s}\]</p>
+                <p><strong>Answer:</strong> Throat velocity = 14.61 m/s, Flow rate = 115 L/s</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Pitot Tube Airspeed</h3>
+            <p>A pitot tube on an aircraft measures a stagnation pressure of 105 kPa and a static pressure of 100 kPa. If the air density is 1.2 kg/m³, calculate the aircraft's airspeed.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Stagnation pressure: P₀ = 105 kPa = 105,000 Pa</li>
+                    <li>Static pressure: P = 100 kPa = 100,000 Pa</li>
+                    <li>Air density: ρ = 1.2 kg/m³</li>
+                </ul>
+                <p><strong>Concept:</strong> At the stagnation point, velocity = 0, so:</p>
+                <p>\[P_0 = P + \frac{1}{2}\rho v^2\]</p>
+                <p><strong>Solve for velocity:</strong></p>
+                <p>\[\frac{1}{2}\rho v^2 = P_0 - P = 105000 - 100000 = 5000 \text{ Pa}\]</p>
+                <p>\[v^2 = \frac{2 \times 5000}{1.2} = \frac{10000}{1.2} = 8333.33\]</p>
+                <p>\[v = \sqrt{8333.33} = 91.3 \text{ m/s}\]</p>
+                <p><strong>Answer:</strong> The aircraft's airspeed is approximately 91.3 m/s (or 328.7 km/h)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: KNOWLEDGE CHECK QUIZ -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does Bernoulli's equation represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> Conservation of mass in fluid flow</label>
+                    <label><input type="radio" name="q1" value="b"> Conservation of energy along a streamline</label>
+                    <label><input type="radio" name="q1" value="c"> Conservation of momentum in turbulent flow</label>
+                    <label><input type="radio" name="q1" value="d"> Newton's second law for fluids</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In a horizontal pipe with constant elevation, if the velocity increases, what happens to pressure?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> Pressure increases</label>
+                    <label><input type="radio" name="q2" value="b"> Pressure decreases</label>
+                    <label><input type="radio" name="q2" value="c"> Pressure remains constant</label>
+                    <label><input type="radio" name="q2" value="d"> Pressure becomes zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Which of the following is NOT an assumption of Bernoulli's equation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> Steady flow</label>
+                    <label><input type="radio" name="q3" value="b"> Incompressible fluid</label>
+                    <label><input type="radio" name="q3" value="c"> Viscous flow with friction</label>
+                    <label><input type="radio" name="q3" value="d"> Flow along a streamline</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The dynamic pressure term in Bernoulli's equation is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> \(\rho g h\)</label>
+                    <label><input type="radio" name="q4" value="b"> \(P\)</label>
+                    <label><input type="radio" name="q4" value="c"> \(\frac{1}{2}\rho v^2\)</label>
+                    <label><input type="radio" name="q4" value="d"> \(\frac{P}{\rho g}\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: A Venturi meter works by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> Measuring temperature changes in the fluid</label>
+                    <label><input type="radio" name="q5" value="b"> Measuring pressure difference between wide and narrow sections</label>
+                    <label><input type="radio" name="q5" value="c"> Measuring the viscosity of the fluid</label>
+                    <label><input type="radio" name="q5" value="d"> Directly measuring the fluid velocity</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // System parameters
+        let inletVelocity = 5.0;
+        let diameterRatio = 0.5;
+        let fluidDensity = 1000;
+        let animating = false;
+        let particlePositions = [];
+
+        // Constants
+        const P_atm = 101325; // Atmospheric pressure in Pa
+        const g = 9.81;
+
+        // DOM elements
+        const velocitySlider = document.getElementById('velocity-slider');
+        const velocityValue = document.getElementById('velocity-value');
+        const diameterSlider = document.getElementById('diameter-slider');
+        const diameterValue = document.getElementById('diameter-value');
+        const densitySlider = document.getElementById('density-slider');
+        const densityValue = document.getElementById('density-value');
+        const animateButton = document.getElementById('animate-button');
+        const resetButton = document.getElementById('reset-button');
+
+        // P5.js sketch
+        new p5(function(p) {
+            const canvasWidth = 700;
+            const canvasHeight = 400;
+
+            // Tube dimensions
+            const tubeStartX = 50;
+            const tubeEndX = 650;
+            const inletRadius = 80;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('bernoulli-sketch');
+                p.frameRate(30);
+
+                // Initialize particles
+                for (let i = 0; i < 20; i++) {
+                    particlePositions.push({
+                        x: tubeStartX - i * 30,
+                        y: canvasHeight / 2 + p.random(-inletRadius + 10, inletRadius - 10),
+                        vx: inletVelocity
+                    });
+                }
+
+                // Register event listeners
+                velocitySlider.addEventListener('input', updateParameters);
+                diameterSlider.addEventListener('input', updateParameters);
+                densitySlider.addEventListener('input', updateParameters);
+
+                animateButton.addEventListener('click', toggleAnimation);
+                resetButton.addEventListener('click', resetSimulation);
+
+                updateDisplay();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Calculate current values
+                const throatRadius = inletRadius * diameterRatio;
+                const A1 = Math.PI * inletRadius * inletRadius / 10000; // Convert to m²
+                const A2 = Math.PI * throatRadius * throatRadius / 10000;
+                const v1 = inletVelocity;
+                const v2 = v1 * (A1 / A2); // Continuity equation
+
+                // Bernoulli's equation (horizontal pipe, h1 = h2)
+                const P1 = P_atm;
+                const P2 = P1 + 0.5 * fluidDensity * (v1 * v1 - v2 * v2);
+                const deltaP = P1 - P2;
+
+                // Update displays
+                document.getElementById('v1-display').textContent = v1.toFixed(2);
+                document.getElementById('v2-display').textContent = v2.toFixed(2);
+                document.getElementById('p1-display').textContent = P1.toFixed(0);
+                document.getElementById('p2-display').textContent = P2.toFixed(0);
+                document.getElementById('dp-display').textContent = deltaP.toFixed(0);
+
+                // Draw tube outline
+                drawVenturiTube(p, inletRadius, throatRadius);
+
+                // Draw pressure indicators
+                drawPressureIndicators(p, P1, P2, inletRadius, throatRadius);
+
+                // Update and draw particles
+                if (animating) {
+                    updateParticles(p, inletRadius, throatRadius, v1, v2);
+                }
+                drawParticles(p);
+
+                // Draw labels
+                drawLabels(p);
+            };
+
+            function drawVenturiTube(p, r1, r2) {
+                p.fill(200, 220, 255, 100);
+                p.stroke(0, 0, 150);
+                p.strokeWeight(3);
+
+                const centerY = canvasHeight / 2;
+                const throatX = (tubeStartX + tubeEndX) / 2;
+
+                // Top curve
+                p.beginShape();
+                for (let x = tubeStartX; x <= tubeEndX; x++) {
+                    const t = (x - tubeStartX) / (tubeEndX - tubeStartX);
+                    let radius;
+                    if (x < throatX) {
+                        const localT = (x - tubeStartX) / (throatX - tubeStartX);
+                        radius = r1 - (r1 - r2) * localT;
+                    } else {
+                        const localT = (x - throatX) / (tubeEndX - throatX);
+                        radius = r2 + (r1 - r2) * localT;
+                    }
+                    p.vertex(x, centerY - radius);
+                }
+                p.endShape();
+
+                // Bottom curve
+                p.beginShape();
+                for (let x = tubeEndX; x >= tubeStartX; x--) {
+                    const t = (x - tubeStartX) / (tubeEndX - tubeStartX);
+                    let radius;
+                    if (x < throatX) {
+                        const localT = (x - tubeStartX) / (throatX - tubeStartX);
+                        radius = r1 - (r1 - r2) * localT;
+                    } else {
+                        const localT = (x - throatX) / (tubeEndX - throatX);
+                        radius = r2 + (r1 - r2) * localT;
+                    }
+                    p.vertex(x, centerY + radius);
+                }
+                p.endShape();
+
+                // Close the shape
+                p.line(tubeStartX, centerY - r1, tubeStartX, centerY + r1);
+                p.line(tubeEndX, centerY - r1, tubeEndX, centerY + r1);
+            }
+
+            function drawPressureIndicators(p, P1, P2, r1, r2) {
+                const centerY = canvasHeight / 2;
+                const inletX = tubeStartX + 100;
+                const throatX = (tubeStartX + tubeEndX) / 2;
+
+                // Scale pressure to visual height (exaggerated for visibility)
+                const scale = 0.0005;
+                const h1 = (P1 - P_atm) * scale + 50;
+                const h2 = (P2 - P_atm) * scale + 50;
+
+                // Inlet pressure indicator
+                p.stroke(255, 0, 0);
+                p.strokeWeight(2);
+                p.line(inletX, centerY + r1 + 10, inletX, centerY + r1 + 10 + h1);
+                p.noStroke();
+                p.fill(255, 0, 0);
+                p.text('P₁', inletX - 10, centerY + r1 + 25);
+
+                // Throat pressure indicator
+                p.stroke(0, 0, 255);
+                p.strokeWeight(2);
+                p.line(throatX, centerY + r2 + 10, throatX, centerY + r2 + 10 + h2);
+                p.noStroke();
+                p.fill(0, 0, 255);
+                p.text('P₂', throatX - 10, centerY + r2 + 25);
+            }
+
+            function updateParticles(p, r1, r2, v1, v2) {
+                const centerY = canvasHeight / 2;
+                const throatX = (tubeStartX + tubeEndX) / 2;
+
+                for (let i = 0; i < particlePositions.length; i++) {
+                    const particle = particlePositions[i];
+
+                    // Determine current velocity based on position
+                    let currentV;
+                    if (particle.x < throatX) {
+                        const t = (particle.x - tubeStartX) / (throatX - tubeStartX);
+                        currentV = v1 + (v2 - v1) * t;
+                    } else {
+                        const t = (particle.x - throatX) / (tubeEndX - throatX);
+                        currentV = v2 - (v2 - v1) * t;
+                    }
+
+                    // Update position
+                    particle.x += currentV * 0.5;
+
+                    // Reset particle if it exits
+                    if (particle.x > tubeEndX) {
+                        particle.x = tubeStartX - 10;
+                        particle.y = centerY + p.random(-r1 + 10, r1 - 10);
+                    }
+                }
+            }
+
+            function drawParticles(p) {
+                p.fill(0, 100, 200);
+                p.noStroke();
+                for (let particle of particlePositions) {
+                    p.ellipse(particle.x, particle.y, 6, 6);
+                }
+            }
+
+            function drawLabels(p) {
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+
+                p.text('Section 1 (Inlet)', tubeStartX + 100, 30);
+                p.text('Section 2 (Throat)', (tubeStartX + tubeEndX) / 2, 30);
+                p.text('Section 3 (Outlet)', tubeEndX - 50, 30);
+
+                p.textSize(12);
+                p.text('Flow Direction →', canvasWidth / 2, canvasHeight - 20);
+            }
+
+            function updateParameters() {
+                inletVelocity = parseFloat(velocitySlider.value);
+                velocityValue.textContent = inletVelocity.toFixed(1) + ' m/s';
+
+                diameterRatio = parseFloat(diameterSlider.value);
+                diameterValue.textContent = diameterRatio.toFixed(2);
+
+                fluidDensity = parseFloat(densitySlider.value);
+                densityValue.textContent = fluidDensity.toFixed(0) + ' kg/m³';
+            }
+
+            function toggleAnimation() {
+                animating = !animating;
+                animateButton.textContent = animating ? 'Stop Animation' : 'Start Animation';
+            }
+
+            function resetSimulation() {
+                animating = false;
+                animateButton.textContent = 'Start Animation';
+
+                // Reset particles
+                particlePositions = [];
+                for (let i = 0; i < 20; i++) {
+                    particlePositions.push({
+                        x: tubeStartX - i * 30,
+                        y: canvasHeight / 2 + p.random(-inletRadius + 10, inletRadius - 10),
+                        vx: inletVelocity
+                    });
+                }
+            }
+
+            function updateDisplay() {
+                updateParameters();
+            }
+        });
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Conservation of energy
+                q2: 'b',  // Pressure decreases
+                q3: 'c',  // Viscous flow is NOT an assumption
+                q4: 'c',  // Dynamic pressure
+                q5: 'b'   // Pressure difference measurement
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

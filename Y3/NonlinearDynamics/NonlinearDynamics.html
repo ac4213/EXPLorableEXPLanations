@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonlinear Dynamics & Chaos - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Nonlinear Dynamics & Chaos</h1>
+        <p class="subtitle">Understanding Complex Behavior in Dynamic Systems</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Nonlinear Dynamics</h2>
+
+        <h3>What are Nonlinear Systems?</h3>
+        <p>Nonlinear systems are those whose behavior cannot be expressed as a linear combination of their inputs. Unlike linear systems, they can exhibit multiple equilibria, limit cycles, bifurcations, and chaos. Most real-world engineering systems are inherently nonlinear.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Nonlinear systems can exhibit dramatically different behavior than linear systems. Small changes in parameters or initial conditions can lead to qualitatively different responses. The principle of superposition does not apply, making analysis more challenging but also revealing rich dynamical behavior.</p>
+        </div>
+
+        <h3>Phase Space and Phase Portraits</h3>
+        <p>A <strong>phase portrait</strong> is a geometric representation of trajectories in phase space (state space). For a second-order system, phase space is two-dimensional with axes representing displacement and velocity.</p>
+
+        <div class="equation-box">
+            <p><strong>Phase Space Representation:</strong></p>
+            <p>For a system described by \(\ddot{x} = f(x, \dot{x}, t)\), define state variables:</p>
+            <p>\[x_1 = x, \quad x_2 = \dot{x}\]</p>
+            <p>Then: \[\dot{x}_1 = x_2, \quad \dot{x}_2 = f(x_1, x_2, t)\]</p>
+            <p>A trajectory in the \((x_1, x_2)\) plane represents the system's evolution over time.</p>
+        </div>
+
+        <h3>Types of Equilibrium Points</h3>
+        <p>Equilibrium points (fixed points) occur where \(\dot{x}_1 = \dot{x}_2 = 0\). Their stability is determined by linearization:</p>
+
+        <ul>
+            <li><strong>Stable Node:</strong> Trajectories spiral into the equilibrium point</li>
+            <li><strong>Unstable Node:</strong> Trajectories spiral away from the equilibrium point</li>
+            <li><strong>Saddle Point:</strong> Stable in one direction, unstable in another</li>
+            <li><strong>Center:</strong> Closed orbits around the equilibrium (neutrally stable)</li>
+            <li><strong>Stable/Unstable Spiral:</strong> Oscillatory approach/departure</li>
+        </ul>
+
+        <h3>Classic Nonlinear Systems</h3>
+
+        <h4>1. Duffing Oscillator</h4>
+        <p>The Duffing equation models a spring with cubic nonlinearity:</p>
+        <div class="equation-box">
+            <p>\[\ddot{x} + \delta\dot{x} + \alpha x + \beta x^3 = \gamma\cos(\omega t)\]</p>
+            <p>where \(\alpha\) is linear stiffness, \(\beta\) is nonlinear stiffness, \(\delta\) is damping, and the right side is forcing.</p>
+            <p><strong>Hardening spring:</strong> \(\beta > 0\) (stiffness increases with displacement)</p>
+            <p><strong>Softening spring:</strong> \(\beta < 0\) (stiffness decreases with displacement)</p>
+        </div>
+
+        <h4>2. Van der Pol Oscillator</h4>
+        <p>Models self-excited oscillations with nonlinear damping:</p>
+        <div class="equation-box">
+            <p>\[\ddot{x} - \mu(1-x^2)\dot{x} + x = 0\]</p>
+            <p>where \(\mu > 0\) controls the nonlinearity strength. For small amplitudes, damping is negative (energy added), for large amplitudes, damping is positive (energy dissipated).</p>
+        </div>
+
+        <h4>3. Pendulum</h4>
+        <p>The simple pendulum exhibits nonlinear behavior for large angles:</p>
+        <div class="equation-box">
+            <p>\[\ddot{\theta} + \frac{g}{L}\sin(\theta) = 0\]</p>
+            <p>Unlike the linearized version, the period depends on amplitude, and the phase portrait shows separatrices dividing oscillation and rotation regions.</p>
+        </div>
+
+        <h3>Limit Cycles</h3>
+        <p>A <strong>limit cycle</strong> is an isolated closed trajectory in phase space. Unlike the center in linear systems, limit cycles are structurally stable - nearby trajectories converge to or diverge from them.</p>
+
+        <div class="key-point">
+            <p><strong>Poincaré-Bendixson Theorem:</strong> For 2D continuous systems, if a trajectory remains in a bounded region and doesn't settle at a fixed point, it must approach a limit cycle. This theorem doesn't apply in higher dimensions, where chaotic behavior can occur.</p>
+        </div>
+
+        <h3>Bifurcations</h3>
+        <p>A <strong>bifurcation</strong> occurs when a qualitative change in system behavior happens as a parameter varies. Common types include:</p>
+
+        <ul>
+            <li><strong>Saddle-Node Bifurcation:</strong> Fixed points appear or disappear in pairs</li>
+            <li><strong>Transcritical Bifurcation:</strong> Fixed points exchange stability</li>
+            <li><strong>Pitchfork Bifurcation:</strong> A fixed point splits into three (symmetric systems)</li>
+            <li><strong>Hopf Bifurcation:</strong> Fixed point becomes a limit cycle</li>
+        </ul>
+
+        <h3>Chaos and Sensitivity to Initial Conditions</h3>
+        <p>Chaotic systems are deterministic yet appear random due to extreme sensitivity to initial conditions. Small differences in initial states lead to exponentially diverging trajectories.</p>
+
+        <div class="equation-box">
+            <p><strong>Lyapunov Exponent:</strong></p>
+            <p>\[\lambda = \lim_{t\to\infty} \frac{1}{t}\ln\frac{|\delta(t)|}{|\delta(0)|}\]</p>
+            <p>Measures the average rate of divergence of nearby trajectories:</p>
+            <ul style="list-style: none;">
+                <li>\(\lambda < 0\): Stable (trajectories converge)</li>
+                <li>\(\lambda = 0\): Neutrally stable</li>
+                <li>\(\lambda > 0\): Chaotic (trajectories diverge exponentially)</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Properties of Chaos:</strong> (1) Sensitivity to initial conditions, (2) Topological mixing (phase space gets thoroughly mixed), (3) Dense periodic orbits, (4) Bounded but non-periodic motion. Chaos requires at least three dimensions in continuous systems (Duffing with forcing is effectively 3D).</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Phase Portrait Simulation</h2>
+        <p>Explore phase portraits of different nonlinear systems. Watch how trajectories evolve and how changing parameters affects system behavior.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="system-type">System Type:</label>
+                <select id="system-type">
+                    <option value="duffing">Duffing Oscillator</option>
+                    <option value="vanderpol">Van der Pol Oscillator</option>
+                    <option value="pendulum">Nonlinear Pendulum</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="param1">Parameter 1: <span id="param1-value">0.5</span></label>
+                <input type="range" id="param1" min="0.1" max="2.0" step="0.1" value="0.5">
+            </div>
+
+            <div class="control-group">
+                <label for="param2">Parameter 2: <span id="param2-value">1.0</span></label>
+                <input type="range" id="param2" min="-2.0" max="2.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <button id="reset-btn">Reset Simulation</button>
+                <button id="clear-btn">Clear Trails</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+        <p style="text-align: center; font-style: italic; margin-top: 10px;">Click on the phase portrait to add trajectories from different initial conditions</p>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let systemType = 'duffing';
+        let param1 = 0.5;
+        let param2 = 1.0;
+
+        // Trajectories
+        let trajectories = [];
+        let maxTrajectories = 8;
+        let showFixedPoints = true;
+
+        function setupControls() {
+            document.getElementById('system-type').addEventListener('change', function() {
+                systemType = this.value;
+                updateParameterLabels();
+                trajectories = [];
+                addDefaultTrajectories();
+            });
+
+            document.getElementById('param1').addEventListener('input', function() {
+                param1 = parseFloat(this.value);
+                document.getElementById('param1-value').textContent = param1.toFixed(2);
+                trajectories = [];
+                addDefaultTrajectories();
+            });
+
+            document.getElementById('param2').addEventListener('input', function() {
+                param2 = parseFloat(this.value);
+                document.getElementById('param2-value').textContent = param2.toFixed(2);
+                trajectories = [];
+                addDefaultTrajectories();
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                trajectories = [];
+                addDefaultTrajectories();
+            });
+
+            document.getElementById('clear-btn').addEventListener('click', function() {
+                for (let traj of trajectories) {
+                    traj.points = [];
+                }
+            });
+        }
+
+        function updateParameterLabels() {
+            let param1Label = document.querySelector('label[for="param1"]');
+            let param2Label = document.querySelector('label[for="param2"]');
+
+            if (systemType === 'duffing') {
+                param1Label.childNodes[0].textContent = 'Damping δ: ';
+                param2Label.childNodes[0].textContent = 'Nonlinearity β: ';
+                document.getElementById('param2').min = '-2.0';
+                document.getElementById('param2').max = '2.0';
+            } else if (systemType === 'vanderpol') {
+                param1Label.childNodes[0].textContent = 'Nonlinearity μ: ';
+                param2Label.childNodes[0].textContent = 'Stiffness ω²: ';
+                document.getElementById('param2').min = '0.1';
+                document.getElementById('param2').max = '3.0';
+            } else if (systemType === 'pendulum') {
+                param1Label.childNodes[0].textContent = 'Damping δ: ';
+                param2Label.childNodes[0].textContent = 'g/L: ';
+                document.getElementById('param2').min = '0.5';
+                document.getElementById('param2').max = '5.0';
+            }
+        }
+
+        function addDefaultTrajectories() {
+            // Add a few default trajectories
+            if (systemType === 'duffing') {
+                trajectories.push(new Trajectory(0.5, 0.0));
+                trajectories.push(new Trajectory(-0.5, 0.0));
+                trajectories.push(new Trajectory(0.0, 1.0));
+            } else if (systemType === 'vanderpol') {
+                trajectories.push(new Trajectory(0.1, 0.0));
+                trajectories.push(new Trajectory(2.0, 0.0));
+            } else if (systemType === 'pendulum') {
+                trajectories.push(new Trajectory(0.5, 0.0));
+                trajectories.push(new Trajectory(2.5, 0.0));
+            }
+        }
+
+        class Trajectory {
+            constructor(x0, v0) {
+                this.x = x0;
+                this.v = v0;
+                this.points = [];
+                this.color = color(random(100, 255), random(100, 255), random(100, 255));
+                this.maxPoints = 2000;
+            }
+
+            update(dt) {
+                // Runge-Kutta 4th order integration
+                let k1x = this.v;
+                let k1v = this.derivative(this.x, this.v);
+
+                let k2x = this.v + 0.5 * dt * k1v;
+                let k2v = this.derivative(this.x + 0.5 * dt * k1x, this.v + 0.5 * dt * k1v);
+
+                let k3x = this.v + 0.5 * dt * k2v;
+                let k3v = this.derivative(this.x + 0.5 * dt * k2x, this.v + 0.5 * dt * k2v);
+
+                let k4x = this.v + dt * k3v;
+                let k4v = this.derivative(this.x + dt * k3x, this.v + dt * k3v);
+
+                this.x += (dt / 6) * (k1x + 2 * k2x + 2 * k3x + k4x);
+                this.v += (dt / 6) * (k1v + 2 * k2v + 2 * k3v + k4v);
+
+                // Store point for trail
+                this.points.push({x: this.x, v: this.v});
+                if (this.points.length > this.maxPoints) {
+                    this.points.shift();
+                }
+            }
+
+            derivative(x, v) {
+                if (systemType === 'duffing') {
+                    // Duffing: ẍ + δẋ + x + βx³ = 0
+                    return -param1 * v - x - param2 * x * x * x;
+                } else if (systemType === 'vanderpol') {
+                    // Van der Pol: ẍ - μ(1-x²)ẋ + ω²x = 0
+                    return param1 * (1 - x * x) * v - param2 * x;
+                } else if (systemType === 'pendulum') {
+                    // Pendulum: θ̈ + δθ̇ + (g/L)sin(θ) = 0
+                    return -param1 * v - param2 * Math.sin(x);
+                }
+            }
+        }
+
+        function setup() {
+            let canvas = createCanvas(900, 700);
+            canvas.parent('sketch-holder');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+
+            setupControls();
+            updateParameterLabels();
+            addDefaultTrajectories();
+        }
+
+        function draw() {
+            background(255);
+
+            // Set up phase portrait view
+            push();
+            translate(150, 350);
+
+            // Draw grid
+            drawGrid();
+
+            // Draw fixed points
+            if (showFixedPoints) {
+                drawFixedPoints();
+            }
+
+            // Update and draw trajectories
+            for (let traj of trajectories) {
+                // Update multiple times per frame for smooth animation
+                for (let i = 0; i < 5; i++) {
+                    traj.update(0.01);
+                }
+
+                // Draw trail
+                stroke(traj.color);
+                strokeWeight(2);
+                noFill();
+                beginShape();
+                for (let pt of traj.points) {
+                    let px = map(pt.x, -3, 3, 0, 600);
+                    let py = map(pt.v, -3, 3, 300, -300);
+                    vertex(px, py);
+                }
+                endShape();
+
+                // Draw current point
+                fill(traj.color);
+                noStroke();
+                let px = map(traj.x, -3, 3, 0, 600);
+                let py = map(traj.v, -3, 3, 300, -300);
+                circle(px, py, 8);
+            }
+
+            pop();
+
+            // Draw labels and info
+            drawLabelsAndInfo();
+        }
+
+        function drawGrid() {
+            // Background
+            fill(240);
+            noStroke();
+            rect(0, -300, 600, 600);
+
+            // Grid lines
+            stroke(220);
+            strokeWeight(1);
+            for (let i = -3; i <= 3; i++) {
+                let px = map(i, -3, 3, 0, 600);
+                let py = map(i, -3, 3, 300, -300);
+                line(px, -300, px, 300);
+                line(0, py, 600, py);
+            }
+
+            // Axes
+            stroke(0);
+            strokeWeight(2);
+            line(0, 0, 600, 0); // x-axis
+            line(300, -300, 300, 300); // y-axis
+
+            // Axis labels
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(12);
+            for (let i = -3; i <= 3; i++) {
+                let px = map(i, -3, 3, 0, 600);
+                text(i.toFixed(1), px, 20);
+            }
+            textAlign(RIGHT);
+            for (let i = -3; i <= 3; i++) {
+                let py = map(i, -3, 3, 300, -300);
+                text(i.toFixed(1), -10, py + 5);
+            }
+        }
+
+        function drawFixedPoints() {
+            // Draw equilibrium points (all systems have origin as equilibrium)
+            fill(255, 0, 0);
+            noStroke();
+            let px = map(0, -3, 3, 0, 600);
+            let py = map(0, -3, 3, 300, -300);
+            circle(px, py, 10);
+
+            // For Duffing with negative beta, additional equilibria exist
+            if (systemType === 'duffing' && param2 < 0) {
+                let x_eq = Math.sqrt(-1 / param2);
+                let px1 = map(x_eq, -3, 3, 0, 600);
+                let px2 = map(-x_eq, -3, 3, 0, 600);
+                circle(px1, py, 10);
+                circle(px2, py, 10);
+            }
+        }
+
+        function drawLabelsAndInfo() {
+            fill(0);
+            noStroke();
+            textAlign(CENTER);
+            textSize(16);
+            text("Phase Portrait", 450, 30);
+
+            textSize(14);
+            text("Displacement", 450, 680);
+
+            push();
+            translate(30, 350);
+            rotate(-PI / 2);
+            text("Velocity", 0, 0);
+            pop();
+
+            // System info
+            textAlign(LEFT);
+            textSize(12);
+            text("System: " + getSystemName(), 50, 60);
+            text("Parameters: " + getParameterInfo(), 50, 80);
+            text("Trajectories: " + trajectories.length + "/" + maxTrajectories, 50, 100);
+        }
+
+        function getSystemName() {
+            if (systemType === 'duffing') return "Duffing Oscillator";
+            if (systemType === 'vanderpol') return "Van der Pol Oscillator";
+            if (systemType === 'pendulum') return "Nonlinear Pendulum";
+        }
+
+        function getParameterInfo() {
+            if (systemType === 'duffing') {
+                return "δ=" + param1.toFixed(2) + ", β=" + param2.toFixed(2);
+            } else if (systemType === 'vanderpol') {
+                return "μ=" + param1.toFixed(2) + ", ω²=" + param2.toFixed(2);
+            } else if (systemType === 'pendulum') {
+                return "δ=" + param1.toFixed(2) + ", g/L=" + param2.toFixed(2);
+            }
+        }
+
+        function mousePressed() {
+            // Add new trajectory at click position if within phase portrait
+            if (mouseX >= 150 && mouseX <= 750 && mouseY >= 50 && mouseY <= 650) {
+                let x0 = map(mouseX - 150, 0, 600, -3, 3);
+                let v0 = map(mouseY - 350, 300, -300, -3, 3);
+
+                if (trajectories.length >= maxTrajectories) {
+                    trajectories.shift();
+                }
+                trajectories.push(new Trajectory(x0, v0));
+            }
+        }
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Nonlinear dynamics and chaos theory have profound implications across engineering disciplines:</p>
+        <ul>
+            <li><strong>Structural Dynamics:</strong> Large-amplitude vibrations in beams, plates, and shells exhibit nonlinear stiffness. Understanding bifurcations helps predict catastrophic failure modes like snap-through buckling.</li>
+            <li><strong>Fluid-Structure Interaction:</strong> Vortex-induced vibrations and flutter in bridges, aircraft wings, and marine structures involve nonlinear coupling that can lead to limit cycle oscillations.</li>
+            <li><strong>Power Systems:</strong> Electrical grids can exhibit chaotic behavior under certain operating conditions. Understanding nonlinear dynamics is critical for preventing blackouts and ensuring stability.</li>
+            <li><strong>Control Systems:</strong> Nonlinear controllers often perform better than linear ones for large disturbances. Phase plane analysis guides controller design for robots, aircraft, and process control.</li>
+            <li><strong>Mechanical Systems:</strong> Gear rattling, bearing dynamics, and friction-induced vibrations (brake squeal, machine tool chatter) are inherently nonlinear phenomena.</li>
+            <li><strong>Biomechanics:</strong> Heart rhythms, neural networks, and walking gaits exhibit nonlinear dynamics. Chaos analysis helps detect pathologies and design better prosthetics.</li>
+            <li><strong>Weather and Climate:</strong> Atmospheric models are highly nonlinear, exhibiting sensitive dependence on initial conditions. This limits long-term weather prediction but reveals climate attractors.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Duffing Oscillator</td>
+                    <td>\(\ddot{x} + \delta\dot{x} + \alpha x + \beta x^3 = \gamma\cos(\omega t)\)</td>
+                    <td>Nonlinear spring with cubic stiffness</td>
+                </tr>
+                <tr>
+                    <td>Van der Pol Oscillator</td>
+                    <td>\(\ddot{x} - \mu(1-x^2)\dot{x} + x = 0\)</td>
+                    <td>Self-excited oscillation with nonlinear damping</td>
+                </tr>
+                <tr>
+                    <td>Nonlinear Pendulum</td>
+                    <td>\(\ddot{\theta} + \frac{g}{L}\sin(\theta) = 0\)</td>
+                    <td>Exact pendulum equation (nonlinear)</td>
+                </tr>
+                <tr>
+                    <td>State Space Form</td>
+                    <td>\(\dot{x}_1 = x_2, \quad \dot{x}_2 = f(x_1, x_2, t)\)</td>
+                    <td>First-order system representation</td>
+                </tr>
+                <tr>
+                    <td>Equilibrium Condition</td>
+                    <td>\(\dot{x}_1 = \dot{x}_2 = 0\)</td>
+                    <td>Fixed points in phase space</td>
+                </tr>
+                <tr>
+                    <td>Lyapunov Exponent</td>
+                    <td>\(\lambda = \lim_{t\to\infty} \frac{1}{t}\ln\frac{|\delta(t)|}{|\delta(0)|}\)</td>
+                    <td>Measure of trajectory divergence; \(\lambda > 0\) indicates chaos</td>
+                </tr>
+                <tr>
+                    <td>Jacobian Matrix (2D)</td>
+                    <td>\(J = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \frac{\partial f_1}{\partial x_2} \\ \frac{\partial f_2}{\partial x_1} & \frac{\partial f_2}{\partial x_2} \end{bmatrix}\)</td>
+                    <td>Linearization for stability analysis</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Equilibrium Points of Duffing Oscillator</h3>
+            <p>For the unforced, undamped Duffing equation \(\ddot{x} + x + \beta x^3 = 0\), find all equilibrium points for (a) \(\beta > 0\) and (b) \(\beta < 0\). Discuss their physical meaning.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Equilibrium points satisfy:</strong> \(\dot{x} = 0\) and \(\ddot{x} = 0\)</p>
+                <p>This gives: \(x + \beta x^3 = 0\) or \(x(1 + \beta x^2) = 0\)</p>
+
+                <p><strong>(a) For β > 0 (hardening spring):</strong></p>
+                <p>The only real solution is \(x = 0\)</p>
+                <p>There is one equilibrium at the origin (stable for undamped system).</p>
+
+                <p><strong>(b) For β < 0 (softening spring):</strong></p>
+                <p>\(x = 0\) or \(1 + \beta x^2 = 0\)</p>
+                <p>\(x^2 = -1/\beta\)</p>
+                <p>\(x = \pm\sqrt{-1/\beta}\)</p>
+                <p>Three equilibria: \(x = 0, +\sqrt{-1/\beta}, -\sqrt{-1/\beta}\)</p>
+
+                <p><strong>Physical Interpretation:</strong> For softening springs, the origin becomes unstable, and two stable equilibria appear symmetrically. This is a pitchfork bifurcation occurring at \(\beta = 0\). The system can settle in either of the non-zero positions, demonstrating bistability.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Van der Pol Limit Cycle</h3>
+            <p>The Van der Pol oscillator \(\ddot{x} - \mu(1-x^2)\dot{x} + x = 0\) has a limit cycle. Explain why the origin is unstable for small perturbations but trajectories don't escape to infinity.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Analysis near the origin (small x):</strong></p>
+                <p>For \(|x| \ll 1\), the damping term is approximately \(-\mu\dot{x}\)</p>
+                <p>The equation becomes: \(\ddot{x} - \mu\dot{x} + x \approx 0\)</p>
+                <p>This is a linear oscillator with negative damping (\(\mu > 0\)), causing exponential growth of oscillations.</p>
+
+                <p><strong>Analysis for large x:</strong></p>
+                <p>For \(|x| \gg 1\), \((1-x^2) < 0\), so damping term is \(+\mu x^2\dot{x}\)</p>
+                <p>This provides positive damping (energy dissipation) that limits amplitude growth.</p>
+
+                <p><strong>Conclusion:</strong> Energy is added to the system at small amplitudes and removed at large amplitudes. This creates a stable limit cycle - a periodic orbit that attracts all trajectories except the unstable origin. The amplitude and frequency of the limit cycle depend on \(\mu\). This behavior is common in self-excited oscillators like electronic circuits (relaxation oscillators) and biological rhythms (heartbeat, circadian cycles).</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Pendulum Phase Portrait</h3>
+            <p>Sketch the phase portrait of the undamped pendulum \(\ddot{\theta} + \sin(\theta) = 0\). Identify equilibrium points, their stability, and the separatrix.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Equilibrium points:</strong> \(\dot{\theta} = 0\) and \(\sin(\theta) = 0\)</p>
+                <p>\(\theta = n\pi\) where \(n = 0, \pm1, \pm2, ...\)</p>
+
+                <p><strong>Stability Analysis:</strong></p>
+                <p>Linearize near equilibrium: \(\ddot{\theta} + \cos(\theta_0)\theta \approx 0\)</p>
+                <p>At \(\theta = 0, \pm2\pi, ...\): \(\cos(\theta_0) = 1 > 0\) → <strong>Centers (stable)</strong></p>
+                <p>At \(\theta = \pm\pi, \pm3\pi, ...\): \(\cos(\theta_0) = -1 < 0\) → <strong>Saddle points (unstable)</strong></p>
+
+                <p><strong>Phase Portrait Features:</strong></p>
+                <ul>
+                    <li>Closed orbits around centers represent oscillations (pendulum swinging back and forth)</li>
+                    <li>Orbits connecting saddle points are <strong>separatrices</strong> - they separate oscillation from rotation</li>
+                    <li>Trajectories outside separatrices represent continuous rotation (pendulum going over the top)</li>
+                    <li>Energy is conserved: \(E = \frac{1}{2}\dot{\theta}^2 - \cos(\theta) = \text{constant}\)</li>
+                </ul>
+
+                <p><strong>Physical Significance:</strong> The separatrix corresponds to the minimum energy needed for the pendulum to just reach the inverted position. Trajectories below it oscillate; above it, the pendulum rotates continuously.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is a phase portrait?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) A time history plot</label>
+                    <label><input type="radio" name="q1" value="b"> b) A geometric representation of trajectories in state space</label>
+                    <label><input type="radio" name="q1" value="c"> c) A frequency spectrum</label>
+                    <label><input type="radio" name="q1" value="d"> d) A bifurcation diagram</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A limit cycle is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) An unstable equilibrium point</label>
+                    <label><input type="radio" name="q2" value="b"> b) An isolated closed trajectory in phase space</label>
+                    <label><input type="radio" name="q2" value="c"> c) A saddle point</label>
+                    <label><input type="radio" name="q2" value="d"> d) A linear oscillation</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Chaotic systems are characterized by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Linear behavior</label>
+                    <label><input type="radio" name="q3" value="b"> b) Periodic motion only</label>
+                    <label><input type="radio" name="q3" value="c"> c) Sensitive dependence on initial conditions</label>
+                    <label><input type="radio" name="q3" value="d"> d) No bounded motion</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The Duffing oscillator with β > 0 represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) A softening spring</label>
+                    <label><input type="radio" name="q4" value="b"> b) A hardening spring</label>
+                    <label><input type="radio" name="q4" value="c"> c) A linear spring</label>
+                    <label><input type="radio" name="q4" value="d"> d) No spring at all</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: A positive Lyapunov exponent indicates:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Stable equilibrium</label>
+                    <label><input type="radio" name="q5" value="b"> b) Periodic motion</label>
+                    <label><input type="radio" name="q5" value="c"> c) Chaotic behavior</label>
+                    <label><input type="radio" name="q5" value="d"> d) No motion</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Trajectories in state space
+                        q2: 'b', // Isolated closed trajectory
+                        q3: 'c', // Sensitive dependence on IC
+                        q4: 'b', // Hardening spring
+                        q5: 'c'  // Chaotic behavior
+                    };
+
+                    let score = 0;
+                    let totalQuestions = Object.keys(answers).length;
+                    let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        const correctAnswer = answers[question];
+
+                        if (selectedOption) {
+                            if (selectedOption.value === correctAnswer) {
+                                score++;
+                                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                            } else {
+                                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                            }
+                        } else {
+                            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                        }
+                    }
+
+                    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                    document.getElementById('quiz-results').innerHTML = resultsHTML;
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

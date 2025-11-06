@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulley Systems & Mechanical Advantage - Interactive Lecture</title>
+
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Pulley Systems & Mechanical Advantage</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Pulley Systems</h2>
+        <p>Pulleys are simple machines that use grooved wheels and ropes to change the direction of forces and provide mechanical advantage. They are fundamental components in lifting systems, reducing the effort force required to lift heavy loads.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Pulleys allow us to lift heavy objects with less effort by trading force for distance. The more rope segments supporting a load, the greater the mechanical advantage.</p>
+        </div>
+
+        <h3>Types of Pulleys</h3>
+        <p>There are three basic types of pulley systems:</p>
+
+        <h4>1. Fixed Pulley</h4>
+        <p>A fixed pulley is attached to a stationary point. It changes the direction of the applied force but provides no mechanical advantage.</p>
+        <div class="equation-box">
+            <p><strong>Fixed Pulley:</strong></p>
+            <p>\[F_{\text{effort}} = F_{\text{load}}\]</p>
+            <p>\[\text{Mechanical Advantage (MA)} = 1\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(F_{\text{effort}}\) = Force applied by the user (N)</li>
+                <li>\(F_{\text{load}}\) = Weight of the load (N)</li>
+            </ul>
+        </div>
+
+        <h4>2. Movable Pulley</h4>
+        <p>A movable pulley is attached to the load and moves with it. Two rope segments support the load, providing a mechanical advantage of 2 in the ideal case.</p>
+        <div class="equation-box">
+            <p><strong>Movable Pulley (Ideal):</strong></p>
+            <p>\[F_{\text{effort}} = \frac{F_{\text{load}}}{2}\]</p>
+            <p>\[\text{MA} = 2\]</p>
+        </div>
+
+        <h4>3. Compound Pulley System</h4>
+        <p>A compound pulley combines fixed and movable pulleys to achieve greater mechanical advantage.</p>
+
+        <h3>Mechanical Advantage</h3>
+        <p>Mechanical advantage (MA) is the ratio of load force to effort force. It tells us how much a machine multiplies the input force.</p>
+
+        <div class="equation-box">
+            <p><strong>Actual Mechanical Advantage (AMA):</strong></p>
+            <p>\[\text{AMA} = \frac{F_{\text{load}}}{F_{\text{effort}}}\]</p>
+
+            <p><strong>Ideal Mechanical Advantage (IMA):</strong></p>
+            <p>\[\text{IMA} = \frac{d_{\text{effort}}}{d_{\text{load}}} = n\]</p>
+            <p>Where \(n\) is the number of rope segments supporting the load.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Important:</strong> The IMA equals the number of rope segments supporting the movable pulley. Each segment shares the load equally in an ideal system.</p>
+        </div>
+
+        <h3>Velocity Ratio</h3>
+        <p>The velocity ratio (VR) is the ratio of the distance moved by the effort to the distance moved by the load.</p>
+
+        <div class="equation-box">
+            <p><strong>Velocity Ratio:</strong></p>
+            <p>\[\text{VR} = \frac{d_{\text{effort}}}{d_{\text{load}}}\]</p>
+            <p>For an ideal pulley system: \(\text{VR} = \text{IMA}\)</p>
+        </div>
+
+        <h3>Efficiency</h3>
+        <p>Real pulley systems have friction in the bearings and rope, making them less than 100% efficient.</p>
+
+        <div class="equation-box">
+            <p><strong>Efficiency:</strong></p>
+            <p>\[\eta = \frac{\text{AMA}}{\text{IMA}} \times 100\% = \frac{\text{Work}_{\text{output}}}{\text{Work}_{\text{input}}} \times 100\%\]</p>
+
+            <p><strong>Work Relations:</strong></p>
+            <p>\[W_{\text{input}} = F_{\text{effort}} \times d_{\text{effort}}\]</p>
+            <p>\[W_{\text{output}} = F_{\text{load}} \times d_{\text{load}}\]</p>
+            <p>\[W_{\text{lost}} = W_{\text{input}} - W_{\text{output}}\]</p>
+        </div>
+
+        <h3>Compound Pulley Systems</h3>
+        <p>When multiple pulleys are combined, the overall mechanical advantage can be calculated by:</p>
+
+        <div class="equation-box">
+            <p><strong>For pulleys in series:</strong></p>
+            <p>\[\text{MA}_{\text{total}} = \text{MA}_1 \times \text{MA}_2 \times \ldots \times \text{MA}_n\]</p>
+
+            <p><strong>For typical block and tackle:</strong></p>
+            <p>\[\text{IMA} = n = \text{number of supporting rope segments}\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Energy Conservation:</strong> Even though pulleys provide mechanical advantage in force, the total work done remains the same (neglecting friction). What you gain in force, you sacrifice in distance: \(F_1 d_1 = F_2 d_2\)</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Pulley System Comparison</h2>
+        <p>Explore different pulley configurations and observe how mechanical advantage affects the effort force required to lift a load. Adjust the load weight and friction to see how they impact efficiency.</p>
+
+        <div id="sketch-holder"></div>
+
+        <div class="controls-panel">
+            <div class="type-selector">
+                <button class="type-button active" data-type="fixed">Fixed Pulley</button>
+                <button class="type-button" data-type="movable">Movable Pulley</button>
+                <button class="type-button" data-type="compound">Compound System</button>
+            </div>
+
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="load-weight">Load Weight (N):</label>
+                    <div class="slider-row">
+                        <input type="range" id="load-weight" min="50" max="500" value="200">
+                        <span id="load-weight-value" class="value-display">200</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="friction-coeff">Friction Coefficient:</label>
+                    <div class="slider-row">
+                        <input type="range" id="friction-coeff" min="0" max="0.3" step="0.01" value="0.1">
+                        <span id="friction-coeff-value" class="value-display">0.10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-panel">
+                <p><strong>Effort Force Required:</strong> <span id="effort-force">200.0</span> N</p>
+                <p><strong>Ideal MA:</strong> <span id="ima-display">1</span></p>
+                <p><strong>Actual MA:</strong> <span id="ama-display">1.00</span></p>
+                <p><strong>Efficiency:</strong> <span id="efficiency-display">100.0</span>%</p>
+                <p><strong>Distance Ratio:</strong> Pull <span id="distance-ratio">1.0</span>m of rope to lift load 1.0m</p>
+            </div>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Observation:</strong> Notice how the compound system reduces the effort force significantly, but requires pulling much more rope. The work done remains constant (accounting for friction losses).</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Construction and Building</h3>
+        <ul>
+            <li><strong>Tower Cranes:</strong> Use compound pulley systems to lift heavy construction materials to great heights, with mechanical advantages of 4:1 or higher</li>
+            <li><strong>Elevators:</strong> Employ pulley systems with counterweights to efficiently move passengers and cargo vertically in buildings</li>
+            <li><strong>Scaffolding Systems:</strong> Utilize pulleys to raise and lower materials safely on construction sites</li>
+        </ul>
+
+        <h3>Maritime and Shipping</h3>
+        <ul>
+            <li><strong>Cargo Cranes:</strong> Ship-to-shore cranes use complex pulley arrangements to load and unload containers weighing up to 60 tonnes</li>
+            <li><strong>Sailing Rigging:</strong> Sailboats use block and tackle systems to adjust sails with mechanical advantages of 3:1 to 6:1</li>
+            <li><strong>Anchor Systems:</strong> Windlasses incorporate pulleys to retrieve heavy anchors with reduced manual effort</li>
+        </ul>
+
+        <h3>Automotive and Transportation</h3>
+        <ul>
+            <li><strong>Engine Hoists:</strong> Mobile engine lifts use pulley systems with 2:1 or 4:1 mechanical advantage to safely remove engines</li>
+            <li><strong>Vehicle Recovery:</strong> Winch systems with snatch blocks (movable pulleys) can double or triple pulling force for vehicle recovery</li>
+            <li><strong>Cable Cars:</strong> Aerial tramways use large pulleys to support and guide cables carrying passenger cabins</li>
+        </ul>
+
+        <h3>Theater and Entertainment</h3>
+        <ul>
+            <li><strong>Stage Rigging:</strong> Counterweight fly systems use pulleys to raise and lower scenery, lights, and curtains efficiently</li>
+            <li><strong>Arena Scoreboards:</strong> Large overhead displays use pulley systems for installation and maintenance access</li>
+        </ul>
+
+        <h3>Exercise and Fitness</h3>
+        <ul>
+            <li><strong>Weight Machines:</strong> Cable-based exercise equipment uses pulleys to redirect forces and provide adjustable resistance</li>
+            <li><strong>Resistance Training:</strong> Pulley systems allow for constant tension throughout the range of motion in various exercises</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> Pulley systems are often designed with a trade-off between mechanical advantage and rope speed. High MA systems require pulling more rope but with less force, making them ideal for very heavy loads. Lower MA systems are faster but require more effort, suitable for lighter loads that need quick positioning.</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ideal Mechanical Advantage</td>
+                        <td>\(\text{IMA} = n\)</td>
+                        <td>Number of rope segments supporting load</td>
+                    </tr>
+                    <tr>
+                        <td>Actual Mechanical Advantage</td>
+                        <td>\(\text{AMA} = \frac{F_{\text{load}}}{F_{\text{effort}}}\)</td>
+                        <td>Ratio of load to effort force</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity Ratio</td>
+                        <td>\(\text{VR} = \frac{d_{\text{effort}}}{d_{\text{load}}}\)</td>
+                        <td>Ratio of distances moved</td>
+                    </tr>
+                    <tr>
+                        <td>Efficiency</td>
+                        <td>\(\eta = \frac{\text{AMA}}{\text{IMA}} \times 100\%\)</td>
+                        <td>Effectiveness of the system</td>
+                    </tr>
+                    <tr>
+                        <td>Work Input</td>
+                        <td>\(W_{\text{in}} = F_{\text{effort}} \times d_{\text{effort}}\)</td>
+                        <td>Energy supplied to the system</td>
+                    </tr>
+                    <tr>
+                        <td>Work Output</td>
+                        <td>\(W_{\text{out}} = F_{\text{load}} \times d_{\text{load}}\)</td>
+                        <td>Useful work done by the system</td>
+                    </tr>
+                    <tr>
+                        <td>Fixed Pulley MA</td>
+                        <td>\(\text{MA} = 1\)</td>
+                        <td>Changes direction only</td>
+                    </tr>
+                    <tr>
+                        <td>Movable Pulley MA</td>
+                        <td>\(\text{MA} = 2\)</td>
+                        <td>Two rope segments support load</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Simple Movable Pulley</h3>
+            <p>A worker uses a movable pulley to lift a 300 N crate. Assuming an ideal system with no friction:</p>
+            <ol>
+                <li>What effort force is required?</li>
+                <li>If the crate is lifted 2 metres, how much rope must the worker pull?</li>
+                <li>Calculate the work input and work output.</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong> \(F_{\text{load}} = 300\) N, movable pulley (IMA = 2), ideal system</p>
+
+                <p><strong>a) Effort force:</strong></p>
+                <p>For an ideal movable pulley: \(\text{IMA} = 2\)</p>
+                <p>\[F_{\text{effort}} = \frac{F_{\text{load}}}{\text{IMA}} = \frac{300}{2} = 150 \text{ N}\]</p>
+
+                <p><strong>b) Rope distance:</strong></p>
+                <p>Given: \(d_{\text{load}} = 2\) m</p>
+                <p>\[d_{\text{effort}} = \text{IMA} \times d_{\text{load}} = 2 \times 2 = 4 \text{ m}\]</p>
+
+                <p><strong>c) Work calculations:</strong></p>
+                <p>\[W_{\text{input}} = F_{\text{effort}} \times d_{\text{effort}} = 150 \times 4 = 600 \text{ J}\]</p>
+                <p>\[W_{\text{output}} = F_{\text{load}} \times d_{\text{load}} = 300 \times 2 = 600 \text{ J}\]</p>
+                <p>Since the system is ideal, \(W_{\text{input}} = W_{\text{output}}\) ✓</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Compound Pulley with Friction</h3>
+            <p>A compound pulley system with 4 supporting rope segments is used to lift a 800 N load. Due to friction, the actual effort force required is 250 N. The load is lifted 1.5 metres.</p>
+            <ol>
+                <li>Calculate the ideal mechanical advantage</li>
+                <li>Calculate the actual mechanical advantage</li>
+                <li>Determine the efficiency of the system</li>
+                <li>How much rope must be pulled?</li>
+                <li>Calculate the work lost to friction</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong> \(n = 4\) segments, \(F_{\text{load}} = 800\) N, \(F_{\text{effort}} = 250\) N, \(d_{\text{load}} = 1.5\) m</p>
+
+                <p><strong>a) Ideal mechanical advantage:</strong></p>
+                <p>\[\text{IMA} = n = 4\]</p>
+
+                <p><strong>b) Actual mechanical advantage:</strong></p>
+                <p>\[\text{AMA} = \frac{F_{\text{load}}}{F_{\text{effort}}} = \frac{800}{250} = 3.2\]</p>
+
+                <p><strong>c) Efficiency:</strong></p>
+                <p>\[\eta = \frac{\text{AMA}}{\text{IMA}} \times 100\% = \frac{3.2}{4} \times 100\% = 80\%\]</p>
+
+                <p><strong>d) Rope distance:</strong></p>
+                <p>\[d_{\text{effort}} = \text{IMA} \times d_{\text{load}} = 4 \times 1.5 = 6 \text{ m}\]</p>
+
+                <p><strong>e) Work lost to friction:</strong></p>
+                <p>\[W_{\text{input}} = F_{\text{effort}} \times d_{\text{effort}} = 250 \times 6 = 1500 \text{ J}\]</p>
+                <p>\[W_{\text{output}} = F_{\text{load}} \times d_{\text{load}} = 800 \times 1.5 = 1200 \text{ J}\]</p>
+                <p>\[W_{\text{lost}} = W_{\text{input}} - W_{\text{output}} = 1500 - 1200 = 300 \text{ J}\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Design Challenge</h3>
+            <p>An engineer needs to design a pulley system to lift a 1200 N engine block. The maximum force a worker can comfortably apply is 300 N. The system should be at least 75% efficient.</p>
+            <ol>
+                <li>What is the minimum ideal mechanical advantage required?</li>
+                <li>How many supporting rope segments are needed?</li>
+                <li>If the system achieves 75% efficiency, what will be the actual effort force required?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong> \(F_{\text{load}} = 1200\) N, \(F_{\text{effort,max}} = 300\) N, \(\eta = 75\% = 0.75\)</p>
+
+                <p><strong>a) Minimum IMA required:</strong></p>
+                <p>We need: \(\text{AMA} \geq \frac{F_{\text{load}}}{F_{\text{effort,max}}} = \frac{1200}{300} = 4\)</p>
+                <p>Using: \(\eta = \frac{\text{AMA}}{\text{IMA}}\)</p>
+                <p>\[\text{IMA} = \frac{\text{AMA}}{\eta} = \frac{4}{0.75} = 5.33\]</p>
+                <p>Round up to nearest integer: \(\text{IMA} = 6\)</p>
+
+                <p><strong>b) Supporting rope segments:</strong></p>
+                <p>\[n = \text{IMA} = 6 \text{ segments}\]</p>
+
+                <p><strong>c) Actual effort force at 75% efficiency:</strong></p>
+                <p>With IMA = 6 and η = 0.75:</p>
+                <p>\[\text{AMA} = \eta \times \text{IMA} = 0.75 \times 6 = 4.5\]</p>
+                <p>\[F_{\text{effort}} = \frac{F_{\text{load}}}{\text{AMA}} = \frac{1200}{4.5} = 267 \text{ N}\]</p>
+                <p>This is within the worker's 300 N limit ✓</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary advantage of a fixed pulley?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) It reduces the effort force required</label>
+                    <label><input type="radio" name="q1" value="b"> b) It changes the direction of the applied force</label>
+                    <label><input type="radio" name="q1" value="c"> c) It provides a mechanical advantage of 2</label>
+                    <label><input type="radio" name="q1" value="d"> d) It increases the speed of lifting</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A pulley system has 5 rope segments supporting the load. What is its ideal mechanical advantage?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 2.5</label>
+                    <label><input type="radio" name="q2" value="b"> b) 5</label>
+                    <label><input type="radio" name="q2" value="c"> c) 10</label>
+                    <label><input type="radio" name="q2" value="d"> d) 25</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: If a pulley system has an IMA of 4 and efficiency of 80%, what is its actual mechanical advantage?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 5.0</label>
+                    <label><input type="radio" name="q3" value="b"> b) 4.8</label>
+                    <label><input type="radio" name="q3" value="c"> c) 3.2</label>
+                    <label><input type="radio" name="q3" value="d"> d) 0.8</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Which statement about work in pulley systems is TRUE?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Work output is always greater than work input</label>
+                    <label><input type="radio" name="q4" value="b"> b) Pulleys create energy to lift loads</label>
+                    <label><input type="radio" name="q4" value="c"> c) Work input equals work output plus work lost to friction</label>
+                    <label><input type="radio" name="q4" value="d"> d) Mechanical advantage eliminates the need for work</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: A movable pulley requires 100 N of effort to lift a 180 N load. What is the efficiency of this system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 55.6%</label>
+                    <label><input type="radio" name="q5" value="b"> b) 80.0%</label>
+                    <label><input type="radio" name="q5" value="c"> c) 90.0%</label>
+                    <label><input type="radio" name="q5" value="d"> d) 180%</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript for simulation -->
+    <script>
+        // Pulley System Simulation
+        let pulleySketch = function(p) {
+            let pulleyType = 'fixed'; // 'fixed', 'movable', 'compound'
+            let loadWeight = 200; // N
+            let frictionCoeff = 0.1;
+            let ropePosition = 0; // 0 to 1, represents rope pull position
+            let animating = false;
+
+            // Calculated values
+            let effortForce = 200;
+            let ima = 1;
+            let ama = 1;
+            let efficiency = 100;
+            let distanceRatio = 1;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 500);
+                canvas.parent('sketch-holder');
+                setupControls();
+                calculate();
+            };
+
+            p.draw = function() {
+                p.background(250);
+
+                // Draw based on pulley type
+                if (pulleyType === 'fixed') {
+                    drawFixedPulley();
+                } else if (pulleyType === 'movable') {
+                    drawMovablePulley();
+                } else {
+                    drawCompoundPulley();
+                }
+
+                // Draw force labels
+                drawForceLabels();
+            };
+
+            function drawFixedPulley() {
+                let centerX = p.width / 2;
+                let pulleyY = 100;
+                let pulleyRadius = 30;
+
+                // Support structure
+                p.fill(100);
+                p.rect(centerX - 10, 20, 20, 60);
+
+                // Pulley wheel
+                p.fill(200);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.circle(centerX, pulleyY, pulleyRadius * 2);
+
+                // Center hub
+                p.fill(150);
+                p.circle(centerX, pulleyY, 15);
+
+                // Rope
+                p.stroke(139, 69, 19);
+                p.strokeWeight(3);
+                // Left side (effort)
+                p.line(centerX - pulleyRadius, pulleyY, centerX - pulleyRadius, 400);
+                // Right side (load)
+                p.line(centerX + pulleyRadius, pulleyY, centerX + pulleyRadius, 350);
+
+                // Load
+                p.fill(220, 100, 100);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(centerX + pulleyRadius - 25, 350, 50, 60);
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text(loadWeight + ' N', centerX + pulleyRadius, 385);
+
+                // Effort force arrow
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                let arrowY = 400;
+                p.line(centerX - pulleyRadius, arrowY, centerX - pulleyRadius, arrowY + 40);
+                // Arrowhead
+                p.triangle(
+                    centerX - pulleyRadius, arrowY + 40,
+                    centerX - pulleyRadius - 8, arrowY + 28,
+                    centerX - pulleyRadius + 8, arrowY + 28
+                );
+
+                // Label
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text('Effort\n' + effortForce.toFixed(1) + ' N', centerX - pulleyRadius, arrowY + 60);
+            }
+
+            function drawMovablePulley() {
+                let leftX = p.width / 2 - 80;
+                let rightX = p.width / 2 + 80;
+                let fixedPulleyY = 100;
+                let movablePulleyY = 300;
+                let pulleyRadius = 25;
+
+                // Support structure
+                p.fill(100);
+                p.rect(leftX - 10, 20, 20, 60);
+                p.rect(rightX - 10, 20, 20, 60);
+
+                // Fixed pulleys
+                p.fill(200);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.circle(leftX, fixedPulleyY, pulleyRadius * 2);
+                p.circle(rightX, fixedPulleyY, pulleyRadius * 2);
+                p.fill(150);
+                p.circle(leftX, fixedPulleyY, 12);
+                p.circle(rightX, fixedPulleyY, 12);
+
+                // Movable pulley
+                p.fill(200);
+                p.stroke(0);
+                p.circle(p.width / 2, movablePulleyY, pulleyRadius * 2);
+                p.fill(150);
+                p.circle(p.width / 2, movablePulleyY, 12);
+
+                // Rope
+                p.stroke(139, 69, 19);
+                p.strokeWeight(3);
+                // Left segment
+                p.line(leftX, fixedPulleyY + pulleyRadius, leftX, movablePulleyY - pulleyRadius);
+                p.line(leftX, movablePulleyY - pulleyRadius, p.width / 2 - pulleyRadius, movablePulleyY);
+                // Right segment
+                p.line(p.width / 2 + pulleyRadius, movablePulleyY, rightX, movablePulleyY - pulleyRadius);
+                p.line(rightX, movablePulleyY - pulleyRadius, rightX, fixedPulleyY + pulleyRadius);
+                // Effort side
+                p.line(rightX, fixedPulleyY + pulleyRadius, rightX, 430);
+
+                // Load attached to movable pulley
+                p.fill(220, 100, 100);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(p.width / 2 - 25, movablePulleyY + pulleyRadius + 10, 50, 60);
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text(loadWeight + ' N', p.width / 2, movablePulleyY + pulleyRadius + 45);
+
+                // Effort force arrow
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                let arrowY = 430;
+                p.line(rightX, arrowY, rightX, arrowY + 30);
+                p.triangle(rightX, arrowY + 30, rightX - 8, arrowY + 18, rightX + 8, arrowY + 18);
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.text('Effort\n' + effortForce.toFixed(1) + ' N', rightX, arrowY + 48);
+            }
+
+            function drawCompoundPulley() {
+                let centerX = p.width / 2;
+                let topY = 80;
+                let midY = 200;
+                let bottomY = 340;
+                let pulleyRadius = 25;
+
+                // Support
+                p.fill(100);
+                p.rect(centerX - 100, 20, 20, 40);
+                p.rect(centerX + 80, 20, 20, 40);
+
+                // Top pulleys (fixed)
+                p.fill(200);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.circle(centerX - 90, topY, pulleyRadius * 2);
+                p.circle(centerX + 90, topY, pulleyRadius * 2);
+                p.fill(150);
+                p.circle(centerX - 90, topY, 12);
+                p.circle(centerX + 90, topY, 12);
+
+                // Middle pulleys (movable)
+                p.fill(220, 220, 255);
+                p.stroke(0);
+                p.circle(centerX - 50, midY, pulleyRadius * 2);
+                p.circle(centerX + 50, midY, pulleyRadius * 2);
+                p.fill(150);
+                p.circle(centerX - 50, midY, 12);
+                p.circle(centerX + 50, midY, 12);
+
+                // Bottom pulley (movable)
+                p.fill(220, 220, 255);
+                p.stroke(0);
+                p.circle(centerX, bottomY, pulleyRadius * 2);
+                p.fill(150);
+                p.circle(centerX, bottomY, 12);
+
+                // Rope (4 segments supporting load)
+                p.stroke(139, 69, 19);
+                p.strokeWeight(3);
+                // Segment 1
+                p.line(centerX - 90, topY + pulleyRadius, centerX - 90, midY - pulleyRadius);
+                p.line(centerX - 90, midY - pulleyRadius, centerX - 50 - pulleyRadius, midY);
+                // Segment 2
+                p.line(centerX - 50 + pulleyRadius, midY, centerX - 10, midY + 70);
+                p.line(centerX - 10, midY + 70, centerX - pulleyRadius, bottomY);
+                // Segment 3
+                p.line(centerX + pulleyRadius, bottomY, centerX + 10, midY + 70);
+                p.line(centerX + 10, midY + 70, centerX + 50 - pulleyRadius, midY);
+                // Segment 4
+                p.line(centerX + 50 + pulleyRadius, midY, centerX + 90, midY - pulleyRadius);
+                p.line(centerX + 90, midY - pulleyRadius, centerX + 90, topY + pulleyRadius);
+                // Effort line
+                p.line(centerX + 90, topY + pulleyRadius, centerX + 90, 450);
+
+                // Load
+                p.fill(220, 100, 100);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(centerX - 30, bottomY + pulleyRadius + 10, 60, 60);
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text(loadWeight + ' N', centerX, bottomY + pulleyRadius + 45);
+
+                // Effort arrow
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                let arrowY = 450;
+                p.line(centerX + 90, arrowY, centerX + 90, arrowY + 25);
+                p.triangle(centerX + 90, arrowY + 25, centerX + 82, arrowY + 15, centerX + 98, arrowY + 15);
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.text('Effort: ' + effortForce.toFixed(1) + ' N', centerX + 90, arrowY + 42);
+            }
+
+            function drawForceLabels() {
+                // Info panel
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(10, 10, 180, 120, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text('System: ' + pulleyType.toUpperCase(), 20, 30);
+                p.textSize(12);
+                p.text('Load: ' + loadWeight + ' N', 20, 50);
+                p.text('IMA: ' + ima, 20, 68);
+                p.text('AMA: ' + ama.toFixed(2), 20, 86);
+                p.text('Efficiency: ' + efficiency.toFixed(1) + '%', 20, 104);
+                p.text('Friction: ' + (frictionCoeff * 100).toFixed(0) + '%', 20, 122);
+            }
+
+            function calculate() {
+                // Determine IMA based on type
+                if (pulleyType === 'fixed') {
+                    ima = 1;
+                } else if (pulleyType === 'movable') {
+                    ima = 2;
+                } else { // compound
+                    ima = 4;
+                }
+
+                // Calculate ideal effort force
+                let idealEffort = loadWeight / ima;
+
+                // Add friction losses (friction increases effort needed)
+                effortForce = idealEffort * (1 + frictionCoeff);
+
+                // Calculate actual MA
+                ama = loadWeight / effortForce;
+
+                // Calculate efficiency
+                efficiency = (ama / ima) * 100;
+
+                // Distance ratio
+                distanceRatio = ima;
+
+                // Update displays
+                document.getElementById('effort-force').textContent = effortForce.toFixed(1);
+                document.getElementById('ima-display').textContent = ima;
+                document.getElementById('ama-display').textContent = ama.toFixed(2);
+                document.getElementById('efficiency-display').textContent = efficiency.toFixed(1);
+                document.getElementById('distance-ratio').textContent = distanceRatio.toFixed(1);
+            }
+
+            function setupControls() {
+                // Type selector buttons
+                document.querySelectorAll('.type-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        document.querySelectorAll('.type-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        pulleyType = this.dataset.type;
+                        calculate();
+                    });
+                });
+
+                // Load weight slider
+                document.getElementById('load-weight').addEventListener('input', function() {
+                    loadWeight = parseFloat(this.value);
+                    document.getElementById('load-weight-value').textContent = loadWeight;
+                    calculate();
+                });
+
+                // Friction coefficient slider
+                document.getElementById('friction-coeff').addEventListener('input', function() {
+                    frictionCoeff = parseFloat(this.value);
+                    document.getElementById('friction-coeff-value').textContent = frictionCoeff.toFixed(2);
+                    calculate();
+                });
+            }
+        };
+
+        new p5(pulleySketch);
+
+        // Quiz functionality
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Changes direction
+                q2: 'b',  // IMA = 5
+                q3: 'c',  // AMA = 4 * 0.8 = 3.2
+                q4: 'c',  // Work input = output + lost
+                q5: 'c',  // AMA = 180/100 = 1.8, IMA = 2, eff = 1.8/2 = 90%
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

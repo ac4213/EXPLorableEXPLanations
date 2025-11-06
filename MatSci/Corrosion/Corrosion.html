@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrosion Mechanisms - Interactive Lecture</title>
+
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <style>
+        .corrosion-type {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 6px solid;
+        }
+        .uniform-corr {
+            border-color: #e67e22;
+            background-color: #fdebd0;
+        }
+        .galvanic-corr {
+            border-color: #e74c3c;
+            background-color: #fadbd8;
+        }
+        .pitting-corr {
+            border-color: #9b59b6;
+            background-color: #ebdef0;
+        }
+        .crevice-corr {
+            border-color: #3498db;
+            background-color: #d6eaf8;
+        }
+        .stress-corr {
+            border-color: #16a085;
+            background-color: #d5f4e6;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Corrosion Mechanisms</h1>
+        <p class="subtitle">Understanding Material Degradation and Protection Strategies - Interactive Lecture</p>
+    </header>
+
+    <div class="content-section">
+        <h2>What is Corrosion?</h2>
+        <div class="key-point">
+            <p><strong>Corrosion</strong> is the gradual degradation of materials (usually metals) through electrochemical or chemical reactions with their environment. It is the process of materials returning to their thermodynamically stable oxide or compound state. Corrosion costs the global economy an estimated $2.5 trillion annually (3-4% of global GDP).</p>
+        </div>
+
+        <p>Why understanding corrosion is critical:</p>
+        <ul>
+            <li><strong>Safety:</strong> Structural failures (bridges, aircraft, pipelines) can be catastrophic</li>
+            <li><strong>Economics:</strong> Replacement and maintenance costs are enormous</li>
+            <li><strong>Sustainability:</strong> Corrosion wastes natural resources and energy</li>
+            <li><strong>Design:</strong> Material selection and protection strategies must account for environment</li>
+        </ul>
+
+        <h3>Fundamental Principle:</h3>
+        <p>Most corrosion is <strong>electrochemical</strong> in nature, requiring:</p>
+        <ul>
+            <li>An <strong>anode</strong> (where oxidation/metal dissolution occurs)</li>
+            <li>A <strong>cathode</strong> (where reduction occurs)</li>
+            <li>An <strong>electrolyte</strong> (conductive medium, often water with dissolved ions)</li>
+            <li>An <strong>electrical connection</strong> between anode and cathode</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Fundamental Concepts</h2>
+
+        <h3>1. Electrochemical Reactions</h3>
+        <div class="equation-box">
+            <p><strong>Oxidation at the Anode</strong> (metal dissolution):</p>
+            <p>\(\text{M} \rightarrow \text{M}^{n+} + ne^-\)</p>
+            <p>Example for iron: \(\text{Fe} \rightarrow \text{Fe}^{2+} + 2e^-\)</p>
+            <br>
+            <p><strong>Reduction at the Cathode</strong> (consumes electrons):</p>
+            <p>In acidic solution: \(2\text{H}^+ + 2e^- \rightarrow \text{H}_2\) (hydrogen evolution)</p>
+            <p>In neutral/basic solution: \(\text{O}_2 + 2\text{H}_2\text{O} + 4e^- \rightarrow 4\text{OH}^-\) (oxygen reduction)</p>
+            <p>In aerated water: \(\text{O}_2 + 4\text{H}^+ + 4e^- \rightarrow 2\text{H}_2\text{O}\)</p>
+        </div>
+
+        <h3>2. Electrochemical Series (Standard Electrode Potentials)</h3>
+        <div class="equation-box">
+            <p>The <strong>standard electrode potential (E°)</strong> indicates the tendency of a metal to corrode:</p>
+            <p>More negative E° = More active (anodic) = Corrodes more easily</p>
+            <p>More positive E° = More noble (cathodic) = Resists corrosion</p>
+            <br>
+            <p><strong>Selected values (V vs. SHE):</strong></p>
+            <ul>
+                <li>Au³⁺/Au: +1.50 V (most noble)</li>
+                <li>Pt²⁺/Pt: +1.20 V</li>
+                <li>Ag⁺/Ag: +0.80 V</li>
+                <li>Cu²⁺/Cu: +0.34 V</li>
+                <li>2H⁺/H₂: 0.00 V (reference)</li>
+                <li>Fe²⁺/Fe: -0.44 V</li>
+                <li>Zn²⁺/Zn: -0.76 V</li>
+                <li>Al³⁺/Al: -1.66 V</li>
+                <li>Mg²⁺/Mg: -2.37 V (most active)</li>
+            </ul>
+        </div>
+
+        <h3>3. Galvanic Series in Seawater</h3>
+        <div class="key-point">
+            <p>The practical corrosion behavior in real environments (not standard conditions):</p>
+            <p><strong>Noble (Cathodic) end:</strong></p>
+            <ul>
+                <li>Platinum, Gold</li>
+                <li>Titanium, Silver</li>
+                <li>Stainless steel (passive)</li>
+                <li>Nickel (passive), Copper alloys</li>
+                <li>Nickel (active), Tin, Lead</li>
+                <li>Stainless steel (active), Cast iron, Steel</li>
+                <li>Aluminum alloys</li>
+                <li>Zinc, Magnesium</li>
+            </ul>
+            <p><strong>Active (Anodic) end</strong></p>
+        </div>
+
+        <h3>4. Thermodynamics: Pourbaix Diagrams</h3>
+        <div class="equation-box">
+            <p><strong>Pourbaix diagrams</strong> show regions of corrosion, immunity, and passivation as functions of pH and electrode potential.</p>
+            <p>Three key regions:</p>
+            <ul>
+                <li><strong>Immunity:</strong> Metal is thermodynamically stable (won't corrode)</li>
+                <li><strong>Corrosion:</strong> Metal dissolves as ions</li>
+                <li><strong>Passivation:</strong> Protective oxide film forms, slowing corrosion</li>
+            </ul>
+        </div>
+
+        <h3>5. Kinetics: Polarization and Corrosion Rate</h3>
+        <div class="equation-box">
+            <p><strong>Faraday's Law</strong> relates corrosion current to mass loss:</p>
+            <p>\(\text{Corrosion Rate} = \frac{i_{corr} \cdot M}{nF\rho A}\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(i_{corr}\) = corrosion current (A)</li>
+                <li>\(M\) = atomic weight (g/mol)</li>
+                <li>\(n\) = number of electrons in oxidation reaction</li>
+                <li>\(F\) = Faraday's constant = 96,485 C/mol</li>
+                <li>\(\rho\) = density (g/cm³)</li>
+                <li>\(A\) = surface area (cm²)</li>
+            </ul>
+            <p>Penetration rate (mm/year): \(\text{CR (mm/y)} = \frac{3.27 \times i_{corr} (µA/cm²) \times M}{n \times \rho}\)</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Types of Corrosion</h2>
+        <p>Explore different corrosion mechanisms and how they attack materials. Select a corrosion type to visualize!</p>
+
+        <div id="sketch-holder-corrosion-types"></div>
+
+        <div class="simulation-controls">
+            <div class="slider-container">
+                <label>Corrosion Type:</label>
+                <select id="corrosion-type">
+                    <option value="uniform">Uniform Corrosion</option>
+                    <option value="galvanic">Galvanic Corrosion</option>
+                    <option value="pitting">Pitting Corrosion</option>
+                    <option value="crevice">Crevice Corrosion</option>
+                    <option value="stress">Stress-Corrosion Cracking</option>
+                </select>
+            </div>
+            <div class="slider-container">
+                <label>Environmental Aggressiveness: <span id="env-value" class="slider-value">Medium</span></label>
+                <input type="range" id="env-slider" min="1" max="3" step="1" value="2">
+            </div>
+            <div style="text-align: center; margin: 10px 0;">
+                <button id="start-corrosion">START CORROSION</button>
+                <button id="reset-corrosion">RESET</button>
+            </div>
+            <div id="corrosion-info" style="padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                <h4 style="margin-top: 0;">Corrosion Mechanism:</h4>
+                <div id="corrosion-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Galvanic Couple</h2>
+        <p>See what happens when two different metals are in electrical contact in an electrolyte. The more active metal becomes the anode and corrodes!</p>
+
+        <div id="sketch-holder-galvanic"></div>
+
+        <div class="simulation-controls">
+            <div class="control-row">
+                <div class="control-column">
+                    <div class="slider-container">
+                        <label>Metal A:</label>
+                        <select id="metal-a">
+                            <option value="mg">Magnesium (E° = -2.37 V)</option>
+                            <option value="al">Aluminum (E° = -1.66 V)</option>
+                            <option value="zn" selected>Zinc (E° = -0.76 V)</option>
+                            <option value="fe">Iron (E° = -0.44 V)</option>
+                            <option value="cu">Copper (E° = +0.34 V)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="control-column">
+                    <div class="slider-container">
+                        <label>Metal B:</label>
+                        <select id="metal-b">
+                            <option value="mg">Magnesium (E° = -2.37 V)</option>
+                            <option value="al">Aluminum (E° = -1.66 V)</option>
+                            <option value="zn">Zinc (E° = -0.76 V)</option>
+                            <option value="fe" selected>Iron (E° = -0.44 V)</option>
+                            <option value="cu">Copper (E° = +0.34 V)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="galvanic-info" style="padding: 10px; background: #f0f0f0; border-radius: 5px; margin-top: 10px;">
+                <h4 style="margin-top: 0;">Galvanic Couple Analysis:</h4>
+                <div id="galvanic-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Types of Corrosion</h2>
+
+        <div class="corrosion-type uniform-corr">
+            <h3>1. Uniform (General) Corrosion</h3>
+            <p><strong>Mechanism:</strong> Corrosion occurs evenly over the entire exposed surface.</p>
+            <p><strong>Characteristics:</strong> Most common, predictable, easiest to design for.</p>
+            <p><strong>Examples:</strong> Rusting of steel, tarnishing of silver, atmospheric corrosion.</p>
+            <p><strong>Prevention:</strong> Coatings, cathodic protection, material selection.</p>
+        </div>
+
+        <div class="corrosion-type galvanic-corr">
+            <h3>2. Galvanic (Dissimilar Metal) Corrosion</h3>
+            <p><strong>Mechanism:</strong> Two different metals in electrical contact in an electrolyte. The more active metal (anode) corrodes preferentially.</p>
+            <p><strong>Characteristics:</strong> Corrosion rate depends on potential difference and anode/cathode area ratio.</p>
+            <p><strong>Examples:</strong> Steel screw in copper plate, aluminum rivets in steel, brass fittings on steel pipes.</p>
+            <p><strong>Prevention:</strong> Use similar metals, insulate dissimilar metals, use sacrificial anodes.</p>
+        </div>
+
+        <div class="corrosion-type pitting-corr">
+            <h3>3. Pitting Corrosion</h3>
+            <p><strong>Mechanism:</strong> Localized attack forming small holes or cavities. Protective film breaks down at specific sites.</p>
+            <p><strong>Characteristics:</strong> Extremely dangerous - small surface damage but deep penetration. Difficult to predict.</p>
+            <p><strong>Examples:</strong> Stainless steel in chloride environments, aluminum in seawater.</p>
+            <p><strong>Prevention:</strong> Alloy modification (Mo in stainless), avoid stagnant conditions, cathodic protection.</p>
+        </div>
+
+        <div class="corrosion-type crevice-corr">
+            <h3>4. Crevice Corrosion</h3>
+            <p><strong>Mechanism:</strong> Occurs in shielded areas (gaps, under gaskets, deposits) where oxygen is depleted, creating local anodes.</p>
+            <p><strong>Characteristics:</strong> Similar to pitting but in confined spaces. Autocatalytic process.</p>
+            <p><strong>Examples:</strong> Under bolt heads, washers, gaskets, lap joints, deposits.</p>
+            <p><strong>Prevention:</strong> Design to avoid crevices, use sealants, maintain clean surfaces.</p>
+        </div>
+
+        <div class="corrosion-type stress-corr">
+            <h3>5. Stress-Corrosion Cracking (SCC)</h3>
+            <p><strong>Mechanism:</strong> Combined action of tensile stress and corrosive environment causes brittle cracking.</p>
+            <p><strong>Characteristics:</strong> Sudden catastrophic failure with little warning. Highly specific to material-environment combinations.</p>
+            <p><strong>Examples:</strong> Brass in ammonia, stainless steel in chlorides, high-strength aluminum in seawater.</p>
+            <p><strong>Prevention:</strong> Stress relief, material selection, control environment, shot peening.</p>
+        </div>
+
+        <h3>Other Important Types:</h3>
+        <ul>
+            <li><strong>Intergranular Corrosion:</strong> Attack along grain boundaries (e.g., sensitized stainless steel)</li>
+            <li><strong>Erosion-Corrosion:</strong> Combined mechanical wear and corrosion (e.g., in pumps, pipelines)</li>
+            <li><strong>Selective Leaching:</strong> Preferential removal of one element (e.g., dezincification of brass)</li>
+            <li><strong>Hydrogen Embrittlement:</strong> Hydrogen absorbed during corrosion causes brittleness</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Corrosion Protection Strategies</h3>
+        <ul>
+            <li><strong>Material Selection:</strong> Choose corrosion-resistant alloys (stainless steel, titanium, nickel alloys)</li>
+            <li><strong>Coatings:</strong> Paints, powder coatings, metallic coatings (galvanizing, chrome plating)</li>
+            <li><strong>Cathodic Protection:</strong> Sacrificial anodes (zinc on steel) or impressed current systems</li>
+            <li><strong>Anodic Protection:</strong> Maintaining passive film (for passivating metals)</li>
+            <li><strong>Design:</strong> Avoid crevices, ensure drainage, prevent galvanic couples</li>
+            <li><strong>Environmental Control:</strong> Dehumidification, inhibitors, pH control</li>
+        </ul>
+
+        <h3>Critical Infrastructure Applications</h3>
+        <ul>
+            <li><strong>Pipelines:</strong> Cathodic protection, coatings, corrosion monitoring systems</li>
+            <li><strong>Marine Structures:</strong> Sacrificial anodes on ships and offshore platforms</li>
+            <li><strong>Aircraft:</strong> Corrosion inspection programs, protective coatings, material selection</li>
+            <li><strong>Bridges:</strong> Galvanizing, weathering steel, regular inspection and maintenance</li>
+        </ul>
+
+        <h3>Industry-Specific Solutions</h3>
+        <ul>
+            <li><strong>Chemical Processing:</strong> Titanium, Hastelloy, glass-lined reactors for aggressive chemicals</li>
+            <li><strong>Oil & Gas:</strong> Corrosion inhibitors, corrosion-resistant alloys (CRAs) in sour service</li>
+            <li><strong>Power Generation:</strong> Stainless steel in boilers, copper alloys in condensers</li>
+            <li><strong>Automotive:</strong> Galvanized steel, aluminum alloys, polymer coatings</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> The most effective corrosion control strategy is a multi-layered approach combining proper material selection, protective coatings, design considerations, and regular inspection. The cost of prevention is always less than the cost of failure.</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Anodic Reaction</td>
+                    <td>\(\text{M} \rightarrow \text{M}^{n+} + ne^-\)</td>
+                    <td>Metal oxidation (dissolution)</td>
+                </tr>
+                <tr>
+                    <td>Cathodic Reaction (acidic)</td>
+                    <td>\(2\text{H}^+ + 2e^- \rightarrow \text{H}_2\)</td>
+                    <td>Hydrogen evolution</td>
+                </tr>
+                <tr>
+                    <td>Cathodic Reaction (aerated)</td>
+                    <td>\(\text{O}_2 + 2\text{H}_2\text{O} + 4e^- \rightarrow 4\text{OH}^-\)</td>
+                    <td>Oxygen reduction</td>
+                </tr>
+                <tr>
+                    <td>Galvanic Potential</td>
+                    <td>\(\Delta E = E_{cathode} - E_{anode}\)</td>
+                    <td>Driving force for galvanic corrosion</td>
+                </tr>
+                <tr>
+                    <td>Corrosion Rate</td>
+                    <td>\(\text{CR} = \frac{3.27 \times i_{corr} \times M}{n \times \rho}\)</td>
+                    <td>Penetration rate (mm/year)</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Galvanic Corrosion Prediction</h3>
+            <p>A steel bolt (E° = -0.44 V) is used to fasten a copper plate (E° = +0.34 V) in a marine environment. Which metal will corrode, and what is the driving potential for this galvanic couple?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p>Given: \(E°_{Fe} = -0.44\) V, \(E°_{Cu} = +0.34\) V</p>
+
+                <p><strong>Determining the anode and cathode:</strong></p>
+                <p>The metal with more negative potential becomes the anode (corrodes).</p>
+                <p>Steel (Fe) is more negative → Steel is the <strong>anode</strong></p>
+                <p>Copper (Cu) is more positive → Copper is the <strong>cathode</strong></p>
+
+                <p><strong>Driving potential:</strong></p>
+                <p>\(\Delta E = E_{cathode} - E_{anode}\)</p>
+                <p>\(\Delta E = 0.34 - (-0.44) = 0.78\) V</p>
+
+                <p><strong>Conclusion:</strong> The steel bolt will corrode preferentially while the copper plate is protected. The driving potential is <strong>0.78 V</strong>, which is quite large and will cause significant galvanic corrosion.</p>
+
+                <p><strong>Engineering solution:</strong> Use stainless steel bolts, or insulate the bolt from the copper plate.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Corrosion Rate Calculation</h3>
+            <p>A corrosion current density of 0.1 mA/cm² is measured on an iron sample (M = 55.85 g/mol, ρ = 7.87 g/cm³, n = 2). Calculate the corrosion rate in mm/year.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p>Given: \(i_{corr} = 0.1\) mA/cm² = 100 µA/cm²</p>
+                <p>\(M = 55.85\) g/mol, \(\rho = 7.87\) g/cm³, \(n = 2\)</p>
+
+                <p><strong>Using the corrosion rate equation:</strong></p>
+                <p>\(\text{CR (mm/y)} = \displaystyle \frac{3.27 \times i_{corr} (µA/cm²) \times M}{n \times \rho}\)</p>
+
+                <p>\(\text{CR} = \displaystyle \frac{3.27 \times 100 \times 55.85}{2 \times 7.87}\)</p>
+
+                <p>\(\text{CR} = \displaystyle \frac{18,262.95}{15.74} = 1160.3\) mm/year</p>
+
+                <p><strong>Result:</strong> The corrosion rate is <strong>1.16 mm/year</strong>.</p>
+
+                <p>This is a very high corrosion rate! For a 5 mm thick component, complete penetration would occur in about 4 years.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Cathodic Protection Design</h3>
+            <p>A steel pipeline requires cathodic protection. Zinc anodes (E° = -0.76 V) are to be used. The pipeline surface area is 100 m². The required protection current density is 0.02 A/m². If each zinc anode can deliver 0.5 A for 5 years before replacement, how many anodes are needed?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p>Given:</p>
+                <ul>
+                    <li>Pipeline area: \(A = 100\) m²</li>
+                    <li>Required current density: \(i = 0.02\) A/m²</li>
+                    <li>Current per anode: \(I_{anode} = 0.5\) A</li>
+                    <li>Design life: 5 years</li>
+                </ul>
+
+                <p><strong>Step 1: Calculate total protection current required:</strong></p>
+                <p>\(I_{total} = i \times A = 0.02 \times 100 = 2.0\) A</p>
+
+                <p><strong>Step 2: Calculate number of anodes needed:</strong></p>
+                <p>\(N = \displaystyle \frac{I_{total}}{I_{anode}} = \frac{2.0}{0.5} = 4\) anodes</p>
+
+                <p><strong>Conclusion:</strong> <strong>4 zinc anodes</strong> are needed to provide adequate cathodic protection for the pipeline.</p>
+
+                <p><strong>Engineering considerations:</strong></p>
+                <ul>
+                    <li>Add 20-30% extra anodes for safety margin and non-uniform current distribution</li>
+                    <li>Recommended: Install 5-6 anodes</li>
+                    <li>Space anodes evenly along the pipeline</li>
+                    <li>Monitor potential regularly to ensure protection</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: In a galvanic couple, which metal corrodes?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The metal with more positive electrode potential (cathode)</label>
+                    <label><input type="radio" name="q1" value="b"> b) The metal with more negative electrode potential (anode)</label>
+                    <label><input type="radio" name="q1" value="c"> c) Both metals corrode equally</label>
+                    <label><input type="radio" name="q1" value="d"> d) Neither metal corrodes</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: Which type of corrosion is characterized by deep, localized penetration with minimal surface damage?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Uniform corrosion</label>
+                    <label><input type="radio" name="q2" value="b"> b) Galvanic corrosion</label>
+                    <label><input type="radio" name="q2" value="c"> c) Pitting corrosion</label>
+                    <label><input type="radio" name="q2" value="d"> d) Erosion-corrosion</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: What is the primary cathodic reaction in neutral, aerated water?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) \(2\text{H}^+ + 2e^- \rightarrow \text{H}_2\)</label>
+                    <label><input type="radio" name="q3" value="b"> b) \(\text{O}_2 + 2\text{H}_2\text{O} + 4e^- \rightarrow 4\text{OH}^-\)</label>
+                    <label><input type="radio" name="q3" value="c"> c) \(\text{M}^{n+} + ne^- \rightarrow \text{M}\)</label>
+                    <label><input type="radio" name="q3" value="d"> d) \(\text{Fe} \rightarrow \text{Fe}^{2+} + 2e^-\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Which of these metals would be the best sacrificial anode for protecting a steel structure in seawater?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Copper (E° = +0.34 V)</label>
+                    <label><input type="radio" name="q4" value="b"> b) Nickel (E° = -0.25 V)</label>
+                    <label><input type="radio" name="q4" value="c"> c) Zinc (E° = -0.76 V)</label>
+                    <label><input type="radio" name="q4" value="d"> d) Silver (E° = +0.80 V)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Stress-corrosion cracking requires:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Only a corrosive environment</label>
+                    <label><input type="radio" name="q5" value="b"> b) Only tensile stress</label>
+                    <label><input type="radio" name="q5" value="c"> c) Both tensile stress and a specific corrosive environment</label>
+                    <label><input type="radio" name="q5" value="d"> d) High temperature only</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- p5.js sketches -->
+    <script>
+        // Corrosion Types Visualization
+        let corrosionTypesSketch = function(p) {
+            let corrosionType = 'uniform';
+            let envAggressiveness = 2;
+            let corroding = false;
+            let time = 0;
+            let damagePoints = [];
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-corrosion-types');
+                initializeDamage();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Draw metal sample
+                drawMetalSample();
+
+                // Draw corrosion damage
+                if (corroding) {
+                    time += 0.05 * envAggressiveness;
+                    updateCorrosion();
+                }
+
+                drawCorrosionDamage();
+
+                // Info
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text(`Time: ${time.toFixed(1)} days`, 10, 25);
+                p.text(`Damage Level: ${getDamageLevel()}`, 10, 45);
+
+                updateCorrosionInfo();
+            };
+
+            function drawMetalSample() {
+                p.push();
+                p.fill(180, 180, 200);
+                p.stroke(100);
+                p.strokeWeight(2);
+
+                if (corrosionType === 'galvanic') {
+                    // Two different metals
+                    p.fill(180, 180, 200);
+                    p.rect(200, 150, 200, 100);
+                    p.fill(220, 160, 120);
+                    p.rect(400, 150, 200, 100);
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.CENTER);
+                    p.text('Steel', 300, 200);
+                    p.text('Copper', 500, 200);
+                } else if (corrosionType === 'crevice') {
+                    // Metal with crevice
+                    p.rect(200, 150, 400, 100);
+                    p.fill(100);
+                    p.rect(350, 140, 100, 30);
+                    p.fill(0);
+                    p.noStroke();
+                    p.text('Gasket/Washer', 400, 155);
+                } else {
+                    // Regular metal sample
+                    p.rect(200, 150, 400, 100);
+                }
+                p.pop();
+            }
+
+            function updateCorrosion() {
+                if (corrosionType === 'uniform') {
+                    if (p.random() < 0.1 * envAggressiveness) {
+                        damagePoints.push({
+                            x: p.random(200, 600),
+                            y: p.random(150, 250),
+                            size: p.random(3, 8),
+                            depth: 0
+                        });
+                    }
+                } else if (corrosionType === 'pitting') {
+                    if (p.random() < 0.02 * envAggressiveness) {
+                        damagePoints.push({
+                            x: p.random(220, 580),
+                            y: p.random(160, 240),
+                            size: p.random(5, 10),
+                            depth: p.random(10, 30)
+                        });
+                    }
+                } else if (corrosionType === 'galvanic') {
+                    if (p.random() < 0.15 * envAggressiveness) {
+                        damagePoints.push({
+                            x: p.random(200, 400),
+                            y: p.random(150, 250),
+                            size: p.random(4, 9),
+                            depth: 0
+                        });
+                    }
+                } else if (corrosionType === 'crevice') {
+                    if (p.random() < 0.08 * envAggressiveness) {
+                        damagePoints.push({
+                            x: p.random(350, 450),
+                            y: p.random(160, 180),
+                            size: p.random(4, 10),
+                            depth: p.random(5, 20)
+                        });
+                    }
+                } else if (corrosionType === 'stress') {
+                    if (p.random() < 0.01 * envAggressiveness) {
+                        damagePoints.push({
+                            x: p.random(220, 580),
+                            y: p.random(150, 250),
+                            type: 'crack',
+                            length: p.random(30, 80)
+                        });
+                    }
+                }
+
+                // Grow existing damage
+                for (let pt of damagePoints) {
+                    if (pt.size) pt.size *= 1.005;
+                    if (pt.depth) pt.depth *= 1.01;
+                    if (pt.length) pt.length *= 1.008;
+                }
+            }
+
+            function drawCorrosionDamage() {
+                p.noStroke();
+                for (let pt of damagePoints) {
+                    if (pt.type === 'crack') {
+                        p.stroke(255, 0, 0);
+                        p.strokeWeight(2);
+                        p.line(pt.x, pt.y, pt.x + pt.length, pt.y + p.random(-10, 10));
+                    } else {
+                        p.fill(139, 69, 19, 200);
+                        p.ellipse(pt.x, pt.y, pt.size, pt.size);
+                        if (pt.depth > 0) {
+                            p.fill(80, 40, 10, 150);
+                            p.ellipse(pt.x, pt.y, pt.size * 0.5, pt.size * 0.5);
+                        }
+                    }
+                }
+            }
+
+            function getDamageLevel() {
+                if (time < 2) return 'Minimal';
+                if (time < 5) return 'Low';
+                if (time < 10) return 'Moderate';
+                if (time < 20) return 'Severe';
+                return 'Critical';
+            }
+
+            function initializeDamage() {
+                damagePoints = [];
+                time = 0;
+            }
+
+            function updateCorrosionInfo() {
+                let info = '';
+                switch(corrosionType) {
+                    case 'uniform':
+                        info = '<strong>Uniform Corrosion:</strong> Even attack across entire surface. Predictable and manageable.';
+                        break;
+                    case 'galvanic':
+                        info = '<strong>Galvanic Corrosion:</strong> Steel (anode) corrodes preferentially. Copper (cathode) is protected.';
+                        break;
+                    case 'pitting':
+                        info = '<strong>Pitting:</strong> Localized deep holes. Dangerous due to hidden damage and stress concentration.';
+                        break;
+                    case 'crevice':
+                        info = '<strong>Crevice Corrosion:</strong> Accelerated attack in oxygen-depleted gaps under gasket.';
+                        break;
+                    case 'stress':
+                        info = '<strong>Stress-Corrosion Cracking:</strong> Brittle cracks form under combined stress and corrosion. Catastrophic!';
+                        break;
+                }
+                document.getElementById('corrosion-details').innerHTML = info;
+            }
+
+            window.updateCorrosionType = function(type) {
+                corrosionType = type;
+                initializeDamage();
+            };
+
+            window.updateEnvAggressiveness = function(level) {
+                envAggressiveness = parseInt(level);
+            };
+
+            window.startCorrosion = function() {
+                corroding = true;
+            };
+
+            window.resetCorrosionSim = function() {
+                corroding = false;
+                initializeDamage();
+            };
+        };
+
+        // Galvanic Couple Simulation
+        let galvanicSketch = function(p) {
+            let metalA = 'zn';
+            let metalB = 'fe';
+            let corrosionA = 0;
+            let corrosionB = 0;
+
+            const metalData = {
+                mg: { name: 'Magnesium', potential: -2.37, color: [200, 200, 200] },
+                al: { name: 'Aluminum', potential: -1.66, color: [192, 192, 192] },
+                zn: { name: 'Zinc', potential: -0.76, color: [186, 196, 200] },
+                fe: { name: 'Iron', potential: -0.44, color: [180, 180, 200] },
+                cu: { name: 'Copper', potential: 0.34, color: [184, 115, 51] }
+            };
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 400);
+                canvas.parent('sketch-holder-galvanic');
+                p.textFont('Arial');
+                p.frameRate(30);
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Draw electrolyte (water)
+                p.fill(200, 220, 255, 100);
+                p.noStroke();
+                p.rect(0, 200, p.width, 200);
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Electrolyte (Seawater)', p.width/2, 380);
+
+                // Draw metals
+                let colorA = metalData[metalA].color;
+                let colorB = metalData[metalB].color;
+
+                // Metal A
+                p.fill(colorA[0], colorA[1], colorA[2]);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(200, 150, 150, 200);
+
+                // Metal B
+                p.fill(colorB[0], colorB[1], colorB[2]);
+                p.rect(450, 150, 150, 200);
+
+                // Wire connection
+                p.stroke(255, 200, 0);
+                p.strokeWeight(4);
+                p.line(275, 150, 525, 150);
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.text('Electrical Connection', 400, 135);
+
+                // Determine anode and cathode
+                let potA = metalData[metalA].potential;
+                let potB = metalData[metalB].potential;
+                let deltaE = Math.abs(potB - potA);
+                let anode, cathode;
+
+                if (potA < potB) {
+                    anode = 'A';
+                    cathode = 'B';
+                    corrosionA += deltaE * 0.5;
+                } else if (potB < potA) {
+                    anode = 'B';
+                    cathode = 'A';
+                    corrosionB += deltaE * 0.5;
+                } else {
+                    deltaE = 0;
+                }
+
+                // Draw corrosion products on anode
+                if (anode === 'A') {
+                    for (let i = 0; i < corrosionA; i++) {
+                        p.fill(139, 69, 19, 150);
+                        p.noStroke();
+                        p.ellipse(p.random(200, 350), p.random(250, 350), 8, 8);
+                    }
+                    // Label
+                    p.fill(255, 0, 0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(16);
+                    p.text('ANODE\n(Corroding)', 275, 240);
+                } else if (anode === 'B') {
+                    for (let i = 0; i < corrosionB; i++) {
+                        p.fill(139, 69, 19, 150);
+                        p.noStroke();
+                        p.ellipse(p.random(450, 600), p.random(250, 350), 8, 8);
+                    }
+                    p.fill(255, 0, 0);
+                    p.textAlign(p.CENTER);
+                    p.textSize(16);
+                    p.text('ANODE\n(Corroding)', 525, 240);
+                }
+
+                // Cathode label
+                if (cathode === 'A') {
+                    p.fill(0, 150, 0);
+                    p.text('CATHODE\n(Protected)', 275, 240);
+                } else if (cathode === 'B') {
+                    p.fill(0, 150, 0);
+                    p.text('CATHODE\n(Protected)', 525, 240);
+                }
+
+                // Metal labels
+                p.fill(0);
+                p.textSize(14);
+                p.text(metalData[metalA].name, 275, 380);
+                p.text(metalData[metalB].name, 525, 380);
+
+                // Electron flow
+                if (deltaE > 0) {
+                    p.stroke(255, 255, 0);
+                    p.strokeWeight(3);
+                    let flowX = anode === 'A' ? 275 : 525;
+                    let toX = cathode === 'A' ? 275 : 525;
+                    p.line(flowX, 145, toX, 145);
+                    // Arrow
+                    p.fill(255, 255, 0);
+                    p.noStroke();
+                    let arrowX = (flowX + toX) / 2;
+                    let dir = cathode === 'A' ? -1 : 1;
+                    p.triangle(arrowX, 145, arrowX - 10*dir, 140, arrowX - 10*dir, 150);
+                    p.fill(0);
+                    p.text('e⁻ flow', arrowX, 125);
+                }
+
+                updateGalvanicInfo();
+            };
+
+            function updateGalvanicInfo() {
+                let potA = metalData[metalA].potential;
+                let potB = metalData[metalB].potential;
+                let deltaE = potB - potA;
+
+                let info = `<strong>${metalData[metalA].name}:</strong> E° = ${potA.toFixed(2)} V<br>`;
+                info += `<strong>${metalData[metalB].name}:</strong> E° = ${potB.toFixed(2)} V<br>`;
+                info += `<strong>ΔE = ${Math.abs(deltaE).toFixed(2)} V</strong><br><br>`;
+
+                if (Math.abs(deltaE) < 0.01) {
+                    info += '<span style="color: #27ae60;">Same metals - No galvanic corrosion!</span>';
+                } else if (deltaE > 0) {
+                    info += `<span style="color: #e74c3c;">${metalData[metalA].name} is the ANODE (corrodes)</span><br>`;
+                    info += `<span style="color: #27ae60;">${metalData[metalB].name} is the CATHODE (protected)</span>`;
+                } else {
+                    info += `<span style="color: #e74c3c;">${metalData[metalB].name} is the ANODE (corrodes)</span><br>`;
+                    info += `<span style="color: #27ae60;">${metalData[metalA].name} is the CATHODE (protected)</span>`;
+                }
+
+                document.getElementById('galvanic-details').innerHTML = info;
+            }
+
+            window.updateMetalA = function(metal) {
+                metalA = metal;
+                corrosionA = 0;
+                corrosionB = 0;
+            };
+
+            window.updateMetalB = function(metal) {
+                metalB = metal;
+                corrosionA = 0;
+                corrosionB = 0;
+            };
+        };
+
+        // Create p5 instances
+        new p5(corrosionTypesSketch);
+        new p5(galvanicSketch);
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Corrosion types controls
+            const corrosionTypeSelect = document.getElementById('corrosion-type');
+            const envSlider = document.getElementById('env-slider');
+
+            corrosionTypeSelect.addEventListener('change', e => {
+                window.updateCorrosionType(e.target.value);
+            });
+
+            envSlider.addEventListener('input', e => {
+                let labels = ['Low', 'Medium', 'High'];
+                document.getElementById('env-value').textContent = labels[parseInt(e.target.value) - 1];
+                window.updateEnvAggressiveness(e.target.value);
+            });
+
+            document.getElementById('start-corrosion').addEventListener('click', window.startCorrosion);
+            document.getElementById('reset-corrosion').addEventListener('click', window.resetCorrosionSim);
+
+            // Galvanic couple controls
+            const metalASelect = document.getElementById('metal-a');
+            const metalBSelect = document.getElementById('metal-b');
+
+            metalASelect.addEventListener('change', e => {
+                window.updateMetalA(e.target.value);
+            });
+
+            metalBSelect.addEventListener('change', e => {
+                window.updateMetalB(e.target.value);
+            });
+
+            // Quiz
+            document.getElementById('submit-quiz').addEventListener('click', function() {
+                const answers = {
+                    q1: 'b',
+                    q2: 'c',
+                    q3: 'b',
+                    q4: 'c',
+                    q5: 'c'
+                };
+
+                let score = 0;
+                let totalQuestions = Object.keys(answers).length;
+                let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                for (let question in answers) {
+                    const selected = document.querySelector(`input[name="${question}"]:checked`);
+                    const correctAnswer = answers[question];
+
+                    if (selected) {
+                        if (selected.value === correctAnswer) {
+                            score++;
+                            resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct!</p>`;
+                        } else {
+                            resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect</p>`;
+                        }
+                    } else {
+                        resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                    }
+                }
+
+                const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                document.getElementById('quiz-results').innerHTML = resultsHTML;
+            });
+        });
+    </script>
+</body>
+</html>

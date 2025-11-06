@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Vibrations & Spectral Analysis - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Random Vibrations & Spectral Analysis</h1>
+        <p class="subtitle">Understanding Stochastic Processes and Power Spectral Density</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Random Vibrations</h2>
+
+        <h3>What are Random Vibrations?</h3>
+        <p>Unlike deterministic vibrations where the response can be predicted exactly at any time, random vibrations are non-deterministic and can only be described statistically. Examples include earthquake ground motion, wind loads on structures, road roughness for vehicles, and acoustic noise.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Random vibrations require statistical methods for analysis. We characterize them using statistical measures like mean, variance, autocorrelation, and power spectral density (PSD). The PSD describes how the power (or variance) of a signal is distributed with frequency.</p>
+        </div>
+
+        <h3>Stationary Random Processes</h3>
+        <p>A random process is <strong>stationary</strong> if its statistical properties do not change with time. For engineering applications, we often assume <strong>wide-sense stationary</strong> processes where the mean and autocorrelation are time-invariant.</p>
+
+        <div class="equation-box">
+            <p><strong>Statistical Descriptors:</strong></p>
+            <p><strong>Mean:</strong> \(\mu_x = E[x(t)] = \text{constant}\)</p>
+            <p><strong>Mean Square:</strong> \(E[x^2(t)] = \sigma_x^2 + \mu_x^2\)</p>
+            <p><strong>Variance:</strong> \(\sigma_x^2 = E[(x(t) - \mu_x)^2]\)</p>
+            <p><strong>Autocorrelation Function:</strong> \(R_{xx}(\tau) = E[x(t)x(t+\tau)]\)</p>
+        </div>
+
+        <h3>Power Spectral Density (PSD)</h3>
+        <p>The Power Spectral Density function \(S_{xx}(\omega)\) describes how the variance of a random process is distributed over frequency. It is the Fourier transform of the autocorrelation function.</p>
+
+        <div class="equation-box">
+            <p><strong>Wiener-Khinchin Theorem:</strong></p>
+            <p>\[S_{xx}(\omega) = \int_{-\infty}^{\infty} R_{xx}(\tau)e^{-i\omega\tau}d\tau\]</p>
+            <p>\[R_{xx}(\tau) = \frac{1}{2\pi}\int_{-\infty}^{\infty} S_{xx}(\omega)e^{i\omega\tau}d\omega\]</p>
+            <p><strong>Physical Interpretation:</strong> The area under the PSD curve equals the variance:</p>
+            <p>\[\sigma_x^2 = \int_{0}^{\infty} S_{xx}(\omega)d\omega\]</p>
+        </div>
+
+        <h3>Common PSD Models</h3>
+
+        <h4>1. White Noise</h4>
+        <p>White noise has constant PSD across all frequencies (ideal but physically unrealizable):</p>
+        <div class="equation-box">
+            <p>\[S_{xx}(\omega) = S_0 \quad \text{for all } \omega\]</p>
+            <p>where \(S_0\) is a constant spectral density.</p>
+        </div>
+
+        <h4>2. Band-Limited White Noise</h4>
+        <p>A practical approximation with constant PSD over a frequency range:</p>
+        <div class="equation-box">
+            <p>\[S_{xx}(\omega) = \begin{cases} S_0 & \omega_1 \leq \omega \leq \omega_2 \\ 0 & \text{otherwise} \end{cases}\]</p>
+        </div>
+
+        <h4>3. Kanai-Tajimi Spectrum</h4>
+        <p>Widely used for earthquake ground motion modeling:</p>
+        <div class="equation-box">
+            <p>\[S_{xx}(\omega) = S_0 \frac{\omega_g^4 + 4\zeta_g^2\omega_g^2\omega^2}{(\omega_g^2 - \omega^2)^2 + 4\zeta_g^2\omega_g^2\omega^2}\]</p>
+            <p>where \(\omega_g\) is the predominant ground frequency and \(\zeta_g\) is the damping ratio.</p>
+        </div>
+
+        <h3>SDOF System Response to Random Excitation</h3>
+        <p>For a SDOF system with natural frequency \(\omega_n\) and damping ratio \(\zeta\) subjected to random base acceleration with PSD \(S_{uu}(\omega)\):</p>
+
+        <div class="equation-box">
+            <p><strong>Frequency Response Function:</strong></p>
+            <p>\[H(\omega) = \frac{1}{1 - r^2 + 2i\zeta r}\]</p>
+            <p>where \(r = \omega/\omega_n\) is the frequency ratio.</p>
+
+            <p><strong>Response PSD:</strong></p>
+            <p>\[S_{xx}(\omega) = |H(\omega)|^2 S_{uu}(\omega)\]</p>
+            <p>where \(|H(\omega)|^2\) is the squared magnitude of the frequency response function.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Important Result:</strong> The mean square response (variance) is obtained by integrating the response PSD over all frequencies. For narrow-band random excitation near the natural frequency, the response can be significantly amplified, similar to harmonic resonance.</p>
+        </div>
+
+        <h3>RMS Response Calculation</h3>
+        <p>The root-mean-square (RMS) response is a key design parameter:</p>
+
+        <div class="equation-box">
+            <p>\[\sigma_x^2 = \int_{0}^{\infty} S_{xx}(\omega)d\omega = \int_{0}^{\infty} |H(\omega)|^2 S_{uu}(\omega)d\omega\]</p>
+            <p>\[x_{RMS} = \sigma_x = \sqrt{\sigma_x^2}\]</p>
+            <p><strong>For white noise excitation:</strong></p>
+            <p>\[\sigma_x^2 = \frac{\pi S_0 \omega_n}{4\zeta}\]</p>
+            <p>This shows that response increases with natural frequency and decreases with damping.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive PSD Simulation</h2>
+        <p>This simulation demonstrates random vibration response of a SDOF system. Adjust the excitation PSD and system parameters to see how the response PSD changes.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="natural-freq">Natural Frequency ω_n (rad/s): <span id="natural-freq-value">10.0</span></label>
+                <input type="range" id="natural-freq" min="5" max="30" step="0.5" value="10.0">
+            </div>
+
+            <div class="control-group">
+                <label for="damping">Damping Ratio ζ: <span id="damping-value">0.05</span></label>
+                <input type="range" id="damping" min="0.01" max="0.20" step="0.01" value="0.05">
+            </div>
+
+            <div class="control-group">
+                <label for="psd-level">PSD Level S₀: <span id="psd-level-value">1.0</span></label>
+                <input type="range" id="psd-level" min="0.1" max="5.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <label for="excitation-type">Excitation Type:</label>
+                <select id="excitation-type">
+                    <option value="white">White Noise</option>
+                    <option value="bandlimited">Band-Limited White Noise</option>
+                    <option value="kanai">Kanai-Tajimi Spectrum</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let omega_n = 10.0;
+        let zeta = 0.05;
+        let S0 = 1.0;
+        let excitationType = 'white';
+
+        // Frequency array
+        let frequencies = [];
+        let inputPSD = [];
+        let responsePSD = [];
+        let FRF = [];
+
+        function setupSliders() {
+            document.getElementById('natural-freq').addEventListener('input', function() {
+                omega_n = parseFloat(this.value);
+                document.getElementById('natural-freq-value').textContent = omega_n.toFixed(1);
+                calculatePSD();
+            });
+
+            document.getElementById('damping').addEventListener('input', function() {
+                zeta = parseFloat(this.value);
+                document.getElementById('damping-value').textContent = zeta.toFixed(2);
+                calculatePSD();
+            });
+
+            document.getElementById('psd-level').addEventListener('input', function() {
+                S0 = parseFloat(this.value);
+                document.getElementById('psd-level-value').textContent = S0.toFixed(1);
+                calculatePSD();
+            });
+
+            document.getElementById('excitation-type').addEventListener('change', function() {
+                excitationType = this.value;
+                calculatePSD();
+            });
+        }
+
+        function calculatePSD() {
+            frequencies = [];
+            inputPSD = [];
+            responsePSD = [];
+            FRF = [];
+
+            let maxFreq = 50;
+            let numPoints = 500;
+
+            for (let i = 0; i <= numPoints; i++) {
+                let omega = (i / numPoints) * maxFreq;
+                frequencies.push(omega);
+
+                // Input PSD based on excitation type
+                let Suu = 0;
+                if (excitationType === 'white') {
+                    Suu = S0;
+                } else if (excitationType === 'bandlimited') {
+                    if (omega >= 2 && omega <= 20) {
+                        Suu = S0;
+                    }
+                } else if (excitationType === 'kanai') {
+                    let omega_g = 15.0;
+                    let zeta_g = 0.6;
+                    let num = omega_g * omega_g * omega_g * omega_g + 4 * zeta_g * zeta_g * omega_g * omega_g * omega * omega;
+                    let den = Math.pow(omega_g * omega_g - omega * omega, 2) + 4 * zeta_g * zeta_g * omega_g * omega_g * omega * omega;
+                    Suu = S0 * num / den;
+                }
+                inputPSD.push(Suu);
+
+                // Frequency response function
+                let r = omega / omega_n;
+                let H_real = (1 - r * r);
+                let H_imag = 2 * zeta * r;
+                let H_mag_sq = 1 / (H_real * H_real + H_imag * H_imag);
+                FRF.push(Math.sqrt(H_mag_sq));
+
+                // Response PSD
+                let Sxx = H_mag_sq * Suu;
+                responsePSD.push(Sxx);
+            }
+        }
+
+        function setup() {
+            let canvas = createCanvas(900, 800);
+            canvas.parent('sketch-holder');
+            canvas.style('display', 'block');
+            canvas.style('margin', '0 auto');
+
+            setupSliders();
+            calculatePSD();
+        }
+
+        function draw() {
+            background(255);
+
+            // Calculate RMS response
+            let variance = 0;
+            for (let i = 1; i < responsePSD.length; i++) {
+                let df = frequencies[i] - frequencies[i-1];
+                variance += responsePSD[i] * df;
+            }
+            let rms = Math.sqrt(variance);
+
+            // Draw plots
+            drawPSDPlot(50, 50, 800, 200, "Input PSD S_uu(ω)", frequencies, inputPSD, 'blue');
+            drawPSDPlot(50, 300, 800, 200, "Frequency Response Function |H(ω)|", frequencies, FRF, 'green');
+            drawPSDPlot(50, 550, 800, 200, "Response PSD S_xx(ω)", frequencies, responsePSD, 'red');
+
+            // Display RMS response
+            fill(0);
+            textAlign(LEFT);
+            textSize(14);
+            text("RMS Response: " + rms.toFixed(4), 50, 780);
+            text("Natural Frequency: " + omega_n.toFixed(1) + " rad/s", 300, 780);
+            text("Damping Ratio: " + zeta.toFixed(2), 600, 780);
+        }
+
+        function drawPSDPlot(x, y, w, h, title, freqData, psdData, plotColor) {
+            push();
+            translate(x, y);
+
+            // Title
+            fill(0);
+            textAlign(CENTER);
+            textSize(14);
+            text(title, w / 2, -10);
+
+            // Background
+            fill(240);
+            noStroke();
+            rect(0, 0, w, h);
+
+            // Find data range
+            let yMax = Math.max(...psdData);
+            if (yMax < 1e-10) yMax = 1;
+            let yMin = 0;
+
+            // Grid
+            stroke(220);
+            strokeWeight(1);
+            for (let i = 0; i <= 10; i++) {
+                let xPos = (i / 10) * w;
+                line(xPos, 0, xPos, h);
+            }
+            for (let i = 0; i <= 5; i++) {
+                let yPos = (i / 5) * h;
+                line(0, yPos, w, yPos);
+            }
+
+            // Axes
+            stroke(0);
+            strokeWeight(2);
+            line(0, h, w, h);
+            line(0, 0, 0, h);
+
+            // Y-axis labels
+            fill(0);
+            noStroke();
+            textSize(10);
+            textAlign(RIGHT);
+            for (let i = 0; i <= 5; i++) {
+                let yPos = h - (i / 5) * h;
+                let yVal = (i / 5) * yMax;
+                text(yVal.toFixed(2), -5, yPos + 3);
+            }
+
+            // X-axis labels
+            textAlign(CENTER);
+            let maxFreq = freqData[freqData.length - 1];
+            for (let i = 0; i <= 5; i++) {
+                let xPos = (i / 5) * w;
+                text((i / 5 * maxFreq).toFixed(0), xPos, h + 15);
+            }
+
+            // X-axis title
+            text("Frequency (rad/s)", w / 2, h + 30);
+
+            // Plot data
+            stroke(plotColor);
+            strokeWeight(2);
+            noFill();
+            beginShape();
+            for (let i = 0; i < freqData.length; i++) {
+                let px = map(freqData[i], 0, maxFreq, 0, w);
+                let py = map(psdData[i], yMin, yMax, h, 0);
+                vertex(px, py);
+            }
+            endShape();
+
+            // Draw vertical line at natural frequency
+            if (title.includes("Response") || title.includes("FRF")) {
+                stroke(100);
+                strokeWeight(1);
+                drawingContext.setLineDash([5, 5]);
+                let omega_n_pos = map(omega_n, 0, maxFreq, 0, w);
+                line(omega_n_pos, 0, omega_n_pos, h);
+                drawingContext.setLineDash([]);
+
+                fill(100);
+                noStroke();
+                textSize(10);
+                text("ω_n", omega_n_pos, 15);
+            }
+
+            pop();
+        }
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Random vibration analysis is essential in many engineering fields:</p>
+        <ul>
+            <li><strong>Earthquake Engineering:</strong> Buildings and bridges must be designed to withstand random earthquake ground motions characterized by PSD functions. The Kanai-Tajimi spectrum models earthquake frequency content.</li>
+            <li><strong>Aerospace Structures:</strong> Aircraft and spacecraft experience random turbulence, acoustic loads during launch, and atmospheric buffeting. PSD analysis ensures structural integrity and fatigue life.</li>
+            <li><strong>Vehicle Dynamics:</strong> Automobiles encounter random road roughness characterized by road PSD profiles. Suspension systems are designed to minimize passenger discomfort and vehicle damage.</li>
+            <li><strong>Offshore Structures:</strong> Oil platforms and ships experience random wave loads. Spectral analysis using wave spectra (Pierson-Moskowitz, JONSWAP) predicts structural response and fatigue.</li>
+            <li><strong>Electronic Systems:</strong> Circuit boards and components in vehicles, aircraft, and machinery must survive random vibration environments specified by PSD test standards (MIL-STD-810).</li>
+            <li><strong>Wind Engineering:</strong> Tall buildings, bridges, and wind turbines respond to random wind loads characterized by wind power spectra (Davenport, Kaimal spectra).</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Autocorrelation Function</td>
+                    <td>\(R_{xx}(\tau) = E[x(t)x(t+\tau)]\)</td>
+                    <td>Correlation between signal at different times</td>
+                </tr>
+                <tr>
+                    <td>Power Spectral Density</td>
+                    <td>\(S_{xx}(\omega) = \int_{-\infty}^{\infty} R_{xx}(\tau)e^{-i\omega\tau}d\tau\)</td>
+                    <td>Fourier transform of autocorrelation</td>
+                </tr>
+                <tr>
+                    <td>Variance from PSD</td>
+                    <td>\(\sigma_x^2 = \int_{0}^{\infty} S_{xx}(\omega)d\omega\)</td>
+                    <td>Area under PSD curve</td>
+                </tr>
+                <tr>
+                    <td>White Noise PSD</td>
+                    <td>\(S_{xx}(\omega) = S_0\)</td>
+                    <td>Constant across all frequencies</td>
+                </tr>
+                <tr>
+                    <td>Frequency Response Function</td>
+                    <td>\(H(\omega) = \frac{1}{1 - r^2 + 2i\zeta r}\)</td>
+                    <td>SDOF system transfer function, \(r = \omega/\omega_n\)</td>
+                </tr>
+                <tr>
+                    <td>Response PSD</td>
+                    <td>\(S_{xx}(\omega) = |H(\omega)|^2 S_{uu}(\omega)\)</td>
+                    <td>Output PSD from input PSD</td>
+                </tr>
+                <tr>
+                    <td>SDOF Response to White Noise</td>
+                    <td>\(\sigma_x^2 = \frac{\pi S_0 \omega_n}{4\zeta}\)</td>
+                    <td>RMS response variance</td>
+                </tr>
+                <tr>
+                    <td>Kanai-Tajimi Spectrum</td>
+                    <td>\(S_{xx}(\omega) = S_0 \frac{\omega_g^4 + 4\zeta_g^2\omega_g^2\omega^2}{(\omega_g^2 - \omega^2)^2 + 4\zeta_g^2\omega_g^2\omega^2}\)</td>
+                    <td>Earthquake ground motion model</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: White Noise Response</h3>
+            <p>A SDOF system with natural frequency \(\omega_n = 20\) rad/s and damping ratio \(\zeta = 0.05\) is subjected to white noise base acceleration with PSD \(S_0 = 0.1\) (m/s²)²/(rad/s). Calculate the RMS displacement response.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong> \(\omega_n = 20\) rad/s, \(\zeta = 0.05\), \(S_0 = 0.1\) (m/s²)²/(rad/s)</p>
+
+                <p><strong>Step 1: Calculate variance of displacement response</strong></p>
+                <p>For white noise base acceleration, the displacement variance is:</p>
+                <p>\[\sigma_x^2 = \frac{\pi S_0}{4\zeta\omega_n^3}\]</p>
+
+                <p>\[\sigma_x^2 = \frac{\pi \times 0.1}{4 \times 0.05 \times 20^3} = \frac{0.314}{1600} = 1.96 \times 10^{-4} \text{ m}^2\]</p>
+
+                <p><strong>Step 2: Calculate RMS displacement</strong></p>
+                <p>\[x_{RMS} = \sigma_x = \sqrt{1.96 \times 10^{-4}} = 0.014 \text{ m} = 14 \text{ mm}\]</p>
+
+                <p><strong>Answer:</strong> The RMS displacement is 14 mm. Higher natural frequency or higher damping would reduce this response.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Band-Limited Excitation</h3>
+            <p>A system with \(\omega_n = 10\) rad/s and \(\zeta = 0.10\) experiences band-limited white noise from 5 to 15 rad/s with \(S_0 = 2.0\). Estimate the RMS response assuming the FRF is approximately constant within the band.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong> \(\omega_n = 10\) rad/s, \(\zeta = 0.10\), \(S_0 = 2.0\), band: 5-15 rad/s</p>
+
+                <p><strong>Step 1: Evaluate FRF at natural frequency</strong></p>
+                <p>\[|H(\omega_n)|^2 = \frac{1}{(2\zeta)^2} = \frac{1}{(0.2)^2} = 25\]</p>
+
+                <p><strong>Step 2: Calculate response variance (approximation)</strong></p>
+                <p>Since the excitation band includes \(\omega_n\), we approximate:</p>
+                <p>\[\sigma_x^2 \approx |H(\omega_n)|^2 \times S_0 \times \Delta\omega\]</p>
+                <p>where \(\Delta\omega = 15 - 5 = 10\) rad/s (bandwidth)</p>
+                <p>\[\sigma_x^2 \approx 25 \times 2.0 \times 10 = 500\]</p>
+
+                <p><strong>Step 3: RMS response</strong></p>
+                <p>\[x_{RMS} = \sqrt{500} = 22.4\]</p>
+
+                <p><strong>Note:</strong> This is a rough approximation. For accurate results, integrate \(|H(\omega)|^2 S_0\) numerically over the frequency band.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Effect of Damping</h3>
+            <p>For a system with \(\omega_n = 15\) rad/s subjected to white noise with \(S_0 = 0.5\), calculate the RMS response for damping ratios of \(\zeta = 0.02\), \(0.05\), and \(0.10\). Discuss the trend.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Using:</strong> \(\sigma_x^2 = \frac{\pi S_0 \omega_n}{4\zeta}\)</p>
+
+                <p><strong>For ζ = 0.02:</strong></p>
+                <p>\[\sigma_x^2 = \frac{\pi \times 0.5 \times 15}{4 \times 0.02} = \frac{23.56}{0.08} = 294.5\]</p>
+                <p>\[x_{RMS} = 17.2\]</p>
+
+                <p><strong>For ζ = 0.05:</strong></p>
+                <p>\[\sigma_x^2 = \frac{23.56}{0.20} = 117.8\]</p>
+                <p>\[x_{RMS} = 10.9\]</p>
+
+                <p><strong>For ζ = 0.10:</strong></p>
+                <p>\[\sigma_x^2 = \frac{23.56}{0.40} = 58.9\]</p>
+                <p>\[x_{RMS} = 7.7\]</p>
+
+                <p><strong>Conclusion:</strong> RMS response is inversely proportional to damping ratio. Doubling damping from 0.05 to 0.10 reduces response by \(\sqrt{2}\). This highlights the importance of damping in random vibration control.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does the Power Spectral Density (PSD) represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The time-domain signal amplitude</label>
+                    <label><input type="radio" name="q1" value="b"> b) How signal power is distributed across frequencies</label>
+                    <label><input type="radio" name="q1" value="c"> c) The maximum displacement</label>
+                    <label><input type="radio" name="q1" value="d"> d) The damping ratio</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The area under the PSD curve equals:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) The mean value</label>
+                    <label><input type="radio" name="q2" value="b"> b) The variance (mean square value)</label>
+                    <label><input type="radio" name="q2" value="c"> c) The natural frequency</label>
+                    <label><input type="radio" name="q2" value="d"> d) The damping coefficient</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: White noise has PSD that is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Zero at all frequencies</label>
+                    <label><input type="radio" name="q3" value="b"> b) Constant at all frequencies</label>
+                    <label><input type="radio" name="q3" value="c"> c) Maximum at resonance only</label>
+                    <label><input type="radio" name="q3" value="d"> d) Decreasing with frequency</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: For a SDOF system under white noise excitation, increasing damping:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Increases RMS response</label>
+                    <label><input type="radio" name="q4" value="b"> b) Decreases RMS response</label>
+                    <label><input type="radio" name="q4" value="c"> c) Has no effect on RMS response</label>
+                    <label><input type="radio" name="q4" value="d"> d) Increases natural frequency</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The Kanai-Tajimi spectrum is commonly used to model:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Road roughness</label>
+                    <label><input type="radio" name="q5" value="b"> b) Earthquake ground motion</label>
+                    <label><input type="radio" name="q5" value="c"> c) Acoustic noise</label>
+                    <label><input type="radio" name="q5" value="d"> d) Wind loads</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b', // Power distribution across frequencies
+                        q2: 'b', // Variance
+                        q3: 'b', // Constant at all frequencies
+                        q4: 'b', // Decreases RMS response
+                        q5: 'b'  // Earthquake ground motion
+                    };
+
+                    let score = 0;
+                    let totalQuestions = Object.keys(answers).length;
+                    let resultsHTML = '<h3>Quiz Results:</h3>';
+
+                    for (let question in answers) {
+                        const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                        const correctAnswer = answers[question];
+
+                        if (selectedOption) {
+                            if (selectedOption.value === correctAnswer) {
+                                score++;
+                                resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                            } else {
+                                resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                            }
+                        } else {
+                            resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                        }
+                    }
+
+                    const percentage = ((score / totalQuestions) * 100).toFixed(0);
+                    resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+                    document.getElementById('quiz-results').innerHTML = resultsHTML;
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heat Transfer: Conduction, Convection, Radiation - Interactive Lecture</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/problems.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Heat Transfer: Conduction, Convection, Radiation</h1>
+        <p class="small-caps">Interactive Lecture on Energy Transfer Mechanisms</p>
+        <p>Dr. Arnaldo Delli Carri</p>
+    </header>
+
+    <!-- SECTION 1: TEACHING CONTENT -->
+    <div class="content-section">
+        <h2>Understanding Heat Transfer</h2>
+        <p>Heat transfer is the movement of thermal energy from one object or material to another due to a temperature difference. It is a fundamental concept in engineering, governing everything from building insulation to electronic cooling systems. Heat naturally flows from regions of higher temperature to regions of lower temperature until thermal equilibrium is reached.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> Heat transfer occurs through three fundamental mechanisms: conduction (direct contact), convection (fluid motion), and radiation (electromagnetic waves). In many engineering applications, all three modes operate simultaneously.</p>
+        </div>
+
+        <h3>Mode 1: Conduction</h3>
+        <p>Conduction is heat transfer through a solid material or between materials in direct contact. It occurs when faster-moving molecules (at higher temperature) collide with slower-moving molecules (at lower temperature), transferring kinetic energy.</p>
+
+        <div class="equation-box">
+            <p><strong>Fourier's Law of Heat Conduction:</strong></p>
+            <p>\[Q = -kA\frac{dT}{dx}\]</p>
+            <p>For steady-state conduction through a plane wall:</p>
+            <p>\[Q = \frac{kA(T_1 - T_2)}{L}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(Q\) = Heat transfer rate (W)</li>
+                <li>\(k\) = Thermal conductivity (W/m·K)</li>
+                <li>\(A\) = Cross-sectional area (m²)</li>
+                <li>\(T_1, T_2\) = Temperatures at surfaces (K or °C)</li>
+                <li>\(L\) = Thickness (m)</li>
+                <li>\(\frac{dT}{dx}\) = Temperature gradient (K/m)</li>
+            </ul>
+        </div>
+
+        <p><strong>Thermal Conductivity:</strong> Different materials have vastly different thermal conductivities:</p>
+        <ul>
+            <li>Metals (high): Copper k ≈ 400 W/m·K, Aluminum k ≈ 200 W/m·K</li>
+            <li>Non-metals (moderate): Concrete k ≈ 1.5 W/m·K, Glass k ≈ 1.0 W/m·K</li>
+            <li>Insulators (low): Fiberglass k ≈ 0.04 W/m·K, Air k ≈ 0.026 W/m·K</li>
+        </ul>
+
+        <div class="equation-box">
+            <p><strong>Thermal Resistance (Conduction):</strong></p>
+            <p>\[R_{cond} = \frac{L}{kA}\]</p>
+            <p>Using thermal resistance analogy (similar to electrical resistance):</p>
+            <p>\[Q = \frac{\Delta T}{R_{total}}\]</p>
+        </div>
+
+        <h3>Mode 2: Convection</h3>
+        <p>Convection is heat transfer between a solid surface and a moving fluid (liquid or gas). It combines conduction within the fluid and the bulk motion of the fluid.</p>
+
+        <div class="equation-box">
+            <p><strong>Newton's Law of Cooling:</strong></p>
+            <p>\[Q = hA(T_s - T_\infty)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(h\) = Convection heat transfer coefficient (W/m²·K)</li>
+                <li>\(A\) = Surface area (m²)</li>
+                <li>\(T_s\) = Surface temperature (K or °C)</li>
+                <li>\(T_\infty\) = Fluid temperature far from surface (K or °C)</li>
+            </ul>
+        </div>
+
+        <p><strong>Types of Convection:</strong></p>
+        <ul>
+            <li><strong>Natural (Free) Convection:</strong> Fluid motion caused by buoyancy forces due to density differences (e.g., hot air rising). Typical h: 5-25 W/m²·K</li>
+            <li><strong>Forced Convection:</strong> Fluid motion caused by external means like fans or pumps. Typical h: 25-250 W/m²·K</li>
+        </ul>
+
+        <div class="equation-box">
+            <p><strong>Thermal Resistance (Convection):</strong></p>
+            <p>\[R_{conv} = \frac{1}{hA}\]</p>
+        </div>
+
+        <h3>Mode 3: Radiation</h3>
+        <p>Radiation is heat transfer through electromagnetic waves, requiring no medium. All objects emit thermal radiation proportional to the fourth power of their absolute temperature.</p>
+
+        <div class="equation-box">
+            <p><strong>Stefan-Boltzmann Law:</strong></p>
+            <p>\[Q = \varepsilon \sigma A T^4\]</p>
+            <p>For radiation exchange between two surfaces:</p>
+            <p>\[Q = \varepsilon \sigma A (T_1^4 - T_2^4)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\varepsilon\) = Emissivity (0 ≤ ε ≤ 1, dimensionless)</li>
+                <li>\(\sigma\) = Stefan-Boltzmann constant = 5.67 × 10⁻⁸ W/m²·K⁴</li>
+                <li>\(A\) = Surface area (m²)</li>
+                <li>\(T\) = Absolute temperature (K)</li>
+            </ul>
+        </div>
+
+        <p><strong>Emissivity Values:</strong></p>
+        <ul>
+            <li>Blackbody (ideal): ε = 1.0</li>
+            <li>Black paint: ε ≈ 0.95</li>
+            <li>Aluminum (polished): ε ≈ 0.05</li>
+            <li>Aluminum (oxidized): ε ≈ 0.3</li>
+            <li>Human skin: ε ≈ 0.95</li>
+        </ul>
+
+        <h3>Combined Heat Transfer</h3>
+        <p>In most engineering applications, heat transfer occurs through multiple modes simultaneously. For example, heat loss from a building involves conduction through the wall, convection at the surfaces, and possibly radiation.</p>
+
+        <div class="equation-box">
+            <p><strong>Overall Heat Transfer Coefficient:</strong></p>
+            <p>For a composite wall with convection at both surfaces:</p>
+            <p>\[Q = UA\Delta T\]</p>
+            <p>Where \(U\) is the overall heat transfer coefficient:</p>
+            <p>\[\frac{1}{UA} = R_{total} = R_{conv,1} + R_{cond,1} + R_{cond,2} + \cdots + R_{conv,2}\]</p>
+            <p>\[\frac{1}{U} = \frac{1}{h_1} + \frac{L_1}{k_1} + \frac{L_2}{k_2} + \cdots + \frac{1}{h_2}\]</p>
+        </div>
+    </div>
+
+    <!-- SECTION 2: INTERACTIVE SIMULATION -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Heat Transfer Through a Wall</h2>
+        <p>Explore how different materials, thicknesses, and boundary conditions affect heat transfer. Observe temperature distribution and heat flux through a composite wall.</p>
+
+        <div class="type-selector">
+            <button class="type-button active" data-mode="conduction">Conduction Only</button>
+            <button class="type-button" data-mode="convection">With Convection</button>
+            <button class="type-button" data-mode="radiation">All Three Modes</button>
+        </div>
+
+        <div id="heat-sketch"></div>
+
+        <div class="controls-panel">
+            <div class="control-row">
+                <label>Hot Side Temperature (°C):</label>
+                <input type="range" id="temp-hot-slider" min="20" max="100" step="1" value="80">
+                <span id="temp-hot-value">80 °C</span>
+            </div>
+
+            <div class="control-row">
+                <label>Cold Side Temperature (°C):</label>
+                <input type="range" id="temp-cold-slider" min="-20" max="30" step="1" value="20">
+                <span id="temp-cold-value">20 °C</span>
+            </div>
+
+            <div class="control-row">
+                <label>Wall Thickness (cm):</label>
+                <input type="range" id="thickness-slider" min="5" max="50" step="1" value="20">
+                <span id="thickness-value">20 cm</span>
+            </div>
+
+            <div class="control-row">
+                <label>Thermal Conductivity (W/m·K):</label>
+                <input type="range" id="conductivity-slider" min="0.02" max="2.0" step="0.02" value="0.5">
+                <span id="conductivity-value">0.50 W/m·K</span>
+            </div>
+
+            <div class="control-row" id="conv-h-control" style="display:none;">
+                <label>Convection Coefficient (W/m²·K):</label>
+                <input type="range" id="conv-h-slider" min="5" max="50" step="1" value="10">
+                <span id="conv-h-value">10 W/m²·K</span>
+            </div>
+
+            <div class="control-row" id="emissivity-control" style="display:none;">
+                <label>Emissivity (ε):</label>
+                <input type="range" id="emissivity-slider" min="0.05" max="1.0" step="0.05" value="0.9">
+                <span id="emissivity-value">0.90</span>
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <h3>Heat Transfer Analysis:</h3>
+            <p><strong>Heat Flux:</strong> q = <span id="heat-flux-display">150</span> W/m²</p>
+            <p><strong>Total Heat Transfer (1 m² area):</strong> Q = <span id="heat-total-display">150</span> W</p>
+            <p><strong>Thermal Resistance:</strong> R<sub>total</sub> = <span id="resistance-display">0.40</span> m²·K/W</p>
+            <p><strong>Temperature Drop Across Wall:</strong> ΔT = <span id="temp-drop-display">60</span> °C</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: ENGINEERING APPLICATIONS -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Building Insulation and HVAC Design</h3>
+        <p>Building envelopes (walls, roofs, windows) involve all three heat transfer modes. Engineers calculate R-values (thermal resistance) to design energy-efficient buildings. Double-pane windows reduce conduction, while low-emissivity coatings minimize radiation losses.</p>
+
+        <h3>2. Electronic Cooling Systems</h3>
+        <p>Microprocessors and power electronics generate significant heat that must be removed to prevent failure. Heat sinks use conduction through metal fins and forced convection from fans. High-performance systems may use heat pipes or liquid cooling.</p>
+
+        <h3>3. Heat Exchangers</h3>
+        <p>Heat exchangers transfer thermal energy between two fluids without mixing them. Applications include car radiators, air conditioning condensers, and industrial process equipment. Design involves optimizing surface area and flow rates to maximize heat transfer.</p>
+
+        <h3>4. Thermoelectric Generators</h3>
+        <p>Radioisotope thermoelectric generators (RTGs) used in spacecraft convert heat from radioactive decay directly to electricity. They rely on the Seebeck effect and require careful thermal management to maintain temperature differences.</p>
+
+        <h3>5. Boilers and Steam Generators</h3>
+        <p>Power plant boilers transfer heat from combustion gases to water through convection and radiation. The complex geometry of tube banks maximizes surface area while maintaining structural integrity at high temperatures and pressures.</p>
+
+        <h3>6. Thermal Protection Systems</h3>
+        <p>Spacecraft re-entry involves extreme heating from atmospheric friction. Thermal protection systems use ablative materials (conduction and phase change), ceramic tiles (low conductivity), and reflective coatings (radiation shields) to protect the vehicle.</p>
+
+        <h3>7. Food Processing and Preservation</h3>
+        <p>Pasteurization, sterilization, and freezing processes require precise control of heat transfer rates. Convection ovens, blast freezers, and heat exchangers are designed based on heat transfer principles to ensure food safety and quality.</p>
+
+        <h3>8. Solar Thermal Collectors</h3>
+        <p>Solar water heaters and concentrating solar power plants absorb radiation from the sun, convert it to heat via conduction, and transfer it to a working fluid through convection. Selective coatings maximize absorption while minimizing radiation losses.</p>
+    </div>
+
+    <!-- SECTION 4: SUMMARY OF KEY EQUATIONS -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Fourier's Law (Conduction)</td>
+                        <td>\(Q = -kA\frac{dT}{dx}\)</td>
+                        <td>Heat conduction rate</td>
+                    </tr>
+                    <tr>
+                        <td>Conduction (Plane Wall)</td>
+                        <td>\(Q = \frac{kA(T_1 - T_2)}{L}\)</td>
+                        <td>Steady-state heat transfer through wall</td>
+                    </tr>
+                    <tr>
+                        <td>Thermal Resistance (Cond.)</td>
+                        <td>\(R_{cond} = \frac{L}{kA}\)</td>
+                        <td>Conduction thermal resistance</td>
+                    </tr>
+                    <tr>
+                        <td>Newton's Law of Cooling</td>
+                        <td>\(Q = hA(T_s - T_\infty)\)</td>
+                        <td>Convective heat transfer</td>
+                    </tr>
+                    <tr>
+                        <td>Thermal Resistance (Conv.)</td>
+                        <td>\(R_{conv} = \frac{1}{hA}\)</td>
+                        <td>Convection thermal resistance</td>
+                    </tr>
+                    <tr>
+                        <td>Stefan-Boltzmann Law</td>
+                        <td>\(Q = \varepsilon\sigma A(T_1^4 - T_2^4)\)</td>
+                        <td>Radiation heat transfer</td>
+                    </tr>
+                    <tr>
+                        <td>Overall Heat Transfer</td>
+                        <td>\(Q = UA\Delta T\)</td>
+                        <td>Combined heat transfer modes</td>
+                    </tr>
+                    <tr>
+                        <td>Overall HT Coefficient</td>
+                        <td>\(\frac{1}{U} = \frac{1}{h_1} + \frac{L}{k} + \frac{1}{h_2}\)</td>
+                        <td>Series thermal resistances</td>
+                    </tr>
+                    <tr>
+                        <td>Thermal Diffusivity</td>
+                        <td>\(\alpha = \frac{k}{\rho c_p}\)</td>
+                        <td>Rate of temperature change</td>
+                    </tr>
+                    <tr>
+                        <td>Biot Number</td>
+                        <td>\(Bi = \frac{hL_c}{k}\)</td>
+                        <td>Ratio of internal to surface resistance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 5: PRACTICE PROBLEMS -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Heat Conduction Through a Wall</h3>
+            <p>A concrete wall (k = 1.4 W/m·K) is 20 cm thick. The inside surface temperature is 25°C and the outside surface temperature is 5°C. Calculate:</p>
+            <ol>
+                <li>The heat flux through the wall (W/m²)</li>
+                <li>The heat transfer rate for a wall area of 15 m²</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Thermal conductivity: k = 1.4 W/m·K</li>
+                    <li>Thickness: L = 20 cm = 0.2 m</li>
+                    <li>Inside temperature: T₁ = 25°C</li>
+                    <li>Outside temperature: T₂ = 5°C</li>
+                    <li>Area: A = 15 m²</li>
+                </ul>
+                <p><strong>(a) Heat flux:</strong></p>
+                <p>Using Fourier's law:</p>
+                <p>\[q = \frac{k(T_1 - T_2)}{L} = \frac{1.4 \times (25 - 5)}{0.2}\]</p>
+                <p>\[q = \frac{1.4 \times 20}{0.2} = \frac{28}{0.2} = 140 \text{ W/m}^2\]</p>
+                <p><strong>(b) Total heat transfer:</strong></p>
+                <p>\[Q = q \times A = 140 \times 15 = 2100 \text{ W} = 2.1 \text{ kW}\]</p>
+                <p><strong>Answers:</strong></p>
+                <ul>
+                    <li>(a) Heat flux = 140 W/m²</li>
+                    <li>(b) Total heat transfer = 2.1 kW</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Convection Heat Transfer</h3>
+            <p>A hot plate at 150°C is cooled by air at 25°C flowing over it. The convection heat transfer coefficient is h = 20 W/m²·K. If the plate area is 0.5 m², calculate:</p>
+            <ol>
+                <li>The heat transfer rate from the plate</li>
+                <li>The convective thermal resistance</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Surface temperature: T<sub>s</sub> = 150°C</li>
+                    <li>Air temperature: T<sub>∞</sub> = 25°C</li>
+                    <li>Convection coefficient: h = 20 W/m²·K</li>
+                    <li>Area: A = 0.5 m²</li>
+                </ul>
+                <p><strong>(a) Heat transfer rate:</strong></p>
+                <p>Using Newton's law of cooling:</p>
+                <p>\[Q = hA(T_s - T_\infty) = 20 \times 0.5 \times (150 - 25)\]</p>
+                <p>\[Q = 10 \times 125 = 1250 \text{ W} = 1.25 \text{ kW}\]</p>
+                <p><strong>(b) Convective thermal resistance:</strong></p>
+                <p>\[R_{conv} = \frac{1}{hA} = \frac{1}{20 \times 0.5} = \frac{1}{10} = 0.1 \text{ K/W}\]</p>
+                <p><strong>Verification:</strong> \(Q = \frac{\Delta T}{R} = \frac{125}{0.1} = 1250 \text{ W}\) ✓</p>
+                <p><strong>Answers:</strong></p>
+                <ul>
+                    <li>(a) Heat transfer rate = 1.25 kW</li>
+                    <li>(b) Thermal resistance = 0.1 K/W</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Composite Wall with Convection</h3>
+            <p>A composite wall consists of:</p>
+            <ul>
+                <li>Layer 1: Brick, k₁ = 0.7 W/m·K, L₁ = 15 cm</li>
+                <li>Layer 2: Insulation, k₂ = 0.04 W/m·K, L₂ = 5 cm</li>
+            </ul>
+            <p>Inside convection: h₁ = 10 W/m²·K, T<sub>∞,1</sub> = 22°C</p>
+            <p>Outside convection: h₂ = 25 W/m²·K, T<sub>∞,2</sub> = -5°C</p>
+            <p>Calculate:</p>
+            <ol>
+                <li>The overall heat transfer coefficient U</li>
+                <li>The heat flux through the wall</li>
+                <li>The interface temperature between the two layers</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Brick: k₁ = 0.7 W/m·K, L₁ = 0.15 m</li>
+                    <li>Insulation: k₂ = 0.04 W/m·K, L₂ = 0.05 m</li>
+                    <li>Inside: h₁ = 10 W/m²·K, T<sub>∞,1</sub> = 22°C</li>
+                    <li>Outside: h₂ = 25 W/m²·K, T<sub>∞,2</sub> = -5°C</li>
+                </ul>
+                <p><strong>(a) Overall heat transfer coefficient:</strong></p>
+                <p>\[\frac{1}{U} = \frac{1}{h_1} + \frac{L_1}{k_1} + \frac{L_2}{k_2} + \frac{1}{h_2}\]</p>
+                <p>\[\frac{1}{U} = \frac{1}{10} + \frac{0.15}{0.7} + \frac{0.05}{0.04} + \frac{1}{25}\]</p>
+                <p>\[\frac{1}{U} = 0.1 + 0.214 + 1.25 + 0.04 = 1.604 \text{ m}^2\text{·K/W}\]</p>
+                <p>\[U = \frac{1}{1.604} = 0.623 \text{ W/m}^2\text{·K}\]</p>
+                <p><strong>(b) Heat flux:</strong></p>
+                <p>\[q = U(T_{\infty,1} - T_{\infty,2}) = 0.623 \times (22 - (-5)) = 0.623 \times 27 = 16.8 \text{ W/m}^2\]</p>
+                <p><strong>(c) Interface temperature:</strong></p>
+                <p>From inside to interface:</p>
+                <p>\[q = \frac{T_{\infty,1} - T_{interface}}{R_1 + R_{brick}}\]</p>
+                <p>Where \(R_1 = 0.1\) and \(R_{brick} = 0.214\)</p>
+                <p>\[16.8 = \frac{22 - T_{interface}}{0.1 + 0.214}\]</p>
+                <p>\[16.8 = \frac{22 - T_{interface}}{0.314}\]</p>
+                <p>\[22 - T_{interface} = 16.8 \times 0.314 = 5.28\]</p>
+                <p>\[T_{interface} = 22 - 5.28 = 16.72°C\]</p>
+                <p><strong>Answers:</strong></p>
+                <ul>
+                    <li>(a) U = 0.623 W/m²·K</li>
+                    <li>(b) Heat flux = 16.8 W/m²</li>
+                    <li>(c) Interface temperature = 16.7°C</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 6: KNOWLEDGE CHECK QUIZ -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Which mode of heat transfer requires a physical medium?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> Conduction only</label>
+                    <label><input type="radio" name="q1" value="b"> Convection only</label>
+                    <label><input type="radio" name="q1" value="c"> Both conduction and convection</label>
+                    <label><input type="radio" name="q1" value="d"> Radiation only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: According to Fourier's law, heat flux is proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> Temperature</label>
+                    <label><input type="radio" name="q2" value="b"> Temperature gradient</label>
+                    <label><input type="radio" name="q2" value="c"> Thermal conductivity only</label>
+                    <label><input type="radio" name="q2" value="d"> Area only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Which material would be best for insulation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> Material with high thermal conductivity</label>
+                    <label><input type="radio" name="q3" value="b"> Material with low thermal conductivity</label>
+                    <label><input type="radio" name="q3" value="c"> Material with high emissivity</label>
+                    <label><input type="radio" name="q3" value="d"> Material with high density</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: In the Stefan-Boltzmann law, heat transfer by radiation is proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> Temperature</label>
+                    <label><input type="radio" name="q4" value="b"> Temperature squared</label>
+                    <label><input type="radio" name="q4" value="c"> Temperature cubed</label>
+                    <label><input type="radio" name="q4" value="d"> Temperature to the fourth power</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Forced convection differs from natural convection in that:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> It occurs at higher temperatures</label>
+                    <label><input type="radio" name="q5" value="b"> Fluid motion is caused by external means like fans or pumps</label>
+                    <label><input type="radio" name="q5" value="c"> It only occurs in liquids</label>
+                    <label><input type="radio" name="q5" value="d"> It has a lower heat transfer coefficient</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation parameters
+        let transferMode = 'conduction';
+        let tempHot = 80;
+        let tempCold = 20;
+        let thickness = 0.20; // meters
+        let conductivity = 0.5; // W/m·K
+        let convH = 10; // W/m²·K
+        let emissivity = 0.9;
+
+        // Constants
+        const sigma = 5.67e-8; // Stefan-Boltzmann constant W/m²·K⁴
+
+        // DOM elements
+        const tempHotSlider = document.getElementById('temp-hot-slider');
+        const tempHotValue = document.getElementById('temp-hot-value');
+        const tempColdSlider = document.getElementById('temp-cold-slider');
+        const tempColdValue = document.getElementById('temp-cold-value');
+        const thicknessSlider = document.getElementById('thickness-slider');
+        const thicknessValue = document.getElementById('thickness-value');
+        const conductivitySlider = document.getElementById('conductivity-slider');
+        const conductivityValue = document.getElementById('conductivity-value');
+        const convHSlider = document.getElementById('conv-h-slider');
+        const convHValue = document.getElementById('conv-h-value');
+        const emissivitySlider = document.getElementById('emissivity-slider');
+        const emissivityValue = document.getElementById('emissivity-value');
+
+        // P5.js sketch
+        new p5(function(p) {
+            const canvasWidth = 700;
+            const canvasHeight = 500;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('heat-sketch');
+                p.frameRate(30);
+
+                // Event listeners
+                tempHotSlider.addEventListener('input', updateParameters);
+                tempColdSlider.addEventListener('input', updateParameters);
+                thicknessSlider.addEventListener('input', updateParameters);
+                conductivitySlider.addEventListener('input', updateParameters);
+                convHSlider.addEventListener('input', updateParameters);
+                emissivitySlider.addEventListener('input', updateParameters);
+
+                // Mode selector
+                document.querySelectorAll('.type-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        document.querySelectorAll('.type-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        transferMode = this.dataset.mode;
+                        updateControlVisibility();
+                        calculateHeatTransfer();
+                    });
+                });
+
+                updateControlVisibility();
+                calculateHeatTransfer();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Draw wall cross-section
+                drawWall(p);
+
+                // Draw temperature distribution
+                drawTemperatureProfile(p);
+
+                // Draw heat flow arrows
+                drawHeatFlowArrows(p);
+
+                // Draw labels and legend
+                drawLabelsAndLegend(p);
+            };
+
+            function drawWall(p) {
+                const wallX = 250;
+                const wallY = 150;
+                const wallWidth = 200;
+                const wallHeight = 200;
+
+                // Wall
+                p.fill(180);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(wallX, wallY, wallWidth, wallHeight);
+
+                // Hot side (red)
+                p.fill(255, 100, 100, 150);
+                p.noStroke();
+                p.rect(wallX - 50, wallY, 50, wallHeight);
+
+                // Cold side (blue)
+                p.fill(100, 100, 255, 150);
+                p.rect(wallX + wallWidth, wallY, 50, wallHeight);
+
+                // Labels
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text(`${tempHot}°C`, wallX - 25, wallY + wallHeight / 2);
+                p.text(`${tempCold}°C`, wallX + wallWidth + 25, wallY + wallHeight / 2);
+                p.text(`${(thickness * 100).toFixed(0)} cm`, wallX + wallWidth / 2, wallY + wallHeight + 30);
+            }
+
+            function drawTemperatureProfile(p) {
+                const graphX = 50;
+                const graphY = 400;
+                const graphWidth = 600;
+                const graphHeight = 80;
+
+                // Background
+                p.fill(255);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(graphX, graphY, graphWidth, graphHeight);
+
+                // Temperature gradient
+                for (let i = 0; i < graphWidth; i++) {
+                    const ratio = i / graphWidth;
+                    const temp = tempHot - (tempHot - tempCold) * ratio;
+                    const colorVal = p.map(temp, tempCold, tempHot, 0, 255);
+                    p.stroke(255 - colorVal, 0, colorVal);
+                    p.line(graphX + i, graphY, graphX + i, graphY + graphHeight);
+                }
+
+                // Profile line
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i <= graphWidth; i += 10) {
+                    const ratio = i / graphWidth;
+                    const temp = tempHot - (tempHot - tempCold) * ratio;
+                    const y = graphY + graphHeight - p.map(temp, tempCold, tempHot, 0, graphHeight);
+                    p.vertex(graphX + i, y);
+                }
+                p.endShape();
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(12);
+                p.text('Temperature Profile', graphX, graphY - 10);
+                p.text(`${tempHot}°C`, graphX + 5, graphY + 20);
+                p.text(`${tempCold}°C`, graphX + graphWidth - 40, graphY + graphHeight - 10);
+            }
+
+            function drawHeatFlowArrows(p) {
+                const arrowY = 250;
+                const numArrows = 5;
+
+                p.stroke(255, 150, 0);
+                p.strokeWeight(3);
+                p.fill(255, 150, 0);
+
+                for (let i = 0; i < numArrows; i++) {
+                    const y = arrowY + (i - 2) * 30;
+                    // Arrow shaft
+                    p.line(200, y, 480, y);
+                    // Arrow head
+                    p.triangle(480, y, 470, y - 5, 470, y + 5);
+                }
+
+                p.fill(255, 150, 0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Heat Flow →', 340, 220);
+            }
+
+            function drawLabelsAndLegend(p) {
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(16);
+
+                let modeText = '';
+                if (transferMode === 'conduction') {
+                    modeText = 'Pure Conduction';
+                } else if (transferMode === 'convection') {
+                    modeText = 'Conduction + Convection';
+                } else {
+                    modeText = 'Conduction + Convection + Radiation';
+                }
+
+                p.text(`Mode: ${modeText}`, 50, 50);
+                p.textSize(12);
+                p.text(`k = ${conductivity.toFixed(2)} W/m·K`, 50, 75);
+                if (transferMode !== 'conduction') {
+                    p.text(`h = ${convH} W/m²·K`, 50, 95);
+                }
+                if (transferMode === 'radiation') {
+                    p.text(`ε = ${emissivity.toFixed(2)}`, 50, 115);
+                }
+            }
+
+            function calculateHeatTransfer() {
+                const area = 1.0; // 1 m² for calculations
+
+                let heatFlux, totalHeat, resistance, tempDrop;
+
+                if (transferMode === 'conduction') {
+                    // Pure conduction
+                    heatFlux = conductivity * (tempHot - tempCold) / thickness;
+                    totalHeat = heatFlux * area;
+                    resistance = thickness / (conductivity * area);
+                    tempDrop = tempHot - tempCold;
+
+                } else if (transferMode === 'convection') {
+                    // Conduction + convection at both surfaces
+                    const Rcond = thickness / (conductivity * area);
+                    const Rconv1 = 1 / (convH * area);
+                    const Rconv2 = 1 / (convH * area);
+                    resistance = Rconv1 + Rcond + Rconv2;
+                    totalHeat = (tempHot - tempCold) / resistance;
+                    heatFlux = totalHeat / area;
+                    tempDrop = tempHot - tempCold;
+
+                } else {
+                    // All three modes
+                    const Rcond = thickness / (conductivity * area);
+                    const Rconv1 = 1 / (convH * area);
+                    const Rconv2 = 1 / (convH * area);
+                    const Rtotal_cond_conv = Rconv1 + Rcond + Rconv2;
+
+                    // Radiation (approximate, added in parallel)
+                    const T1_K = tempHot + 273.15;
+                    const T2_K = tempCold + 273.15;
+                    const Qrad = emissivity * sigma * area * (Math.pow(T1_K, 4) - Math.pow(T2_K, 4));
+
+                    const Qcond_conv = (tempHot - tempCold) / Rtotal_cond_conv;
+                    totalHeat = Qcond_conv + Qrad;
+                    heatFlux = totalHeat / area;
+                    resistance = (tempHot - tempCold) / totalHeat;
+                    tempDrop = tempHot - tempCold;
+                }
+
+                // Update displays
+                document.getElementById('heat-flux-display').textContent = heatFlux.toFixed(1);
+                document.getElementById('heat-total-display').textContent = totalHeat.toFixed(1);
+                document.getElementById('resistance-display').textContent = resistance.toFixed(3);
+                document.getElementById('temp-drop-display').textContent = tempDrop.toFixed(1);
+            }
+
+            function updateParameters() {
+                tempHot = parseFloat(tempHotSlider.value);
+                tempHotValue.textContent = tempHot.toFixed(0) + ' °C';
+
+                tempCold = parseFloat(tempColdSlider.value);
+                tempColdValue.textContent = tempCold.toFixed(0) + ' °C';
+
+                thickness = parseFloat(thicknessSlider.value) / 100; // Convert cm to m
+                thicknessValue.textContent = thicknessSlider.value + ' cm';
+
+                conductivity = parseFloat(conductivitySlider.value);
+                conductivityValue.textContent = conductivity.toFixed(2) + ' W/m·K';
+
+                convH = parseFloat(convHSlider.value);
+                convHValue.textContent = convH.toFixed(0) + ' W/m²·K';
+
+                emissivity = parseFloat(emissivitySlider.value);
+                emissivityValue.textContent = emissivity.toFixed(2);
+
+                calculateHeatTransfer();
+            }
+        });
+
+        function updateControlVisibility() {
+            const convControl = document.getElementById('conv-h-control');
+            const emissivityControl = document.getElementById('emissivity-control');
+
+            convControl.style.display = 'none';
+            emissivityControl.style.display = 'none';
+
+            if (transferMode === 'convection') {
+                convControl.style.display = 'flex';
+            } else if (transferMode === 'radiation') {
+                convControl.style.display = 'flex';
+                emissivityControl.style.display = 'flex';
+            }
+        }
+
+        // Quiz handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Both conduction and convection
+                q2: 'b',  // Temperature gradient
+                q3: 'b',  // Low thermal conductivity
+                q4: 'd',  // T^4
+                q5: 'b'   // External means
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #333;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+</body>
+</html>

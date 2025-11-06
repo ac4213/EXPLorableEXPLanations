@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermodynamic Processes for Ideal Gases - Interactive Lecture</title>
+    <meta name="description" content="Interactive lecture on thermodynamic processes (isothermal, isobaric, isochoric, and adiabatic) for ideal gases with simulations">
+    <meta name="keywords" content="thermodynamics, ideal gas, isothermal, isobaric, isochoric, adiabatic, pV diagram, engineering">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Thermodynamic Processes for Ideal Gases</h1>
+        <p class="subtitle">Understanding Isothermal, Isobaric, Isochoric, and Adiabatic Processes</p>
+    </header>
+
+    <!-- Navigation breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="/">Home</a> &gt;
+        <a href="/">Y1</a> &gt;
+        <span>Thermodynamic Processes</span>
+    </nav>
+
+    <!-- Introduction & Theory Section -->
+    <div class="content-section">
+        <h2>Introduction to Thermodynamic Processes</h2>
+
+        <p>In thermodynamics, a <strong>process</strong> is a transformation of a system from one equilibrium state to another. For an ideal gas, the relationship between pressure (\(P\)), volume (\(V\)), temperature (\(T\)), and the number of moles (\(n\)) is governed by the <strong>ideal gas law</strong>:</p>
+
+        <div class="equation-box">
+            <p>\[PV = nRT\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(P\) = Pressure (Pa)</li>
+                <li>\(V\) = Volume (m³)</li>
+                <li>\(n\) = Number of moles (mol)</li>
+                <li>\(R\) = Universal gas constant = 8.314 J/(mol·K)</li>
+                <li>\(T\) = Absolute temperature (K)</li>
+            </ul>
+        </div>
+
+        <p>Understanding how gases behave during various processes is fundamental to engineering applications such as engines, compressors, turbines, and refrigeration systems. We'll explore four fundamental thermodynamic processes:</p>
+
+        <h3>1. Isothermal Process (Constant Temperature)</h3>
+        <p>An <strong>isothermal process</strong> occurs when the temperature remains constant throughout the transformation. This requires perfect thermal contact with a heat reservoir.</p>
+
+        <div class="equation-box">
+            <p><strong>Key Relations:</strong></p>
+            <p>\[T = \text{constant}\]</p>
+            <p>\[PV = \text{constant}\]</p>
+            <p>\[P_1V_1 = P_2V_2\]</p>
+            <p><strong>Work Done:</strong> \[W = nRT\ln\left(\frac{V_2}{V_1}\right) = P_1V_1\ln\left(\frac{V_2}{V_1}\right)\]</p>
+            <p><strong>Heat Transfer:</strong> \[Q = W\]</p>
+            <p><strong>Internal Energy Change:</strong> \[\Delta U = 0\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Insight:</strong> During isothermal expansion, gas particles maintain the same average kinetic energy (temperature), but the gas does work on the surroundings by pushing the piston. This work energy comes from heat absorbed from the reservoir.</p>
+        </div>
+
+        <h3>2. Isobaric Process (Constant Pressure)</h3>
+        <p>An <strong>isobaric process</strong> occurs at constant pressure. This is common in systems with movable pistons exposed to atmospheric pressure.</p>
+
+        <div class="equation-box">
+            <p><strong>Key Relations:</strong></p>
+            <p>\[P = \text{constant}\]</p>
+            <p>\[\frac{V}{T} = \text{constant}\]</p>
+            <p>\[\frac{V_1}{T_1} = \frac{V_2}{T_2}\]</p>
+            <p><strong>Work Done:</strong> \[W = P(V_2 - V_1) = nR(T_2 - T_1)\]</p>
+            <p><strong>Heat Transfer:</strong> \[Q = nC_P\Delta T\]</p>
+            <p><strong>Internal Energy Change:</strong> \[\Delta U = nC_V\Delta T\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Insight:</strong> When a gas is heated at constant pressure, it expands proportionally to temperature increase. The heat added goes into both increasing internal energy and doing expansion work.</p>
+        </div>
+
+        <h3>3. Isochoric Process (Constant Volume)</h3>
+        <p>An <strong>isochoric process</strong> (also called isovolumetric) occurs when the volume remains constant. No boundary work is done in this process.</p>
+
+        <div class="equation-box">
+            <p><strong>Key Relations:</strong></p>
+            <p>\[V = \text{constant}\]</p>
+            <p>\[\frac{P}{T} = \text{constant}\]</p>
+            <p>\[\frac{P_1}{T_1} = \frac{P_2}{T_2}\]</p>
+            <p><strong>Work Done:</strong> \[W = 0\]</p>
+            <p><strong>Heat Transfer:</strong> \[Q = nC_V\Delta T\]</p>
+            <p><strong>Internal Energy Change:</strong> \[\Delta U = Q = nC_V\Delta T\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Insight:</strong> In a rigid container, heating increases particle kinetic energy (temperature) without volume change. All heat added directly increases internal energy since no work is done.</p>
+        </div>
+
+        <h3>4. Adiabatic Process (No Heat Transfer)</h3>
+        <p>An <strong>adiabatic process</strong> occurs with no heat exchange between the system and surroundings. This requires perfect thermal insulation or a very rapid process.</p>
+
+        <div class="equation-box">
+            <p><strong>Key Relations:</strong></p>
+            <p>\[Q = 0\]</p>
+            <p>\[PV^\gamma = \text{constant}\]</p>
+            <p>\[TV^{\gamma-1} = \text{constant}\]</p>
+            <p>\[P_1V_1^\gamma = P_2V_2^\gamma\]</p>
+            <p>Where \(\gamma = \frac{C_P}{C_V}\) is the heat capacity ratio</p>
+            <p><strong>Work Done:</strong> \[W = \frac{P_1V_1 - P_2V_2}{\gamma - 1} = \frac{nR(T_1 - T_2)}{\gamma - 1}\]</p>
+            <p><strong>Internal Energy Change:</strong> \[\Delta U = -W\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Insight:</strong> During adiabatic expansion, gas cools because internal energy is converted to work with no heat input. During adiabatic compression, gas heats up because work done on the gas increases internal energy.</p>
+        </div>
+
+        <h3>The First Law of Thermodynamics</h3>
+        <p>All these processes obey the First Law of Thermodynamics, which is the conservation of energy:</p>
+
+        <div class="equation-box">
+            <p>\[\Delta U = Q - W\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\Delta U\) = Change in internal energy</li>
+                <li>\(Q\) = Heat added to the system (positive when heat flows in)</li>
+                <li>\(W\) = Work done by the system (positive when system does work)</li>
+            </ul>
+        </div>
+
+        <h3>Heat Capacities</h3>
+        <p>The heat capacity of an ideal gas depends on whether heating occurs at constant volume or constant pressure:</p>
+
+        <div class="equation-box">
+            <p><strong>Constant Volume:</strong> \[C_V = \left(\frac{\partial U}{\partial T}\right)_V\]</p>
+            <p><strong>Constant Pressure:</strong> \[C_P = C_V + R\]</p>
+            <p><strong>Heat Capacity Ratio:</strong> \[\gamma = \frac{C_P}{C_V}\]</p>
+            <p>For ideal gases:</p>
+            <ul>
+                <li>Monatomic gases: \(\gamma \approx 1.67\)</li>
+                <li>Diatomic gases: \(\gamma \approx 1.40\)</li>
+                <li>Polyatomic gases: \(\gamma \approx 1.33\)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Interactive Simulation Section -->
+    <div class="content-section">
+        <h2>Interactive Simulation: Thermodynamic Processes</h2>
+
+        <p>Use the controls below to explore different thermodynamic processes. The left panel shows gas particles in a piston-cylinder, while the right panel displays the process on a thermodynamic diagram.</p>
+
+        <div class="simulation-container">
+            <!-- Control Panel -->
+            <div class="controls-panel" style="margin-bottom: 20px;">
+                <div class="slider-container">
+                    <label for="process-type">Process Type:</label>
+                    <select id="process-type" style="padding: 5px; font-size: 14px;">
+                        <option value="isothermal">Isothermal (Constant T)</option>
+                        <option value="isobaric">Isobaric (Constant P)</option>
+                        <option value="isochoric">Isochoric (Constant V)</option>
+                        <option value="adiabatic">Adiabatic (Q = 0)</option>
+                    </select>
+                </div>
+
+                <div class="slider-container">
+                    <label for="diagram-type">Diagram Type:</label>
+                    <select id="diagram-type" style="padding: 5px; font-size: 14px;">
+                        <option value="pv">P-V Diagram</option>
+                        <option value="ts">T-S Diagram</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="controls-panel" style="margin-bottom: 15px;">
+                <div class="slider-container">
+                    <label for="pressure-slider">Pressure (kPa): <span id="pressure-value">100.0</span></label>
+                    <input type="range" id="pressure-slider" min="50" max="300" step="1" value="100">
+                </div>
+
+                <div class="slider-container">
+                    <label for="volume-slider">Volume (L): <span id="volume-value">10.0</span></label>
+                    <input type="range" id="volume-slider" min="5" max="30" step="0.1" value="10">
+                </div>
+
+                <div class="slider-container">
+                    <label for="temperature-slider">Temperature (K): <span id="temperature-value">300</span></label>
+                    <input type="range" id="temperature-slider" min="200" max="500" step="1" value="300">
+                </div>
+
+                <div class="slider-container">
+                    <label for="moles-slider">Amount (mol): <span id="moles-value">1.00</span></label>
+                    <input type="range" id="moles-slider" min="0.5" max="3" step="0.1" value="1">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <button id="animate-btn">Animate Process</button>
+                <button id="reset-btn">Reset</button>
+                <button id="trace-btn">Toggle Trace</button>
+            </div>
+
+            <!-- Simulation Canvas -->
+            <div id="sketch-holder"></div>
+
+            <!-- State Information Display -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                <h4 style="margin-top: 0;">Current State:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div><strong>Pressure:</strong> <span id="display-pressure">100.0 kPa</span></div>
+                    <div><strong>Volume:</strong> <span id="display-volume">10.0 L</span></div>
+                    <div><strong>Temperature:</strong> <span id="display-temperature">300 K</span></div>
+                    <div><strong>Amount:</strong> <span id="display-moles">1.00 mol</span></div>
+                </div>
+                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #dee2e6;">
+                    <strong>Process Information:</strong> <span id="process-info">Adjust sliders to see process behavior</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engineering Applications Section -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Internal Combustion Engines (Otto and Diesel Cycles)</h3>
+        <p>The power cycle of internal combustion engines involves multiple thermodynamic processes:</p>
+        <ul>
+            <li><strong>Compression stroke:</strong> Nearly adiabatic compression of air-fuel mixture</li>
+            <li><strong>Combustion:</strong> Approximated as isochoric (Otto) or isobaric (Diesel) heat addition</li>
+            <li><strong>Power stroke:</strong> Nearly adiabatic expansion producing work</li>
+            <li><strong>Exhaust:</strong> Isochoric heat rejection</li>
+        </ul>
+        <p>Understanding these processes allows engineers to optimize engine efficiency and performance.</p>
+
+        <h3>2. Compressors and Turbines</h3>
+        <p>In gas turbines and jet engines:</p>
+        <ul>
+            <li><strong>Compressor:</strong> Adiabatic compression increases pressure and temperature</li>
+            <li><strong>Combustion chamber:</strong> Approximately isobaric heat addition</li>
+            <li><strong>Turbine:</strong> Adiabatic expansion extracts work</li>
+        </ul>
+        <p>The Brayton cycle efficiency depends on the pressure ratio and heat capacity ratio of the working fluid.</p>
+
+        <h3>3. Refrigeration and Heat Pumps</h3>
+        <p>Vapor compression refrigeration cycles use thermodynamic processes to transfer heat:</p>
+        <ul>
+            <li><strong>Compression:</strong> Adiabatic compression of refrigerant vapor</li>
+            <li><strong>Condensation:</strong> Isobaric heat rejection to surroundings</li>
+            <li><strong>Expansion:</strong> Adiabatic (or throttling) expansion</li>
+            <li><strong>Evaporation:</strong> Isobaric heat absorption from cold space</li>
+        </ul>
+
+        <h3>4. Pneumatic Systems</h3>
+        <p>Compressed air systems in manufacturing and automation rely on:</p>
+        <ul>
+            <li><strong>Storage tanks:</strong> Isochoric pressure changes during charging/discharging</li>
+            <li><strong>Rapid expansion:</strong> Nearly adiabatic process causing temperature drop</li>
+            <li><strong>Actuators:</strong> Isobaric or isothermal expansion producing mechanical work</li>
+        </ul>
+
+        <h3>5. Atmospheric Phenomena</h3>
+        <p>Weather and climate involve thermodynamic processes:</p>
+        <ul>
+            <li><strong>Rising air masses:</strong> Undergo adiabatic expansion and cooling</li>
+            <li><strong>Cloud formation:</strong> Occurs when adiabatically cooled air reaches dew point</li>
+            <li><strong>Chinook winds:</strong> Result from adiabatic compression warming descending air</li>
+        </ul>
+    </div>
+
+    <!-- Summary of Key Equations Section -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Process</th>
+                        <th>Constraint</th>
+                        <th>Path Equation</th>
+                        <th>Work Done</th>
+                        <th>Heat Transfer</th>
+                        <th>\(\Delta U\)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Isothermal</strong></td>
+                        <td>\(T = \text{const}\)</td>
+                        <td>\(PV = \text{const}\)</td>
+                        <td>\(nRT\ln\frac{V_2}{V_1}\)</td>
+                        <td>\(W\)</td>
+                        <td>\(0\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isobaric</strong></td>
+                        <td>\(P = \text{const}\)</td>
+                        <td>\(\frac{V}{T} = \text{const}\)</td>
+                        <td>\(P(V_2 - V_1)\)</td>
+                        <td>\(nC_P\Delta T\)</td>
+                        <td>\(nC_V\Delta T\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Isochoric</strong></td>
+                        <td>\(V = \text{const}\)</td>
+                        <td>\(\frac{P}{T} = \text{const}\)</td>
+                        <td>\(0\)</td>
+                        <td>\(nC_V\Delta T\)</td>
+                        <td>\(Q\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Adiabatic</strong></td>
+                        <td>\(Q = 0\)</td>
+                        <td>\(PV^\gamma = \text{const}\)</td>
+                        <td>\(\frac{P_1V_1 - P_2V_2}{\gamma - 1}\)</td>
+                        <td>\(0\)</td>
+                        <td>\(-W\)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Important Constants and Relations</h3>
+            <ul>
+                <li>Universal gas constant: \(R = 8.314 \text{ J/(mol·K)}\)</li>
+                <li>Ideal gas law: \(PV = nRT\)</li>
+                <li>First Law: \(\Delta U = Q - W\)</li>
+                <li>Heat capacities: \(C_P = C_V + R\)</li>
+                <li>Heat capacity ratio: \(\gamma = C_P/C_V\)</li>
+                <li>Internal energy (ideal gas): \(U = nC_VT\)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Practice Problems Section -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Isothermal Expansion</h3>
+            <p>An ideal gas at initial pressure 200 kPa and volume 5 L undergoes an isothermal expansion to a final volume of 15 L at temperature 350 K. Calculate:</p>
+            <p>(a) The final pressure<br>
+               (b) The work done by the gas<br>
+               (c) The heat transferred</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol1')">Show Solution</p>
+            <div id="sol1" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(P_1 = 200 \text{ kPa} = 200{,}000 \text{ Pa}\)</li>
+                    <li>\(V_1 = 5 \text{ L} = 0.005 \text{ m}^3\)</li>
+                    <li>\(V_2 = 15 \text{ L} = 0.015 \text{ m}^3\)</li>
+                    <li>\(T = 350 \text{ K}\) (constant)</li>
+                </ul>
+
+                <p><strong>(a) Final Pressure:</strong></p>
+                <p>For isothermal process: \(P_1V_1 = P_2V_2\)</p>
+                <p>\[P_2 = \frac{P_1V_1}{V_2} = \frac{200 \times 5}{15} = 66.7 \text{ kPa}\]</p>
+
+                <p><strong>(b) Work Done:</strong></p>
+                <p>First, find number of moles:</p>
+                <p>\[n = \frac{P_1V_1}{RT} = \frac{200{,}000 \times 0.005}{8.314 \times 350} = 0.344 \text{ mol}\]</p>
+                <p>Work done:</p>
+                <p>\[W = nRT\ln\frac{V_2}{V_1} = 0.344 \times 8.314 \times 350 \times \ln(3) = 1{,}098 \text{ J}\]</p>
+
+                <p><strong>(c) Heat Transfer:</strong></p>
+                <p>For isothermal process, \(\Delta U = 0\), so:</p>
+                <p>\[Q = W = 1{,}098 \text{ J}\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Adiabatic Compression</h3>
+            <p>Air (assume \(\gamma = 1.4\)) at 100 kPa and 300 K is compressed adiabatically to one-quarter of its initial volume. Calculate:</p>
+            <p>(a) The final pressure<br>
+               (b) The final temperature<br>
+               (c) The work done per mole</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol2')">Show Solution</p>
+            <div id="sol2" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(P_1 = 100 \text{ kPa} = 100{,}000 \text{ Pa}\)</li>
+                    <li>\(T_1 = 300 \text{ K}\)</li>
+                    <li>\(V_2 = V_1/4\)</li>
+                    <li>\(\gamma = 1.4\)</li>
+                </ul>
+
+                <p><strong>(a) Final Pressure:</strong></p>
+                <p>For adiabatic process: \(P_1V_1^\gamma = P_2V_2^\gamma\)</p>
+                <p>\[P_2 = P_1\left(\frac{V_1}{V_2}\right)^\gamma = 100 \times 4^{1.4} = 100 \times 7.10 = 710 \text{ kPa}\]</p>
+
+                <p><strong>(b) Final Temperature:</strong></p>
+                <p>Using \(T_1V_1^{\gamma-1} = T_2V_2^{\gamma-1}\):</p>
+                <p>\[T_2 = T_1\left(\frac{V_1}{V_2}\right)^{\gamma-1} = 300 \times 4^{0.4} = 300 \times 1.74 = 522 \text{ K}\]</p>
+
+                <p><strong>(c) Work Done per Mole:</strong></p>
+                <p>For adiabatic compression (work done ON the gas is negative):</p>
+                <p>\[W = \frac{R(T_1 - T_2)}{\gamma - 1} = \frac{8.314(300 - 522)}{0.4} = -4{,}614 \text{ J/mol}\]</p>
+                <p>The negative sign indicates work is done on the gas.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Isobaric Heating</h3>
+            <p>A piston-cylinder device contains 2 mol of helium gas (monatomic, \(C_V = 12.5\) J/(mol·K)) at 150 kPa and 300 K. The gas is heated at constant pressure until its volume doubles. Calculate:</p>
+            <p>(a) The final temperature<br>
+               (b) The work done<br>
+               (c) The heat transferred<br>
+               (d) The change in internal energy</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol3')">Show Solution</p>
+            <div id="sol3" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(n = 2 \text{ mol}\)</li>
+                    <li>\(P = 150 \text{ kPa} = 150{,}000 \text{ Pa}\) (constant)</li>
+                    <li>\(T_1 = 300 \text{ K}\)</li>
+                    <li>\(V_2 = 2V_1\)</li>
+                    <li>\(C_V = 12.5 \text{ J/(mol·K)}\)</li>
+                </ul>
+
+                <p><strong>(a) Final Temperature:</strong></p>
+                <p>For isobaric process: \(\frac{V_1}{T_1} = \frac{V_2}{T_2}\)</p>
+                <p>\[T_2 = T_1\frac{V_2}{V_1} = 300 \times 2 = 600 \text{ K}\]</p>
+
+                <p><strong>(b) Work Done:</strong></p>
+                <p>\[W = P(V_2 - V_1) = nR(T_2 - T_1) = 2 \times 8.314 \times (600 - 300) = 4{,}988 \text{ J}\]</p>
+
+                <p><strong>(c) Heat Transfer:</strong></p>
+                <p>\(C_P = C_V + R = 12.5 + 8.314 = 20.814\) J/(mol·K)</p>
+                <p>\[Q = nC_P\Delta T = 2 \times 20.814 \times 300 = 12{,}488 \text{ J}\]</p>
+
+                <p><strong>(d) Change in Internal Energy:</strong></p>
+                <p>\[\Delta U = nC_V\Delta T = 2 \times 12.5 \times 300 = 7{,}500 \text{ J}\]</p>
+                <p>Verify: \(\Delta U = Q - W = 12{,}488 - 4{,}988 = 7{,}500\) J ✓</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Isochoric Pressure Change</h3>
+            <p>A rigid container holds 0.5 mol of nitrogen gas (diatomic) at 250 K and 80 kPa. Heat is added until the pressure reaches 200 kPa. For nitrogen, \(C_V = 20.8\) J/(mol·K). Calculate:</p>
+            <p>(a) The final temperature<br>
+               (b) The heat transferred<br>
+               (c) The change in internal energy</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol4')">Show Solution</p>
+            <div id="sol4" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(n = 0.5 \text{ mol}\)</li>
+                    <li>\(T_1 = 250 \text{ K}\)</li>
+                    <li>\(P_1 = 80 \text{ kPa}\)</li>
+                    <li>\(P_2 = 200 \text{ kPa}\)</li>
+                    <li>\(C_V = 20.8 \text{ J/(mol·K)}\)</li>
+                    <li>Volume is constant (rigid container)</li>
+                </ul>
+
+                <p><strong>(a) Final Temperature:</strong></p>
+                <p>For isochoric process: \(\frac{P_1}{T_1} = \frac{P_2}{T_2}\)</p>
+                <p>\[T_2 = T_1\frac{P_2}{P_1} = 250 \times \frac{200}{80} = 625 \text{ K}\]</p>
+
+                <p><strong>(b) Heat Transfer:</strong></p>
+                <p>For constant volume process:</p>
+                <p>\[Q = nC_V\Delta T = 0.5 \times 20.8 \times (625 - 250) = 3{,}900 \text{ J}\]</p>
+
+                <p><strong>(c) Change in Internal Energy:</strong></p>
+                <p>Since \(W = 0\) for isochoric process:</p>
+                <p>\[\Delta U = Q - W = 3{,}900 - 0 = 3{,}900 \text{ J}\]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Check Quiz Section -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Q1: In an isothermal process for an ideal gas, which statement is true?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> (a) No work is done by or on the gas</label>
+                    <label><input type="radio" name="q1" value="b"> (b) The internal energy remains constant</label>
+                    <label><input type="radio" name="q1" value="c"> (c) No heat is exchanged with the surroundings</label>
+                    <label><input type="radio" name="q1" value="d"> (d) The pressure remains constant</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q2: For an adiabatic process, which equation correctly relates pressure and volume?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> (a) \(PV = \text{constant}\)</label>
+                    <label><input type="radio" name="q2" value="b"> (b) \(PV^2 = \text{constant}\)</label>
+                    <label><input type="radio" name="q2" value="c"> (c) \(PV^\gamma = \text{constant}\)</label>
+                    <label><input type="radio" name="q2" value="d"> (d) \(P/V = \text{constant}\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q3: In an isochoric process, what is the work done by the gas?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> (a) \(W = P\Delta V\)</label>
+                    <label><input type="radio" name="q3" value="b"> (b) \(W = nRT\ln(V_2/V_1)\)</label>
+                    <label><input type="radio" name="q3" value="c"> (c) \(W = 0\)</label>
+                    <label><input type="radio" name="q3" value="d"> (d) \(W = nC_V\Delta T\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q4: During an isobaric expansion of an ideal gas, what happens?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> (a) Temperature decreases</label>
+                    <label><input type="radio" name="q4" value="b"> (b) Temperature increases</label>
+                    <label><input type="radio" name="q4" value="c"> (c) Temperature remains constant</label>
+                    <label><input type="radio" name="q4" value="d"> (d) Temperature may increase or decrease depending on volume change</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q5: Which process has the steepest curve on a P-V diagram?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> (a) Isothermal</label>
+                    <label><input type="radio" name="q5" value="b"> (b) Isobaric</label>
+                    <label><input type="radio" name="q5" value="c"> (c) Isochoric</label>
+                    <label><input type="radio" name="q5" value="d"> (d) Adiabatic</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q6: For an ideal gas undergoing an adiabatic expansion, which is true?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> (a) Temperature increases and work is done by the gas</label>
+                    <label><input type="radio" name="q6" value="b"> (b) Temperature decreases and work is done by the gas</label>
+                    <label><input type="radio" name="q6" value="c"> (c) Temperature increases and work is done on the gas</label>
+                    <label><input type="radio" name="q6" value="d"> (d) Temperature remains constant and no work is done</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q7: The heat capacity ratio γ (gamma) is defined as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> (a) \(C_V / C_P\)</label>
+                    <label><input type="radio" name="q7" value="b"> (b) \(C_P / C_V\)</label>
+                    <label><input type="radio" name="q7" value="c"> (c) \(C_P - C_V\)</label>
+                    <label><input type="radio" name="q7" value="d"> (d) \(C_P + C_V\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q8: In which process does all the heat added go directly into changing the internal energy?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> (a) Isothermal</label>
+                    <label><input type="radio" name="q8" value="b"> (b) Isobaric</label>
+                    <label><input type="radio" name="q8" value="c"> (c) Isochoric</label>
+                    <label><input type="radio" name="q8" value="d"> (d) Adiabatic</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript for Simulation -->
+    <script>
+        // Thermodynamic Processes Simulation
+        let sketch = new p5(function(p) {
+            // Constants
+            const R = 8.314; // J/(mol·K)
+            const GAMMA = 1.4; // For diatomic gas (air)
+
+            // State variables
+            let pressure = 100; // kPa
+            let volume = 10; // L
+            let temperature = 300; // K
+            let moles = 1; // mol
+
+            // Initial state for animation
+            let initialState = {};
+            let finalState = {};
+            let animating = false;
+            let animProgress = 0;
+            let processType = 'isothermal';
+            let diagramType = 'pv';
+            let showTrace = true;
+            let tracePoints = [];
+
+            // Particle system
+            let particles = [];
+            const numParticles = 50;
+
+            // Canvas dimensions
+            let canvasWidth, canvasHeight;
+            let leftPanelWidth, rightPanelWidth;
+
+            // Particle class
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = p.random(-2, 2);
+                    this.vy = p.random(-2, 2);
+                    this.radius = 3;
+                }
+
+                update(boxWidth, boxHeight, temp) {
+                    // Speed proportional to sqrt(temperature)
+                    let speedFactor = p.sqrt(temp / 300);
+
+                    this.x += this.vx * speedFactor;
+                    this.y += this.vy * speedFactor;
+
+                    // Boundary collisions
+                    if (this.x <= this.radius || this.x >= boxWidth - this.radius) {
+                        this.vx *= -1;
+                        this.x = p.constrain(this.x, this.radius, boxWidth - this.radius);
+                    }
+                    if (this.y <= this.radius || this.y >= boxHeight - this.radius) {
+                        this.vy *= -1;
+                        this.y = p.constrain(this.y, this.radius, boxHeight - this.radius);
+                    }
+                }
+
+                display(offsetX, offsetY) {
+                    p.fill(220, 50, 50, 200);
+                    p.noStroke();
+                    p.circle(offsetX + this.x, offsetY + this.y, this.radius * 2);
+                }
+            }
+
+            p.setup = function() {
+                canvasWidth = Math.min(1000, p.windowWidth - 40);
+                canvasHeight = 500;
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('sketch-holder');
+
+                leftPanelWidth = canvasWidth * 0.45;
+                rightPanelWidth = canvasWidth * 0.45;
+
+                // Initialize particles
+                initializeParticles();
+
+                // Setup event listeners
+                setupEventListeners();
+
+                // Initial state
+                updateState();
+            };
+
+            function initializeParticles() {
+                particles = [];
+                let boxWidth = leftPanelWidth * 0.7;
+                let boxHeight = 300;
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push(new Particle(
+                        p.random(10, boxWidth - 10),
+                        p.random(10, boxHeight - 10)
+                    ));
+                }
+            }
+
+            function setupEventListeners() {
+                // Process type selector
+                document.getElementById('process-type').addEventListener('change', function() {
+                    processType = this.value;
+                    animating = false;
+                    document.getElementById('animate-btn').textContent = 'Animate Process';
+                    updateProcessInfo();
+                });
+
+                // Diagram type selector
+                document.getElementById('diagram-type').addEventListener('change', function() {
+                    diagramType = this.value;
+                    tracePoints = [];
+                });
+
+                // Sliders
+                document.getElementById('pressure-slider').addEventListener('input', function() {
+                    if (!animating) {
+                        pressure = parseFloat(this.value);
+                        updateFromSlider('pressure');
+                    }
+                });
+
+                document.getElementById('volume-slider').addEventListener('input', function() {
+                    if (!animating) {
+                        volume = parseFloat(this.value);
+                        updateFromSlider('volume');
+                    }
+                });
+
+                document.getElementById('temperature-slider').addEventListener('input', function() {
+                    if (!animating) {
+                        temperature = parseFloat(this.value);
+                        updateFromSlider('temperature');
+                    }
+                });
+
+                document.getElementById('moles-slider').addEventListener('input', function() {
+                    if (!animating) {
+                        moles = parseFloat(this.value);
+                        updateFromSlider('moles');
+                    }
+                });
+
+                // Buttons
+                document.getElementById('animate-btn').addEventListener('click', function() {
+                    if (!animating) {
+                        startAnimation();
+                        this.textContent = 'Stop Animation';
+                    } else {
+                        animating = false;
+                        this.textContent = 'Animate Process';
+                    }
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    resetSimulation();
+                });
+
+                document.getElementById('trace-btn').addEventListener('click', function() {
+                    showTrace = !showTrace;
+                    if (!showTrace) tracePoints = [];
+                    this.textContent = showTrace ? 'Hide Trace' : 'Show Trace';
+                });
+            }
+
+            function updateFromSlider(changedParam) {
+                // Update other parameters based on ideal gas law
+                // Keep moles constant, adjust other parameters
+
+                switch(changedParam) {
+                    case 'pressure':
+                        // P changed, update T keeping V constant
+                        temperature = (pressure * 1000 * volume * 0.001) / (moles * R);
+                        break;
+                    case 'volume':
+                        // V changed, update T keeping P constant
+                        temperature = (pressure * 1000 * volume * 0.001) / (moles * R);
+                        break;
+                    case 'temperature':
+                        // T changed, update P keeping V constant
+                        pressure = (moles * R * temperature) / (volume * 0.001) / 1000;
+                        break;
+                    case 'moles':
+                        // n changed, update P keeping V and T constant
+                        pressure = (moles * R * temperature) / (volume * 0.001) / 1000;
+                        break;
+                }
+
+                // Constrain values
+                pressure = p.constrain(pressure, 50, 300);
+                volume = p.constrain(volume, 5, 30);
+                temperature = p.constrain(temperature, 200, 500);
+
+                updateState();
+            }
+
+            function updateState() {
+                // Update display values
+                document.getElementById('pressure-value').textContent = pressure.toFixed(1);
+                document.getElementById('volume-value').textContent = volume.toFixed(1);
+                document.getElementById('temperature-value').textContent = temperature.toFixed(0);
+                document.getElementById('moles-value').textContent = moles.toFixed(2);
+
+                document.getElementById('display-pressure').textContent = pressure.toFixed(1) + ' kPa';
+                document.getElementById('display-volume').textContent = volume.toFixed(1) + ' L';
+                document.getElementById('display-temperature').textContent = temperature.toFixed(0) + ' K';
+                document.getElementById('display-moles').textContent = moles.toFixed(2) + ' mol';
+
+                // Update sliders if not animating
+                if (!animating) {
+                    document.getElementById('pressure-slider').value = pressure;
+                    document.getElementById('volume-slider').value = volume;
+                    document.getElementById('temperature-slider').value = temperature;
+                    document.getElementById('moles-slider').value = moles;
+                }
+
+                // Add to trace
+                if (showTrace && tracePoints.length < 500) {
+                    tracePoints.push({p: pressure, v: volume, t: temperature});
+                }
+            }
+
+            function startAnimation() {
+                initialState = {
+                    p: pressure,
+                    v: volume,
+                    t: temperature,
+                    n: moles
+                };
+
+                // Define final state based on process type
+                switch(processType) {
+                    case 'isothermal':
+                        // Double the volume, T constant
+                        finalState = {
+                            v: Math.min(initialState.v * 2, 30),
+                            t: initialState.t,
+                            n: initialState.n
+                        };
+                        finalState.p = (finalState.n * R * finalState.t) / (finalState.v * 0.001) / 1000;
+                        break;
+
+                    case 'isobaric':
+                        // Increase temperature by 50%, P constant
+                        finalState = {
+                            p: initialState.p,
+                            t: Math.min(initialState.t * 1.5, 500),
+                            n: initialState.n
+                        };
+                        finalState.v = (finalState.n * R * finalState.t) / (finalState.p * 1000) * 1000;
+                        break;
+
+                    case 'isochoric':
+                        // Increase temperature by 50%, V constant
+                        finalState = {
+                            v: initialState.v,
+                            t: Math.min(initialState.t * 1.5, 500),
+                            n: initialState.n
+                        };
+                        finalState.p = (finalState.n * R * finalState.t) / (finalState.v * 0.001) / 1000;
+                        break;
+
+                    case 'adiabatic':
+                        // Double the volume adiabatically
+                        finalState = {
+                            v: Math.min(initialState.v * 2, 30),
+                            n: initialState.n
+                        };
+                        // P1*V1^gamma = P2*V2^gamma
+                        finalState.p = initialState.p * Math.pow(initialState.v / finalState.v, GAMMA);
+                        // T1*V1^(gamma-1) = T2*V2^(gamma-1)
+                        finalState.t = initialState.t * Math.pow(initialState.v / finalState.v, GAMMA - 1);
+                        break;
+                }
+
+                animating = true;
+                animProgress = 0;
+                tracePoints = [];
+            }
+
+            function resetSimulation() {
+                animating = false;
+                pressure = 100;
+                volume = 10;
+                temperature = 300;
+                moles = 1;
+                animProgress = 0;
+                tracePoints = [];
+                updateState();
+                initializeParticles();
+                document.getElementById('animate-btn').textContent = 'Animate Process';
+            }
+
+            function updateProcessInfo() {
+                let info = '';
+                switch(processType) {
+                    case 'isothermal':
+                        info = 'Isothermal process: Temperature constant, heat flows to maintain T';
+                        break;
+                    case 'isobaric':
+                        info = 'Isobaric process: Pressure constant, volume changes with temperature';
+                        break;
+                    case 'isochoric':
+                        info = 'Isochoric process: Volume constant, no boundary work done';
+                        break;
+                    case 'adiabatic':
+                        info = 'Adiabatic process: No heat transfer, T changes with compression/expansion';
+                        break;
+                }
+                document.getElementById('process-info').textContent = info;
+            }
+
+            p.draw = function() {
+                p.background(250);
+
+                // Update animation
+                if (animating) {
+                    animProgress += 0.005;
+                    if (animProgress >= 1) {
+                        animProgress = 1;
+                        animating = false;
+                        document.getElementById('animate-btn').textContent = 'Animate Process';
+                    }
+
+                    // Interpolate state
+                    pressure = p.lerp(initialState.p, finalState.p, animProgress);
+                    volume = p.lerp(initialState.v, finalState.v, animProgress);
+                    temperature = p.lerp(initialState.t, finalState.t, animProgress);
+
+                    updateState();
+                }
+
+                // Draw left panel: Piston-cylinder with particles
+                drawLeftPanel();
+
+                // Draw right panel: PV or TS diagram
+                drawRightPanel();
+
+                // Draw center divider
+                p.stroke(200);
+                p.strokeWeight(2);
+                p.line(canvasWidth / 2, 0, canvasWidth / 2, canvasHeight);
+            };
+
+            function drawLeftPanel() {
+                let centerX = leftPanelWidth / 2;
+                let topY = 80;
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text('Piston-Cylinder System', centerX, 30);
+
+                // Box dimensions based on volume
+                let maxBoxWidth = leftPanelWidth * 0.7;
+                let boxHeight = 300;
+                let boxWidth = p.map(volume, 5, 30, maxBoxWidth * 0.3, maxBoxWidth);
+                let boxX = centerX - boxWidth / 2;
+                let boxY = topY;
+
+                // Draw cylinder
+                p.fill(220, 230, 240);
+                p.stroke(80);
+                p.strokeWeight(2);
+                p.rect(boxX, boxY, boxWidth, boxHeight);
+
+                // Draw piston
+                p.fill(150, 160, 170);
+                p.rect(boxX, boxY, boxWidth, 15);
+
+                // Piston handle
+                p.stroke(100);
+                p.strokeWeight(4);
+                p.line(centerX, boxY + 7, centerX, boxY - 20);
+
+                // Update and draw particles
+                for (let particle of particles) {
+                    particle.update(boxWidth, boxHeight - 20, temperature);
+                    particle.display(boxX, boxY + 15);
+                }
+
+                // Display state information
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(13);
+                let infoY = boxY + boxHeight + 30;
+                p.text(`P = ${pressure.toFixed(1)} kPa`, boxX, infoY);
+                p.text(`V = ${volume.toFixed(1)} L`, boxX, infoY + 20);
+                p.text(`T = ${temperature.toFixed(0)} K`, boxX, infoY + 40);
+
+                // Particle speed indicator
+                p.textSize(11);
+                p.fill(100);
+                p.text('Particle speed ∝ √T', boxX, infoY + 65);
+            }
+
+            function drawRightPanel() {
+                let offsetX = canvasWidth / 2 + 30;
+                let centerX = offsetX + rightPanelWidth / 2;
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                let title = diagramType === 'pv' ? 'Pressure-Volume Diagram' : 'Temperature-Entropy Diagram';
+                p.text(title, centerX, 30);
+
+                if (diagramType === 'pv') {
+                    drawPVDiagram(offsetX);
+                } else {
+                    drawTSDiagram(offsetX);
+                }
+            }
+
+            function drawPVDiagram(offsetX) {
+                let marginLeft = 60;
+                let marginBottom = 60;
+                let marginTop = 60;
+                let marginRight = 30;
+
+                let plotWidth = rightPanelWidth - marginLeft - marginRight;
+                let plotHeight = canvasHeight - marginTop - marginBottom;
+
+                let plotX = offsetX + marginLeft;
+                let plotY = marginTop;
+
+                // Axes ranges
+                let vMin = 5, vMax = 30;
+                let pMin = 30, pMax = 300;
+
+                // Draw axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(plotX, plotY + plotHeight, plotX + plotWidth, plotY + plotHeight); // V axis
+                p.line(plotX, plotY, plotX, plotY + plotHeight); // P axis
+
+                // Axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Volume (L)', plotX + plotWidth / 2, plotY + plotHeight + 45);
+
+                p.push();
+                p.translate(plotX - 45, plotY + plotHeight / 2);
+                p.rotate(-p.PI / 2);
+                p.text('Pressure (kPa)', 0, 0);
+                p.pop();
+
+                // Tick marks and labels
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                // V ticks
+                for (let v = 5; v <= 30; v += 5) {
+                    let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                    p.stroke(0);
+                    p.line(x, plotY + plotHeight, x, plotY + plotHeight + 5);
+                    p.noStroke();
+                    p.fill(0);
+                    p.text(v, x, plotY + plotHeight + 20);
+                }
+
+                // P ticks
+                p.textAlign(p.RIGHT);
+                for (let pVal = 50; pVal <= 300; pVal += 50) {
+                    let y = plotY + plotHeight - p.map(pVal, pMin, pMax, 0, plotHeight);
+                    p.stroke(0);
+                    p.line(plotX - 5, y, plotX, y);
+                    p.noStroke();
+                    p.fill(0);
+                    p.text(pVal, plotX - 10, y + 4);
+                }
+
+                // Draw grid
+                p.stroke(230);
+                p.strokeWeight(1);
+                for (let v = 5; v <= 30; v += 5) {
+                    let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                    p.line(x, plotY, x, plotY + plotHeight);
+                }
+                for (let pVal = 50; pVal <= 300; pVal += 50) {
+                    let y = plotY + plotHeight - p.map(pVal, pMin, pMax, 0, plotHeight);
+                    p.line(plotX, y, plotX + plotWidth, y);
+                }
+
+                // Draw process curves as reference
+                drawProcessCurves(plotX, plotY, plotWidth, plotHeight, vMin, vMax, pMin, pMax);
+
+                // Draw trace
+                if (showTrace && tracePoints.length > 1) {
+                    p.stroke(255, 100, 0);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let pt of tracePoints) {
+                        let x = plotX + p.map(pt.v, vMin, vMax, 0, plotWidth);
+                        let y = plotY + plotHeight - p.map(pt.p, pMin, pMax, 0, plotHeight);
+                        p.vertex(x, y);
+                    }
+                    p.endShape();
+                }
+
+                // Draw current state point
+                let currentX = plotX + p.map(volume, vMin, vMax, 0, plotWidth);
+                let currentY = plotY + plotHeight - p.map(pressure, pMin, pMax, 0, plotHeight);
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.circle(currentX, currentY, 10);
+            }
+
+            function drawProcessCurves(plotX, plotY, plotWidth, plotHeight, vMin, vMax, pMin, pMax) {
+                // Draw light reference curves for different processes
+                let refT = 300; // Reference temperature
+                let refN = 1;   // Reference moles
+
+                // Isothermal curve
+                p.stroke(0, 100, 200, 80);
+                p.strokeWeight(1.5);
+                p.noFill();
+                p.beginShape();
+                for (let v = vMin; v <= vMax; v += 0.5) {
+                    let pCalc = (refN * R * refT) / (v * 0.001) / 1000;
+                    if (pCalc >= pMin && pCalc <= pMax) {
+                        let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                        let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
+                        p.vertex(x, y);
+                    }
+                }
+                p.endShape();
+
+                // Adiabatic curve
+                p.stroke(150, 0, 200, 80);
+                p.beginShape();
+                let v1 = 10;
+                let p1 = (refN * R * refT) / (v1 * 0.001) / 1000;
+                for (let v = vMin; v <= vMax; v += 0.5) {
+                    let pCalc = p1 * Math.pow(v1 / v, GAMMA);
+                    if (pCalc >= pMin && pCalc <= pMax) {
+                        let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                        let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
+                        p.vertex(x, y);
+                    }
+                }
+                p.endShape();
+
+                // Add legend
+                p.textSize(10);
+                p.textAlign(p.LEFT);
+                let legendX = plotX + 10;
+                let legendY = plotY + 20;
+
+                p.stroke(0, 100, 200, 150);
+                p.strokeWeight(2);
+                p.line(legendX, legendY, legendX + 20, legendY);
+                p.noStroke();
+                p.fill(0, 100, 200);
+                p.text('Isothermal', legendX + 25, legendY + 4);
+
+                p.stroke(150, 0, 200, 150);
+                p.strokeWeight(2);
+                p.line(legendX, legendY + 15, legendX + 20, legendY + 15);
+                p.noStroke();
+                p.fill(150, 0, 200);
+                p.text('Adiabatic', legendX + 25, legendY + 19);
+            }
+
+            function drawTSDiagram(offsetX) {
+                let marginLeft = 60;
+                let marginBottom = 60;
+                let marginTop = 60;
+                let marginRight = 30;
+
+                let plotWidth = rightPanelWidth - marginLeft - marginRight;
+                let plotHeight = canvasHeight - marginTop - marginBottom;
+
+                let plotX = offsetX + marginLeft;
+                let plotY = marginTop;
+
+                // For T-S diagram, we need to calculate entropy changes
+                // This is simplified - actual entropy calculation is more complex
+
+                // Axes ranges
+                let tMin = 200, tMax = 500;
+                let sMin = 0, sMax = 3; // Normalized entropy units
+
+                // Draw axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(plotX, plotY + plotHeight, plotX + plotWidth, plotY + plotHeight);
+                p.line(plotX, plotY, plotX, plotY + plotHeight);
+
+                // Axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text('Entropy (normalized)', plotX + plotWidth / 2, plotY + plotHeight + 45);
+
+                p.push();
+                p.translate(plotX - 45, plotY + plotHeight / 2);
+                p.rotate(-p.PI / 2);
+                p.text('Temperature (K)', 0, 0);
+                p.pop();
+
+                // Tick marks
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                for (let s = 0; s <= 3; s += 0.5) {
+                    let x = plotX + p.map(s, sMin, sMax, 0, plotWidth);
+                    p.stroke(0);
+                    p.line(x, plotY + plotHeight, x, plotY + plotHeight + 5);
+                    p.noStroke();
+                    p.fill(0);
+                    p.text(s.toFixed(1), x, plotY + plotHeight + 20);
+                }
+
+                p.textAlign(p.RIGHT);
+                for (let t = 200; t <= 500; t += 50) {
+                    let y = plotY + plotHeight - p.map(t, tMin, tMax, 0, plotHeight);
+                    p.stroke(0);
+                    p.line(plotX - 5, y, plotX, y);
+                    p.noStroke();
+                    p.fill(0);
+                    p.text(t, plotX - 10, y + 4);
+                }
+
+                // Draw grid
+                p.stroke(230);
+                p.strokeWeight(1);
+                for (let s = 0; s <= 3; s += 0.5) {
+                    let x = plotX + p.map(s, sMin, sMax, 0, plotWidth);
+                    p.line(x, plotY, x, plotY + plotHeight);
+                }
+                for (let t = 200; t <= 500; t += 50) {
+                    let y = plotY + plotHeight - p.map(t, tMin, tMax, 0, plotHeight);
+                    p.line(plotX, y, plotX + plotWidth, y);
+                }
+
+                // Simplified entropy calculation (for visualization)
+                let s = p.map(temperature, 200, 500, 0.5, 2.5);
+
+                // Draw current point
+                let currentX = plotX + p.map(s, sMin, sMax, 0, plotWidth);
+                let currentY = plotY + plotHeight - p.map(temperature, tMin, tMax, 0, plotHeight);
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.circle(currentX, currentY, 10);
+
+                // Note
+                p.fill(100);
+                p.textAlign(p.CENTER);
+                p.textSize(11);
+                p.text('(Simplified T-S representation)', plotX + plotWidth / 2, plotY + plotHeight - 20);
+            }
+
+            p.windowResized = function() {
+                if (p.width > 100) {
+                    canvasWidth = Math.min(1000, p.windowWidth - 40);
+                    p.resizeCanvas(canvasWidth, canvasHeight);
+                    leftPanelWidth = canvasWidth * 0.45;
+                    rightPanelWidth = canvasWidth * 0.45;
+                }
+            };
+
+            // Initialize
+            updateProcessInfo();
+
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'c',
+                q3: 'c',
+                q4: 'b',
+                q5: 'd',
+                q6: 'b',
+                q7: 'b',
+                q8: 'c'
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3><div style="margin-top: 15px;">';
+
+            for (let question in answers) {
+                const selected = document.querySelector(`input[name="${question}"]:checked`);
+                const correct = answers[question];
+
+                if (selected && selected.value === correct) {
+                    score++;
+                    resultsHTML += `<p style="color: #28a745; margin: 5px 0;"><strong>${question.toUpperCase()}:</strong> Correct! ✓</p>`;
+                } else {
+                    const correctText = `Correct answer: (${correct})`;
+                    resultsHTML += `<p style="color: #dc3545; margin: 5px 0;"><strong>${question.toUpperCase()}:</strong> Incorrect ✗ ${correctText}</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let gradeComment = '';
+            if (percentage >= 90) gradeComment = 'Excellent! Outstanding understanding!';
+            else if (percentage >= 75) gradeComment = 'Good work! Solid grasp of the concepts.';
+            else if (percentage >= 60) gradeComment = 'Passing, but review the material for better understanding.';
+            else gradeComment = 'Please review the lecture material and try again.';
+
+            resultsHTML = `<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                <p style="font-size: 18px; margin: 0;"><strong>Score: ${score}/${totalQuestions} (${percentage}%)</strong></p>
+                <p style="margin: 10px 0 0 0;">${gradeComment}</p>
+            </div>` + resultsHTML + '</div>';
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

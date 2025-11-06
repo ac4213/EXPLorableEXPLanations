@@ -128,7 +128,6 @@ Start with the template structure (see next section) and customize for your topi
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
 
     <!-- MathJax for LaTeX equations -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 
     <!-- p5.js for interactive simulations -->
@@ -820,7 +819,6 @@ setupQuizQuestion('q1', 'b', 'q1-feedback', 'check-q1');
 
 **Include in `<head>`:**
 ```html
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
 ```
 

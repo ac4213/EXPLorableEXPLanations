@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotational Dynamics - Interactive Lecture</title>
+
+    <!-- Import p5.js for simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Import MathJax for equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Rotational Dynamics</h1>
+        <p class="subtitle">Torque, Moment of Inertia & Angular Motion - Interactive Lecture</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Rotational Dynamics</h2>
+        <p>Rotational dynamics describes how objects rotate when subjected to torques. Just as forces cause linear acceleration in Newton's second law, torques cause angular acceleration. Understanding rotational dynamics is essential for analyzing spinning wheels, rotating machinery, and pivoting structures.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Rotational motion is the angular analog of linear motion. Every concept in linear dynamics (force, mass, acceleration, momentum) has a rotational counterpart (torque, moment of inertia, angular acceleration, angular momentum).</p>
+        </div>
+
+        <h3>Angular Kinematics</h3>
+        <p>Before studying rotational dynamics, we must understand how to describe rotational motion:</p>
+
+        <div class="equation-box">
+            <p><strong>Angular Position:</strong> \(\theta\) (radians)</p>
+            <p><strong>Angular Velocity:</strong> \(\omega = \frac{d\theta}{dt}\) (rad/s)</p>
+            <p><strong>Angular Acceleration:</strong> \(\alpha = \frac{d\omega}{dt} = \frac{d^2\theta}{dt^2}\) (rad/s²)</p>
+        </div>
+
+        <h3>Rotational Kinematics Equations</h3>
+        <p>For constant angular acceleration, the rotational kinematics equations mirror the linear SUVAT equations:</p>
+
+        <div class="equation-box">
+            <p><strong>Angular Kinematics (Constant \(\alpha\)):</strong></p>
+            <ol>
+                <li>\(\omega = \omega_0 + \alpha t\)</li>
+                <li>\(\theta = \omega_0 t + \frac{1}{2}\alpha t^2\)</li>
+                <li>\(\omega^2 = \omega_0^2 + 2\alpha\theta\)</li>
+                <li>\(\theta = \frac{(\omega_0 + \omega)t}{2}\)</li>
+            </ol>
+            <p>Where:</p>
+            <ul>
+                <li>\(\theta\) = angular displacement (rad)</li>
+                <li>\(\omega_0\) = initial angular velocity (rad/s)</li>
+                <li>\(\omega\) = final angular velocity (rad/s)</li>
+                <li>\(\alpha\) = angular acceleration (rad/s²)</li>
+                <li>\(t\) = time (s)</li>
+            </ul>
+        </div>
+
+        <h3>Torque</h3>
+        <p>Torque (also called moment) is the rotational equivalent of force. It measures the turning effect of a force about a pivot point or axis of rotation.</p>
+
+        <div class="equation-box">
+            <p><strong>Torque Definition:</strong></p>
+            <p>\[\vec{\tau} = \vec{r} \times \vec{F}\]</p>
+            <p>Magnitude: \(\tau = rF\sin\theta\)</p>
+            <p>For perpendicular force: \(\tau = rF\) or \(\tau = Fd\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\tau\) = torque (N·m)</li>
+                <li>\(r\) = distance from axis of rotation to point of force application (m)</li>
+                <li>\(F\) = applied force (N)</li>
+                <li>\(d\) = perpendicular distance (moment arm or lever arm) (m)</li>
+                <li>\(\theta\) = angle between \(\vec{r}\) and \(\vec{F}\)</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Important:</strong> Torque is a vector quantity with direction given by the right-hand rule. Conventionally, counter-clockwise rotation is positive (+), and clockwise rotation is negative (-).</p>
+        </div>
+
+        <h3>Moment of Inertia</h3>
+        <p>Moment of inertia \(I\) is the rotational analog of mass. It quantifies an object's resistance to changes in rotational motion and depends on both the mass distribution and the axis of rotation.</p>
+
+        <div class="equation-box">
+            <p><strong>Moment of Inertia:</strong></p>
+            <p>\[I = \sum m_i r_i^2 = \int r^2 \, dm\]</p>
+            <p>SI Unit: kg·m²</p>
+            <p>Where \(r\) is the perpendicular distance from the axis of rotation to the mass element \(dm\).</p>
+        </div>
+
+        <h3>Common Moments of Inertia</h3>
+        <div class="equation-box">
+            <p><strong>Point Mass:</strong> \(I = mr^2\)</p>
+            <p><strong>Thin Rod (about center):</strong> \(I = \frac{1}{12}mL^2\)</p>
+            <p><strong>Thin Rod (about end):</strong> \(I = \frac{1}{3}mL^2\)</p>
+            <p><strong>Solid Disk/Cylinder (about center axis):</strong> \(I = \frac{1}{2}mr^2\)</p>
+            <p><strong>Hollow Cylinder (about center axis):</strong> \(I = mr^2\)</p>
+            <p><strong>Solid Sphere (about diameter):</strong> \(I = \frac{2}{5}mr^2\)</p>
+            <p><strong>Hollow Sphere (about diameter):</strong> \(I = \frac{2}{3}mr^2\)</p>
+            <p><strong>Rectangular Plate (about center, perpendicular to plate):</strong> \(I = \frac{1}{12}m(a^2 + b^2)\)</p>
+        </div>
+
+        <h3>Parallel Axis Theorem</h3>
+        <p>The parallel axis theorem allows us to calculate the moment of inertia about any axis parallel to an axis through the center of mass.</p>
+
+        <div class="equation-box">
+            <p><strong>Parallel Axis Theorem:</strong></p>
+            <p>\[I = I_{\text{cm}} + md^2\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(I\) = moment of inertia about the new axis (kg·m²)</li>
+                <li>\(I_{\text{cm}}\) = moment of inertia about parallel axis through center of mass (kg·m²)</li>
+                <li>\(m\) = total mass (kg)</li>
+                <li>\(d\) = perpendicular distance between the two parallel axes (m)</li>
+            </ul>
+        </div>
+
+        <h3>Newton's Second Law for Rotation</h3>
+        <p>The rotational analog of Newton's second law \(F = ma\) relates torque to angular acceleration:</p>
+
+        <div class="equation-box">
+            <p><strong>Rotational Dynamics Equation:</strong></p>
+            <p>\[\sum \tau = I\alpha\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\sum \tau\) = net torque about the axis (N·m)</li>
+                <li>\(I\) = moment of inertia about the axis (kg·m²)</li>
+                <li>\(\alpha\) = angular acceleration (rad/s²)</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Key Insight:</strong> Just as a larger mass requires more force to achieve the same acceleration, a larger moment of inertia requires more torque to achieve the same angular acceleration.</p>
+        </div>
+
+        <h3>Rotational Kinetic Energy</h3>
+        <p>A rotating object possesses kinetic energy due to its rotation:</p>
+
+        <div class="equation-box">
+            <p><strong>Rotational Kinetic Energy:</strong></p>
+            <p>\[E_{\text{rot}} = \frac{1}{2}I\omega^2\]</p>
+            <p>This is analogous to linear kinetic energy: \(E_{\text{lin}} = \frac{1}{2}mv^2\)</p>
+        </div>
+
+        <h3>Work and Power in Rotation</h3>
+        <div class="equation-box">
+            <p><strong>Rotational Work:</strong> \(W = \tau \theta\)</p>
+            <p><strong>Rotational Power:</strong> \(P = \tau \omega\)</p>
+            <p><strong>Work-Energy Theorem:</strong> \(W = \Delta E_{\text{rot}} = \frac{1}{2}I\omega^2 - \frac{1}{2}I\omega_0^2\)</p>
+        </div>
+
+        <h3>Angular Momentum</h3>
+        <p>Angular momentum is the rotational analog of linear momentum:</p>
+
+        <div class="equation-box">
+            <p><strong>Angular Momentum:</strong></p>
+            <p>\[L = I\omega\]</p>
+            <p>SI Unit: kg·m²/s</p>
+
+            <p><strong>Conservation of Angular Momentum:</strong></p>
+            <p>If the net external torque is zero: \(\sum \tau_{\text{ext}} = 0\)</p>
+            <p>Then: \(L = I\omega = \text{constant}\)</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Insight:</strong> Conservation of angular momentum explains why ice skaters spin faster when they pull their arms in (decreasing \(I\), so \(\omega\) must increase to keep \(L\) constant), and why divers tuck to increase rotation speed.</p>
+        </div>
+
+        <h3>Relationship Between Linear and Angular Quantities</h3>
+        <div class="equation-box">
+            <p>For a point at distance \(r\) from the rotation axis:</p>
+            <p><strong>Linear velocity:</strong> \(v = r\omega\)</p>
+            <p><strong>Tangential acceleration:</strong> \(a_t = r\alpha\)</p>
+            <p><strong>Centripetal acceleration:</strong> \(a_c = r\omega^2 = \frac{v^2}{r}\)</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Rotational Motion</h2>
+        <p>Apply torques to rotating objects and observe how moment of inertia affects angular acceleration. Watch how different shapes with the same mass respond differently to the same torque.</p>
+
+        <div id="sketch-holder"></div>
+
+        <div class="controls-panel">
+            <div class="type-selector">
+                <button class="type-button active" data-shape="disk">Solid Disk</button>
+                <button class="type-button" data-shape="ring">Hollow Ring</button>
+                <button class="type-button" data-shape="rod">Thin Rod</button>
+                <button class="type-button" data-shape="sphere">Solid Sphere</button>
+            </div>
+
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="mass">Mass (kg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="mass" min="1" max="20" value="10">
+                        <span id="mass-value" class="value-display">10</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="radius">Radius (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="radius" min="0.1" max="2" step="0.1" value="1">
+                        <span id="radius-value" class="value-display">1.0</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="torque">Applied Torque (N·m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="torque" min="-50" max="50" value="10">
+                        <span id="torque-value" class="value-display">10</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 10px 0;">
+                <button id="start-btn">Start</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+
+            <div class="results-panel">
+                <p><strong>Moment of Inertia:</strong> <span id="inertia-display">5.00</span> kg·m²</p>
+                <p><strong>Angular Acceleration:</strong> <span id="alpha-display">2.00</span> rad/s²</p>
+                <p><strong>Angular Velocity:</strong> <span id="omega-display">0.00</span> rad/s</p>
+                <p><strong>Rotational KE:</strong> <span id="ke-display">0.00</span> J</p>
+                <p><strong>Angular Momentum:</strong> <span id="momentum-display">0.00</span> kg·m²/s</p>
+            </div>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Observation:</strong> For the same mass and radius, different shapes have different moments of inertia. The hollow ring has the largest \(I\) (all mass far from center), while the solid sphere has the smallest. This affects how quickly each object accelerates under the same torque.</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>Automotive Engineering</h3>
+        <ul>
+            <li><strong>Engine Flywheels:</strong> Store rotational kinetic energy to smooth out power delivery from pistons. Designed with high moment of inertia to maintain steady rotation between power strokes</li>
+            <li><strong>Brake Systems:</strong> Brake torque must overcome the rotational inertia of wheels and rotors. Larger, heavier wheels require greater braking torque to achieve the same deceleration</li>
+            <li><strong>Drivetrain Design:</strong> Engineers minimize moment of inertia in rotating components (wheels, driveshafts) to improve acceleration and fuel efficiency</li>
+            <li><strong>Differential Gears:</strong> Use torque distribution to allow wheels to rotate at different speeds while turning</li>
+        </ul>
+
+        <h3>Aerospace Engineering</h3>
+        <ul>
+            <li><strong>Reaction Wheels:</strong> Satellites use spinning wheels to change orientation in space by conservation of angular momentum, without expelling propellant</li>
+            <li><strong>Helicopter Rotors:</strong> Require massive torque to overcome the large moment of inertia of rotor blades. Tail rotors counteract the reaction torque from main rotors</li>
+            <li><strong>Gyroscopes:</strong> Navigation systems use spinning gyroscopes that resist changes in orientation due to conservation of angular momentum</li>
+            <li><strong>Turbine Engines:</strong> Turbine blade design must account for rotational stresses that increase with \(\omega^2\)</li>
+        </ul>
+
+        <h3>Mechanical Power Transmission</h3>
+        <ul>
+            <li><strong>Gearboxes:</strong> Trade torque for angular velocity (or vice versa) while conserving power: \(P = \tau_1\omega_1 = \tau_2\omega_2\)</li>
+            <li><strong>Clutches:</strong> Engage and disengage torque transmission between rotating shafts, matching angular velocities through friction</li>
+            <li><strong>Belt Drives:</strong> Transmit torque between pulleys while changing speed ratios based on pulley diameters</li>
+            <li><strong>Shaft Design:</strong> Must resist torsional stress caused by applied torques: \(\tau = \frac{\pi d^3 \tau_{\text{max}}}{16}\)</li>
+        </ul>
+
+        <h3>Sports and Recreation</h3>
+        <ul>
+            <li><strong>Figure Skating:</strong> Skaters control rotation speed by changing body position (changing \(I\)) while conserving angular momentum</li>
+            <li><strong>Diving and Gymnastics:</strong> Athletes tuck to reduce \(I\) and increase rotation speed for multiple flips</li>
+            <li><strong>Bicycle Wheels:</strong> Spinning wheels provide gyroscopic stability, resisting tipping motions</li>
+            <li><strong>Golf Clubs:</strong> Moment of inertia of club head affects swing speed and impact energy transfer</li>
+        </ul>
+
+        <h3>Energy Storage and Generation</h3>
+        <ul>
+            <li><strong>Flywheel Energy Storage:</strong> Modern systems store energy in high-speed rotating flywheels (\(E = \frac{1}{2}I\omega^2\)), providing grid stabilization and backup power</li>
+            <li><strong>Wind Turbines:</strong> Convert wind's linear kinetic energy into rotational energy, with blade design optimized for torque generation</li>
+            <li><strong>Hydroelectric Turbines:</strong> Water flow creates torque on turbine blades, with power output \(P = \tau\omega\)</li>
+        </ul>
+
+        <div class="key-point">
+            <p><strong>Engineering Insight:</strong> The parallel axis theorem is crucial in practice because objects rarely rotate about their center of mass. For example, a door rotates about its hinges (not its center), so its effective moment of inertia is \(I = I_{\text{cm}} + md^2\), where \(d\) is the distance from hinges to center of mass.</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Angular Velocity</td>
+                        <td>\(\omega = \frac{d\theta}{dt}\)</td>
+                        <td>Rate of change of angular position</td>
+                    </tr>
+                    <tr>
+                        <td>Angular Acceleration</td>
+                        <td>\(\alpha = \frac{d\omega}{dt}\)</td>
+                        <td>Rate of change of angular velocity</td>
+                    </tr>
+                    <tr>
+                        <td>Torque</td>
+                        <td>\(\tau = rF\sin\theta\)</td>
+                        <td>Rotational effect of a force</td>
+                    </tr>
+                    <tr>
+                        <td>Moment of Inertia</td>
+                        <td>\(I = \sum m_i r_i^2\)</td>
+                        <td>Rotational inertia</td>
+                    </tr>
+                    <tr>
+                        <td>Solid Disk/Cylinder</td>
+                        <td>\(I = \frac{1}{2}mr^2\)</td>
+                        <td>About central axis</td>
+                    </tr>
+                    <tr>
+                        <td>Hollow Cylinder</td>
+                        <td>\(I = mr^2\)</td>
+                        <td>Thin-walled, about central axis</td>
+                    </tr>
+                    <tr>
+                        <td>Solid Sphere</td>
+                        <td>\(I = \frac{2}{5}mr^2\)</td>
+                        <td>About diameter</td>
+                    </tr>
+                    <tr>
+                        <td>Thin Rod (center)</td>
+                        <td>\(I = \frac{1}{12}mL^2\)</td>
+                        <td>About center, perpendicular to rod</td>
+                    </tr>
+                    <tr>
+                        <td>Parallel Axis Theorem</td>
+                        <td>\(I = I_{\text{cm}} + md^2\)</td>
+                        <td>Shift axis from center of mass</td>
+                    </tr>
+                    <tr>
+                        <td>Rotational Dynamics</td>
+                        <td>\(\sum \tau = I\alpha\)</td>
+                        <td>Newton's 2nd Law for rotation</td>
+                    </tr>
+                    <tr>
+                        <td>Rotational KE</td>
+                        <td>\(E_{\text{rot}} = \frac{1}{2}I\omega^2\)</td>
+                        <td>Kinetic energy of rotation</td>
+                    </tr>
+                    <tr>
+                        <td>Angular Momentum</td>
+                        <td>\(L = I\omega\)</td>
+                        <td>Rotational momentum</td>
+                    </tr>
+                    <tr>
+                        <td>Rotational Power</td>
+                        <td>\(P = \tau\omega\)</td>
+                        <td>Rate of doing rotational work</td>
+                    </tr>
+                    <tr>
+                        <td>Linear-Angular Link</td>
+                        <td>\(v = r\omega\)</td>
+                        <td>Tangential velocity</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Torque and Angular Acceleration</h3>
+            <p>A solid disk of mass 5 kg and radius 0.3 m is free to rotate about its central axis. A force of 20 N is applied tangentially to the rim of the disk.</p>
+            <ol>
+                <li>Calculate the moment of inertia of the disk</li>
+                <li>Determine the torque applied to the disk</li>
+                <li>Find the angular acceleration</li>
+                <li>If the disk starts from rest, what is its angular velocity after 3 seconds?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Given:</strong> \(m = 5\) kg, \(r = 0.3\) m, \(F = 20\) N (tangential)</p>
+
+                <p><strong>a) Moment of inertia:</strong></p>
+                <p>For a solid disk: \(I = \frac{1}{2}mr^2\)</p>
+                <p>\[I = \frac{1}{2}(5)(0.3)^2 = \frac{1}{2}(5)(0.09) = 0.225 \text{ kg·m}^2\]</p>
+
+                <p><strong>b) Torque:</strong></p>
+                <p>Since force is tangential: \(\tau = rF\)</p>
+                <p>\[\tau = (0.3)(20) = 6 \text{ N·m}\]</p>
+
+                <p><strong>c) Angular acceleration:</strong></p>
+                <p>Using: \(\tau = I\alpha\)</p>
+                <p>\[\alpha = \frac{\tau}{I} = \frac{6}{0.225} = 26.67 \text{ rad/s}^2\]</p>
+
+                <p><strong>d) Angular velocity after 3 seconds:</strong></p>
+                <p>Using: \(\omega = \omega_0 + \alpha t\) with \(\omega_0 = 0\)</p>
+                <p>\[\omega = 0 + (26.67)(3) = 80 \text{ rad/s}\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Parallel Axis Theorem Application</h3>
+            <p>A thin uniform rod of mass 2 kg and length 1.2 m is pivoted about a point 0.3 m from one end.</p>
+            <ol>
+                <li>Calculate the moment of inertia about the center of mass</li>
+                <li>Use the parallel axis theorem to find the moment of inertia about the pivot point</li>
+                <li>If a torque of 8 N·m is applied, what is the angular acceleration?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Given:</strong> \(m = 2\) kg, \(L = 1.2\) m, pivot at 0.3 m from one end</p>
+
+                <p><strong>a) Moment of inertia about center:</strong></p>
+                <p>For a thin rod about center: \(I_{\text{cm}} = \frac{1}{12}mL^2\)</p>
+                <p>\[I_{\text{cm}} = \frac{1}{12}(2)(1.2)^2 = \frac{1}{12}(2)(1.44) = 0.24 \text{ kg·m}^2\]</p>
+
+                <p><strong>b) Moment of inertia about pivot:</strong></p>
+                <p>Center of mass is at \(L/2 = 0.6\) m from either end</p>
+                <p>Distance from pivot to center of mass: \(d = 0.6 - 0.3 = 0.3\) m</p>
+                <p>Using parallel axis theorem: \(I = I_{\text{cm}} + md^2\)</p>
+                <p>\[I = 0.24 + (2)(0.3)^2 = 0.24 + 0.18 = 0.42 \text{ kg·m}^2\]</p>
+
+                <p><strong>c) Angular acceleration:</strong></p>
+                <p>Using: \(\tau = I\alpha\)</p>
+                <p>\[\alpha = \frac{\tau}{I} = \frac{8}{0.42} = 19.05 \text{ rad/s}^2\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Conservation of Angular Momentum</h3>
+            <p>A student sits on a rotating stool holding a 3 kg dumbbell in each hand. With arms extended, the student rotates at 1.5 rad/s with a total moment of inertia (student + dumbbells) of 6 kg·m². The student then pulls the dumbbells inward, reducing the total moment of inertia to 3 kg·m².</p>
+            <ol>
+                <li>Calculate the initial angular momentum</li>
+                <li>Find the final angular velocity (assuming no friction)</li>
+                <li>Calculate the change in rotational kinetic energy</li>
+                <li>Where did this extra energy come from?</li>
+            </ol>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Given:</strong> \(I_1 = 6\) kg·m², \(\omega_1 = 1.5\) rad/s, \(I_2 = 3\) kg·m²</p>
+
+                <p><strong>a) Initial angular momentum:</strong></p>
+                <p>\[L = I_1\omega_1 = (6)(1.5) = 9 \text{ kg·m}^2\text{/s}\]</p>
+
+                <p><strong>b) Final angular velocity:</strong></p>
+                <p>By conservation of angular momentum: \(L_1 = L_2\)</p>
+                <p>\[I_1\omega_1 = I_2\omega_2\]</p>
+                <p>\[\omega_2 = \frac{I_1\omega_1}{I_2} = \frac{(6)(1.5)}{3} = 3 \text{ rad/s}\]</p>
+
+                <p><strong>c) Change in kinetic energy:</strong></p>
+                <p>\[E_1 = \frac{1}{2}I_1\omega_1^2 = \frac{1}{2}(6)(1.5)^2 = 6.75 \text{ J}\]</p>
+                <p>\[E_2 = \frac{1}{2}I_2\omega_2^2 = \frac{1}{2}(3)(3)^2 = 13.5 \text{ J}\]</p>
+                <p>\[\Delta E = E_2 - E_1 = 13.5 - 6.75 = 6.75 \text{ J}\]</p>
+
+                <p><strong>d) Energy source:</strong></p>
+                <p>The extra kinetic energy came from the student's muscular work done in pulling the dumbbells inward against the centrifugal effect. Angular momentum is conserved, but mechanical energy is not conserved when internal forces do work.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Which quantity is the rotational analog of mass in linear motion?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Torque</label>
+                    <label><input type="radio" name="q1" value="b"> b) Angular velocity</label>
+                    <label><input type="radio" name="q1" value="c"> c) Moment of inertia</label>
+                    <label><input type="radio" name="q1" value="d"> d) Angular momentum</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A solid disk and a hollow ring have the same mass and radius. Which has the larger moment of inertia about their central axes?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Solid disk</label>
+                    <label><input type="radio" name="q2" value="b"> b) Hollow ring</label>
+                    <label><input type="radio" name="q2" value="c"> c) They have the same moment of inertia</label>
+                    <label><input type="radio" name="q2" value="d"> d) Cannot determine without knowing the actual mass</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A torque of 15 N·m is applied to a wheel with moment of inertia 5 kg·m². What is the angular acceleration?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 75 rad/s²</label>
+                    <label><input type="radio" name="q3" value="b"> b) 10 rad/s²</label>
+                    <label><input type="radio" name="q3" value="c"> c) 3 rad/s²</label>
+                    <label><input type="radio" name="q3" value="d"> d) 0.33 rad/s²</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Which statement about angular momentum conservation is TRUE?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Angular momentum is always conserved in any system</label>
+                    <label><input type="radio" name="q4" value="b"> b) Angular momentum is conserved when the net external torque is zero</label>
+                    <label><input type="radio" name="q4" value="c"> c) Angular momentum equals moment of inertia divided by angular velocity</label>
+                    <label><input type="radio" name="q4" value="d"> d) Angular momentum conservation implies kinetic energy is also conserved</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: A point on a rotating disk has tangential velocity v = 6 m/s and is located 0.5 m from the axis. What is the angular velocity of the disk?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 3 rad/s</label>
+                    <label><input type="radio" name="q5" value="b"> b) 12 rad/s</label>
+                    <label><input type="radio" name="q5" value="c"> c) 6 rad/s</label>
+                    <label><input type="radio" name="q5" value="d"> d) 0.083 rad/s</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript for simulation -->
+    <script>
+        // Rotational Dynamics Simulation
+        let rotationSketch = function(p) {
+            let shape = 'disk'; // 'disk', 'ring', 'rod', 'sphere'
+            let mass = 10; // kg
+            let radius = 1; // m
+            let torque = 10; // N·m
+            let omega = 0; // rad/s
+            let angle = 0; // rad
+            let animating = false;
+
+            // Calculated values
+            let inertia = 5;
+            let alpha = 2;
+            let ke = 0;
+            let angularMomentum = 0;
+
+            // Simulation scale
+            let scale = 100; // pixels per meter
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 500);
+                canvas.parent('sketch-holder');
+                setupControls();
+                calculate();
+            };
+
+            p.draw = function() {
+                p.background(250);
+
+                // Update rotation if animating
+                if (animating) {
+                    let dt = 1/60; // 60 fps
+                    omega += alpha * dt;
+                    angle += omega * dt;
+
+                    // Update displays
+                    ke = 0.5 * inertia * omega * omega;
+                    angularMomentum = inertia * omega;
+                    updateDisplays();
+                }
+
+                // Draw coordinate system
+                p.push();
+                p.translate(p.width / 2, p.height / 2);
+
+                // Draw axis of rotation
+                p.stroke(100);
+                p.strokeWeight(4);
+                p.line(0, -200, 0, 200);
+                p.fill(100);
+                p.noStroke();
+                p.circle(0, 0, 10);
+
+                // Draw rotating object
+                p.rotate(angle);
+
+                if (shape === 'disk') {
+                    drawDisk();
+                } else if (shape === 'ring') {
+                    drawRing();
+                } else if (shape === 'rod') {
+                    drawRod();
+                } else if (shape === 'sphere') {
+                    drawSphere();
+                }
+
+                p.pop();
+
+                // Draw torque arrow
+                drawTorqueArrow();
+
+                // Draw info panel
+                drawInfoPanel();
+
+                // Draw angular velocity indicator
+                drawAngularVelocityIndicator();
+            };
+
+            function drawDisk() {
+                // Solid disk
+                p.fill(100, 150, 255, 200);
+                p.stroke(0, 100, 200);
+                p.strokeWeight(2);
+                p.circle(0, 0, radius * scale * 2);
+
+                // Reference line
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.line(0, 0, radius * scale, 0);
+
+                // Center dot
+                p.fill(0);
+                p.noStroke();
+                p.circle(0, 0, 8);
+            }
+
+            function drawRing() {
+                // Hollow ring
+                p.noFill();
+                p.stroke(0, 100, 200);
+                p.strokeWeight(15);
+                p.circle(0, 0, radius * scale * 2);
+
+                // Inner circle
+                p.strokeWeight(2);
+                p.circle(0, 0, radius * scale * 2 - 15);
+
+                // Reference line
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.line(0, 0, radius * scale, 0);
+
+                // Center dot
+                p.fill(0);
+                p.noStroke();
+                p.circle(0, 0, 8);
+            }
+
+            function drawRod() {
+                // Thin rod (length = 2 * radius for visualization)
+                p.fill(150, 100, 50);
+                p.stroke(100, 70, 30);
+                p.strokeWeight(2);
+                p.rectMode(p.CENTER);
+                p.rect(0, 0, radius * scale * 2, 20, 5);
+
+                // Center dot
+                p.fill(0);
+                p.noStroke();
+                p.circle(0, 0, 8);
+            }
+
+            function drawSphere() {
+                // Solid sphere (shown as shaded circle with 3D effect)
+                // Gradient effect
+                for (let r = radius * scale; r > 0; r -= 2) {
+                    let shade = p.map(r, 0, radius * scale, 150, 255);
+                    p.fill(shade, 180, 100);
+                    p.noStroke();
+                    p.circle(-10, -10, r * 2);
+                }
+
+                // Outline
+                p.noFill();
+                p.stroke(0, 100, 50);
+                p.strokeWeight(2);
+                p.circle(0, 0, radius * scale * 2);
+
+                // Reference line
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.line(0, 0, radius * scale, 0);
+
+                // Center dot
+                p.fill(0);
+                p.noStroke();
+                p.circle(0, 0, 8);
+            }
+
+            function drawTorqueArrow() {
+                if (torque === 0) return;
+
+                let x = p.width / 2 + radius * scale + 40;
+                let y = p.height / 2;
+                let arrowLen = Math.abs(torque) * 3;
+
+                p.push();
+                if (torque > 0) {
+                    // Counter-clockwise (positive)
+                    p.fill(0, 200, 0);
+                    p.stroke(0, 200, 0);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.arc(x, y, 50, 50, -p.PI/2, p.PI/2);
+                    // Arrowhead
+                    p.fill(0, 200, 0);
+                    p.noStroke();
+                    p.triangle(x, y + 25, x - 8, y + 20, x - 8, y + 30);
+
+                    p.fill(0, 150, 0);
+                    p.textAlign(p.LEFT);
+                    p.text('τ = +' + torque + ' N·m', x + 30, y + 5);
+                } else {
+                    // Clockwise (negative)
+                    p.fill(200, 0, 0);
+                    p.stroke(200, 0, 0);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.arc(x, y, 50, 50, p.PI/2, -p.PI/2);
+                    // Arrowhead
+                    p.fill(200, 0, 0);
+                    p.noStroke();
+                    p.triangle(x, y - 25, x - 8, y - 20, x - 8, y - 30);
+
+                    p.fill(150, 0, 0);
+                    p.textAlign(p.LEFT);
+                    p.text('τ = ' + torque + ' N·m', x + 30, y + 5);
+                }
+                p.pop();
+            }
+
+            function drawAngularVelocityIndicator() {
+                // Show angular velocity as a speedometer-style arc
+                p.push();
+                p.translate(p.width - 120, p.height - 80);
+
+                // Background arc
+                p.noFill();
+                p.stroke(200);
+                p.strokeWeight(8);
+                p.arc(0, 0, 80, 80, p.PI, 2 * p.PI);
+
+                // Velocity arc
+                let maxOmega = 10; // rad/s for display
+                let omegaClamped = p.constrain(Math.abs(omega), 0, maxOmega);
+                let arcAngle = p.map(omegaClamped, 0, maxOmega, 0, p.PI);
+
+                if (omega > 0) {
+                    p.stroke(0, 200, 0);
+                } else if (omega < 0) {
+                    p.stroke(200, 0, 0);
+                } else {
+                    p.stroke(150);
+                }
+                p.strokeWeight(8);
+                p.arc(0, 0, 80, 80, p.PI, p.PI + arcAngle);
+
+                // Label
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(10);
+                p.text('ω', 0, -50);
+                p.textSize(12);
+                p.text(omega.toFixed(2) + ' rad/s', 0, 15);
+
+                p.pop();
+            }
+
+            function drawInfoPanel() {
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(10, 10, 200, 100, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(14);
+                p.text('Shape: ' + shape.toUpperCase(), 20, 30);
+                p.textSize(12);
+                p.text('Mass: ' + mass + ' kg', 20, 50);
+                p.text('Radius: ' + radius.toFixed(1) + ' m', 20, 68);
+                p.text('I = ' + inertia.toFixed(2) + ' kg·m²', 20, 86);
+                p.text('α = ' + alpha.toFixed(2) + ' rad/s²', 20, 104);
+            }
+
+            function calculate() {
+                // Calculate moment of inertia based on shape
+                if (shape === 'disk') {
+                    inertia = 0.5 * mass * radius * radius;
+                } else if (shape === 'ring') {
+                    inertia = mass * radius * radius;
+                } else if (shape === 'rod') {
+                    // Using rod length = 2*radius
+                    let length = 2 * radius;
+                    inertia = (1/12) * mass * length * length;
+                } else if (shape === 'sphere') {
+                    inertia = 0.4 * mass * radius * radius; // 2/5 * m * r^2
+                }
+
+                // Calculate angular acceleration
+                if (inertia > 0) {
+                    alpha = torque / inertia;
+                } else {
+                    alpha = 0;
+                }
+
+                // Update displays
+                updateDisplays();
+            }
+
+            function updateDisplays() {
+                document.getElementById('inertia-display').textContent = inertia.toFixed(2);
+                document.getElementById('alpha-display').textContent = alpha.toFixed(2);
+                document.getElementById('omega-display').textContent = omega.toFixed(2);
+                document.getElementById('ke-display').textContent = ke.toFixed(2);
+                document.getElementById('momentum-display').textContent = angularMomentum.toFixed(2);
+            }
+
+            function setupControls() {
+                // Shape selector buttons
+                document.querySelectorAll('.type-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        document.querySelectorAll('.type-button').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                        shape = this.dataset.shape;
+                        calculate();
+                    });
+                });
+
+                // Mass slider
+                document.getElementById('mass').addEventListener('input', function() {
+                    mass = parseFloat(this.value);
+                    document.getElementById('mass-value').textContent = mass;
+                    calculate();
+                });
+
+                // Radius slider
+                document.getElementById('radius').addEventListener('input', function() {
+                    radius = parseFloat(this.value);
+                    document.getElementById('radius-value').textContent = radius.toFixed(1);
+                    calculate();
+                });
+
+                // Torque slider
+                document.getElementById('torque').addEventListener('input', function() {
+                    torque = parseFloat(this.value);
+                    document.getElementById('torque-value').textContent = torque;
+                    calculate();
+                });
+
+                // Start/Stop button
+                document.getElementById('start-btn').addEventListener('click', function() {
+                    animating = !animating;
+                    this.textContent = animating ? 'Stop' : 'Start';
+                });
+
+                // Reset button
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    animating = false;
+                    omega = 0;
+                    angle = 0;
+                    ke = 0;
+                    angularMomentum = 0;
+                    document.getElementById('start-btn').textContent = 'Start';
+                    updateDisplays();
+                });
+            }
+        };
+
+        new p5(rotationSketch);
+
+        // Quiz functionality
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',  // Moment of inertia
+                q2: 'b',  // Hollow ring has larger I
+                q3: 'c',  // α = 15/5 = 3 rad/s²
+                q4: 'b',  // Conserved when net external torque is zero
+                q5: 'b',  // ω = v/r = 6/0.5 = 12 rad/s
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>
