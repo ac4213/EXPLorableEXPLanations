@@ -59,6 +59,53 @@
             font-size: 13px;
             color: #718096;
         }
+
+        .info-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 14px;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: help;
+            margin-left: 3px;
+            position: relative;
+        }
+
+        .info-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2d3748;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 1000;
+            font-weight: normal;
+            line-height: 1.4;
+            width: 200px;
+            white-space: normal;
+            text-align: left;
+        }
+
+        .info-icon:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #2d3748;
+            z-index: 1000;
+        }
         
         #wordHints {
             display: flex;
@@ -142,7 +189,72 @@
             min-height: 25px;
             flex-shrink: 0;
         }
-        
+
+        #revealedVowelsDisplay {
+            text-align: center;
+            padding: 8px;
+            margin-bottom: 5px;
+            background: #fef5e7;
+            border: 2px solid #f39c12;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #d68910;
+            min-height: 40px;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        #revealedVowelsDisplay.visible {
+            display: block;
+        }
+
+        #solutionDisplay {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #2e7d32;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        #solutionDisplay.visible {
+            display: block;
+        }
+
+        #solutionDisplay .solution-word {
+            font-size: 20px;
+            margin: 5px 0;
+            letter-spacing: 2px;
+        }
+
+        #solutionDisplay .solution-meaning {
+            font-size: 14px;
+            color: #558b2f;
+            margin: 5px 0;
+        }
+
+        #solutionDisplay .pronounce-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #4285f4;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        #solutionDisplay .pronounce-link:hover {
+            background: #3367d6;
+        }
+
         #keyboard {
             display: grid;
             gap: 3px;
@@ -222,9 +334,19 @@
             font-size: 12px;
             color: #4a5568;
         }
-        
-        /* Leaderboard Styles */
-        #leaderboardModal {
+
+        #aboutButton {
+            padding: 6px 12px;
+            background: #38b2ac;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* About Modal Styles */
+        #aboutModal {
             display: none;
             position: fixed;
             top: 0;
@@ -236,130 +358,82 @@
             padding: 20px;
             overflow-y: auto;
         }
-        
-        #leaderboardContent {
+
+        #aboutContent {
             background: white;
             border-radius: 15px;
             max-width: 400px;
             margin: 20px auto;
-            padding: 20px;
+            padding: 25px;
             animation: slideIn 0.3s ease;
         }
-        
+
         @keyframes slideIn {
             from { transform: translateY(-50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
-        #leaderboardContent h2 {
+
+        #aboutContent h2 {
             color: #4a5568;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 24px;
         }
-        
-        .score-submission {
+
+        .about-section {
             background: #f7fafc;
             border-radius: 10px;
             padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .score-submission input {
-            padding: 8px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 14px;
-            width: 150px;
-            margin-right: 10px;
-        }
-        
-        .score-submission button {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .score-submission button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-        
-        .leaderboard-tabs {
-            display: flex;
-            justify-content: center;
             margin-bottom: 15px;
-            gap: 10px;
         }
-        
-        .leaderboard-tab {
-            padding: 6px 16px;
-            background: #e2e8f0;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
+
+        .about-section h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
-        
-        .leaderboard-tab.active {
-            background: #667eea;
-            color: white;
+
+        .about-section p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
         }
-        
-        .leaderboard-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 5px;
-            background: #f7fafc;
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-        
-        .leaderboard-entry:hover {
-            transform: translateX(5px);
-            background: #edf2f7;
-        }
-        
-        .leaderboard-entry.current-user {
+
+        .contact-info {
             background: #e6fffa;
             border: 2px solid #38b2ac;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
         }
-        
-        .leaderboard-entry.top-three {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
+
+        .contact-info strong {
+            color: #2c7a7b;
+            display: block;
+            margin-bottom: 5px;
         }
-        
-        .rank {
-            font-weight: bold;
-            color: #4a5568;
-            width: 30px;
+
+        .contact-info a {
+            color: #3182ce;
+            text-decoration: none;
+            word-break: break-all;
         }
-        
-        .player-name {
-            flex: 1;
-            margin: 0 10px;
-            color: #2d3748;
+
+        .contact-info a:hover {
+            text-decoration: underline;
         }
-        
-        .player-score {
-            font-weight: bold;
-            color: #667eea;
+
+        .feedback-note {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #856404;
         }
-        
-        .close-leaderboard {
+
+        .close-about {
             display: block;
             margin: 20px auto 0;
             padding: 8px 20px;
@@ -368,18 +442,13 @@
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 14px;
         }
-        
-        #leaderboardButton {
-            padding: 6px 12px;
-            background: #38b2ac;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
+
+        .close-about:hover {
+            background: #2d3748;
         }
-        
+
         @media (max-height: 700px) {
             h1 { font-size: 20px; margin-bottom: 3px; }
             #gameInfo { font-size: 12px; margin-bottom: 5px; }
@@ -417,14 +486,14 @@
             <h1>🎯 Word Quest BIO 🧬</h1>
             <div id="gameInfo">
                 <span id="modeDisplay">Daily: <span id="wordCount">1/8</span></span>
-                <span>Score: <span id="score">0</span></span>
+                <span>Score: <span id="score">0</span><span class="info-icon" data-tooltip="Base: Word length × 10 points. Bonus: (6 - attempts + 1) × 5 points. Fewer attempts = higher score!">i</span></span>
                 <span>Streak: <span id="streak">0</span></span>
             </div>
         </div>
         
         <div id="wordHints">
             <div class="hint-item">
-                <span class="hint-label">Category</span>
+                <span class="hint-label">Meaning</span>
                 <span class="hint-value" id="categoryDisplay">?</span>
             </div>
             <div class="hint-item">
@@ -454,8 +523,16 @@
             </div>
         </div>
         
+        <div id="revealedVowelsDisplay"></div>
+
+        <div id="solutionDisplay">
+            <div class="solution-word"></div>
+            <div class="solution-meaning"></div>
+            <a href="#" target="_blank" class="pronounce-link">🔊 Listen on Google Translate</a>
+        </div>
+
         <div id="message"></div>
-        
+
         <div id="keyboard">
             <div class="keyboard-row" id="row1"></div>
             <div class="keyboard-row" id="row2"></div>
@@ -465,37 +542,39 @@
         <div id="bottomActions">
             <span>Best: <span id="bestScore">0</span></span>
             <button onclick="startNewGame()">New Game</button>
-            <button id="leaderboardButton" onclick="showLeaderboard()">🏆 Leaderboard</button>
+            <button id="aboutButton" onclick="showAbout()">ℹ️ About</button>
             <span id="gameMode">Daily Mode</span>
         </div>
     </div>
-    
-    <!-- Leaderboard Modal -->
-    <div id="leaderboardModal" onclick="closeLeaderboardModal(event)">
-        <div id="leaderboardContent">
-            <h2>🏆 Daily Leaderboard</h2>
-            
-            <div class="score-submission" id="scoreSubmission" style="display: none;">
-                <div style="margin-bottom: 10px;">
-                    <strong>Your Score: <span id="submitScore">0</span></strong>
+
+    <!-- About Modal -->
+    <div id="aboutModal" onclick="closeAboutModal(event)">
+        <div id="aboutContent">
+            <h2>ℹ️ About Word Quest BIO</h2>
+
+            <div class="about-section">
+                <h3>📚 About This Game</h3>
+                <p>Word Quest BIO is an educational word game designed to help students learn biology and laboratory terminology in English with Chinese translations.</p>
+                <p>Challenge yourself with technical terms ranging from 4 to 8 letters!</p>
+            </div>
+
+            <div class="about-section">
+                <h3>👨‍🔬 Author</h3>
+                <p><strong>Dr. Arnaldo Delli Carri</strong></p>
+                <p>Coventry University</p>
+
+                <div class="contact-info">
+                    <strong>📧 Contact:</strong>
+                    <a href="mailto:ac4213@coventry.ac.uk">ac4213@coventry.ac.uk</a>
                 </div>
-                <input type="text" id="playerName" placeholder="Enter your name" maxlength="15">
-                <button onclick="submitScore()">Submit Score</button>
-            </div>
-            
-            <div class="leaderboard-tabs">
-                <button class="leaderboard-tab active" onclick="switchLeaderboardTab('today')">Today</button>
-                <button class="leaderboard-tab" onclick="switchLeaderboardTab('yesterday')">Yesterday</button>
-                <button class="leaderboard-tab" onclick="switchLeaderboardTab('alltime')">All Time Best</button>
-            </div>
-            
-            <div class="leaderboard-list" id="leaderboardList">
-                <div class="leaderboard-entry">
-                    <span style="text-align: center; width: 100%; color: #718096;">Loading leaderboard...</span>
+
+                <div class="feedback-note">
+                    💭 <strong>Feedback Welcome!</strong><br>
+                    Your feedback is highly appreciated! Please feel free to reach out with suggestions, bug reports, or comments about the game.
                 </div>
             </div>
-            
-            <button class="close-leaderboard" onclick="closeLeaderboard()">Close</button>
+
+            <button class="close-about" onclick="closeAbout()">Close</button>
         </div>
     </div>
 
@@ -549,6 +628,23 @@ const wordLists = {
         {word: 'ACQUIRE', category: '图像采集'},
         {word: 'LOADING', category: '加载对照'},
         {word: 'CONTROL', category: '加载对照'}
+    ],
+    8: [
+        {word: 'MUTATION', category: '突变'},
+        {word: 'ANTIBODY', category: '抗体'},
+        {word: 'PLASMIDS', category: '质粒'},
+        {word: 'PROMOTER', category: '启动子'},
+        {word: 'MEMBRANE', category: '细胞膜'},
+        {word: 'TEMPLATE', category: '模板'},
+        {word: 'INCUBATE', category: '孵育'},
+        {word: 'TRANSFER', category: '转移'},
+        {word: 'BLOCKING', category: '封闭'},
+        {word: 'GRADIENT', category: '梯度'},
+        {word: 'DILUTION', category: '稀释'},
+        {word: 'STANDARD', category: '标准品'},
+        {word: 'REACTION', category: '反应'},
+        {word: 'ANALYZER', category: '分析仪'},
+        {word: 'PURIFIED', category: '纯化的'}
     ]
 };
 
@@ -558,7 +654,7 @@ const wordLists = {
             currentCategory: '',
             currentLength: 4,
             attempts: [],
-            maxAttempts: 4,
+            maxAttempts: 6,
             currentAttempt: '',
             gameOver: false,
             dailyWordIndex: 0,
@@ -604,7 +700,7 @@ const wordLists = {
 
         // Get random word
         function getRandomWord() {
-            const lengths = [4, 5, 6, 7];
+            const lengths = [4, 5, 6, 7, 8];
             const length = lengths[Math.floor(Math.random() * lengths.length)];
             const list = wordLists[length];
             return list[Math.floor(Math.random() * list.length)];
@@ -698,14 +794,14 @@ const wordLists = {
                 gameState.currentWord = wordData.word;
                 gameState.currentCategory = wordData.category;
                 gameState.currentLength = wordData.word.length;
-                gameState.maxAttempts = gameState.currentLength;
+                gameState.maxAttempts = 6;
                 gameState.attempts = [];
                 gameState.currentAttempt = '';
                 gameState.gameOver = false;
                 gameState.usedSwapTry = false;
                 gameState.revealedVowels = [];
                 gameState.eliminatedLetters = [];
-                
+
                 resetKeyboard();
                 updateWordHints();
                 updateUI();
@@ -727,7 +823,7 @@ const wordLists = {
             gameState.currentWord = wordData.word;
             gameState.currentCategory = wordData.category;
             gameState.currentLength = wordData.word.length;
-            gameState.maxAttempts = gameState.currentLength;
+            gameState.maxAttempts = 6;
             gameState.attempts = [];
             gameState.currentAttempt = '';
             gameState.gameOver = false;
@@ -735,7 +831,7 @@ const wordLists = {
             gameState.revealedVowels = [];
             gameState.eliminatedLetters = [];
             gameState.randomWordsPlayed++;
-            
+
             resetKeyboard();
             updateWordHints();
             updateUI();
@@ -825,10 +921,10 @@ const wordLists = {
                 const baseScore = gameState.currentLength * 10;
                 const attemptBonus = (gameState.maxAttempts - attemptsUsed + 1) * 5;
                 const roundScore = baseScore + attemptBonus;
-                
+
                 if (!gameState.isRandomMode) {
                     gameState.score += roundScore;
-                    
+
                     // Check for streak - need N-2 or fewer attempts twice in a row
                     if (attemptsUsed <= gameState.maxAttempts - 2) {
                         if (gameState.lastStreakGuesses > 0 && gameState.lastStreakGuesses <= gameState.maxAttempts - 2) {
@@ -846,26 +942,30 @@ const wordLists = {
                         gameState.streak = 0;
                     }
                 }
-                
+
                 showMessage(`Excellent! +${roundScore} points`);
                 gameState.gameOver = true;
+                showSolution();
                 setTimeout(() => {
+                    hideSolution();
                     if (!gameState.isRandomMode) {
                         gameState.dailyWordIndex++;
                     }
                     startNextWord();
-                }, 2000);
+                }, 5000);
             } else if (gameState.attempts.length >= gameState.maxAttempts) {
-                showMessage(`The word was: ${gameState.currentWord}`);
                 gameState.gameOver = true;
                 gameState.streak = 0;
                 gameState.lastStreakGuesses = 0;
+                showMessage(`Game Over!`);
+                showSolution();
                 setTimeout(() => {
+                    hideSolution();
                     if (!gameState.isRandomMode) {
                         gameState.dailyWordIndex++;
                     }
                     startNextWord();
-                }, 3000);
+                }, 5000);
             }
             
             updateDisplay();
@@ -948,7 +1048,8 @@ const wordLists = {
                         const vowel = unrevealedVowels[Math.floor(Math.random() * unrevealedVowels.length)];
                         const position = gameState.currentWord.indexOf(vowel) + 1;
                         gameState.revealedVowels.push(vowel);
-                        showMessage(`Vowel '${vowel}' is at position ${position}`);
+                        updateRevealedVowelsDisplay();
+                        showMessage(`Vowel '${vowel}' revealed!`);
                     }
                 } else if (type === 'wrongLetter') {
                     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -987,6 +1088,49 @@ const wordLists = {
             }
         }
 
+        // Update revealed vowels display
+        function updateRevealedVowelsDisplay() {
+            const display = document.getElementById('revealedVowelsDisplay');
+            if (gameState.revealedVowels.length > 0 && !gameState.gameOver) {
+                const vowelInfo = gameState.revealedVowels.map(vowel => {
+                    const positions = [];
+                    for (let i = 0; i < gameState.currentWord.length; i++) {
+                        if (gameState.currentWord[i] === vowel) {
+                            positions.push(i + 1);
+                        }
+                    }
+                    return `${vowel} at position${positions.length > 1 ? 's' : ''} ${positions.join(', ')}`;
+                }).join(' | ');
+                display.innerHTML = `🔤 Revealed Vowels: ${vowelInfo}`;
+                display.className = 'visible';
+            } else {
+                display.className = '';
+            }
+        }
+
+        // Show solution with Google Translate link
+        function showSolution() {
+            const display = document.getElementById('solutionDisplay');
+            const wordElement = display.querySelector('.solution-word');
+            const meaningElement = display.querySelector('.solution-meaning');
+            const linkElement = display.querySelector('.pronounce-link');
+
+            wordElement.textContent = `Solution: ${gameState.currentWord}`;
+            meaningElement.textContent = `Meaning: ${gameState.currentCategory}`;
+
+            // Google Translate URL for pronunciation
+            const translateUrl = `https://translate.google.com/?sl=en&tl=zh-CN&text=${encodeURIComponent(gameState.currentWord)}&op=translate`;
+            linkElement.href = translateUrl;
+
+            display.className = 'visible';
+        }
+
+        // Hide solution
+        function hideSolution() {
+            const display = document.getElementById('solutionDisplay');
+            display.className = '';
+        }
+
         // Show message
         function showMessage(text) {
             document.getElementById('message').textContent = text;
@@ -1018,7 +1162,8 @@ const wordLists = {
             
             const bestScore = localStorage.getItem('wordQuestBestScore') || 0;
             document.getElementById('bestScore').textContent = bestScore;
-            
+
+            updateRevealedVowelsDisplay();
             updateDisplay();
         }
 
@@ -1028,256 +1173,23 @@ const wordLists = {
             if (gameState.score > bestScore) {
                 localStorage.setItem('wordQuestBestScore', gameState.score);
             }
-            
+
             showMessage(`Daily Complete! Score: ${gameState.score}. Play random words!`);
-            
-            // Show leaderboard with submission option
-            setTimeout(() => {
-                showLeaderboard(true);
-            }, 1000);
         }
-        
-        // LEADERBOARD FUNCTIONS
-        
-        // Backend API configuration
-        // TO CONNECT TO REAL BACKEND:
-        // Replace these URLs with your actual API endpoints
-        const LEADERBOARD_API = {
-            submit: 'https://your-backend.com/api/leaderboard/submit',  // POST endpoint
-            today: 'https://your-backend.com/api/leaderboard/today',     // GET endpoint
-            yesterday: 'https://your-backend.com/api/leaderboard/yesterday', // GET endpoint
-            alltime: 'https://your-backend.com/api/leaderboard/alltime'  // GET endpoint
-        };
-        
-        let currentLeaderboardTab = 'today';
-        let hasSubmittedScore = false;
-        
-        // Show leaderboard modal
-        function showLeaderboard(showSubmission = false) {
-            const modal = document.getElementById('leaderboardModal');
-            const submission = document.getElementById('scoreSubmission');
-            
-            modal.style.display = 'block';
-            
-            // Check if user completed daily challenge today
-            const completedDate = localStorage.getItem('wordQuestCompletedDate');
-            const submittedDate = localStorage.getItem('wordQuestSubmittedDate');
-            const currentDate = getDailySeed();
-            
-            if (showSubmission && completedDate == currentDate && submittedDate != currentDate && !gameState.isRandomMode) {
-                submission.style.display = 'block';
-                document.getElementById('submitScore').textContent = gameState.score;
-                
-                // Load saved name if exists
-                const savedName = localStorage.getItem('wordQuestPlayerName');
-                if (savedName) {
-                    document.getElementById('playerName').value = savedName;
-                }
-            } else {
-                submission.style.display = 'none';
+
+        // About modal functions
+        function showAbout() {
+            document.getElementById('aboutModal').style.display = 'block';
+        }
+
+        function closeAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        function closeAboutModal(event) {
+            if (event.target.id === 'aboutModal') {
+                closeAbout();
             }
-            
-            loadLeaderboard('today');
-        }
-        
-        // Close leaderboard modal
-        function closeLeaderboard() {
-            document.getElementById('leaderboardModal').style.display = 'none';
-        }
-        
-        // Close modal when clicking outside
-        function closeLeaderboardModal(event) {
-            if (event.target.id === 'leaderboardModal') {
-                closeLeaderboard();
-            }
-        }
-        
-        // Switch leaderboard tabs
-        function switchLeaderboardTab(tab) {
-            currentLeaderboardTab = tab;
-            
-            // Update active tab
-            document.querySelectorAll('.leaderboard-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            loadLeaderboard(tab);
-        }
-        
-        // Load leaderboard data
-        async function loadLeaderboard(type) {
-            const list = document.getElementById('leaderboardList');
-            
-            // FOR REAL IMPLEMENTATION:
-            // Uncomment this code and remove the mock data below
-            /*
-            try {
-                const response = await fetch(LEADERBOARD_API[type]);
-                const data = await response.json();
-                displayLeaderboard(data);
-            } catch (error) {
-                console.error('Failed to load leaderboard:', error);
-                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #e53e3e;">Failed to load leaderboard</span></div>';
-            }
-            */
-            
-            // MOCK DATA for demonstration
-            // Remove this when connecting to real backend
-            const mockData = getMockLeaderboardData(type);
-            displayLeaderboard(mockData);
-        }
-        
-        // Display leaderboard entries
-        function displayLeaderboard(data) {
-            const list = document.getElementById('leaderboardList');
-            const currentPlayerName = localStorage.getItem('wordQuestPlayerName');
-            
-            if (!data || data.length === 0) {
-                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #718096;">No scores yet. Be the first!</span></div>';
-                return;
-            }
-            
-            list.innerHTML = data.map((entry, index) => {
-                const rank = index + 1;
-                const isCurrentUser = entry.name === currentPlayerName && entry.date === getDailySeed();
-                const isTopThree = rank <= 3;
-                
-                let rankDisplay = rank;
-                if (rank === 1) rankDisplay = '🥇';
-                else if (rank === 2) rankDisplay = '🥈';
-                else if (rank === 3) rankDisplay = '🥉';
-                
-                return `
-                    <div class="leaderboard-entry ${isCurrentUser ? 'current-user' : ''} ${isTopThree && !isCurrentUser ? 'top-three' : ''}">
-                        <span class="rank">${rankDisplay}</span>
-                        <span class="player-name">${entry.name}</span>
-                        <span class="player-score">${entry.score}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Submit score to leaderboard
-        async function submitScore() {
-            const playerName = document.getElementById('playerName').value.trim();
-            
-            if (!playerName) {
-                alert('Please enter your name');
-                return;
-            }
-            
-            if (playerName.length < 2) {
-                alert('Name must be at least 2 characters');
-                return;
-            }
-            
-            // Save player name for future
-            localStorage.setItem('wordQuestPlayerName', playerName);
-            localStorage.setItem('wordQuestSubmittedDate', getDailySeed());
-            
-            const scoreData = {
-                name: playerName,
-                score: gameState.score,
-                date: getDailySeed(),
-                words: gameState.dailyWordIndex,
-                timestamp: Date.now()
-            };
-            
-            // FOR REAL IMPLEMENTATION:
-            // Uncomment this code to submit to real backend
-            /*
-            try {
-                const response = await fetch(LEADERBOARD_API.submit, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(scoreData)
-                });
-                
-                if (response.ok) {
-                    document.getElementById('scoreSubmission').style.display = 'none';
-                    hasSubmittedScore = true;
-                    loadLeaderboard('today');
-                    showMessage('Score submitted successfully!');
-                } else {
-                    alert('Failed to submit score. Please try again.');
-                }
-            } catch (error) {
-                console.error('Failed to submit score:', error);
-                alert('Failed to submit score. Please try again.');
-            }
-            */
-            
-            // MOCK IMPLEMENTATION for demonstration
-            // Remove this when connecting to real backend
-            addMockScore(scoreData);
-            document.getElementById('scoreSubmission').style.display = 'none';
-            hasSubmittedScore = true;
-            loadLeaderboard('today');
-            showMessage('Score submitted successfully!');
-        }
-        
-        // MOCK DATA FUNCTIONS - Remove these when implementing real backend
-        function getMockLeaderboardData(type) {
-            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
-            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
-            
-            const today = getDailySeed();
-            const yesterday = today - 1;
-            
-            if (type === 'today') {
-                return allScores.filter(s => s.date === today).sort((a, b) => b.score - a.score).slice(0, 50);
-            } else if (type === 'yesterday') {
-                return allScores.filter(s => s.date === yesterday).sort((a, b) => b.score - a.score).slice(0, 50);
-            } else {
-                // All time best - group by player and take their best score
-                const bestScores = {};
-                allScores.forEach(score => {
-                    if (!bestScores[score.name] || bestScores[score.name].score < score.score) {
-                        bestScores[score.name] = score;
-                    }
-                });
-                return Object.values(bestScores).sort((a, b) => b.score - a.score).slice(0, 50);
-            }
-        }
-        
-        function addMockScore(scoreData) {
-            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
-            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
-            allScores.push(scoreData);
-            localStorage.setItem('wordQuestMockLeaderboard', JSON.stringify(allScores));
-        }
-        
-        function getDefaultMockScores() {
-            const today = getDailySeed();
-            const yesterday = today - 1;
-            
-            return [
-                // Today's scores
-                { name: 'Dr Arnaldo Delli Carri', score: 385, date: today },
-                { name: 'ac4213@coventry.ac.uk', score: 360, date: today },
-                { name: 'Coventry University', score: 340, date: today },
-                { name: 'GrannySmith', score: 320, date: today },
-                { name: 'Bob', score: 295, date: today },
-                { name: 'Alice', score: 280, date: today },
-                { name: 'Charlie', score: 265, date: today },
-                { name: 'Diana', score: 250, date: today },
-                
-                // Yesterday's scores
-                { name: 'PuzzlePro', score: 390, date: yesterday },
-                { name: 'Emma', score: 375, date: yesterday },
-                { name: 'David', score: 355, date: yesterday },
-                { name: 'Sophie', score: 330, date: yesterday },
-                { name: 'Tom', score: 310, date: yesterday },
-                { name: 'Lucy', score: 290, date: yesterday },
-                
-                // Older scores for all-time
-                { name: 'Champion', score: 410, date: today - 7 },
-                { name: 'Legend27', score: 405, date: today - 14 },
-                { name: 'MasterMind', score: 395, date: today - 21 }
-            ];
         }
 
         // Start new game
@@ -1305,7 +1217,7 @@ const wordLists = {
                     currentCategory: '',
                     currentLength: 4,
                     attempts: [],
-                    maxAttempts: 4,
+                    maxAttempts: 6,
                     currentAttempt: '',
                     gameOver: false,
                     dailyWordIndex: 0,
