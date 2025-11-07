@@ -79,7 +79,7 @@
         .info-icon:hover::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: 120%;
+            top: 120%;
             left: 50%;
             transform: translateX(-50%);
             background: #2d3748;
@@ -99,12 +99,117 @@
         .info-icon:hover::before {
             content: '';
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
             border: 6px solid transparent;
-            border-top-color: #2d3748;
+            border-bottom-color: #2d3748;
             z-index: 1000;
+        }
+
+        #instructionsButton {
+            padding: 6px 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Instructions Modal Styles */
+        #instructionsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #instructionsContent {
+            background: white;
+            border-radius: 15px;
+            max-width: 450px;
+            margin: 20px auto;
+            padding: 25px;
+            animation: slideIn 0.3s ease;
+        }
+
+        #instructionsContent h2 {
+            color: #4a5568;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .instructions-section {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .instructions-section h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .instructions-section p {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .instructions-section ul {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .color-demo {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .color-demo.correct {
+            background: #48bb78;
+        }
+
+        .color-demo.wrong-position {
+            background: #f6ad55;
+        }
+
+        .color-demo.not-in-word {
+            background: #a0aec0;
+        }
+
+        .close-instructions {
+            display: block;
+            margin: 20px auto 0;
+            padding: 8px 20px;
+            background: #4a5568;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .close-instructions:hover {
+            background: #2d3748;
         }
         
         #wordHints {
@@ -406,12 +511,13 @@
             border-radius: 8px;
             padding: 12px;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .contact-info strong {
             color: #2c7a7b;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
 
         .contact-info a {
@@ -485,7 +591,7 @@
         <div id="header">
             <h1>🎯 Word Quest BIO 🧬</h1>
             <div id="gameInfo">
-                <span id="modeDisplay">Daily: <span id="wordCount">1/8</span></span>
+                <span id="modeDisplay">Daily: <span id="wordCount">1/5</span></span>
                 <span>Score: <span id="score">0</span><span class="info-icon" data-tooltip="Base: Word length × 10 points. Bonus: (6 - attempts + 1) × 5 points. Fewer attempts = higher score!">i</span></span>
                 <span>Streak: <span id="streak">0</span></span>
             </div>
@@ -541,38 +647,84 @@
         
         <div id="bottomActions">
             <span>Best: <span id="bestScore">0</span></span>
+            <button id="instructionsButton" onclick="showInstructions()">How to Play</button>
             <button onclick="startNewGame()">New Game</button>
-            <button id="aboutButton" onclick="showAbout()">ℹ️ About</button>
+            <button id="aboutButton" onclick="showAbout()">Contacts</button>
             <span id="gameMode">Daily Mode</span>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructionsModal" onclick="closeInstructionsModal(event)">
+        <div id="instructionsContent">
+            <h2>🎮 How to Play</h2>
+
+            <div class="instructions-section">
+                <h3>Objective</h3>
+                <p>Guess the biology-related word in 6 tries or less. Each word has a meaning provided in Chinese to help you.</p>
+            </div>
+
+            <div class="instructions-section">
+                <h3>Game Modes</h3>
+                <p><strong>Daily Mode:</strong> Play 5 words in sequence, increasing from 4 to 8 letters. Complete all 5 for your final score!</p>
+                <p><strong>Random Mode:</strong> After completing the daily challenge, play unlimited random words.</p>
+            </div>
+
+            <div class="instructions-section">
+                <h3>Color Feedback</h3>
+                <ul>
+                    <li><span class="color-demo correct"></span><strong>Green:</strong> Letter is correct and in the right position</li>
+                    <li><span class="color-demo wrong-position"></span><strong>Orange:</strong> Letter is in the word but wrong position</li>
+                    <li><span class="color-demo not-in-word"></span><strong>Gray:</strong> Letter is not in the word</li>
+                </ul>
+            </div>
+
+            <div class="instructions-section">
+                <h3>Power-Ups</h3>
+                <p><strong>🔤 Purchase Vowel:</strong> Reveals a vowel and its position(s)</p>
+                <p><strong>❌ Remove 3:</strong> Eliminates 3 letters not in the word</p>
+                <p><strong>🔄 Swap Try:</strong> Trade one attempt for a random power-up</p>
+            </div>
+
+            <div class="instructions-section">
+                <h3>Scoring</h3>
+                <p>Base Score: Word length × 10 points</p>
+                <p>Bonus: (6 - attempts + 1) × 5 points</p>
+                <p>Fewer attempts = higher score!</p>
+            </div>
+
+            <div class="instructions-section">
+                <h3>Streak Bonus</h3>
+                <p>Solve two consecutive words in 4 or fewer attempts to earn a bonus power-up!</p>
+            </div>
+
+            <button class="close-instructions" onclick="closeInstructions()">Got it!</button>
         </div>
     </div>
 
     <!-- About Modal -->
     <div id="aboutModal" onclick="closeAboutModal(event)">
         <div id="aboutContent">
-            <h2>ℹ️ About Word Quest BIO</h2>
 
             <div class="about-section">
-                <h3>📚 About This Game</h3>
-                <p>Word Quest BIO is an educational word game designed to help students learn biology and laboratory terminology in English with Chinese translations.</p>
-                <p>Challenge yourself with technical terms ranging from 4 to 8 letters!</p>
-            </div>
-
-            <div class="about-section">
-                <h3>👨‍🔬 Author</h3>
-                <p><strong>Dr. Arnaldo Delli Carri</strong></p>
+                <h3>Authors </h3>
+                <p><strong>👨‍💻 Dr. Arnaldo Delli Carri</strong></p>
                 <p>Coventry University</p>
-
                 <div class="contact-info">
                     <strong>📧 Contact:</strong>
                     <a href="mailto:ac4213@coventry.ac.uk">ac4213@coventry.ac.uk</a>
                 </div>
+                <p><strong>👨‍🔬 Dr. Emanuele Conte</strong></p>
+                <p>University of Glasgow</p>
+                <div class="contact-info">
+                    <strong>📧 Contact:</strong>
+                    <a href="mailto:emanuele.conte@glasgow.ac.uk">emanuele.conte@glasgow.ac.uk</a>
+            </div>
 
                 <div class="feedback-note">
                     💭 <strong>Feedback Welcome!</strong><br>
-                    Your feedback is highly appreciated! Please feel free to reach out with suggestions, bug reports, or comments about the game.
+                    Please feel free to reach out with suggestions, bug reports, or comments about the game. If you are an educator using the app in your teaching, please let us know!
                 </div>
-            </div>
 
             <button class="close-about" onclick="closeAbout()">Close</button>
         </div>
@@ -582,69 +734,302 @@
 // Word lists by length with categories (Mandarin)
 const wordLists = {
     4: [
-        {word: 'GENE', category: '基因'},
-        {word: 'CELL', category: '细胞'},
+        {word: 'ACID', category: '酸'},
         {word: 'AGAR', category: '琼脂'},
+        {word: 'AXIS', category: '轴'},
+        {word: 'BASE', category: '基'},
+        {word: 'BETA', category: '贝塔'},
         {word: 'BLOT', category: '印迹'},
-        {word: 'GELS', category: '凝胶'},
-        {word: 'WELL', category: '孔'},
+        {word: 'BOND', category: '键'},
+        {word: 'BONE', category: '骨'},
+        {word: 'CDNA', category: '互补脱氧核糖核苷酸'},
+        {word: 'CELL', category: '细胞'},
+        {word: 'CODE', category: '密码'},
+        {word: 'DIET', category: '饮食'},
+        {word: 'DNDP', category: '脱氧核苷二磷酸'},
+        {word: 'DNMP', category: '脱氧核苷一磷酸'},
+        {word: 'DNTP', category: '脱氧核苷三磷酸'},
+        {word: 'DRUG', category: '药'},
+        {word: 'EDTA', category: '乙二胺四乙酸'},
+        {word: 'EMIT', category: '发射'},
+        {word: 'EXON', category: '外显子'},
+        {word: 'GENE', category: '基因'},
+        {word: 'HAEM', category: '血红素'},
+        {word: 'LOOP', category: '环'},
+        {word: 'LUNG', category: '肺'},
+        {word: 'MOLE', category: '摩尔'},
+        {word: 'MRNA', category: '信使核糖核酸'},
+        {word: 'NICK', category: '缺口'},
+        {word: 'PAGE', category: '聚丙烯酰胺凝胶电泳'},
+        {word: 'PEAK', category: '峰'},
+        {word: 'PORE', category: '孔隙'},
+        {word: 'PURE', category: '纯净'},
+        {word: 'RRNA', category: '核糖体核糖核酸'},
+        {word: 'SALT', category: '盐'},
+        {word: 'TRNA', category: '转运核糖核酸'},
         {word: 'TUBE', category: '管'},
-        {word: 'BAND', category: '条带'}
+        {word: 'WAVE', category: '波'}
     ],
     5: [
-        {word: 'DNTPS', category: '脱氧核苷酸混合物'},
-        {word: 'CYCLE', category: 'PCR仪'},
-        {word: 'CURVE', category: '标准曲线'},
-        {word: 'ERROR', category: '误差线'},
-        {word: 'RTPCR', category: '逆转录PCR'}
+        {word: 'ALPHA', category: '阿尔法'},
+        {word: 'AMINO', category: '氨基'},
+        {word: 'ANION', category: '阴离子'},
+        {word: 'ASSAY', category: '测定'},
+        {word: 'BLOOD', category: '血'},
+        {word: 'BLUNT', category: '钝'},
+        {word: 'BRAIN', category: '脑'},
+        {word: 'BROTH', category: '液体培养基'},
+        {word: 'CLONE', category: '克隆'},
+        {word: 'CODON', category: '密码子'},
+        {word: 'CURVE', category: '曲线'},
+        {word: 'CYCLE', category: '循环'},
+        {word: 'DDNTP', category: '双脱氧核苷酸'},
+        {word: 'DELTA', category: '德尔塔'},
+        {word: 'DIGIT', category: '数'},
+        {word: 'DNASE', category: '脱氧核糖核酸酶'},
+        {word: 'DSDNA', category: '双链脱氧核糖核苷酸'},
+        {word: 'ELISA', category: '酶联免疫吸附测定'},
+        {word: 'ERROR', category: '错误'},
+        {word: 'FIBRE', category: '纤维'},
+        {word: 'FLASK', category: '烧瓶'},
+        {word: 'GAMMA', category: '伽马'},
+        {word: 'GLAND', category: '腺'},
+        {word: 'GLOVE', category: '手套'},
+        {word: 'GRAPH', category: '图表'},
+        {word: 'HEART', category: '心'},
+        {word: 'HELIX', category: '螺旋'},
+        {word: 'LIPID', category: '脂质'},
+        {word: 'LOCUS', category: '基因座'},
+        {word: 'LYSIS', category: '裂解'},
+        {word: 'MICRO', category: '微'},
+        {word: 'NERVE', category: '神经'},
+        {word: 'OLIGO', category: '寡核苷酸'},
+        {word: 'ORGAN', category: '器官'},
+        {word: 'PHAGE', category: '噬菌体'},
+        {word: 'PLATE', category: '平板'},
+        {word: 'PROBE', category: '探针'},
+        {word: 'RATIO', category: '比'},
+        {word: 'RNASE', category: '核糖核酸酶'},
+        {word: 'RTPCR', category: '逆转录聚合酶链式反应'},
+        {word: 'SCALE', category: '刻度'},
+        {word: 'SIGMA', category: '西格玛'},
+        {word: 'SIRNA', category: '小分子干扰核糖核酸'},
+        {word: 'SSDNA', category: '单链脱氧核糖核苷酸'},
+        {word: 'STOCK', category: '储备'},
+        {word: 'SUGAR', category: '糖'},
+        {word: 'THETA', category: '西塔'},
+        {word: 'TOXIN', category: '毒素'},
+        {word: 'TRAIT', category: '性状'},
+        {word: 'UNCUT', category: '未切割'},
+        {word: 'VIRUS', category: '病毒'},
+        {word: 'WATER', category: '水'},
+        {word: 'YEAST', category: '酵母'}
     ],
     6: [
-        {word: 'VORTEX', category: '离心'},
-        {word: 'BUFFER', category: '缓冲液制备'},
-        {word: 'DDNTPS', category: '脱氧核苷酸混合物'},
+        {word: 'ABSORB', category: '吸收'},
+        {word: 'ALLELE', category: '等位基因'},
+        {word: 'ANNEAL', category: '退火'},
+        {word: 'ANOXIA', category: '缺氧症'},
+        {word: 'BEAKER', category: '烧杯'},
+        {word: 'BREAST', category: '胸'},
+        {word: 'BUFFER', category: '缓冲剂'},
+        {word: 'BUNSEN', category: '本生灯'},
+        {word: 'CANCER', category: '癌'},
+        {word: 'CAPSID', category: '衣壳'},
+        {word: 'CARBON', category: '碳'},
+        {word: 'CATION', category: '阳离子'},
+        {word: 'CHIRAL', category: '手性'},
+        {word: 'CLEAVE', category: '裂解'},
+        {word: 'COILED', category: '盘绕'},
+        {word: 'COLONY', category: '菌落'},
+        {word: 'COLUMN', category: '柱'},
+        {word: 'DIGEST', category: '消化'},
+        {word: 'DILUTE', category: '稀释'},
+        {word: 'DOMAIN', category: '结构域'},
+        {word: 'EMBRYO', category: '胚胎'},
+        {word: 'ENZYME', category: '酶'},
+        {word: 'FLAVIN', category: '黄素'},
+        {word: 'GAMETE', category: '配子'},
+        {word: 'GENOME', category: '基因组'},
+        {word: 'HYBRID', category: '杂交体'},
+        {word: 'INVIVO', category: '体内'},
+        {word: 'INDUCE', category: '诱导'},
+        {word: 'INFECT', category: '感染'},
+        {word: 'INSERT', category: '插入片段'},
+        {word: 'INTRON', category: '内含子'},
+        {word: 'KIDNEY', category: '肾脏'},
+        {word: 'LIGAND', category: '配体'},
+        {word: 'LIGASE', category: '连接酶'},
+        {word: 'LYSATE', category: '裂解液'},
+        {word: 'LYSINE', category: '赖氨酸'},
+        {word: 'MARKER', category: '标记'},
+        {word: 'MOIETY', category: '基团'},
+        {word: 'MUTANT', category: '突变体'},
+        {word: 'MUTATE', category: '突变体'},
+        {word: 'MYELIN', category: '髓鞘'},
+        {word: 'OPERON', category: '操纵子'},
+        {word: 'PELLET', category: '沉淀'},
+        {word: 'PHENOL', category: '苯酚'},
+        {word: 'PLASMA', category: '血浆'},
+        {word: 'PURINE', category: '嘌呤'},
+        {word: 'REDUCE', category: '降低'},
+        {word: 'RIBOSE', category: '核糖'},
+        {word: 'SAFETY', category: '安全'},
+        {word: 'SAMPLE', category: '样本'},
+        {word: 'SCREEN', category: '筛选'},
+        {word: 'SERINE', category: '丝氨酸'},
         {word: 'SHAKER', category: '摇床'},
-        {word: 'SAMPLE', category: '样本量'},
-        {word: 'TARGET', category: '目标基因'},
-        {word: 'TAQMAN', category: 'TaqMan探针'},
-        {word: 'PRIMER', category: '引物效率'},
-        {word: 'IMAGE', category: '图像采集'}
+        {word: 'SILICA', category: '二氧化硅'},
+        {word: 'SOLUTE', category: '溶质'},
+        {word: 'STICKY', category: '黏'},
+        {word: 'STRAIN', category: '菌株'},
+        {word: 'STRAND', category: '链'},
+        {word: 'STROKE', category: '中风'},
+        {word: 'TARGET', category: '靶'},
+        {word: 'THESIS', category: '论文'},
+        {word: 'THYMUS', category: '胸腺'},
+        {word: 'TISSUE', category: '组织'},
+        {word: 'TUMOUR', category: '肿瘤'},
+        {word: 'URACIL', category: '尿嘧啶'},
+        {word: 'VALINE', category: '缬氨酸'},
+        {word: 'VECTOR', category: '载体'},
+        {word: 'VOLUME', category: '量'},
+        {word: 'WEIGHT', category: '重'},
+        {word: 'ZYGOTE', category: '合子'}
     ],
     7: [
-        {word: 'PIPETTE', category: '移液'},
-        {word: 'STERILE', category: '消毒 / 灭菌'},
+        {word: 'ADENINE', category: '腺嘌呤'},
         {word: 'AGAROSE', category: '琼脂糖'},
-        {word: 'POLYMER', category: 'Taq聚合酶'},
-        {word: 'TRYPSIN', category: '胰蛋白酶'},
-        {word: 'CONTROL', category: '对照组'},
+        {word: 'ALANINE', category: '丙氨酸'},
+        {word: 'ALIQUOT', category: '等分'},
+        {word: 'AMPLIFY', category: '扩增'},
+        {word: 'AMYLASE', category: '淀粉酶'},
+        {word: 'AMYLOSE', category: '直链淀粉'},
+        {word: 'ANAEMIA', category: '贫血'},
+        {word: 'ANTIGEN', category: '抗原'},
+        {word: 'BIOTECH', category: '生物技术'},
+        {word: 'CHRONIC', category: '慢性病'},
+        {word: 'CLONING', category: '克隆'},
+        {word: 'CONTROL', category: '对照'},
         {word: 'CTVALUE', category: '阈值循环数'},
-        {word: 'MELTING', category: '熔解曲线分析'},
-        {word: 'REVERSE', category: '逆转录'},
-        {word: 'WESTERN', category: '蛋白质印迹'},
-        {word: 'PROTEIN', category: '蛋白质提取'},
-        {word: 'SDSPAGE', category: 'SDS-聚丙烯酰胺凝胶电泳'},
-        {word: 'PRIMARY', category: '一抗'},
-        {word: 'WASHING', category: '洗涤缓冲液'},
-        {word: 'REAGENT', category: '检测试剂'},
-        {word: 'ACQUIRE', category: '图像采集'},
-        {word: 'LOADING', category: '加载对照'},
-        {word: 'CONTROL', category: '加载对照'}
+        {word: 'CULTURE', category: '培养'},
+        {word: 'CUVETTE', category: '比色皿'},
+        {word: 'CYTOSOL', category: '细胞质'},
+        {word: 'DENSITY', category: '密度'},
+        {word: 'DEVIATE', category: '偏离'},
+        {word: 'DIPLOID', category: '二倍体'},
+        {word: 'DISEASE', category: '疾病'},
+        {word: 'EPITOPE', category: '抗原表位'},
+        {word: 'EPSILON', category: '埃普西隆'},
+        {word: 'ETHANOL', category: '乙醇'},
+        {word: 'EUPLOID', category: '整倍体'},
+        {word: 'EXTRACT', category: '提取液'},
+        {word: 'FISSION', category: '分裂'},
+        {word: 'FOLDING', category: '折叠'},
+        {word: 'GLUCOSE', category: '葡萄糖'},
+        {word: 'GLYCINE', category: '甘氨酸'},
+        {word: 'GOGGLES', category: '护目镜'},
+        {word: 'GUANINE', category: '鸟嘌呤'},
+        {word: 'HAIRPIN', category: '发卡结构'},
+        {word: 'HAPLOID', category: '单倍体'},
+        {word: 'HISTONE', category: '组蛋白'},
+        {word: 'HORMONE', category: '激素'},
+        {word: 'HYPOXIA', category: '缺氧'},
+        {word: 'IMAGING', category: '成像'},
+        {word: 'INVITRO', category: '体外'},
+        {word: 'INDUCER', category: '诱导剂'},
+        {word: 'INHIBIT', category: '抑制'},
+        {word: 'INSULIN', category: '胰岛素'},
+        {word: 'LABCOAT', category: '实验服'},
+        {word: 'LEUCINE', category: '亮氨酸'},
+        {word: 'LINKAGE', category: '连锁'},
+        {word: 'MEIOSIS', category: '减数分裂'},
+        {word: 'MELANIN', category: '黑色素'},
+        {word: 'MELTING', category: '融化'},
+        {word: 'MICROBE', category: '微生物'},
+        {word: 'MITOSIS', category: '有丝分裂'},
+        {word: 'MONOMER', category: '单体'},
+        {word: 'NEURONE', category: '神经元'},
+        {word: 'NUCLEUS', category: '核'},
+        {word: 'OBESITY', category: '肥胖'},
+        {word: 'OPTICAL', category: '光学的'},
+        {word: 'OXIDIZE', category: '氧化'},
+        {word: 'PENTOSE', category: '戊糖'},
+        {word: 'PEPTIDE', category: '肽'},
+        {word: 'PIGMENT', category: '色素'},
+        {word: 'PIPETTE', category: '移液器'},
+        {word: 'PLASMID', category: '质粒'},
+        {word: 'PLATING', category: '平板培养'},
+        {word: 'POLYMER', category: '聚合物'},
+        {word: 'PRIMARY', category: '基本的'},
+        {word: 'PROLINE', category: '脯氨酸'},
+        {word: 'PROTEIN', category: '蛋白质'},
+        {word: 'REAGENT', category: '试剂'},
+        {word: 'RELAXED', category: '解除超螺旋'},
+        {word: 'RESIDUE', category: '残基'},
+        {word: 'REVERSE', category: '反向'},
+        {word: 'SOMATIC', category: '体细胞'},
+        {word: 'STERILE', category: '无菌'},
+        {word: 'SUBUNIT', category: '蛋白质亚基'},
+        {word: 'SYNAPSE', category: '突触'},
+        {word: 'THERAPY', category: '治疗'},
+        {word: 'THYMINE', category: '胸腺嘧啶'},
+        {word: 'THYROID', category: '甲状腺'},
+        {word: 'TRISOMY', category: '三体性'},
+        {word: 'TRYPSIN', category: '胰蛋白酶'},
+        {word: 'VACCINE', category: '疫苗'},
+        {word: 'VESICLE', category: '囊泡'},
+        {word: 'WESTERN', category: '蛋白印迹法'}
     ],
     8: [
-        {word: 'MUTATION', category: '突变'},
+        {word: 'ABSOLUTE', category: '绝对'},
+        {word: 'ANALYSIS', category: '分析'},
         {word: 'ANTIBODY', category: '抗体'},
-        {word: 'PLASMIDS', category: '质粒'},
-        {word: 'PROMOTER', category: '启动子'},
-        {word: 'MEMBRANE', category: '细胞膜'},
-        {word: 'TEMPLATE', category: '模板'},
-        {word: 'INCUBATE', category: '孵育'},
-        {word: 'TRANSFER', category: '转移'},
+        {word: 'ANTIGENE', category: '抗原'},
+        {word: 'ARGININE', category: '精氨酸'},
+        {word: 'BASELINE', category: '基准线'},
         {word: 'BLOCKING', category: '封闭'},
+        {word: 'CYSTEINE', category: '半胱氨酸'},
+        {word: 'CYTOSINE', category: '胞嘧啶'},
+        {word: 'DIABETES', category: '糖尿病'},
+        {word: 'EXPOSURE', category: '曝光'},
+        {word: 'GENETICS', category: '遗传学'},
+        {word: 'GENOTYPE', category: '基因型'},
         {word: 'GRADIENT', category: '梯度'},
-        {word: 'DILUTION', category: '稀释'},
-        {word: 'STANDARD', category: '标准品'},
+        {word: 'HOMOLOGY', category: '同源性'},
+        {word: 'HYDROXYL', category: '羟基'},
+        {word: 'INCUBATE', category: '孵育'},
+        {word: 'MEMBRANE', category: '膜'},
+        {word: 'MOLARITY', category: '摩尔浓度'},
+        {word: 'NANODROP', category: '微量分光光度计（仪器名）'},
+        {word: 'NANOMOLE', category: '纳摩尔'},
+        {word: 'NITROGEN', category: '氮'},
+        {word: 'ONCOGENE', category: '致癌基因'},
+        {word: 'PATHOGEN', category: '病原体'},
+        {word: 'PICOGRAM', category: '皮克克'},
+        {word: 'PLATELET', category: '血小板'},
+        {word: 'PROMOTER', category: '启动子'},
+        {word: 'PROPHASE', category: '前期'},
+        {word: 'PROTEASE', category: '蛋白酶'},
+        {word: 'PROTOCOL', category: '实验方案'},
+        {word: 'PYRUVATE', category: '丙酮酸'},
         {word: 'REACTION', category: '反应'},
-        {word: 'ANALYZER', category: '分析仪'},
-        {word: 'PURIFIED', category: '纯化的'}
+        {word: 'RECEPTOR', category: '受体'},
+        {word: 'RESPONSE', category: '反应'},
+        {word: 'RESTRICT', category: '限制'},
+        {word: 'RIBOSOME', category: '核糖体'},
+        {word: 'SAMPLING', category: '取样'},
+        {word: 'SOUTHERN', category: 'DNA印迹法'},
+        {word: 'SPECIMEN', category: '标本'},
+        {word: 'SPECTRUM', category: '光谱'},
+        {word: 'SPLICING', category: '剪接'},
+        {word: 'STANDARD', category: '标准'},
+        {word: 'SYNAPSIS', category: '联会'},
+        {word: 'SYNDROME', category: '综合征'},
+        {word: 'TEMPLATE', category: '模版'},
+        {word: 'TRANSFER', category: '转移'},
+        {word: 'TYROSINE', category: '酪氨酸'},
+        {word: 'WILDTYPE', category: '野生型'}
     ]
 };
 
@@ -658,7 +1043,7 @@ const wordLists = {
             currentAttempt: '',
             gameOver: false,
             dailyWordIndex: 0,
-            totalWords: 8,
+            totalWords: 5,
             score: 0,
             streak: 0,
             powerUps: {
@@ -691,7 +1076,7 @@ const wordLists = {
         // Get daily word based on index
         function getDailyWord(index) {
             const seed = getDailySeed() + index;
-            const lengths = [4, 4, 5, 5, 6, 6, 7, 7];
+            const lengths = [4, 5, 6, 7, 8];
             const length = lengths[index];
             const list = wordLists[length];
             const wordIndex = Math.floor(seededRandom(seed) * list.length);
@@ -1177,6 +1562,21 @@ const wordLists = {
             showMessage(`Daily Complete! Score: ${gameState.score}. Play random words!`);
         }
 
+        // Instructions modal functions
+        function showInstructions() {
+            document.getElementById('instructionsModal').style.display = 'block';
+        }
+
+        function closeInstructions() {
+            document.getElementById('instructionsModal').style.display = 'none';
+        }
+
+        function closeInstructionsModal(event) {
+            if (event.target.id === 'instructionsModal') {
+                closeInstructions();
+            }
+        }
+
         // About modal functions
         function showAbout() {
             document.getElementById('aboutModal').style.display = 'block';
@@ -1221,7 +1621,7 @@ const wordLists = {
                     currentAttempt: '',
                     gameOver: false,
                     dailyWordIndex: 0,
-                    totalWords: 8,
+                    totalWords: 5,
                     score: 0,
                     streak: 0,
                     powerUps: {
