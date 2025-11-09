@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navier-Stokes Equations - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Navier-Stokes Equations</h1>
+        <p class="subtitle">Understanding Fluid Flow Through Conservation Laws</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding the Navier-Stokes Equations</h2>
+
+        <h3>What are the Navier-Stokes Equations?</h3>
+        <p>The Navier-Stokes equations are the fundamental governing equations of fluid mechanics, describing the motion of viscous fluids. They express Newton's second law for fluid elements, accounting for pressure gradients, viscous forces, and body forces.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> The Navier-Stokes equations represent conservation of momentum for a fluid continuum. Combined with mass conservation (continuity equation) and energy conservation, they form a complete system for predicting fluid behavior in engineering applications from aircraft aerodynamics to blood flow.</p>
+        </div>
+
+        <h3>Conservation of Mass (Continuity Equation)</h3>
+        <p>For an incompressible fluid, the continuity equation simplifies to:</p>
+
+        <div class="equation-box">
+            <p>\[\nabla \cdot \vec{u} = \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} = 0\]</p>
+            <p>This states that the divergence of the velocity field must be zero for incompressible flow.</p>
+        </div>
+
+        <h3>Conservation of Momentum (Navier-Stokes)</h3>
+        <p>The momentum equation for an incompressible Newtonian fluid is:</p>
+
+        <div class="equation-box">
+            <p><strong>Vector Form:</strong></p>
+            <p>\[\rho\left(\frac{\partial \vec{u}}{\partial t} + \vec{u} \cdot \nabla \vec{u}\right) = -\nabla p + \mu \nabla^2 \vec{u} + \rho \vec{g}\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(\rho\) = fluid density (kg/m³)</li>
+                <li>\(\vec{u}\) = velocity vector (m/s)</li>
+                <li>\(p\) = pressure (Pa)</li>
+                <li>\(\mu\) = dynamic viscosity (Pa·s)</li>
+                <li>\(\vec{g}\) = gravitational acceleration (m/s²)</li>
+            </ul>
+            <p><strong>Component Form (2D):</strong></p>
+            <p>\[\rho\left(\frac{\partial u}{\partial t} + u\frac{\partial u}{\partial x} + v\frac{\partial u}{\partial y}\right) = -\frac{\partial p}{\partial x} + \mu\left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right)\]</p>
+            <p>\[\rho\left(\frac{\partial v}{\partial t} + u\frac{\partial v}{\partial x} + v\frac{\partial v}{\partial y}\right) = -\frac{\partial p}{\partial y} + \mu\left(\frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}\right)\]</p>
+        </div>
+
+        <h3>Reynolds Number</h3>
+        <p>The Reynolds number characterizes the flow regime and indicates the relative importance of inertial forces to viscous forces:</p>
+
+        <div class="equation-box">
+            <p>\[Re = \frac{\rho U L}{\mu} = \frac{UL}{\nu}\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(U\) = characteristic velocity (m/s)</li>
+                <li>\(L\) = characteristic length (m)</li>
+                <li>\(\nu = \mu/\rho\) = kinematic viscosity (m²/s)</li>
+            </ul>
+            <p><strong>Flow Regimes:</strong></p>
+            <ul>
+                <li>\(Re < 2300\): Laminar flow (smooth, ordered)</li>
+                <li>\(2300 < Re < 4000\): Transition region</li>
+                <li>\(Re > 4000\): Turbulent flow (chaotic, mixing)</li>
+            </ul>
+        </div>
+
+        <h3>Vorticity</h3>
+        <p>Vorticity measures the local rotation of fluid elements and is defined as the curl of the velocity field:</p>
+
+        <div class="equation-box">
+            <p>\[\vec{\omega} = \nabla \times \vec{u}\]</p>
+            <p>In 2D: \(\omega_z = \frac{\partial v}{\partial x} - \frac{\partial u}{\partial y}\)</p>
+            <p>The vorticity transport equation is:</p>
+            <p>\[\frac{\partial \omega}{\partial t} + \vec{u} \cdot \nabla \omega = \nu \nabla^2 \omega\]</p>
+        </div>
+
+        <h3>Simplified Solutions</h3>
+        <p>For certain flow conditions, the Navier-Stokes equations can be simplified:</p>
+
+        <div class="key-point">
+            <p><strong>Common Simplifications:</strong></p>
+            <ul>
+                <li><strong>Potential Flow:</strong> Inviscid (\(\mu = 0\)) and irrotational (\(\omega = 0\))</li>
+                <li><strong>Stokes Flow:</strong> Very low Reynolds number (Re << 1), neglect inertial terms</li>
+                <li><strong>Boundary Layer:</strong> Thin viscous region near walls, inviscid flow outside</li>
+                <li><strong>Steady Flow:</strong> Time derivatives vanish (\(\partial/\partial t = 0\))</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Simulation: Vortex Shedding Behind a Cylinder</h2>
+
+        <div class="key-point" style="margin-bottom: 20px;">
+            <p><strong>What This Simulation Shows:</strong></p>
+            <p>This simulation demonstrates <strong>vortex shedding</strong> (von Kármán vortex street) - a fundamental phenomenon predicted by the Navier-Stokes equations. When fluid flows past an obstacle at moderate Reynolds numbers, vortices alternately form and detach from either side, creating an oscillating wake pattern.</p>
+            <ul>
+                <li><strong>Low Re (< 50):</strong> Smooth, steady flow with no separation</li>
+                <li><strong>Medium Re (50-200):</strong> Periodic vortex shedding begins</li>
+                <li><strong>High Re (> 200):</strong> Strong vortex street formation</li>
+            </ul>
+            <p>The colored particles are <strong>passive tracers</strong> that move with the fluid, visualizing the velocity field. Red particles show clockwise rotation, blue shows counterclockwise rotation.</p>
+        </div>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="flow-speed">Flow Speed U (m/s): <span id="flow-speed-value">1.0</span></label>
+                <input type="range" id="flow-speed" min="0.2" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <label for="viscosity">Kinematic Viscosity ν (m²/s): <span id="viscosity-value">0.01</span></label>
+                <input type="range" id="viscosity" min="0.001" max="0.05" step="0.001" value="0.01">
+            </div>
+
+            <div class="control-group">
+                <label for="cylinder-size">Cylinder Diameter D (m): <span id="cylinder-size-value">0.4</span></label>
+                <input type="range" id="cylinder-size" min="0.2" max="0.8" step="0.1" value="0.4">
+            </div>
+
+            <div class="control-group">
+                <label for="particle-density">Particle Density: <span id="particle-density-value">600</span></label>
+                <input type="range" id="particle-density" min="100" max="2000" step="100" value="600">
+            </div>
+
+            <div class="control-group">
+                <button id="reset-btn">Reset Simulation</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            // Physical parameters
+            let U = 1.0;        // Flow velocity (m/s)
+            let nu = 0.01;      // Kinematic viscosity (m²/s)
+            let D = 0.4;        // Cylinder diameter (m)
+            let Re = 40;        // Reynolds number
+
+            // Simulation domain
+            let cylinderX, cylinderY, cylinderR;
+            let particles = [];
+            let vortices = [];
+            let numParticles = 600;
+            let time = 0;
+            let dt = 0.1;
+
+            // Display variables
+            let regime = '';
+            let behavior = '';
+
+            // Vortex shedding parameters
+            let shedFrequency = 0;
+            let shedPhase = 0;
+            let vortexStrength = 0;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 400);
+                canvas.parent('sketch-holder');
+
+                cylinderX = 250;
+                cylinderY = 200;
+                cylinderR = 40;
+
+                initializeParticles();
+                setupControls();
+                updateReynolds();
+            };
+
+            function initializeParticles() {
+                particles = [];
+                for (let i = 0; i < numParticles; i++) {
+                    particles.push({
+                        x: p.random(-50, p.width),
+                        y: p.random(0, p.height),
+                        age: p.random(0, 100)
+                    });
+                }
+            }
+
+            function setupControls() {
+                document.getElementById('flow-speed').addEventListener('input', function() {
+                    U = parseFloat(this.value);
+                    document.getElementById('flow-speed-value').textContent = U.toFixed(1);
+                    updateReynolds();
+                });
+
+                document.getElementById('viscosity').addEventListener('input', function() {
+                    nu = parseFloat(this.value);
+                    document.getElementById('viscosity-value').textContent = nu.toFixed(3);
+                    updateReynolds();
+                });
+
+                document.getElementById('cylinder-size').addEventListener('input', function() {
+                    D = parseFloat(this.value);
+                    cylinderR = D * 100;
+                    document.getElementById('cylinder-size-value').textContent = D.toFixed(1);
+                    updateReynolds();
+                });
+
+                document.getElementById('particle-density').addEventListener('input', function() {
+                    numParticles = parseInt(this.value);
+                    document.getElementById('particle-density-value').textContent = numParticles;
+                    initializeParticles();
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    initializeParticles();
+                    vortices = [];
+                    time = 0;
+                    shedPhase = 0;
+                });
+            }
+
+            function updateReynolds() {
+                Re = (U * D) / nu;
+
+                if (Re < 5) {
+                    regime = 'Stokes Flow (Creeping)';
+                    behavior = 'Viscosity dominates, very smooth flow';
+                } else if (Re < 50) {
+                    regime = 'Laminar - Steady';
+                    behavior = 'Smooth flow, no vortex shedding';
+                } else if (Re < 150) {
+                    regime = 'Laminar - Periodic Vortex Shedding';
+                    behavior = 'von Kármán vortex street begins to form';
+                } else if (Re < 2300) {
+                    regime = 'Laminar - Strong Vortex Shedding';
+                    behavior = 'Clear alternating vortex pattern in wake';
+                } else if (Re < 4000) {
+                    regime = 'Transitional';
+                    behavior = 'Wake becoming turbulent';
+                } else {
+                    regime = 'Turbulent';
+                    behavior = 'Chaotic, turbulent wake';
+                }
+
+                // Update vortex shedding parameters
+                if (Re > 50) {
+                    // Strouhal number approximately 0.2 for cylinder
+                    shedFrequency = 0.2 * U / D;
+                    vortexStrength = p.constrain((Re - 50) / 200, 0, 2.0);
+                } else {
+                    shedFrequency = 0;
+                    vortexStrength = 0;
+                }
+            }
+
+            p.draw = function() {
+                p.background(240);
+
+                // Update time
+                time += dt;
+                shedPhase = time * shedFrequency;
+
+                // Update vortex positions
+                updateVortices();
+
+                // Update and draw particles
+                updateParticles();
+
+                // Draw cylinder
+                p.fill(60);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.circle(cylinderX, cylinderY, cylinderR * 2);
+
+                // Draw flow direction indicator
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.LEFT);
+                p.text('Flow →', 20, 30);
+
+                // Draw arrow
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(20, 40, 80, 40);
+                p.line(80, 40, 70, 35);
+                p.line(80, 40, 70, 45);
+
+                // Draw info overlay
+                drawInfoOverlay();
+            };
+
+            function drawInfoOverlay() {
+                // Semi-transparent background
+                p.fill(255, 255, 255, 230);
+                p.stroke(50);
+                p.strokeWeight(1);
+                p.rect(p.width - 260, 10, 250, 110, 5);
+
+                // Text
+                p.fill(0);
+                p.noStroke();
+                p.textSize(13);
+                p.textAlign(p.LEFT);
+
+                let x = p.width - 250;
+                let y = 30;
+                let lineHeight = 20;
+
+                p.textStyle(p.BOLD);
+                p.text('Flow Parameters:', x, y);
+                p.textStyle(p.NORMAL);
+
+                y += lineHeight;
+                p.text('Reynolds Number: ' + Re.toFixed(0), x, y);
+
+                y += lineHeight;
+                p.text('Regime: ' + regime, x, y);
+
+                y += lineHeight;
+                p.textSize(11);
+                // Wrap behavior text if needed
+                let maxWidth = 240;
+                let words = behavior.split(' ');
+                let line = '';
+                for (let i = 0; i < words.length; i++) {
+                    let testLine = line + words[i] + ' ';
+                    if (p.textWidth(testLine) > maxWidth && i > 0) {
+                        p.text(line, x, y);
+                        line = words[i] + ' ';
+                        y += 16;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                p.text(line, x, y);
+            }
+
+            function updateVortices() {
+                // Remove old vortices
+                vortices = vortices.filter(v => v.x < p.width + 100);
+
+                // Add new vortices based on shedding frequency
+                if (vortexStrength > 0 && p.frameCount % Math.max(1, Math.floor(30 / shedFrequency)) === 0) {
+                    let side = Math.sin(shedPhase * 2 * Math.PI) > 0 ? 1 : -1;
+                    let offsetY = side * cylinderR * 0.8;
+
+                    vortices.push({
+                        x: cylinderX + cylinderR,
+                        y: cylinderY + offsetY,
+                        strength: side * vortexStrength * 100,
+                        age: 0
+                    });
+                }
+
+                // Move vortices downstream
+                for (let v of vortices) {
+                    v.x += U * 30;
+                    v.age += dt;
+                    // Vortices decay over time
+                    v.strength *= 0.995;
+                }
+            }
+
+            function updateParticles() {
+                for (let particle of particles) {
+                    // Get velocity at particle position
+                    let vel = getVelocity(particle.x, particle.y);
+
+                    // Update position
+                    particle.x += vel.x * dt;
+                    particle.y += vel.y * dt;
+                    particle.age += dt;
+
+                    // Check if inside cylinder
+                    let dx = particle.x - cylinderX;
+                    let dy = particle.y - cylinderY;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+
+                    // Reset particles that go out of bounds or hit cylinder
+                    if (particle.x > p.width + 20 || particle.x < -20 ||
+                        particle.y > p.height + 20 || particle.y < -20 ||
+                        dist < cylinderR || particle.age > 200) {
+                        particle.x = p.random(-20, 0);
+                        particle.y = p.random(0, p.height);
+                        particle.age = 0;
+                    }
+
+                    // Calculate vorticity for color
+                    let vort = getVorticityAtPoint(particle.x, particle.y);
+
+                    // Color based on vorticity (red = clockwise, blue = counterclockwise)
+                    let vortMag = p.constrain(Math.abs(vort) * 50, 0, 255);
+                    if (vort > 0) {
+                        p.fill(200, 50, 50, 180); // Red for positive vorticity
+                    } else {
+                        p.fill(50, 100, 200, 180); // Blue for negative vorticity
+                    }
+
+                    if (Math.abs(vort) < 0.1) {
+                        p.fill(100, 100, 100, 120); // Gray for low vorticity
+                    }
+
+                    p.noStroke();
+                    p.circle(particle.x, particle.y, 3);
+                }
+            }
+
+            function getVelocity(x, y) {
+                // Base uniform flow
+                let u = U * 50; // Scale for pixels
+                let v = 0;
+
+                // Distance to cylinder
+                let dx = x - cylinderX;
+                let dy = y - cylinderY;
+                let r = Math.sqrt(dx*dx + dy*dy);
+
+                // Cylinder influence (simplified potential flow + boundary layer)
+                if (r > cylinderR) {
+                    let R = cylinderR;
+                    let R2 = R * R;
+                    let r2 = r * r;
+
+                    // Potential flow around cylinder
+                    let cos_theta = dx / r;
+                    let sin_theta = dy / r;
+
+                    let u_r = U * 50 * (1 - R2/r2) * cos_theta;
+                    let u_theta = -U * 50 * (1 + R2/r2) * sin_theta;
+
+                    u = u_r * cos_theta - u_theta * sin_theta;
+                    v = u_r * sin_theta + u_theta * cos_theta;
+
+                    // Add vortex influence
+                    for (let vortex of vortices) {
+                        let vdx = x - vortex.x;
+                        let vdy = y - vortex.y;
+                        let vr = Math.sqrt(vdx*vdx + vdy*vdy);
+
+                        if (vr > 5) {
+                            let circulation = vortex.strength;
+                            let u_vortex = -circulation * vdy / (vr * vr);
+                            let v_vortex = circulation * vdx / (vr * vr);
+
+                            u += u_vortex;
+                            v += v_vortex;
+                        }
+                    }
+                }
+
+                return {x: u, y: v};
+            }
+
+            function getVorticityAtPoint(x, y) {
+                let h = 5;
+                let v_right = getVelocity(x + h, y);
+                let v_left = getVelocity(x - h, y);
+                let v_up = getVelocity(x, y - h);
+                let v_down = getVelocity(x, y + h);
+
+                let dvdx = (v_right.y - v_left.y) / (2 * h);
+                let dudy = (v_down.x - v_up.x) / (2 * h);
+
+                return dvdx - dudy;
+            }
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>The Navier-Stokes equations are fundamental to numerous engineering disciplines:</p>
+        <ul>
+            <li><strong>Aerodynamics:</strong> Aircraft design, drag reduction, and lift prediction rely on solving the Navier-Stokes equations. Modern CFD (Computational Fluid Dynamics) tools are based on these equations to optimize wing shapes and reduce fuel consumption.</li>
+            <li><strong>Pipe Flow and Hydraulics:</strong> Water distribution systems, oil pipelines, and HVAC ductwork design all depend on understanding pressure drop and flow rates governed by these equations.</li>
+            <li><strong>Turbomachinery:</strong> Compressors, turbines, and pumps are designed using Navier-Stokes-based simulations to maximize efficiency and prevent flow separation.</li>
+            <li><strong>Weather Prediction:</strong> Atmospheric flow models use the Navier-Stokes equations to predict weather patterns, hurricane trajectories, and climate change effects.</li>
+            <li><strong>Biomedical Engineering:</strong> Blood flow in arteries and veins, drug delivery systems, and medical device design (e.g., heart valves, stents) require accurate fluid flow predictions.</li>
+            <li><strong>Environmental Engineering:</strong> Pollutant dispersion in air and water, ocean currents, and river flow modeling all use these fundamental equations.</li>
+            <li><strong>Structural Engineering:</strong> Vortex shedding (shown in the simulation) can cause oscillations in structures like bridges, towers, and chimneys. The Tacoma Narrows Bridge collapse (1940) was partially attributed to vortex-induced vibrations!</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Continuity (Incompressible)</td>
+                    <td>\(\nabla \cdot \vec{u} = 0\)</td>
+                    <td>Mass conservation</td>
+                </tr>
+                <tr>
+                    <td>Navier-Stokes (Vector)</td>
+                    <td>\(\rho\left(\frac{\partial \vec{u}}{\partial t} + \vec{u} \cdot \nabla \vec{u}\right) = -\nabla p + \mu \nabla^2 \vec{u}\)</td>
+                    <td>Momentum conservation</td>
+                </tr>
+                <tr>
+                    <td>Reynolds Number</td>
+                    <td>\(Re = \frac{\rho U L}{\mu} = \frac{UL}{\nu}\)</td>
+                    <td>Ratio of inertial to viscous forces</td>
+                </tr>
+                <tr>
+                    <td>Vorticity</td>
+                    <td>\(\vec{\omega} = \nabla \times \vec{u}\)</td>
+                    <td>Local rotation of fluid elements</td>
+                </tr>
+                <tr>
+                    <td>Vorticity Transport</td>
+                    <td>\(\frac{\partial \omega}{\partial t} + \vec{u} \cdot \nabla \omega = \nu \nabla^2 \omega\)</td>
+                    <td>Evolution of vorticity</td>
+                </tr>
+                <tr>
+                    <td>Strouhal Number</td>
+                    <td>\(St = \frac{fL}{U}\)</td>
+                    <td>Vortex shedding frequency (≈0.2 for cylinders)</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Reynolds Number Calculation</h3>
+            <p>Water (ν = 1.0 × 10⁻⁶ m²/s) flows through a pipe of diameter D = 0.05 m at a velocity of U = 2 m/s. Calculate the Reynolds number and determine if the flow is laminar or turbulent. If the pipe diameter is doubled while maintaining the same flow rate, how does the Reynolds number change?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Part 1: Calculate Reynolds number</strong></p>
+                <p>\[Re = \frac{UD}{\nu} = \frac{2 \times 0.05}{1.0 \times 10^{-6}} = 100,000\]</p>
+                <p>Since Re = 100,000 >> 4,000, the flow is <strong>turbulent</strong>.</p>
+
+                <p><strong>Part 2: Effect of doubling diameter</strong></p>
+                <p>If diameter doubles: \(D' = 0.1\) m</p>
+                <p>To maintain same flow rate Q: \(Q = U \cdot A = U' \cdot A'\)</p>
+                <p>\(U \cdot \pi (D/2)^2 = U' \cdot \pi (D'/2)^2\)</p>
+                <p>\(U' = U \cdot (D/D')^2 = 2 \times (0.05/0.1)^2 = 0.5\) m/s</p>
+                <p>New Reynolds number:</p>
+                <p>\[Re' = \frac{U' D'}{\nu} = \frac{0.5 \times 0.1}{1.0 \times 10^{-6}} = 50,000\]</p>
+                <p>The Reynolds number is halved when the diameter is doubled at constant flow rate.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Pressure Drop in Pipe Flow</h3>
+            <p>For laminar flow in a circular pipe, the Hagen-Poiseuille equation gives the pressure drop: \(\Delta p = \frac{32 \mu L U}{D^2}\). Calculate the pressure drop for oil (μ = 0.1 Pa·s) flowing at U = 0.5 m/s through a 10 m long pipe with D = 0.02 m. Verify that the flow is indeed laminar (assume ρ = 900 kg/m³).</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Step 1: Check Reynolds number</strong></p>
+                <p>\[\nu = \frac{\mu}{\rho} = \frac{0.1}{900} = 1.11 \times 10^{-4} \text{ m}^2/\text{s}\]</p>
+                <p>\[Re = \frac{UD}{\nu} = \frac{0.5 \times 0.02}{1.11 \times 10^{-4}} = 90\]</p>
+                <p>Since Re = 90 < 2300, the flow is laminar. ✓</p>
+
+                <p><strong>Step 2: Calculate pressure drop</strong></p>
+                <p>\[\Delta p = \frac{32 \mu L U}{D^2} = \frac{32 \times 0.1 \times 10 \times 0.5}{(0.02)^2}\]</p>
+                <p>\[\Delta p = \frac{16}{0.0004} = 40,000 \text{ Pa} = 40 \text{ kPa}\]</p>
+
+                <p><strong>Physical interpretation:</strong> The high pressure drop is due to the high viscosity of oil and small pipe diameter. This relationship shows that pressure drop scales with \(1/D^4\) for constant flow rate, making diameter the most critical design parameter.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Vortex Shedding Frequency</h3>
+            <p>A chimney with diameter D = 2 m is exposed to wind at U = 15 m/s. Using the Strouhal number relationship \(St = fD/U \approx 0.2\) for cylinders, calculate the vortex shedding frequency. If the chimney has a natural frequency of 0.8 Hz, is there a risk of resonance?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Step 1: Calculate shedding frequency</strong></p>
+                <p>\[f = \frac{St \cdot U}{D} = \frac{0.2 \times 15}{2} = 1.5 \text{ Hz}\]</p>
+
+                <p><strong>Step 2: Check for resonance</strong></p>
+                <p>Natural frequency: \(f_n = 0.8\) Hz</p>
+                <p>Shedding frequency: \(f = 1.5\) Hz</p>
+                <p>Ratio: \(f/f_n = 1.5/0.8 = 1.875\)</p>
+
+                <p><strong>Conclusion:</strong> While not exactly at resonance, these frequencies are close enough that vortex-induced vibrations could still be significant. The chimney should be designed with vortex suppression features (helical strakes, shrouds, or spoilers) or the natural frequency should be modified to avoid this wind speed range.</p>
+
+                <p><strong>Real-world note:</strong> This type of analysis prevented disasters like the Tacoma Narrows Bridge collapse!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does the Reynolds number represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The ratio of pressure forces to viscous forces</label>
+                    <label><input type="radio" name="q1" value="b"> b) The ratio of inertial forces to viscous forces</label>
+                    <label><input type="radio" name="q1" value="c"> c) The ratio of gravitational forces to pressure forces</label>
+                    <label><input type="radio" name="q1" value="d"> d) The speed of the fluid divided by the speed of sound</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: For incompressible flow, the continuity equation states:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) The divergence of velocity is zero</label>
+                    <label><input type="radio" name="q2" value="b"> b) The curl of velocity is zero</label>
+                    <label><input type="radio" name="q2" value="c"> c) The velocity is constant everywhere</label>
+                    <label><input type="radio" name="q2" value="d"> d) The pressure gradient is zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: What is vorticity?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) The divergence of the velocity field</label>
+                    <label><input type="radio" name="q3" value="b"> b) The curl of the velocity field</label>
+                    <label><input type="radio" name="q3" value="c"> c) The gradient of pressure</label>
+                    <label><input type="radio" name="q3" value="d"> d) The magnitude of velocity</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Vortex shedding behind a cylinder typically begins when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Re < 5</label>
+                    <label><input type="radio" name="q4" value="b"> b) Re > 50</label>
+                    <label><input type="radio" name="q4" value="c"> c) Re = 1</label>
+                    <label><input type="radio" name="q4" value="d"> d) Viscosity is zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: In the Navier-Stokes equations, the term μ∇²u represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Pressure gradient</label>
+                    <label><input type="radio" name="q5" value="b"> b) Convective acceleration</label>
+                    <label><input type="radio" name="q5" value="c"> c) Viscous diffusion</label>
+                    <label><input type="radio" name="q5" value="d"> d) Gravitational force</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'a',
+                        q3: 'b',
+                        q4: 'b',
+                        q5: 'c'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

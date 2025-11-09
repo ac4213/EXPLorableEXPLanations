@@ -92,36 +92,55 @@
 
     <!-- Section 2: Interactive Simulation -->
     <div class="simulation-container">
-        <h2>Interactive Truss Simulation</h2>
-        <p>Adjust the applied load and observe how the member forces change. Members in <span style="color: red; font-weight: bold;">red</span> are in tension, and members in <span style="color: blue; font-weight: bold;">blue</span> are in compression. The thickness of each member represents the magnitude of the force.</p>
-
-        <!-- Control Panel -->
-        <div class="controls-panel">
-            <div class="controls-grid-2col">
-                <div class="slider-container">
-                    <label for="load">Applied Load (kN):</label>
-                    <div class="slider-row">
-                        <input type="range" id="load" min="5" max="50" value="20" step="5">
-                        <span id="load-value" class="value-display">20</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label for="span">Truss Span (m):</label>
-                    <div class="slider-row">
-                        <input type="range" id="span" min="4" max="12" value="8" step="1">
-                        <span id="span-value" class="value-display">8</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h2>Interactive Warren Truss Simulation</h2>
+        <p><strong>Click on any node</strong> to view its free body diagram and edit applied forces and constraints. Members in <span style="color: red; font-weight: bold;">red</span> are in tension, <span style="color: blue; font-weight: bold;">blue</span> are in compression. The thickness represents force magnitude.</p>
 
         <!-- Canvas Holder -->
         <div id="sketch-holder"></div>
+
+        <!-- Node Editor Panel -->
+        <div id="node-editor" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid #333; border-radius: 10px; padding: 20px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 600px; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-top: 0;">Node <span id="selected-node-id"></span> - Free Body Diagram</h3>
+
+            <!-- Free Body Diagram Canvas -->
+            <div id="fbd-holder" style="border: 2px solid #ddd; margin: 10px 0; background: #f9f9f9;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Applied Force X (kN):</label>
+                    <input type="number" id="force-x" step="0.1" style="width: 100%; padding: 5px; font-size: 14px;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Applied Force Y (kN):</label>
+                    <input type="number" id="force-y" step="0.1" style="width: 100%; padding: 5px; font-size: 14px;">
+                </div>
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Constraint Type:</label>
+                    <select id="constraint-type" style="width: 100%; padding: 5px; font-size: 14px;">
+                        <option value="none">None (Free)</option>
+                        <option value="pin">Pin (Fixed X & Y)</option>
+                        <option value="roller-x">Horizontal Roller (Fixed Y only)</option>
+                        <option value="roller-y">Vertical Roller (Fixed X only)</option>
+                    </select>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">
+                        <strong>Pin:</strong> Prevents movement in X and Y directions<br>
+                        <strong>Horizontal Roller:</strong> Prevents vertical movement (Y) only<br>
+                        <strong>Vertical Roller:</strong> Prevents horizontal movement (X) only
+                    </p>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="apply-node-changes" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">Apply Changes</button>
+                <button id="close-node-editor" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">Close</button>
+            </div>
+        </div>
 
         <!-- Results Panel -->
         <div class="results-panel">
             <p><strong>Maximum Tension:</strong> <span id="max-tension">0</span> kN</p>
             <p><strong>Maximum Compression:</strong> <span id="max-compression">0</span> kN</p>
+            <p><strong>Status:</strong> <span id="solver-status">Click nodes to set forces and constraints</span></p>
         </div>
 
         <!-- Legend -->
@@ -137,6 +156,10 @@
             <div class="legend-item">
                 <div class="legend-color" style="background-color: black;"></div>
                 <span>Zero Force</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #28a745;"></div>
+                <span>Selected Node</span>
             </div>
         </div>
     </div>
@@ -354,179 +377,562 @@
 
     <!-- Page-specific JavaScript -->
     <script>
-        // Truss simulation using p5.js
-        let sketch = new p5(function(p) {
-            let load = 20; // kN
-            let span = 8; // m
-            let height = 2; // m
-            let scale = 40; // pixels per meter
+        // Global variables for node editor
+        let selectedNodeIndex = -1;
+        let fbdSketch = null;
 
-            // Truss geometry
+        // Main truss simulation using p5.js
+        let sketch = new p5(function(p) {
+            const numSpans = 5;
+            const spanLength = 1.5; // meters
+            const trussHeight = 1.5; // meters
+            const scale = 60; // pixels per meter
+
+            // Truss data
             let nodes = [];
             let members = [];
             let memberForces = [];
+            let isSolved = false;
 
             p.setup = function() {
-                let canvasWidth = Math.min(800, p.windowWidth - 40);
-                p.createCanvas(canvasWidth, 400);
-                setupControls();
-                calculateTruss();
+                let canvasWidth = Math.min(900, p.windowWidth - 40);
+                p.createCanvas(canvasWidth, 500);
+                initializeTruss();
+                setupNodeEditor();
             };
 
             p.draw = function() {
                 p.background(240);
-                p.translate(50, 300);
+                p.translate(50, 350);
 
-                // Draw supports
-                drawSupports();
-
-                // Draw members
+                // Draw members first (behind nodes)
                 drawMembers();
 
-                // Draw nodes
+                // Draw supports and nodes
+                drawSupports();
                 drawNodes();
 
-                // Draw load
-                drawLoad();
+                // Draw applied forces
+                drawAppliedForces();
             };
 
-            function setupControls() {
-                document.getElementById("load").addEventListener("input", function() {
-                    load = parseFloat(this.value);
-                    document.getElementById("load-value").textContent = load;
-                    calculateTruss();
-                });
+            p.mousePressed = function() {
+                // Check if a node was clicked
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+                    let screenX = node.x * scale;
+                    let screenY = node.y * scale;
+                    let dx = p.mouseX - 50 - screenX;
+                    let dy = p.mouseY - 350 - screenY;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
 
-                document.getElementById("span").addEventListener("input", function() {
-                    span = parseFloat(this.value);
-                    document.getElementById("span-value").textContent = span;
-                    calculateTruss();
-                });
+                    if (dist < 15) {
+                        openNodeEditor(i);
+                        return;
+                    }
+                }
+            };
+
+            function initializeTruss() {
+                nodes = [];
+                members = [];
+
+                // Create Warren truss nodes
+                // Bottom chord nodes
+                for (let i = 0; i <= numSpans; i++) {
+                    nodes.push({
+                        x: i * spanLength,
+                        y: 0,
+                        fx: 0,
+                        fy: 0,
+                        constraint: i === 0 ? 'pin' : (i === numSpans ? 'roller-x' : 'none')
+                    });
+                }
+
+                // Top chord nodes (between bottom nodes)
+                for (let i = 0; i < numSpans; i++) {
+                    nodes.push({
+                        x: (i + 0.5) * spanLength,
+                        y: -trussHeight,
+                        fx: 0,
+                        fy: i === Math.floor(numSpans / 2) ? -10 : 0, // Apply 10 kN downward at center
+                        constraint: 'none'
+                    });
+                }
+
+                // Create members
+                // Bottom chord
+                for (let i = 0; i < numSpans; i++) {
+                    members.push({start: i, end: i + 1});
+                }
+
+                // Diagonals and top chord
+                for (let i = 0; i < numSpans; i++) {
+                    let topNodeIndex = numSpans + 1 + i;
+                    // Left diagonal
+                    members.push({start: i, end: topNodeIndex});
+                    // Right diagonal
+                    members.push({start: i + 1, end: topNodeIndex});
+                }
+
+                // Top chord
+                for (let i = 0; i < numSpans - 1; i++) {
+                    let topNodeIndex = numSpans + 1 + i;
+                    members.push({start: topNodeIndex, end: topNodeIndex + 1});
+                }
+
+                solveTruss();
             }
 
-            function calculateTruss() {
-                // Simple Warren truss with center load
-                nodes = [
-                    {x: 0, y: 0},           // 0: left support
-                    {x: span/2, y: -height}, // 1: center top
-                    {x: span, y: 0}          // 2: right support
-                ];
+            function solveTruss() {
+                // Build global equilibrium matrix using method of joints
+                const numNodes = nodes.length;
+                const numMembers = members.length;
 
-                // Calculate member forces
-                // For a simple 3-node Warren truss with center load
-                let theta = Math.atan2(height, span/2);
-                let diagonalForce = load / (2 * Math.sin(theta));
-                let horizontalForce = diagonalForce * Math.cos(theta);
+                // Count degrees of freedom
+                let dofCount = 0;
+                let dofMap = []; // Maps node and direction to equation number
 
-                memberForces = [
-                    -diagonalForce,  // Member 0-1 (compression)
-                    -diagonalForce,  // Member 1-2 (compression)
-                    horizontalForce  // Member 0-2 (tension)
-                ];
+                for (let i = 0; i < numNodes; i++) {
+                    let node = nodes[i];
+                    if (node.constraint === 'pin') {
+                        dofMap.push(-1, -1); // Both constrained
+                    } else if (node.constraint === 'roller-x') {
+                        dofMap.push(-1, dofCount++); // X constrained, Y free
+                    } else if (node.constraint === 'roller-y') {
+                        dofMap.push(dofCount++, -1); // X free, Y constrained
+                    } else {
+                        dofMap.push(dofCount++, dofCount++); // Both free
+                    }
+                }
 
-                members = [
-                    {start: 0, end: 1, force: memberForces[0]},
-                    {start: 1, end: 2, force: memberForces[1]},
-                    {start: 0, end: 2, force: memberForces[2]}
-                ];
+                const numEquations = dofCount;
+                if (numEquations === 0) {
+                    memberForces = members.map(() => 0);
+                    isSolved = true;
+                    updateResults();
+                    return;
+                }
+
+                // Build coefficient matrix and force vector
+                let A = Array(numEquations).fill(0).map(() => Array(numEquations).fill(0));
+                let b = Array(numEquations).fill(0);
+
+                // For each member, add its contribution to the equilibrium equations
+                for (let m = 0; m < numMembers; m++) {
+                    let member = members[m];
+                    let n1 = nodes[member.start];
+                    let n2 = nodes[member.end];
+
+                    let dx = n2.x - n1.x;
+                    let dy = n2.y - n1.y;
+                    let length = Math.sqrt(dx * dx + dy * dy);
+                    let cosTheta = dx / length;
+                    let sinTheta = dy / length;
+
+                    // Node 1 equilibrium (force from member is in direction n1->n2)
+                    let eqX1 = dofMap[member.start * 2];
+                    let eqY1 = dofMap[member.start * 2 + 1];
+                    if (eqX1 >= 0) A[eqX1][m] = cosTheta;
+                    if (eqY1 >= 0) A[eqY1][m] = sinTheta;
+
+                    // Node 2 equilibrium (force from member is in direction n2->n1)
+                    let eqX2 = dofMap[member.end * 2];
+                    let eqY2 = dofMap[member.end * 2 + 1];
+                    if (eqX2 >= 0) A[eqX2][m] = -cosTheta;
+                    if (eqY2 >= 0) A[eqY2][m] = -sinTheta;
+                }
+
+                // Add applied forces to right-hand side
+                for (let i = 0; i < numNodes; i++) {
+                    let node = nodes[i];
+                    let eqX = dofMap[i * 2];
+                    let eqY = dofMap[i * 2 + 1];
+                    if (eqX >= 0) b[eqX] = -node.fx;
+                    if (eqY >= 0) b[eqY] = -node.fy;
+                }
+
+                // Check if system is determined
+                if (numEquations !== numMembers) {
+                    memberForces = members.map(() => 0);
+                    isSolved = false;
+                    document.getElementById('solver-status').textContent =
+                        `System indeterminate: ${numEquations} equations, ${numMembers} members`;
+                    updateResults();
+                    return;
+                }
+
+                // Solve using Gaussian elimination
+                try {
+                    memberForces = gaussianElimination(A, b);
+                    isSolved = true;
+                    document.getElementById('solver-status').textContent = 'Solved successfully';
+                } catch (e) {
+                    memberForces = members.map(() => 0);
+                    isSolved = false;
+                    document.getElementById('solver-status').textContent = 'Solution failed: ' + e.message;
+                }
 
                 updateResults();
             }
 
-            function drawSupports() {
-                // Left pin support
-                p.fill(100);
-                p.noStroke();
-                p.triangle(
-                    nodes[0].x * scale - 10, nodes[0].y * scale,
-                    nodes[0].x * scale + 10, nodes[0].y * scale,
-                    nodes[0].x * scale, nodes[0].y * scale + 15
-                );
+            function gaussianElimination(A, b) {
+                const n = A.length;
+                let augmented = A.map((row, i) => [...row, b[i]]);
 
-                // Right roller support
-                p.triangle(
-                    nodes[2].x * scale - 10, nodes[2].y * scale,
-                    nodes[2].x * scale + 10, nodes[2].y * scale,
-                    nodes[2].x * scale, nodes[2].y * scale + 15
-                );
-                p.ellipse(nodes[2].x * scale, nodes[2].y * scale + 20, 10, 10);
+                // Forward elimination
+                for (let i = 0; i < n; i++) {
+                    // Find pivot
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+                            maxRow = k;
+                        }
+                    }
+
+                    // Swap rows
+                    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+
+                    // Check for singular matrix
+                    if (Math.abs(augmented[i][i]) < 1e-10) {
+                        throw new Error('Singular matrix');
+                    }
+
+                    // Eliminate column
+                    for (let k = i + 1; k < n; k++) {
+                        let factor = augmented[k][i] / augmented[i][i];
+                        for (let j = i; j <= n; j++) {
+                            augmented[k][j] -= factor * augmented[i][j];
+                        }
+                    }
+                }
+
+                // Back substitution
+                let x = Array(n).fill(0);
+                for (let i = n - 1; i >= 0; i--) {
+                    x[i] = augmented[i][n];
+                    for (let j = i + 1; j < n; j++) {
+                        x[i] -= augmented[i][j] * x[j];
+                    }
+                    x[i] /= augmented[i][i];
+                }
+
+                return x;
             }
 
             function drawMembers() {
-                for (let member of members) {
-                    let startNode = nodes[member.start];
-                    let endNode = nodes[member.end];
+                if (!isSolved) return;
 
-                    // Color based on tension/compression
-                    if (Math.abs(member.force) < 0.1) {
+                let maxForce = Math.max(...memberForces.map(f => Math.abs(f)), 1);
+
+                for (let i = 0; i < members.length; i++) {
+                    let member = members[i];
+                    let force = memberForces[i];
+                    let n1 = nodes[member.start];
+                    let n2 = nodes[member.end];
+
+                    // Color and thickness based on force
+                    if (Math.abs(force) < 0.1) {
                         p.stroke(0);
                         p.strokeWeight(2);
-                    } else if (member.force > 0) {
+                    } else if (force > 0) {
                         p.stroke(255, 0, 0); // Tension - red
-                        p.strokeWeight(p.map(Math.abs(member.force), 0, load * 2, 2, 8));
+                        p.strokeWeight(p.map(Math.abs(force), 0, maxForce, 2, 10));
                     } else {
                         p.stroke(0, 0, 255); // Compression - blue
-                        p.strokeWeight(p.map(Math.abs(member.force), 0, load * 2, 2, 8));
+                        p.strokeWeight(p.map(Math.abs(force), 0, maxForce, 2, 10));
                     }
 
-                    p.line(
-                        startNode.x * scale, startNode.y * scale,
-                        endNode.x * scale, endNode.y * scale
-                    );
+                    p.line(n1.x * scale, n1.y * scale, n2.x * scale, n2.y * scale);
 
-                    // Draw force magnitude
-                    let midX = (startNode.x + endNode.x) / 2 * scale;
-                    let midY = (startNode.y + endNode.y) / 2 * scale;
-                    p.noStroke();
-                    p.fill(0);
-                    p.textAlign(p.CENTER);
-                    p.textSize(10);
-                    p.text(Math.abs(member.force).toFixed(1) + " kN", midX, midY - 5);
+                    // Draw force magnitude at midpoint
+                    if (Math.abs(force) > 0.1) {
+                        let midX = (n1.x + n2.x) / 2 * scale;
+                        let midY = (n1.y + n2.y) / 2 * scale;
+                        p.noStroke();
+                        p.fill(0);
+                        p.textAlign(p.CENTER, p.CENTER);
+                        p.textSize(10);
+                        p.text(Math.abs(force).toFixed(1), midX, midY - 8);
+                    }
                 }
             }
 
             function drawNodes() {
-                p.fill(0);
-                p.noStroke();
-                for (let node of nodes) {
-                    p.ellipse(node.x * scale, node.y * scale, 8, 8);
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+
+                    // Highlight selected node
+                    if (i === selectedNodeIndex) {
+                        p.fill(40, 167, 69); // Green
+                        p.noStroke();
+                        p.ellipse(node.x * scale, node.y * scale, 20, 20);
+                    }
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.ellipse(node.x * scale, node.y * scale, 10, 10);
+
+                    // Draw node number
+                    p.fill(100);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(10);
+                    p.text(i, node.x * scale, node.y * scale + 20);
                 }
             }
 
-            function drawLoad() {
-                // Draw load arrow at center top
-                let centerNode = nodes[1];
+            function drawSupports() {
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+                    if (node.constraint === 'pin') {
+                        p.fill(100);
+                        p.noStroke();
+                        p.triangle(
+                            node.x * scale - 12, node.y * scale,
+                            node.x * scale + 12, node.y * scale,
+                            node.x * scale, node.y * scale + 18
+                        );
+                    } else if (node.constraint === 'roller-x') {
+                        p.fill(100);
+                        p.noStroke();
+                        p.triangle(
+                            node.x * scale - 12, node.y * scale,
+                            node.x * scale + 12, node.y * scale,
+                            node.x * scale, node.y * scale + 18
+                        );
+                        p.ellipse(node.x * scale, node.y * scale + 23, 10, 10);
+                    } else if (node.constraint === 'roller-y') {
+                        p.fill(100);
+                        p.noStroke();
+                        p.triangle(
+                            node.x * scale, node.y * scale - 12,
+                            node.x * scale, node.y * scale + 12,
+                            node.x * scale - 18, node.y * scale
+                        );
+                        p.ellipse(node.x * scale - 23, node.y * scale, 10, 10);
+                    }
+                }
+            }
+
+            function drawAppliedForces() {
+                for (let node of nodes) {
+                    if (Math.abs(node.fx) > 0.01) {
+                        drawForceArrow(node.x * scale, node.y * scale, node.fx, 0);
+                    }
+                    if (Math.abs(node.fy) > 0.01) {
+                        drawForceArrow(node.x * scale, node.y * scale, 0, node.fy);
+                    }
+                }
+            }
+
+            function drawForceArrow(x, y, fx, fy) {
                 p.stroke(255, 150, 0);
                 p.strokeWeight(3);
                 p.fill(255, 150, 0);
 
+                let arrowLen = 40;
+                let mag = Math.sqrt(fx * fx + fy * fy);
+                let dx = fx / mag * arrowLen;
+                let dy = fy / mag * arrowLen;
+
                 // Arrow line
-                p.line(
-                    centerNode.x * scale, centerNode.y * scale - 40,
-                    centerNode.x * scale, centerNode.y * scale
-                );
+                p.line(x - dx, y - dy, x, y);
 
                 // Arrow head
-                p.triangle(
-                    centerNode.x * scale, centerNode.y * scale,
-                    centerNode.x * scale - 5, centerNode.y * scale - 10,
-                    centerNode.x * scale + 5, centerNode.y * scale - 10
-                );
+                let angle = Math.atan2(dy, dx);
+                p.push();
+                p.translate(x, y);
+                p.rotate(angle);
+                p.triangle(0, 0, -10, -5, -10, 5);
+                p.pop();
 
-                // Load label
+                // Label
                 p.noStroke();
                 p.fill(0);
                 p.textAlign(p.CENTER);
-                p.text(load + " kN", centerNode.x * scale, centerNode.y * scale - 45);
+                p.textSize(11);
+                p.text(mag.toFixed(1) + " kN", x - dx - 15 * Math.cos(angle), y - dy - 15 * Math.sin(angle));
             }
 
             function updateResults() {
-                let maxTension = Math.max(...memberForces.filter(f => f > 0), 0);
-                let maxCompression = Math.min(...memberForces.filter(f => f < 0), 0);
+                let maxTension = 0;
+                let maxCompression = 0;
+
+                for (let force of memberForces) {
+                    if (force > maxTension) maxTension = force;
+                    if (force < maxCompression) maxCompression = force;
+                }
 
                 document.getElementById("max-tension").textContent = maxTension.toFixed(2);
                 document.getElementById("max-compression").textContent = Math.abs(maxCompression).toFixed(2);
             }
+
+            function openNodeEditor(nodeIndex) {
+                selectedNodeIndex = nodeIndex;
+                let node = nodes[nodeIndex];
+
+                document.getElementById('selected-node-id').textContent = nodeIndex;
+                document.getElementById('force-x').value = node.fx;
+                document.getElementById('force-y').value = node.fy;
+                document.getElementById('constraint-type').value = node.constraint;
+                document.getElementById('node-editor').style.display = 'block';
+
+                // Create free body diagram
+                createFBD(nodeIndex);
+            }
+
+            function closeNodeEditor() {
+                selectedNodeIndex = -1;
+                document.getElementById('node-editor').style.display = 'none';
+                if (fbdSketch) {
+                    fbdSketch.remove();
+                    fbdSketch = null;
+                }
+            }
+
+            function applyNodeChanges() {
+                if (selectedNodeIndex >= 0) {
+                    let node = nodes[selectedNodeIndex];
+                    node.fx = parseFloat(document.getElementById('force-x').value) || 0;
+                    node.fy = parseFloat(document.getElementById('force-y').value) || 0;
+                    node.constraint = document.getElementById('constraint-type').value;
+
+                    solveTruss();
+                    createFBD(selectedNodeIndex); // Update FBD
+                }
+            }
+
+            function createFBD(nodeIndex) {
+                if (fbdSketch) {
+                    fbdSketch.remove();
+                }
+
+                fbdSketch = new p5(function(fbd) {
+                    fbd.setup = function() {
+                        fbd.createCanvas(560, 300).parent('fbd-holder');
+                    };
+
+                    fbd.draw = function() {
+                        fbd.background(249);
+                        fbd.translate(280, 150);
+
+                        let node = nodes[nodeIndex];
+
+                        // Draw central node
+                        fbd.fill(40, 167, 69);
+                        fbd.noStroke();
+                        fbd.ellipse(0, 0, 20, 20);
+                        fbd.fill(0);
+                        fbd.textAlign(fbd.CENTER, fbd.CENTER);
+                        fbd.textSize(12);
+                        fbd.text("Node " + nodeIndex, 0, -30);
+
+                        // Find all members connected to this node
+                        let connectedMembers = [];
+                        for (let i = 0; i < members.length; i++) {
+                            if (members[i].start === nodeIndex || members[i].end === nodeIndex) {
+                                connectedMembers.push({index: i, member: members[i]});
+                            }
+                        }
+
+                        // Draw member forces
+                        for (let cm of connectedMembers) {
+                            let member = cm.member;
+                            let force = isSolved ? memberForces[cm.index] : 0;
+                            let otherNodeIndex = member.start === nodeIndex ? member.end : member.start;
+                            let otherNode = nodes[otherNodeIndex];
+
+                            let dx = otherNode.x - node.x;
+                            let dy = otherNode.y - node.y;
+                            let angle = Math.atan2(dy, dx);
+
+                            // Force acts on this node in direction away from node (tension) or toward node (compression)
+                            let arrowLen = 60;
+                            let arrowDx = arrowLen * Math.cos(angle);
+                            let arrowDy = arrowLen * Math.sin(angle);
+
+                            // If compression, reverse direction
+                            if (force < 0) {
+                                arrowDx = -arrowDx;
+                                arrowDy = -arrowDy;
+                            }
+
+                            // Draw arrow
+                            fbd.stroke(force > 0 ? fbd.color(255, 0, 0) : (force < 0 ? fbd.color(0, 0, 255) : fbd.color(0)));
+                            fbd.strokeWeight(3);
+                            fbd.line(0, 0, arrowDx, arrowDy);
+
+                            // Arrow head
+                            fbd.fill(force > 0 ? fbd.color(255, 0, 0) : (force < 0 ? fbd.color(0, 0, 255) : fbd.color(0)));
+                            fbd.push();
+                            fbd.translate(arrowDx, arrowDy);
+                            fbd.rotate(Math.atan2(arrowDy, arrowDx));
+                            fbd.triangle(0, 0, -10, -5, -10, 5);
+                            fbd.pop();
+
+                            // Label
+                            fbd.noStroke();
+                            fbd.fill(0);
+                            fbd.textSize(11);
+                            let labelX = arrowDx * 0.7;
+                            let labelY = arrowDy * 0.7 - 12;
+                            fbd.text("F" + cm.index + " = " + Math.abs(force).toFixed(1) + " kN", labelX, labelY);
+                            fbd.text(force > 0 ? "(T)" : (force < 0 ? "(C)" : ""), labelX, labelY + 12);
+                        }
+
+                        // Draw applied forces
+                        if (Math.abs(node.fx) > 0.01 || Math.abs(node.fy) > 0.01) {
+                            let mag = Math.sqrt(node.fx * node.fx + node.fy * node.fy);
+                            let angle = Math.atan2(node.fy, node.fx);
+                            let arrowLen = 70;
+                            let arrowDx = arrowLen * Math.cos(angle);
+                            let arrowDy = arrowLen * Math.sin(angle);
+
+                            fbd.stroke(255, 150, 0);
+                            fbd.strokeWeight(3);
+                            fbd.line(0, 0, arrowDx, arrowDy);
+
+                            fbd.fill(255, 150, 0);
+                            fbd.push();
+                            fbd.translate(arrowDx, arrowDy);
+                            fbd.rotate(angle);
+                            fbd.triangle(0, 0, -10, -5, -10, 5);
+                            fbd.pop();
+
+                            fbd.noStroke();
+                            fbd.fill(0);
+                            fbd.textSize(11);
+                            fbd.text("Applied: " + mag.toFixed(1) + " kN", arrowDx * 0.7, arrowDy * 0.7 + 15);
+                        }
+
+                        // Draw reaction forces if constrained
+                        if (node.constraint !== 'none') {
+                            fbd.fill(100);
+                            fbd.textSize(11);
+                            fbd.textAlign(fbd.CENTER);
+                            let labelY = 100;
+                            if (node.constraint === 'pin') {
+                                fbd.text("Pin support: Rx and Ry reactions", 0, labelY);
+                            } else if (node.constraint === 'roller-x') {
+                                fbd.text("Horizontal roller: Ry reaction only", 0, labelY);
+                            } else if (node.constraint === 'roller-y') {
+                                fbd.text("Vertical roller: Rx reaction only", 0, labelY);
+                            }
+                        }
+                    };
+                }, 'fbd-holder');
+            }
+
+            function setupNodeEditor() {
+                document.getElementById('close-node-editor').addEventListener('click', closeNodeEditor);
+                document.getElementById('apply-node-changes').addEventListener('click', applyNodeChanges);
+            }
+
+            // Expose functions for external use
+            window.trussSketch = {
+                closeNodeEditor: closeNodeEditor,
+                applyNodeChanges: applyNodeChanges
+            };
 
         }, 'sketch-holder');
 
@@ -540,39 +946,10 @@
                 q5: 'b'
             };
 
-            let score = 0;
-            let totalQuestions = Object.keys(answers).length;
-            let resultsHTML = '<h3>Quiz Results:</h3>';
-
-            for (let question in answers) {
-                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
-                const correctAnswer = answers[question];
-
-                if (selectedOption) {
-                    if (selectedOption.value === correctAnswer) {
-                        score++;
-                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
-                    } else {
-                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
-                    }
-                } else {
-                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
-                }
-            }
-
-            const percentage = ((score / totalQuestions) * 100).toFixed(0);
-            let feedback = "";
-            if (percentage >= 80) {
-                feedback = "Excellent work! You have a strong understanding of truss analysis.";
-            } else if (percentage >= 60) {
-                feedback = "Good job! Review the concepts you missed to strengthen your understanding.";
-            } else {
-                feedback = "Keep studying! Review the lecture content and try the practice problems again.";
-            }
-
-            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p><p>${feedback}</p>` + resultsHTML;
-
-            document.getElementById('quiz-results').innerHTML = resultsHTML;
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
         });
     </script>
 </body>

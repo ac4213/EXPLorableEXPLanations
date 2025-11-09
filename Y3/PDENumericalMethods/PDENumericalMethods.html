@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDE Numerical Methods - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Partial Differential Equations and Numerical Methods</h1>
+        <p class="subtitle">Solving PDEs Using Finite Difference Methods</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Partial Differential Equations</h2>
+
+        <h3>What are PDEs?</h3>
+        <p>Partial Differential Equations (PDEs) describe phenomena involving multiple independent variables and their rates of change. They are fundamental to engineering physics, including heat transfer, wave propagation, and fluid dynamics.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> PDEs govern continuous processes in space and time. Since analytical solutions exist only for simple cases, numerical methods like finite differences, finite elements, and finite volumes are essential for solving real engineering problems.</p>
+        </div>
+
+        <h3>Classification of PDEs</h3>
+        <p>PDEs are classified into three main types based on their mathematical properties:</p>
+
+        <div class="equation-box">
+            <p><strong>Parabolic:</strong> Heat/Diffusion Equation</p>
+            <p>\[\frac{\partial u}{\partial t} = \alpha \frac{\partial^2 u}{\partial x^2}\]</p>
+            <p>Examples: heat conduction, mass diffusion</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Hyperbolic:</strong> Wave Equation</p>
+            <p>\[\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}\]</p>
+            <p>Examples: mechanical vibrations, acoustic waves, electromagnetic waves</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Elliptic:</strong> Laplace/Poisson Equation</p>
+            <p>\[\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = f(x,y)\]</p>
+            <p>Examples: steady-state heat conduction, electrostatics, potential flow</p>
+        </div>
+
+        <h3>Finite Difference Method</h3>
+        <p>The finite difference method approximates derivatives using discrete grid points. For the heat equation, we discretize space and time:</p>
+
+        <div class="equation-box">
+            <p><strong>Spatial Discretization:</strong> Central difference for second derivative</p>
+            <p>\[\frac{\partial^2 u}{\partial x^2} \approx \frac{u_{i+1}^n - 2u_i^n + u_{i-1}^n}{\Delta x^2}\]</p>
+            <p><strong>Temporal Discretization:</strong> Forward difference for time derivative</p>
+            <p>\[\frac{\partial u}{\partial t} \approx \frac{u_i^{n+1} - u_i^n}{\Delta t}\]</p>
+        </div>
+
+        <h3>Explicit vs Implicit Methods</h3>
+        <p>Two main approaches exist for solving the discretized equations:</p>
+
+        <div class="equation-box">
+            <p><strong>Explicit Method (FTCS - Forward Time, Central Space):</strong></p>
+            <p>\[u_i^{n+1} = u_i^n + \frac{\alpha \Delta t}{\Delta x^2}(u_{i+1}^n - 2u_i^n + u_{i-1}^n)\]</p>
+            <p>Simple to implement, but requires stability condition:</p>
+            <p>\[r = \frac{\alpha \Delta t}{\Delta x^2} \leq \frac{1}{2}\]</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Implicit Method (Crank-Nicolson):</strong></p>
+            <p>\[u_i^{n+1} - \frac{r}{2}(u_{i+1}^{n+1} - 2u_i^{n+1} + u_{i-1}^{n+1}) = u_i^n + \frac{r}{2}(u_{i+1}^n - 2u_i^n + u_{i-1}^n)\]</p>
+            <p>Unconditionally stable but requires solving a system of equations at each time step.</p>
+        </div>
+
+        <h3>Stability: CFL Condition</h3>
+        <p>The Courant-Friedrichs-Lewy (CFL) condition ensures numerical stability:</p>
+
+        <div class="equation-box">
+            <p><strong>For Heat Equation (Parabolic):</strong></p>
+            <p>\[r = \frac{\alpha \Delta t}{\Delta x^2} \leq \frac{1}{2} \quad \text{(explicit method)}\]</p>
+            <p><strong>For Wave Equation (Hyperbolic):</strong></p>
+            <p>\[CFL = \frac{c \Delta t}{\Delta x} \leq 1\]</p>
+            <p>These conditions ensure that the numerical domain of dependence includes the physical domain of dependence.</p>
+        </div>
+
+        <h3>Accuracy and Convergence</h3>
+        <div class="key-point">
+            <p><strong>Truncation Error:</strong> The error introduced by approximating derivatives with finite differences. For central difference in space and forward in time: O(Δt) + O(Δx²)</p>
+            <p><strong>Convergence:</strong> As Δx → 0 and Δt → 0, the numerical solution approaches the exact solution, provided the stability condition is satisfied.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Heat Equation Solver</h2>
+        <p>This simulation solves the 1D heat equation using the explicit finite difference method. Watch how heat diffuses from the initial temperature distribution over time.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="thermal-diff">Thermal Diffusivity α (m²/s): <span id="thermal-diff-value">0.001</span></label>
+                <input type="range" id="thermal-diff" min="0.0001" max="0.01" step="0.0001" value="0.001">
+            </div>
+
+            <div class="control-group">
+                <label for="grid-points">Number of Grid Points: <span id="grid-points-value">50</span></label>
+                <input type="range" id="grid-points" min="20" max="100" step="10" value="50">
+            </div>
+
+            <div class="control-group">
+                <label for="initial-shape">Initial Temperature Profile:</label>
+                <select id="initial-shape">
+                    <option value="gaussian">Gaussian Pulse</option>
+                    <option value="step">Step Function</option>
+                    <option value="sine">Sine Wave</option>
+                    <option value="double">Double Peak</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button id="reset-btn">Reset Simulation</button>
+                <button id="pause-btn">Pause</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <h3 style="margin-top: 0;">Simulation Parameters:</h3>
+            <p><strong>Time:</strong> <span id="time-display">0.00</span> s</p>
+            <p><strong>Stability Parameter r:</strong> <span id="stability-display">0.20</span></p>
+            <p><strong>Status:</strong> <span id="status-display">Stable (r ≤ 0.5)</span></p>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            let alpha = 0.001;      // Thermal diffusivity (m²/s)
+            let L = 1.0;            // Domain length (m)
+            let nx = 50;            // Number of grid points
+            let dx = L / (nx - 1);  // Spatial step
+            let dt = 0.01;          // Time step (s)
+            let t = 0;              // Current time
+            let r;                  // Stability parameter
+
+            let u = [];             // Temperature array
+            let u_new = [];         // Updated temperature array
+            let x = [];             // Spatial coordinates
+
+            let isPaused = false;
+            let initialShape = 'gaussian';
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 600);
+                canvas.parent('sketch-holder');
+
+                initializeSimulation();
+                setupControls();
+            };
+
+            function initializeSimulation() {
+                nx = parseInt(document.getElementById('grid-points').value);
+                dx = L / (nx - 1);
+
+                // Calculate stable time step
+                dt = 0.4 * dx * dx / alpha;  // r = 0.4 < 0.5
+                r = alpha * dt / (dx * dx);
+
+                // Initialize arrays
+                x = [];
+                u = [];
+                u_new = [];
+
+                for (let i = 0; i < nx; i++) {
+                    x[i] = i * dx;
+                    u[i] = getInitialTemperature(x[i]);
+                    u_new[i] = u[i];
+                }
+
+                t = 0;
+                updateDisplay();
+            }
+
+            function getInitialTemperature(xi) {
+                let xc = L / 2;
+
+                switch(initialShape) {
+                    case 'gaussian':
+                        return 100 * Math.exp(-200 * (xi - xc) * (xi - xc));
+                    case 'step':
+                        return (xi < xc) ? 100 : 0;
+                    case 'sine':
+                        return 50 * (1 + Math.sin(4 * Math.PI * xi / L));
+                    case 'double':
+                        return 100 * (Math.exp(-500 * (xi - 0.3) * (xi - 0.3)) +
+                                     Math.exp(-500 * (xi - 0.7) * (xi - 0.7)));
+                    default:
+                        return 0;
+                }
+            }
+
+            function setupControls() {
+                document.getElementById('thermal-diff').addEventListener('input', function() {
+                    alpha = parseFloat(this.value);
+                    document.getElementById('thermal-diff-value').textContent = alpha.toFixed(4);
+                    initializeSimulation();
+                });
+
+                document.getElementById('grid-points').addEventListener('input', function() {
+                    document.getElementById('grid-points-value').textContent = this.value;
+                    initializeSimulation();
+                });
+
+                document.getElementById('initial-shape').addEventListener('change', function() {
+                    initialShape = this.value;
+                    initializeSimulation();
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    initializeSimulation();
+                });
+
+                document.getElementById('pause-btn').addEventListener('click', function() {
+                    isPaused = !isPaused;
+                    this.textContent = isPaused ? 'Resume' : 'Pause';
+                });
+            }
+
+            function updateDisplay() {
+                document.getElementById('time-display').textContent = t.toFixed(3);
+                document.getElementById('stability-display').textContent = r.toFixed(3);
+
+                let status = r <= 0.5 ? 'Stable (r ≤ 0.5)' : 'UNSTABLE (r > 0.5)';
+                let color = r <= 0.5 ? 'green' : 'red';
+                document.getElementById('status-display').innerHTML =
+                    `<span style="color: ${color}; font-weight: bold;">${status}</span>`;
+            }
+
+            p.draw = function() {
+                p.background(255);
+
+                if (!isPaused) {
+                    // Explicit finite difference update
+                    for (let i = 1; i < nx - 1; i++) {
+                        u_new[i] = u[i] + r * (u[i+1] - 2*u[i] + u[i-1]);
+                    }
+                    // Boundary conditions: u[0] = 0, u[nx-1] = 0
+                    u_new[0] = 0;
+                    u_new[nx-1] = 0;
+
+                    // Update temperature array
+                    for (let i = 0; i < nx; i++) {
+                        u[i] = u_new[i];
+                    }
+
+                    t += dt;
+                    updateDisplay();
+                }
+
+                // Draw temperature profile
+                drawTemperatureProfile();
+
+                // Draw 2D heat map
+                drawHeatMap();
+            };
+
+            function drawTemperatureProfile() {
+                let plotX = 50;
+                let plotY = 50;
+                let plotW = 800;
+                let plotH = 250;
+
+                p.push();
+                p.translate(plotX, plotY);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(16);
+                p.textAlign(p.CENTER);
+                p.text('Temperature Distribution T(x,t)', plotW/2, -20);
+
+                // Background
+                p.fill(245);
+                p.rect(0, 0, plotW, plotH);
+
+                // Grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xpos = i * plotW / 10;
+                    p.line(xpos, 0, xpos, plotH);
+
+                    let ypos = i * plotH / 10;
+                    p.line(0, ypos, plotW, ypos);
+                }
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(0, plotH, plotW, plotH);
+                p.line(0, 0, 0, plotH);
+
+                // Y-axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.RIGHT);
+                for (let i = 0; i <= 5; i++) {
+                    let ypos = p.map(i, 0, 5, plotH, 0);
+                    let temp = i * 20;
+                    p.text(temp + '°C', -5, ypos + 4);
+                }
+
+                // X-axis labels
+                p.textAlign(p.CENTER);
+                for (let i = 0; i <= 5; i++) {
+                    let xpos = i * plotW / 5;
+                    let pos = (i / 5 * L).toFixed(2);
+                    p.text(pos + ' m', xpos, plotH + 20);
+                }
+
+                // Plot temperature profile
+                p.noFill();
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.beginShape();
+                for (let i = 0; i < nx; i++) {
+                    let px = p.map(x[i], 0, L, 0, plotW);
+                    let py = p.map(u[i], 0, 100, plotH, 0);
+                    p.vertex(px, py);
+                }
+                p.endShape();
+
+                // Points
+                p.fill(255, 0, 0);
+                p.noStroke();
+                for (let i = 0; i < nx; i += Math.max(1, Math.floor(nx/20))) {
+                    let px = p.map(x[i], 0, L, 0, plotW);
+                    let py = p.map(u[i], 0, 100, plotH, 0);
+                    p.circle(px, py, 6);
+                }
+
+                p.pop();
+            }
+
+            function drawHeatMap() {
+                let mapX = 50;
+                let mapY = 370;
+                let mapW = 800;
+                let mapH = 150;
+
+                p.push();
+                p.translate(mapX, mapY);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(16);
+                p.textAlign(p.CENTER);
+                p.text('Temperature Heat Map (Time Evolution)', mapW/2, -20);
+
+                // Draw heat map
+                let cellW = mapW / nx;
+                for (let i = 0; i < nx; i++) {
+                    let temp = u[i];
+                    let colorVal = p.map(temp, 0, 100, 0, 255);
+                    p.fill(colorVal, 50, 255 - colorVal);
+                    p.noStroke();
+                    p.rect(i * cellW, 0, cellW, mapH);
+                }
+
+                // Border
+                p.noFill();
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(0, 0, mapW, mapH);
+
+                // Color scale
+                let scaleY = mapH + 30;
+                let scaleW = 200;
+                let scaleH = 20;
+                let scaleX = (mapW - scaleW) / 2;
+
+                for (let i = 0; i < scaleW; i++) {
+                    let temp = p.map(i, 0, scaleW, 0, 100);
+                    let colorVal = p.map(temp, 0, 100, 0, 255);
+                    p.fill(colorVal, 50, 255 - colorVal);
+                    p.noStroke();
+                    p.rect(scaleX + i, scaleY, 1, scaleH);
+                }
+
+                p.noFill();
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(scaleX, scaleY, scaleW, scaleH);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.LEFT);
+                p.text('0°C', scaleX, scaleY + scaleH + 15);
+                p.textAlign(p.RIGHT);
+                p.text('100°C', scaleX + scaleW, scaleY + scaleH + 15);
+
+                p.pop();
+            }
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Numerical methods for PDEs are essential across all engineering disciplines:</p>
+        <ul>
+            <li><strong>Heat Transfer:</strong> Thermal analysis of engines, electronic cooling, building HVAC design, and heat exchangers all require solving the heat equation numerically.</li>
+            <li><strong>Structural Analysis:</strong> Wave propagation in structures during impacts, earthquake response of buildings, and vibration analysis use hyperbolic PDE solvers.</li>
+            <li><strong>Electromagnetics:</strong> Antenna design, electromagnetic compatibility (EMC), and radar systems rely on solving Maxwell's equations using numerical PDE methods.</li>
+            <li><strong>Fluid Dynamics:</strong> CFD (Computational Fluid Dynamics) solves the Navier-Stokes equations to design aircraft, automobiles, and turbomachinery.</li>
+            <li><strong>Geophysics:</strong> Seismic wave propagation, groundwater flow, and oil reservoir simulation all use numerical PDE techniques.</li>
+            <li><strong>Biomedical Engineering:</strong> Drug diffusion in tissue, heat transfer during hyperthermia treatment, and cardiac electrical propagation are modeled using PDEs.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Heat Equation (1D)</td>
+                    <td>\(\frac{\partial u}{\partial t} = \alpha \frac{\partial^2 u}{\partial x^2}\)</td>
+                    <td>Parabolic PDE for diffusion</td>
+                </tr>
+                <tr>
+                    <td>Wave Equation</td>
+                    <td>\(\frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}\)</td>
+                    <td>Hyperbolic PDE for propagation</td>
+                </tr>
+                <tr>
+                    <td>Laplace Equation</td>
+                    <td>\(\nabla^2 u = \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = 0\)</td>
+                    <td>Elliptic PDE for steady-state</td>
+                </tr>
+                <tr>
+                    <td>Central Difference (2nd)</td>
+                    <td>\(\frac{\partial^2 u}{\partial x^2} \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{\Delta x^2}\)</td>
+                    <td>Spatial discretization O(Δx²)</td>
+                </tr>
+                <tr>
+                    <td>Explicit Method Update</td>
+                    <td>\(u_i^{n+1} = u_i^n + r(u_{i+1}^n - 2u_i^n + u_{i-1}^n)\)</td>
+                    <td>Forward Euler time integration</td>
+                </tr>
+                <tr>
+                    <td>Stability Parameter</td>
+                    <td>\(r = \frac{\alpha \Delta t}{\Delta x^2} \leq \frac{1}{2}\)</td>
+                    <td>CFL condition for stability</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Stability Analysis</h3>
+            <p>For a 1D heat equation solver with α = 0.001 m²/s and spatial step Δx = 0.02 m, what is the maximum time step Δt that ensures stability using the explicit method? If you want to simulate 10 seconds, how many time steps are required?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Step 1: Apply stability condition</strong></p>
+                <p>\[r = \frac{\alpha \Delta t}{\Delta x^2} \leq \frac{1}{2}\]</p>
+                <p>\[\Delta t \leq \frac{\Delta x^2}{2\alpha} = \frac{(0.02)^2}{2 \times 0.001} = \frac{0.0004}{0.002} = 0.2 \text{ s}\]</p>
+
+                <p><strong>Step 2: Calculate number of time steps</strong></p>
+                <p>For safety, use Δt = 0.15 s (r = 0.375 < 0.5)</p>
+                <p>\[N = \frac{t_{final}}{\Delta t} = \frac{10}{0.15} = 66.7 \approx 67 \text{ time steps}\]</p>
+
+                <p><strong>Note:</strong> Using a smaller time step (e.g., Δt = 0.1 s) would require more steps (100) but provide better accuracy and stability margin.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Truncation Error</h3>
+            <p>The central difference approximation for the second derivative has a truncation error. Using Taylor series expansion, show that the error is O(Δx²). What does this mean for solution accuracy?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Taylor Series Expansion:</strong></p>
+                <p>\[u(x + \Delta x) = u(x) + u'(x)\Delta x + \frac{u''(x)}{2}\Delta x^2 + \frac{u'''(x)}{6}\Delta x^3 + O(\Delta x^4)\]</p>
+                <p>\[u(x - \Delta x) = u(x) - u'(x)\Delta x + \frac{u''(x)}{2}\Delta x^2 - \frac{u'''(x)}{6}\Delta x^3 + O(\Delta x^4)\]</p>
+
+                <p><strong>Add the two equations:</strong></p>
+                <p>\[u(x + \Delta x) + u(x - \Delta x) = 2u(x) + u''(x)\Delta x^2 + O(\Delta x^4)\]</p>
+
+                <p><strong>Solve for u''(x):</strong></p>
+                <p>\[u''(x) = \frac{u(x + \Delta x) - 2u(x) + u(x - \Delta x)}{\Delta x^2} + O(\Delta x^2)\]</p>
+
+                <p><strong>Interpretation:</strong> The error decreases quadratically with grid refinement. Halving Δx reduces the error by a factor of 4, which is excellent accuracy for a simple scheme.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Implicit Method Comparison</h3>
+            <p>Compare the computational cost and stability of explicit vs implicit methods. If an explicit method requires Δt = 0.001 s for stability, but an implicit method is stable for any Δt, what is the breakeven point where implicit becomes more efficient?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Explicit Method:</strong></p>
+                <p>• Cost per time step: O(N) operations (N grid points)</p>
+                <p>• Δt limited by stability: Δt = 0.001 s</p>
+                <p>• For 1 second simulation: 1000 time steps</p>
+                <p>• Total cost: 1000 × N = 1000N operations</p>
+
+                <p><strong>Implicit Method:</strong></p>
+                <p>• Cost per time step: O(N) for tridiagonal solver</p>
+                <p>• No stability limit: can use Δt = 0.1 s (100× larger)</p>
+                <p>• For 1 second simulation: 10 time steps</p>
+                <p>• Total cost: 10 × (5N) ≈ 50N operations (factor of 5 for solver)</p>
+
+                <p><strong>Conclusion:</strong> Implicit method is ~20× more efficient for this case! The breakeven point occurs when the desired time step is close to the stability limit. For long-time simulations or stiff problems, implicit methods are essential.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What type of PDE is the heat equation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Hyperbolic</label>
+                    <label><input type="radio" name="q1" value="b"> b) Parabolic</label>
+                    <label><input type="radio" name="q1" value="c"> c) Elliptic</label>
+                    <label><input type="radio" name="q1" value="d"> d) None of the above</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The CFL stability condition for the explicit heat equation is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) r = αΔt/Δx² ≤ 1</label>
+                    <label><input type="radio" name="q2" value="b"> b) r = αΔt/Δx² ≤ 1/2</label>
+                    <label><input type="radio" name="q2" value="c"> c) r = αΔt/Δx ≤ 1</label>
+                    <label><input type="radio" name="q2" value="d"> d) No stability condition needed</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: What is the advantage of implicit methods over explicit methods?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) They are easier to implement</label>
+                    <label><input type="radio" name="q3" value="b"> b) They require less memory</label>
+                    <label><input type="radio" name="q3" value="c"> c) They are unconditionally stable</label>
+                    <label><input type="radio" name="q3" value="d"> d) They are always more accurate</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The central difference approximation for the second derivative is accurate to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) O(Δx)</label>
+                    <label><input type="radio" name="q4" value="b"> b) O(Δx²)</label>
+                    <label><input type="radio" name="q4" value="c"> c) O(Δx³)</label>
+                    <label><input type="radio" name="q4" value="d"> d) O(Δx⁴)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Which equation represents steady-state heat conduction?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) ∂u/∂t = α∂²u/∂x²</label>
+                    <label><input type="radio" name="q5" value="b"> b) ∂²u/∂t² = c²∂²u/∂x²</label>
+                    <label><input type="radio" name="q5" value="c"> c) ∂²u/∂x² + ∂²u/∂y² = 0</label>
+                    <label><input type="radio" name="q5" value="d"> d) ∇·u = 0</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'b',
+                        q3: 'c',
+                        q4: 'b',
+                        q5: 'c'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

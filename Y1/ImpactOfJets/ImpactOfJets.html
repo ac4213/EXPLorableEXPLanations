@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact of Jets - Interactive Lecture</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Impact of Jets</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Impact of Jets</h2>
+        <p>When a fluid jet strikes a solid surface, it exerts a force on that surface due to the change in momentum of the fluid. This principle is fundamental to understanding turbine design, jet propulsion, and various fluid power applications.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> The force exerted by a fluid jet on a surface is equal to the rate of change of momentum of the fluid. This is a direct application of Newton's second law: F = dp/dt = ṁ(v₁ - v₂), where ṁ is the mass flow rate.</p>
+        </div>
+
+        <h3>Momentum Equation for Fluid Jets</h3>
+        <p>The momentum equation for steady flow states that the sum of external forces acting on a control volume equals the net rate of momentum flux leaving the control volume.</p>
+
+        <div class="equation-box">
+            <p><strong>Force on Deflector:</strong></p>
+            <p>\[F = \rho Q (v_1 - v_2 \cos\theta)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(F\) = Force on the deflector (N)</li>
+                <li>\(\rho\) = Fluid density (kg/m³)</li>
+                <li>\(Q\) = Volumetric flow rate (m³/s)</li>
+                <li>\(v_1\) = Jet velocity before impact (m/s)</li>
+                <li>\(v_2\) = Jet velocity after deflection (m/s)</li>
+                <li>\(\theta\) = Deflection angle</li>
+            </ul>
+        </div>
+
+        <h3>Types of Deflectors</h3>
+        <p>Different deflector geometries produce different force characteristics:</p>
+        <ul>
+            <li><strong>Flat Plate (θ = 90°):</strong> Maximum force when perpendicular to jet</li>
+            <li><strong>Curved Vane (θ = 180°):</strong> Used in impulse turbines, reverses flow direction</li>
+            <li><strong>Inclined Plate:</strong> Splits jet into two streams</li>
+            <li><strong>Hemispherical Cup:</strong> Partially reverses flow, used in water wheels</li>
+        </ul>
+
+        <h3>Stationary vs. Moving Deflectors</h3>
+        <p>For moving deflectors, the relative velocity between the jet and deflector must be considered:</p>
+
+        <div class="equation-box">
+            <p><strong>Moving Deflector Force:</strong></p>
+            <p>\[F = \rho A (v - u)^2 (1 - \cos\theta)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(A\) = Jet cross-sectional area (m²)</li>
+                <li>\(v\) = Absolute jet velocity (m/s)</li>
+                <li>\(u\) = Deflector velocity (m/s)</li>
+                <li>\(\theta\) = Deflection angle</li>
+            </ul>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Power and Efficiency:</strong></p>
+            <p>\[P = F \cdot u = \rho A (v - u)^2 u (1 - \cos\theta)\]</p>
+            <p>\[\eta = \frac{P}{\frac{1}{2}\rho Q v^2} = \frac{2u(v-u)(1-\cos\theta)}{v^2}\]</p>
+            <p>Maximum efficiency occurs when \(u = v/3\) for a flat plate (θ = 90°)</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive Jet Impact Simulation</h2>
+        <p>Adjust the jet velocity, deflector type, and deflector velocity to see how the force and power change. Watch the jet interact with different deflector geometries.</p>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="jet-velocity">Jet Velocity (m/s):</label>
+                    <div class="slider-row">
+                        <input type="range" id="jet-velocity" min="5" max="30" value="20" step="1">
+                        <span id="jet-velocity-value" class="value-display">20</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="deflector-velocity">Deflector Velocity (m/s):</label>
+                    <div class="slider-row">
+                        <input type="range" id="deflector-velocity" min="0" max="20" value="0" step="1">
+                        <span id="deflector-velocity-value" class="value-display">0</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="jet-diameter">Jet Diameter (mm):</label>
+                    <div class="slider-row">
+                        <input type="range" id="jet-diameter" min="20" max="100" value="50" step="5">
+                        <span id="jet-diameter-value" class="value-display">50</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="deflector-type">Deflector Type:</label>
+                    <select id="deflector-type" class="slider">
+                        <option value="flat">Flat Plate (90°)</option>
+                        <option value="curved">Curved Vane (180°)</option>
+                        <option value="hemispherical">Hemispherical Cup (120°)</option>
+                        <option value="inclined">Inclined Plate (45°)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <p><strong>Flow Rate:</strong> Q = <span id="flow-rate">0.039</span> m³/s</p>
+            <p><strong>Force on Deflector:</strong> F = <span id="force">785</span> N</p>
+            <p><strong>Power Delivered:</strong> P = <span id="power">0</span> W</p>
+            <p><strong>Efficiency:</strong> η = <span id="efficiency">0</span> %</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="diagram-legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #4A90E2;"></div>
+                <span>Incoming Jet</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #90CAF9;"></div>
+                <span>Deflected Flow</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #E74C3C;"></div>
+                <span>Force Vector</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li><strong>Pelton Turbines:</strong> Impulse turbines use curved buckets to extract energy from high-velocity water jets, commonly used in hydroelectric plants with high heads.</li>
+            <li><strong>Jet Propulsion:</strong> Rockets and jet engines operate on the principle of jet momentum, where expelling high-velocity gas creates thrust force.</li>
+            <li><strong>Water Wheels:</strong> Traditional water wheels use the impact of falling water to generate mechanical power, with cup-shaped buckets capturing the water.</li>
+            <li><strong>Fire Hoses and Nozzles:</strong> Firefighters must brace against the reaction force when directing high-velocity water jets, which can be several hundred newtons.</li>
+            <li><strong>Hydraulic Mining:</strong> High-pressure water jets are used to excavate soil and rock, utilizing the erosive force of jet impact.</li>
+            <li><strong>Lawn Sprinklers:</strong> Rotating sprinklers use the reaction force from deflected water jets to create rotational motion.</li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mass Flow Rate</td>
+                        <td>\(\dot{m} = \rho A v\)</td>
+                        <td>Mass per unit time (kg/s)</td>
+                    </tr>
+                    <tr>
+                        <td>Momentum Flux</td>
+                        <td>\(\dot{m} v = \rho A v^2\)</td>
+                        <td>Rate of momentum transfer (N)</td>
+                    </tr>
+                    <tr>
+                        <td>Force (Stationary Flat Plate)</td>
+                        <td>\(F = \rho A v^2\)</td>
+                        <td>Normal force on perpendicular plate</td>
+                    </tr>
+                    <tr>
+                        <td>Force (Stationary Curved Vane)</td>
+                        <td>\(F = \rho A v^2 (1 - \cos\theta)\)</td>
+                        <td>Force with deflection angle θ</td>
+                    </tr>
+                    <tr>
+                        <td>Force (Moving Deflector)</td>
+                        <td>\(F = \rho A (v-u)^2 (1-\cos\theta)\)</td>
+                        <td>Force on deflector moving at velocity u</td>
+                    </tr>
+                    <tr>
+                        <td>Power</td>
+                        <td>\(P = F \cdot u\)</td>
+                        <td>Power delivered to moving deflector</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetic Energy of Jet</td>
+                        <td>\(KE = \frac{1}{2}\rho Q v^2\)</td>
+                        <td>Available energy in jet</td>
+                    </tr>
+                    <tr>
+                        <td>Efficiency</td>
+                        <td>\(\eta = \frac{P}{KE}\)</td>
+                        <td>Ratio of extracted to available power</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Fire Hose Force</h3>
+            <p>A fire hose has a nozzle diameter of 50 mm and discharges water at 25 m/s. The water jet hits a wall perpendicularly. Calculate the force exerted on the wall. (Density of water = 1000 kg/m³)</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Nozzle diameter: D = 50 mm = 0.05 m</li>
+                    <li>Jet velocity: v = 25 m/s</li>
+                    <li>Density: ρ = 1000 kg/m³</li>
+                    <li>Deflection angle: θ = 90° (perpendicular impact)</li>
+                </ul>
+                <p><strong>Step 1: Calculate jet area:</strong></p>
+                <p>\[A = \frac{\pi D^2}{4} = \frac{\pi (0.05)^2}{4} = 0.00196 \text{ m}^2\]</p>
+                <p><strong>Step 2: Apply force equation for flat plate:</strong></p>
+                <p>\[F = \rho A v^2 = 1000 \times 0.00196 \times 25^2\]</p>
+                <p>\[F = 1000 \times 0.00196 \times 625 = 1225 \text{ N}\]</p>
+                <p><strong>Answer:</strong> The force on the wall is 1225 N (approximately 125 kg force)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Moving Deflector Power</h3>
+            <p>A water jet with velocity 30 m/s and diameter 75 mm strikes a flat plate moving at 10 m/s in the same direction as the jet. Calculate: (a) the force on the plate, (b) the power delivered, and (c) the efficiency.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Jet velocity: v = 30 m/s</li>
+                    <li>Plate velocity: u = 10 m/s</li>
+                    <li>Diameter: D = 75 mm = 0.075 m</li>
+                    <li>Density: ρ = 1000 kg/m³</li>
+                    <li>Deflection angle: θ = 90° (flat plate)</li>
+                </ul>
+                <p><strong>Step 1: Calculate jet area:</strong></p>
+                <p>\[A = \frac{\pi (0.075)^2}{4} = 0.00442 \text{ m}^2\]</p>
+                <p><strong>Step 2: Calculate force (moving deflector):</strong></p>
+                <p>\[F = \rho A (v-u)^2 (1-\cos 90°) = \rho A (v-u)^2\]</p>
+                <p>\[F = 1000 \times 0.00442 \times (30-10)^2 = 1000 \times 0.00442 \times 400\]</p>
+                <p>\[F = 1768 \text{ N}\]</p>
+                <p><strong>Step 3: Calculate power:</strong></p>
+                <p>\[P = F \cdot u = 1768 \times 10 = 17680 \text{ W} = 17.68 \text{ kW}\]</p>
+                <p><strong>Step 4: Calculate efficiency:</strong></p>
+                <p>\[Q = A v = 0.00442 \times 30 = 0.1326 \text{ m}^3\text{/s}\]</p>
+                <p>\[KE = \frac{1}{2}\rho Q v^2 = 0.5 \times 1000 \times 0.1326 \times 900 = 59670 \text{ W}\]</p>
+                <p>\[\eta = \frac{P}{KE} = \frac{17680}{59670} = 0.296 = 29.6\%\]</p>
+                <p><strong>Answers:</strong> (a) F = 1768 N, (b) P = 17.68 kW, (c) η = 29.6%</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Curved Vane Analysis</h3>
+            <p>A water jet with velocity 20 m/s and cross-sectional area 0.01 m² strikes a stationary curved vane that deflects the jet through 180°. Calculate the force on the vane in the direction of the jet.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Jet velocity: v = 20 m/s</li>
+                    <li>Area: A = 0.01 m²</li>
+                    <li>Deflection angle: θ = 180°</li>
+                    <li>Density: ρ = 1000 kg/m³</li>
+                </ul>
+                <p><strong>Apply force equation for curved vane:</strong></p>
+                <p>\[F = \rho A v^2 (1 - \cos\theta)\]</p>
+                <p>\[F = 1000 \times 0.01 \times 20^2 \times (1 - \cos 180°)\]</p>
+                <p>\[F = 1000 \times 0.01 \times 400 \times (1 - (-1))\]</p>
+                <p>\[F = 4000 \times 2 = 8000 \text{ N}\]</p>
+                <p><strong>Note:</strong> The force is twice that of a flat plate because the jet is reversed completely.</p>
+                <p><strong>Answer:</strong> The force on the vane is 8000 N in the direction of the incoming jet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: The force exerted by a jet on a surface is due to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Pressure difference</label>
+                    <label><input type="radio" name="q1" value="b"> b) Change in momentum</label>
+                    <label><input type="radio" name="q1" value="c"> c) Viscous friction</label>
+                    <label><input type="radio" name="q1" value="d"> d) Gravity</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: For a stationary flat plate perpendicular to the jet, the force is proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Jet velocity (v)</label>
+                    <label><input type="radio" name="q2" value="b"> b) Square of jet velocity (v²)</label>
+                    <label><input type="radio" name="q2" value="c"> c) Square root of jet velocity (√v)</label>
+                    <label><input type="radio" name="q2" value="d"> d) Cube of jet velocity (v³)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A curved vane that deflects a jet through 180° experiences:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) The same force as a flat plate</label>
+                    <label><input type="radio" name="q3" value="b"> b) Twice the force of a flat plate</label>
+                    <label><input type="radio" name="q3" value="c"> c) Half the force of a flat plate</label>
+                    <label><input type="radio" name="q3" value="d"> d) No force at all</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: For a moving deflector, maximum power is extracted when the deflector velocity is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Equal to the jet velocity (u = v)</label>
+                    <label><input type="radio" name="q4" value="b"> b) Half the jet velocity (u = v/2)</label>
+                    <label><input type="radio" name="q4" value="c"> c) One-third the jet velocity (u = v/3)</label>
+                    <label><input type="radio" name="q4" value="d"> d) Zero (u = 0)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: When a jet velocity doubles, the force on a stationary plate:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Doubles</label>
+                    <label><input type="radio" name="q5" value="b"> b) Quadruples</label>
+                    <label><input type="radio" name="q5" value="c"> c) Triples</label>
+                    <label><input type="radio" name="q5" value="d"> d) Increases by factor of 8</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: The efficiency of a moving flat plate is defined as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) Ratio of force to jet momentum</label>
+                    <label><input type="radio" name="q6" value="b"> b) Ratio of power output to kinetic energy of jet</label>
+                    <label><input type="radio" name="q6" value="c"> c) Ratio of deflector velocity to jet velocity</label>
+                    <label><input type="radio" name="q6" value="d"> d) Percentage of jet flow captured</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Impact of Jets simulation using p5.js
+        let sketch = new p5(function(p) {
+            let jetVelocity = 20;
+            let deflectorVelocity = 0;
+            let jetDiameter = 50; // mm
+            let deflectorType = 'flat';
+            let deflectorX = 500;
+
+            const density = 1000; // kg/m³
+            let particles = [];
+
+            p.setup = function() {
+                let canvasWidth = Math.min(800, p.windowWidth - 40);
+                p.createCanvas(canvasWidth, 400);
+                setupControls();
+                initializeParticles();
+                calculateResults();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Update deflector position if moving
+                if (deflectorVelocity > 0) {
+                    deflectorX += deflectorVelocity * 0.05;
+                    if (deflectorX > p.width - 100) deflectorX = 500;
+                }
+
+                // Draw nozzle
+                drawNozzle(p);
+
+                // Update and draw particles
+                updateParticles(p);
+                drawParticles(p);
+
+                // Draw deflector
+                drawDeflector(p);
+
+                // Draw force vector
+                drawForceVector(p);
+
+                // Draw info labels
+                drawLabels(p);
+            };
+
+            function initializeParticles() {
+                particles = [];
+                for (let i = 0; i < 40; i++) {
+                    particles.push({
+                        x: 100 + i * 10,
+                        y: 200 + p.random(-jetDiameter/4, jetDiameter/4),
+                        vx: jetVelocity,
+                        vy: 0,
+                        deflected: false
+                    });
+                }
+            }
+
+            function drawNozzle(p) {
+                p.fill(120);
+                p.noStroke();
+                p.rect(50, 200 - jetDiameter/2, 50, jetDiameter);
+
+                // Nozzle opening
+                p.fill(200);
+                p.rect(95, 200 - jetDiameter/2 - 5, 10, jetDiameter + 10);
+            }
+
+            function drawDeflector(p) {
+                p.push();
+                p.translate(deflectorX, 200);
+
+                switch(deflectorType) {
+                    case 'flat':
+                        // Flat plate
+                        p.fill(150);
+                        p.stroke(0);
+                        p.strokeWeight(3);
+                        p.rect(-10, -80, 20, 160);
+                        break;
+
+                    case 'curved':
+                        // Curved vane (180° deflection)
+                        p.fill(150);
+                        p.stroke(0);
+                        p.strokeWeight(3);
+                        p.arc(0, 0, 120, 120, -p.PI/2, p.PI/2);
+                        p.line(-60, 0, -80, 0);
+                        break;
+
+                    case 'hemispherical':
+                        // Hemispherical cup (120° deflection)
+                        p.fill(150);
+                        p.stroke(0);
+                        p.strokeWeight(3);
+                        p.arc(0, 0, 140, 140, -p.PI/3, p.PI/3);
+                        break;
+
+                    case 'inclined':
+                        // Inclined plate (45°)
+                        p.fill(150);
+                        p.stroke(0);
+                        p.strokeWeight(3);
+                        p.rotate(-p.PI/4);
+                        p.rect(-10, -100, 20, 200);
+                        break;
+                }
+                p.pop();
+            }
+
+            function updateParticles(p) {
+                for (let particle of particles) {
+                    // Check collision with deflector
+                    if (!particle.deflected && particle.x >= deflectorX - 70 && particle.x <= deflectorX + 10) {
+                        particle.deflected = true;
+
+                        switch(deflectorType) {
+                            case 'flat':
+                                particle.vx = -jetVelocity * 0.2; // Slight backward
+                                particle.vy = p.random(-2, 2);
+                                break;
+                            case 'curved':
+                                particle.vx = -jetVelocity * 0.9; // Near reversal
+                                particle.vy = p.random(-1, 1);
+                                break;
+                            case 'hemispherical':
+                                const angle = p.random(-p.PI/3, p.PI/3);
+                                particle.vx = jetVelocity * Math.cos(angle + p.PI);
+                                particle.vy = jetVelocity * Math.sin(angle + p.PI);
+                                break;
+                            case 'inclined':
+                                particle.vx = jetVelocity * 0.5;
+                                particle.vy = p.random(0, 1) > 0.5 ? jetVelocity * 0.7 : -jetVelocity * 0.7;
+                                break;
+                        }
+                    }
+
+                    // Update position
+                    particle.x += particle.vx * 0.5;
+                    particle.y += particle.vy * 0.5;
+
+                    // Reset if off screen
+                    if (particle.x < 0 || particle.x > p.width || particle.y < 0 || particle.y > p.height) {
+                        particle.x = 100;
+                        particle.y = 200 + p.random(-jetDiameter/4, jetDiameter/4);
+                        particle.vx = jetVelocity;
+                        particle.vy = 0;
+                        particle.deflected = false;
+                    }
+                }
+            }
+
+            function drawParticles(p) {
+                p.noStroke();
+                for (let particle of particles) {
+                    if (particle.deflected) {
+                        p.fill(144, 202, 249, 180);
+                    } else {
+                        p.fill(74, 144, 226, 200);
+                    }
+                    p.ellipse(particle.x, particle.y, 6, 6);
+                }
+            }
+
+            function drawForceVector(p) {
+                // Calculate force
+                const A = Math.PI * Math.pow(jetDiameter / 2000, 2); // m²
+                const relVel = jetVelocity - deflectorVelocity;
+                let force;
+
+                switch(deflectorType) {
+                    case 'flat':
+                        force = density * A * relVel * relVel;
+                        break;
+                    case 'curved':
+                        force = density * A * relVel * relVel * 2;
+                        break;
+                    case 'hemispherical':
+                        force = density * A * relVel * relVel * (1 - Math.cos(2 * Math.PI / 3));
+                        break;
+                    case 'inclined':
+                        force = density * A * relVel * relVel * (1 - Math.cos(Math.PI / 4));
+                        break;
+                }
+
+                // Draw force arrow
+                const arrowLen = Math.min(force / 5, 100);
+                p.stroke(231, 76, 60);
+                p.strokeWeight(4);
+                p.fill(231, 76, 60);
+                p.line(deflectorX, 200, deflectorX - arrowLen, 200);
+
+                // Arrow head
+                p.triangle(
+                    deflectorX - arrowLen, 200,
+                    deflectorX - arrowLen + 10, 195,
+                    deflectorX - arrowLen + 10, 205
+                );
+
+                // Label
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text('F', deflectorX - arrowLen/2, 190);
+            }
+
+            function drawLabels(p) {
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+
+                let typeLabel = deflectorType.charAt(0).toUpperCase() + deflectorType.slice(1);
+                if (deflectorType === 'hemispherical') typeLabel = 'Hemispherical Cup';
+                if (deflectorType === 'inclined') typeLabel = 'Inclined Plate (45°)';
+
+                p.text('Deflector: ' + typeLabel, 10, 20);
+                p.text('Jet Velocity: ' + jetVelocity + ' m/s', 10, 40);
+                if (deflectorVelocity > 0) {
+                    p.text('Deflector Velocity: ' + deflectorVelocity + ' m/s', 10, 60);
+                }
+            }
+
+            function setupControls() {
+                document.getElementById("jet-velocity").addEventListener("input", function() {
+                    jetVelocity = parseFloat(this.value);
+                    document.getElementById("jet-velocity-value").textContent = jetVelocity;
+                    calculateResults();
+                });
+
+                document.getElementById("deflector-velocity").addEventListener("input", function() {
+                    deflectorVelocity = parseFloat(this.value);
+                    document.getElementById("deflector-velocity-value").textContent = deflectorVelocity;
+                    calculateResults();
+                });
+
+                document.getElementById("jet-diameter").addEventListener("input", function() {
+                    jetDiameter = parseFloat(this.value);
+                    document.getElementById("jet-diameter-value").textContent = jetDiameter;
+                    initializeParticles();
+                    calculateResults();
+                });
+
+                document.getElementById("deflector-type").addEventListener("change", function() {
+                    deflectorType = this.value;
+                    calculateResults();
+                });
+            }
+
+            function calculateResults() {
+                const A = Math.PI * Math.pow(jetDiameter / 2000, 2); // Convert mm to m
+                const Q = A * jetVelocity;
+                const relVel = jetVelocity - deflectorVelocity;
+
+                let force, theta;
+                switch(deflectorType) {
+                    case 'flat':
+                        theta = Math.PI / 2;
+                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        break;
+                    case 'curved':
+                        theta = Math.PI;
+                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        break;
+                    case 'hemispherical':
+                        theta = 2 * Math.PI / 3;
+                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        break;
+                    case 'inclined':
+                        theta = Math.PI / 4;
+                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        break;
+                }
+
+                const power = force * deflectorVelocity;
+                const jetKE = 0.5 * density * Q * jetVelocity * jetVelocity;
+                const efficiency = jetKE > 0 ? (power / jetKE) * 100 : 0;
+
+                document.getElementById("flow-rate").textContent = Q.toFixed(4);
+                document.getElementById("force").textContent = force.toFixed(1);
+                document.getElementById("power").textContent = power.toFixed(1);
+                document.getElementById("efficiency").textContent = efficiency.toFixed(1);
+            }
+
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'b',
+                q4: 'c',
+                q5: 'b',
+                q6: 'b'
+            };
+
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
+        });
+    </script>
+</body>
+</html>

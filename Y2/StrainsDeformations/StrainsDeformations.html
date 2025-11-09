@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strains and Deformations - Interactive Lecture</title>
+    <meta name="description" content="Interactive lecture on strains and deformations due to axial, shear, bending, and torsional loads">
+    <meta name="keywords" content="strain, deformation, axial load, shear, bending, torsion">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Strains and Deformations from Internal Loads</h1>
+        <p class="subtitle">Axial, Shear, Bending, and Torsion</p>
+    </header>
+
+    <nav class="breadcrumb">
+        <a href="/">Home</a> &gt; <a href="/">Y2</a> &gt; <span>Strains and Deformations</span>
+    </nav>
+
+    <div class="content-section">
+        <h2>Introduction to Deformation Analysis</h2>
+        <p>Structural members deform under load. Understanding these deformations is crucial for design, ensuring structures remain functional and safe under service conditions.</p>
+
+        <div class="key-point">
+            <p><strong>Core Concept:</strong> Different internal loads cause different deformation modes. This lecture focuses on axial extension/compression, shear deformation, bending curvature, and torsional twist.</p>
+        </div>
+
+        <h3>1. Axial Deformation</h3>
+        <div class="equation-box">
+            <p><strong>Normal Stress:</strong> \(\sigma = \frac{P}{A}\)</p>
+            <p><strong>Normal Strain:</strong> \(\varepsilon = \frac{\sigma}{E} = \frac{P}{EA}\)</p>
+            <p><strong>Axial Elongation:</strong> \(\delta = \frac{PL}{EA}\)</p>
+            <p>For non-uniform members: \(\delta = \int_0^L \frac{P(x)}{E(x)A(x)}dx\)</p>
+        </div>
+
+        <h3>2. Shear Deformation</h3>
+        <div class="equation-box">
+            <p><strong>Shear Stress:</strong> \(\tau = \frac{V}{A}\) (average)</p>
+            <p><strong>Shear Strain:</strong> \(\gamma = \frac{\tau}{G} = \frac{V}{GA}\)</p>
+            <p><strong>Shear Angle:</strong> Cross-sections slip relative to each other by angle \(\gamma\)</p>
+            <p>For beams: \(\delta_{shear} = \int \frac{kV^2}{GA}dx\) where \(k\) is shape factor</p>
+        </div>
+
+        <h3>3. Bending Deformation</h3>
+        <div class="equation-box">
+            <p><strong>Curvature:</strong> \(\frac{1}{\rho} = \frac{M}{EI}\)</p>
+            <p><strong>Bending Strain:</strong> \(\varepsilon = \frac{y}{\rho} = \frac{My}{EI}\)</p>
+            <p><strong>Deflection:</strong> \(v = \int\int \frac{M}{EI}dx^2\)</p>
+            <p><strong>Key Insight:</strong> Fibers on one side extend, fibers on opposite side compress, neutral axis maintains original length but curves</p>
+        </div>
+
+        <h3>4. Torsional Deformation</h3>
+        <div class="equation-box">
+            <p><strong>Shear Stress:</strong> \(\tau = \frac{T\rho}{J}\)</p>
+            <p><strong>Angle of Twist:</strong> \(\phi = \frac{TL}{GJ}\)</p>
+            <p>For circular shaft: \(J = \frac{\pi d^4}{32}\)</p>
+            <p><strong>Key Insight:</strong> Twist angle increases linearly from fixed end to free end</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive 3D Simulation: Cantilever Beam Deformations</h2>
+        <p>Explore how different loads deform a cantilever beam. The grid mesh shows how the material deforms. Use the magnification slider to exaggerate deformations for better visibility.</p>
+
+        <div class="simulation-container">
+            <div class="controls-panel">
+                <div class="slider-container">
+                    <label for="load-type">Load Type:</label>
+                    <select id="load-type">
+                        <option value="axial">Axial Force</option>
+                        <option value="shear">Shear Force</option>
+                        <option value="bending">Bending Moment</option>
+                        <option value="torsion">Twisting Torque</option>
+                    </select>
+                </div>
+                <div class="slider-container">
+                    <label for="load-mag">Load Magnitude: <span id="load-value">50</span></label>
+                    <input type="range" id="load-mag" min="10" max="100" value="50">
+                </div>
+                <div class="slider-container">
+                    <label for="deform-mag">Deformation Magnification: <span id="deform-value">20</span>x</label>
+                    <input type="range" id="deform-mag" min="1" max="100" value="20">
+                </div>
+            </div>
+            <div id="sketch-holder"></div>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            let loadType = 'axial';
+            let loadMag = 50;
+            let deformMag = 20;
+
+            // Beam geometry
+            let beamLength = 300;
+            let beamRadius = 20;
+            let numSegments = 12;
+            let numCircle = 16;
+
+            p.setup = function() {
+                p.createCanvas(1200, 700);
+                setupListeners();
+            };
+
+            function setupListeners() {
+                document.getElementById('load-type').addEventListener('change', e => {
+                    loadType = e.target.value;
+                });
+                document.getElementById('load-mag').addEventListener('input', e => {
+                    loadMag = parseFloat(e.target.value);
+                    document.getElementById('load-value').textContent = loadMag;
+                });
+                document.getElementById('deform-mag').addEventListener('input', e => {
+                    deformMag = parseFloat(e.target.value);
+                    document.getElementById('deform-value').textContent = deformMag;
+                });
+            }
+
+            // Isometric projection helper
+            function isoProject(x, y, z) {
+                let isoX = (x - z) * Math.cos(Math.PI / 6);
+                let isoY = y - (x + z) * Math.sin(Math.PI / 6);
+                return {x: isoX, y: isoY};
+            }
+
+            p.draw = function() {
+                p.background(250);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(18);
+                p.textAlign(p.CENTER);
+                p.text('3D Cantilever Beam Deformation Visualization', 600, 30);
+
+                // Draw three views
+                drawIsometricView(200, 200);
+                drawSideView(650, 200);
+                drawFrontView(1000, 200);
+
+                // View labels
+                p.textSize(14);
+                p.text('Isometric View', 200, 60);
+                p.text('Side View (Lateral)', 650, 60);
+                p.text('Front View', 1000, 60);
+            };
+
+            function drawIsometricView(cx, cy) {
+                p.push();
+                p.translate(cx, cy);
+
+                // Draw deformed mesh
+                drawDeformedBeamIso();
+
+                // Draw load arrows
+                drawLoadArrowsIso();
+
+                p.pop();
+            }
+
+            function drawDeformedBeamIso() {
+                let points = [];
+
+                // Generate grid points with deformation
+                for (let i = 0; i <= numSegments; i++) {
+                    let row = [];
+                    let x = (i / numSegments) * beamLength;
+
+                    for (let j = 0; j <= numCircle; j++) {
+                        let angle = (j / numCircle) * 2 * Math.PI;
+                        let y = beamRadius * Math.cos(angle);
+                        let z = beamRadius * Math.sin(angle);
+
+                        // Apply deformation based on load type
+                        let def = getDeformation(x, y, z, i);
+
+                        row.push({
+                            x: x + def.dx,
+                            y: y + def.dy,
+                            z: z + def.dz
+                        });
+                    }
+                    points.push(row);
+                }
+
+                // Draw grid lines
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.noFill();
+
+                // Longitudinal lines
+                for (let j = 0; j <= numCircle; j++) {
+                    for (let i = 0; i < numSegments; i++) {
+                        let p1 = isoProject(points[i][j].x, points[i][j].y, points[i][j].z);
+                        let p2 = isoProject(points[i+1][j].x, points[i+1][j].y, points[i+1][j].z);
+                        p.line(p1.x, p1.y, p2.x, p2.y);
+                    }
+                }
+
+                // Circular lines
+                for (let i = 0; i <= numSegments; i++) {
+                    for (let j = 0; j < numCircle; j++) {
+                        let p1 = isoProject(points[i][j].x, points[i][j].y, points[i][j].z);
+                        let p2 = isoProject(points[i][j+1].x, points[i][j+1].y, points[i][j+1].z);
+                        p.line(p1.x, p1.y, p2.x, p2.y);
+                    }
+                }
+
+                // Draw fixed end (wall)
+                p.fill(150);
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.beginShape();
+                for (let j = 0; j <= numCircle; j++) {
+                    let pt = isoProject(points[0][j].x, points[0][j].y, points[0][j].z);
+                    p.vertex(pt.x, pt.y);
+                }
+                p.endShape(p.CLOSE);
+            }
+
+            function getDeformation(x, y, z, segmentIndex) {
+                let ratio = x / beamLength;
+                let dx = 0, dy = 0, dz = 0;
+                let mag = loadMag * deformMag * 0.05;
+
+                switch(loadType) {
+                    case 'axial':
+                        // Axial extension/compression
+                        dx = ratio * mag * 0.5;
+                        break;
+
+                    case 'shear':
+                        // Shear: cross-sections slip
+                        let shearAngle = ratio * mag * 0.01;
+                        dy = -x * shearAngle;
+                        break;
+
+                    case 'bending':
+                        // Bending: arc deformation
+                        let curvature = mag * 0.0001;
+                        let arc = ratio * ratio * beamLength * curvature;
+                        dy = -arc;
+                        dx = arc * ratio * 0.3; // Slight shortening on compression side
+                        // Strain varies with y (distance from neutral axis)
+                        dx += y * arc * 0.01;
+                        break;
+
+                    case 'torsion':
+                        // Torsion: twist increases from root to tip
+                        let twistAngle = ratio * mag * 0.02;
+                        let r = Math.sqrt(y*y + z*z);
+                        let originalAngle = Math.atan2(z, y);
+                        let newAngle = originalAngle + twistAngle;
+                        dy = r * Math.cos(newAngle) - y;
+                        dz = r * Math.sin(newAngle) - z;
+                        break;
+                }
+
+                return {dx, dy, dz};
+            }
+
+            function drawLoadArrowsIso() {
+                let tipX = beamLength;
+                let tipY = 0;
+                let tipZ = 0;
+
+                // Get deformed tip position
+                let def = getDeformation(tipX, tipY, tipZ, numSegments);
+                let tip = isoProject(tipX + def.dx, tipY + def.dy, tipZ + def.dz);
+
+                p.strokeWeight(3);
+                p.fill(255);
+
+                switch(loadType) {
+                    case 'axial':
+                        // Light blue arrow along axis
+                        p.stroke(100, 150, 255);
+                        p.fill(100, 150, 255);
+                        let arrowLen = 60;
+                        let axialEnd = isoProject(tipX + arrowLen + def.dx, tipY + def.dy, tipZ + def.dz);
+                        p.line(tip.x, tip.y, axialEnd.x, axialEnd.y);
+                        drawArrowhead(tip.x, tip.y, axialEnd.x, axialEnd.y);
+                        break;
+
+                    case 'shear':
+                        // Green arrow downward
+                        p.stroke(50, 200, 50);
+                        p.fill(50, 200, 50);
+                        let shearEnd = {x: tip.x, y: tip.y + 60};
+                        p.line(tip.x, tip.y, shearEnd.x, shearEnd.y);
+                        drawArrowhead(tip.x, tip.y, shearEnd.x, shearEnd.y);
+                        break;
+
+                    case 'bending':
+                        // Red double-headed arrow around bending axis (perpendicular to screen)
+                        p.stroke(255, 50, 50);
+                        p.fill(255, 50, 50);
+                        p.noFill();
+                        let bendRad = 40;
+                        p.arc(tip.x, tip.y, bendRad*2, bendRad*2, -Math.PI/3, Math.PI/3);
+                        // Arrowheads
+                        p.fill(255, 50, 50);
+                        p.triangle(tip.x - bendRad*0.866, tip.y - bendRad*0.5,
+                                   tip.x - bendRad*0.766, tip.y - bendRad*0.643,
+                                   tip.x - bendRad*0.966, tip.y - bendRad*0.643);
+                        p.triangle(tip.x + bendRad*0.866, tip.y - bendRad*0.5,
+                                   tip.x + bendRad*0.766, tip.y - bendRad*0.643,
+                                   tip.x + bendRad*0.966, tip.y - bendRad*0.643);
+                        break;
+
+                    case 'torsion':
+                        // Orange double-headed arrow around twisting axis
+                        p.stroke(255, 150, 50);
+                        p.fill(255, 150, 50);
+                        // Arrow pointing along axis
+                        let torsionStart = isoProject(tipX - 50 + def.dx, tipY + def.dy, tipZ + def.dz);
+                        let torsionEnd = isoProject(tipX + 50 + def.dx, tipY + def.dy, tipZ + def.dz);
+                        p.line(torsionStart.x, torsionStart.y, torsionEnd.x, torsionEnd.y);
+                        drawArrowhead(torsionEnd.x, torsionEnd.y, torsionStart.x, torsionStart.y);
+                        drawArrowhead(torsionStart.x, torsionStart.y, torsionEnd.x, torsionEnd.y);
+                        break;
+                }
+            }
+
+            function drawSideView(cx, cy) {
+                p.push();
+                p.translate(cx, cy);
+
+                // Draw side profile (YZ plane, looking along X)
+                p.stroke(100);
+                p.strokeWeight(1);
+
+                // Draw centroidal axis
+                p.stroke(200, 100, 100);
+                p.strokeWeight(2);
+                p.line(-150, 0, 150, 0);
+
+                // Draw beam outline with deformation
+                p.stroke(100);
+                p.fill(220);
+                p.strokeWeight(2);
+
+                for (let i = 0; i <= numSegments; i++) {
+                    let x = (i / numSegments) * beamLength - beamLength/2;
+                    let def = getDeformation(i / numSegments * beamLength, beamRadius, 0, i);
+                    let y1 = -beamRadius + def.dy;
+                    let y2 = beamRadius + def.dy;
+
+                    if (i === 0) {
+                        p.line(x, y1, x, y2);
+                    } else {
+                        let prevX = ((i-1) / numSegments) * beamLength - beamLength/2;
+                        let prevDef = getDeformation((i-1) / numSegments * beamLength, beamRadius, 0, i-1);
+                        p.line(prevX, -beamRadius + prevDef.dy, x, y1);
+                        p.line(prevX, beamRadius + prevDef.dy, x, y2);
+                    }
+                }
+
+                // Close the tip
+                let lastX = beamLength/2;
+                let lastDef = getDeformation(beamLength, beamRadius, 0, numSegments);
+                p.line(lastX, -beamRadius + lastDef.dy, lastX, beamRadius + lastDef.dy);
+
+                // Draw grid lines
+                p.stroke(150);
+                p.strokeWeight(1);
+                for (let i = 0; i <= numSegments; i++) {
+                    let x = (i / numSegments) * beamLength - beamLength/2;
+                    let def = getDeformation(i / numSegments * beamLength, 0, 0, i);
+                    p.line(x, -beamRadius + def.dy, x, beamRadius + def.dy);
+                }
+
+                // Draw load
+                drawLoadArrowsSide();
+
+                p.pop();
+            }
+
+            function drawLoadArrowsSide() {
+                let tipX = beamLength/2;
+                let def = getDeformation(beamLength, 0, 0, numSegments);
+
+                p.strokeWeight(3);
+
+                switch(loadType) {
+                    case 'axial':
+                        // Arrow along axis
+                        p.stroke(100, 150, 255);
+                        p.fill(100, 150, 255);
+                        p.line(tipX, def.dy, tipX + 60, def.dy);
+                        drawArrowhead(tipX, def.dy, tipX + 60, def.dy);
+                        break;
+
+                    case 'shear':
+                        // Arrow downward
+                        p.stroke(50, 200, 50);
+                        p.fill(50, 200, 50);
+                        p.line(tipX, def.dy, tipX, def.dy + 60);
+                        drawArrowhead(tipX, def.dy, tipX, def.dy + 60);
+                        break;
+
+                    case 'bending':
+                        // Arc with arrowhead
+                        p.stroke(255, 50, 50);
+                        p.noFill();
+                        p.arc(tipX, def.dy, 80, 80, 0, Math.PI/2);
+                        p.fill(255, 50, 50);
+                        p.triangle(tipX + 40, def.dy,
+                                   tipX + 35, def.dy - 8,
+                                   tipX + 48, def.dy - 5);
+                        break;
+
+                    case 'torsion':
+                        // Double arrow along axis
+                        p.stroke(255, 150, 50);
+                        p.fill(255, 150, 50);
+                        p.line(tipX - 40, def.dy, tipX + 40, def.dy);
+                        drawArrowhead(tipX + 40, def.dy, tipX - 40, def.dy);
+                        drawArrowhead(tipX - 40, def.dy, tipX + 40, def.dy);
+                        break;
+                }
+            }
+
+            function drawFrontView(cx, cy) {
+                p.push();
+                p.translate(cx, cy);
+
+                // Draw front view (circular cross-section at tip)
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.fill(220);
+
+                let def = getDeformation(beamLength, 0, 0, numSegments);
+
+                // Draw deformed circle with grid
+                for (let j = 0; j < numCircle; j++) {
+                    let angle1 = (j / numCircle) * 2 * Math.PI;
+                    let angle2 = ((j+1) / numCircle) * 2 * Math.PI;
+
+                    let y1 = beamRadius * Math.cos(angle1);
+                    let z1 = beamRadius * Math.sin(angle1);
+                    let y2 = beamRadius * Math.cos(angle2);
+                    let z2 = beamRadius * Math.sin(angle2);
+
+                    let def1 = getDeformation(beamLength, y1, z1, numSegments);
+                    let def2 = getDeformation(beamLength, y2, z2, numSegments);
+
+                    p.line(y1 + def1.dy, z1 + def1.dz, y2 + def2.dy, z2 + def2.dz);
+                }
+
+                // Draw radial lines
+                p.stroke(150);
+                p.strokeWeight(1);
+                for (let j = 0; j < 8; j++) {
+                    let angle = (j / 8) * 2 * Math.PI;
+                    let y = beamRadius * Math.cos(angle);
+                    let z = beamRadius * Math.sin(angle);
+                    let defEdge = getDeformation(beamLength, y, z, numSegments);
+                    let defCenter = getDeformation(beamLength, 0, 0, numSegments);
+                    p.line(defCenter.dy, defCenter.dz, y + defEdge.dy, z + defEdge.dz);
+                }
+
+                // Draw load
+                drawLoadArrowsFront();
+
+                p.pop();
+            }
+
+            function drawLoadArrowsFront() {
+                let def = getDeformation(beamLength, 0, 0, numSegments);
+
+                p.strokeWeight(3);
+
+                switch(loadType) {
+                    case 'axial':
+                        // Point (circle) coming toward viewer
+                        p.stroke(100, 150, 255);
+                        p.fill(100, 150, 255);
+                        p.circle(def.dy, def.dz, 12);
+                        p.circle(def.dy, def.dz, 6);
+                        break;
+
+                    case 'shear':
+                        // Arrow downward
+                        p.stroke(50, 200, 50);
+                        p.fill(50, 200, 50);
+                        p.line(def.dy, def.dz, def.dy, def.dz + 60);
+                        drawArrowhead(def.dy, def.dz, def.dy, def.dz + 60);
+                        break;
+
+                    case 'bending':
+                        // Double-headed arrow perpendicular to bending
+                        p.stroke(255, 50, 50);
+                        p.fill(255, 50, 50);
+                        p.line(def.dy - 40, def.dz, def.dy + 40, def.dz);
+                        drawArrowhead(def.dy + 40, def.dz, def.dy - 40, def.dz);
+                        drawArrowhead(def.dy - 40, def.dz, def.dy + 40, def.dz);
+                        break;
+
+                    case 'torsion':
+                        // Arc with arrowhead (rotation)
+                        p.stroke(255, 150, 50);
+                        p.noFill();
+                        p.arc(def.dy, def.dz, 80, 80, -Math.PI/4, 5*Math.PI/4);
+                        p.fill(255, 150, 50);
+                        // Arrowhead at end of arc
+                        let arrowAngle = 5*Math.PI/4;
+                        let arrowR = 40;
+                        let ax = def.dy + arrowR * Math.cos(arrowAngle);
+                        let ay = def.dz + arrowR * Math.sin(arrowAngle);
+                        p.triangle(ax, ay,
+                                   ax + 8*Math.cos(arrowAngle - Math.PI/2), ay + 8*Math.sin(arrowAngle - Math.PI/2),
+                                   ax + 8*Math.cos(arrowAngle + Math.PI/2), ay + 8*Math.sin(arrowAngle + Math.PI/2));
+                        break;
+                }
+            }
+
+            function drawArrowhead(x1, y1, x2, y2) {
+                let angle = Math.atan2(y2 - y1, x2 - x1);
+                let size = 8;
+                p.triangle(x2, y2,
+                          x2 - size * Math.cos(angle - Math.PI/6),
+                          y2 - size * Math.sin(angle - Math.PI/6),
+                          x2 - size * Math.cos(angle + Math.PI/6),
+                          y2 - size * Math.sin(angle + Math.PI/6));
+            }
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <h3>1. Structural Design</h3>
+        <ul>
+            <li><strong>Deflection limits:</strong> Service requirements (L/360 typical)</li>
+            <li><strong>Vibration control:</strong> Stiffness affects natural frequency</li>
+            <li><strong>Clearances:</strong> Movement accommodations in design</li>
+        </ul>
+
+        <h3>2. Machine Design</h3>
+        <ul>
+            <li><strong>Shaft design:</strong> Torsional stiffness for power transmission</li>
+            <li><strong>Precision equipment:</strong> Minimizing deformation</li>
+            <li><strong>Bearing selection:</strong> Based on shaft deflection</li>
+        </ul>
+
+        <h3>3. Aerospace Structures</h3>
+        <ul>
+            <li><strong>Wing deflection:</strong> Aerodynamic performance</li>
+            <li><strong>Control surfaces:</strong> Twist and bending interaction</li>
+            <li><strong>Fuselage:</strong> Pressurization effects</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr><th>Load Type</th><th>Deformation</th><th>Key Parameters</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Axial</td><td>\(\delta = \frac{PL}{EA}\)</td><td>E, A, L</td></tr>
+                    <tr><td>Shear</td><td>\(\gamma = \frac{V}{GA}\)</td><td>G, A</td></tr>
+                    <tr><td>Bending</td><td>\(\delta = \int\int \frac{M}{EI}dx^2\)</td><td>E, I, M(x)</td></tr>
+                    <tr><td>Torsion</td><td>\(\phi = \frac{TL}{GJ}\)</td><td>G, J, T</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        <div class="practice-problems">
+            <h3>Problem 1: Axial Deformation</h3>
+            <p>A steel rod (E = 200 GPa, A = 500 mm²) of length 2 m carries a tensile load of 80 kN. Calculate the elongation.</p>
+            <p class="toggle-section" onclick="toggleSolution('sol1')">Show Solution</p>
+            <div id="sol1" class="hidden">
+                <p>\(\delta = \frac{PL}{EA} = \frac{80 \times 10^3 \times 2}{200 \times 10^9 \times 500 \times 10^{-6}} = 1.6 \text{ mm}\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Torsional Twist</h3>
+            <p>A solid circular shaft (d = 50mm, L = 1.5m, G = 80 GPa) transmits torque T = 2 kN·m. Find the angle of twist.</p>
+            <p class="toggle-section" onclick="toggleSolution('sol2')">Show Solution</p>
+            <div id="sol2" class="hidden">
+                <p>\(J = \frac{\pi d^4}{32} = \frac{\pi (0.05)^4}{32} = 6.136 \times 10^{-7} \text{ m}^4\)</p>
+                <p>\(\phi = \frac{TL}{GJ} = \frac{2000 \times 1.5}{80 \times 10^9 \times 6.136 \times 10^{-7}} = 0.0611 \text{ rad} = 3.5°\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Bending Deflection</h3>
+            <p>A cantilever beam (L = 3m, EI = 10,000 kN·m²) has a tip load W = 20 kN. Find tip deflection.</p>
+            <p class="toggle-section" onclick="toggleSolution('sol3')">Show Solution</p>
+            <div id="sol3" class="hidden">
+                <p>For cantilever with tip load:</p>
+                <p>\(\delta = \frac{WL^3}{3EI} = \frac{20 \times 3^3}{3 \times 10000} = 0.018 \text{ m} = 18 \text{ mm}\)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Q1: Axial deformation is inversely proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> (a) Length</label>
+                    <label><input type="radio" name="q1" value="b"> (b) Load</label>
+                    <label><input type="radio" name="q1" value="c"> (c) Area and modulus</label>
+                    <label><input type="radio" name="q1" value="d"> (d) Stress</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q2: For a circular shaft, polar moment of inertia J is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> (a) πd⁴/64</label>
+                    <label><input type="radio" name="q2" value="b"> (b) πd⁴/32</label>
+                    <label><input type="radio" name="q2" value="c"> (c) πd³/32</label>
+                    <label><input type="radio" name="q2" value="d"> (d) πd⁴/16</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q3: In bending, which fibers maintain their original length?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> (a) Top fibers</label>
+                    <label><input type="radio" name="q3" value="b"> (b) Bottom fibers</label>
+                    <label><input type="radio" name="q3" value="c"> (c) Neutral axis fibers</label>
+                    <label><input type="radio" name="q3" value="d"> (d) All fibers change length</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q4: The relationship between E and G for isotropic materials is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> (a) G = E/2(1+ν)</label>
+                    <label><input type="radio" name="q4" value="b"> (b) G = 2E</label>
+                    <label><input type="radio" name="q4" value="c"> (c) G = E</label>
+                    <label><input type="radio" name="q4" value="d"> (d) G = E(1+ν)</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q5: Torsional twist angle varies along the beam as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> (a) Constant</label>
+                    <label><input type="radio" name="q5" value="b"> (b) Linear from fixed to free end</label>
+                    <label><input type="radio" name="q5" value="c"> (c) Quadratic</label>
+                    <label><input type="radio" name="q5" value="d"> (d) Maximum at fixed end</label>
+                </div>
+            </div>
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer><script src="/assets/common/footer.js"></script></footer>
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',
+                q2: 'b',
+                q3: 'c',
+                q4: 'a',
+                q5: 'b'
+            };
+
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
+        });
+    </script>
+</body>
+</html>

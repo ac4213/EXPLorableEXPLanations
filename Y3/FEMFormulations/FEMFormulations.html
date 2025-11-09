@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEM Formulations - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Finite Element Method Formulations</h1>
+        <p class="subtitle">Element Types, Shape Functions, and Isoparametric Formulation</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding FEM Formulations</h2>
+
+        <h3>From 1D to 2D and 3D Elements</h3>
+        <p>The power of FEM lies in its ability to discretize complex geometries using different element types. Understanding how shape functions generalize from 1D to higher dimensions is crucial for effective FEM implementation.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> All FEM formulations share the same mathematical foundation: approximate the solution using shape functions defined over elements, derive element equations (usually from weak form or variational principle), and assemble into a global system. The complexity increases with dimensionality but the process remains consistent.</p>
+        </div>
+
+        <h3>1D Elements</h3>
+        <p>The simplest finite elements are one-dimensional:</p>
+
+        <div class="equation-box">
+            <p><strong>Linear 2-Node Bar Element:</strong></p>
+            <p>\[u(\xi) = N_1(\xi)u_1 + N_2(\xi)u_2\]</p>
+            <p>Shape functions in natural coordinates \(\xi \in [-1, 1]\):</p>
+            <p>\[N_1(\xi) = \frac{1 - \xi}{2}, \quad N_2(\xi) = \frac{1 + \xi}{2}\]</p>
+            <p><strong>Quadratic 3-Node Element:</strong></p>
+            <p>\[N_1 = \frac{\xi(\xi-1)}{2}, \quad N_2 = 1 - \xi^2, \quad N_3 = \frac{\xi(\xi+1)}{2}\]</p>
+            <p>The middle node provides curvature, improving accuracy.</p>
+        </div>
+
+        <h3>2D Elements</h3>
+        <p>Two-dimensional elements can be triangular or quadrilateral:</p>
+
+        <div class="equation-box">
+            <p><strong>3-Node Triangle (Linear):</strong></p>
+            <p>Natural coordinates: \(L_1, L_2, L_3\) (area coordinates)</p>
+            <p>\[N_i = L_i, \quad L_1 + L_2 + L_3 = 1\]</p>
+            <p>Displacement field: \(u = N_1 u_1 + N_2 u_2 + N_3 u_3\)</p>
+
+            <p><strong>4-Node Quadrilateral (Bilinear):</strong></p>
+            <p>Natural coordinates: \(\xi, \eta \in [-1, 1]\)</p>
+            <p>\[N_1 = \frac{(1-\xi)(1-\eta)}{4}, \quad N_2 = \frac{(1+\xi)(1-\eta)}{4}\]</p>
+            <p>\[N_3 = \frac{(1+\xi)(1+\eta)}{4}, \quad N_4 = \frac{(1-\xi)(1+\eta)}{4}\]</p>
+        </div>
+
+        <h3>Isoparametric Formulation</h3>
+        <p>The key insight: use the same shape functions for geometry and field variables.</p>
+
+        <div class="equation-box">
+            <p><strong>Coordinate Mapping:</strong></p>
+            <p>\[x(\xi, \eta) = \sum_{i=1}^n N_i(\xi, \eta) x_i\]</p>
+            <p>\[y(\xi, \eta) = \sum_{i=1}^n N_i(\xi, \eta) y_i\]</p>
+            <p><strong>Field Variable Approximation:</strong></p>
+            <p>\[u(\xi, \eta) = \sum_{i=1}^n N_i(\xi, \eta) u_i\]</p>
+            <p>This allows curved elements to fit complex geometries accurately.</p>
+        </div>
+
+        <h3>Jacobian and Coordinate Transformation</h3>
+        <p>Derivatives in physical space require the Jacobian matrix:</p>
+
+        <div class="equation-box">
+            <p>\[[J] = \begin{bmatrix}
+            \frac{\partial x}{\partial \xi} & \frac{\partial y}{\partial \xi} \\
+            \frac{\partial x}{\partial \eta} & \frac{\partial y}{\partial \eta}
+            \end{bmatrix}\]</p>
+            <p>Derivatives transform as:</p>
+            <p>\[\begin{bmatrix}
+            \frac{\partial N}{\partial x} \\
+            \frac{\partial N}{\partial y}
+            \end{bmatrix} = [J]^{-1} \begin{bmatrix}
+            \frac{\partial N}{\partial \xi} \\
+            \frac{\partial N}{\partial \eta}
+            \end{bmatrix}\]</p>
+            <p>Integration requires: \(dx\,dy = \det(J)\,d\xi\,d\eta\)</p>
+        </div>
+
+        <h3>Weak Form and Galerkin Method</h3>
+        <p>FEM typically uses the weak (or variational) form of PDEs:</p>
+
+        <div class="equation-box">
+            <p><strong>Strong Form (Heat equation):</strong></p>
+            <p>\[-k\nabla^2 T = Q \quad \text{in } \Omega\]</p>
+            <p><strong>Weak Form (after integration by parts):</strong></p>
+            <p>\[\int_\Omega k \nabla w \cdot \nabla T\,d\Omega = \int_\Omega wQ\,d\Omega + \int_{\partial\Omega} wq\,d\Gamma\]</p>
+            <p>where \(w\) is the weighting function (test function).</p>
+            <p><strong>Galerkin Method:</strong> Choose \(w = N_i\) (shape functions)</p>
+            <p>This leads to the element stiffness matrix:</p>
+            <p>\[[K^e]_{ij} = \int_{\Omega^e} k \nabla N_i \cdot \nabla N_j\,d\Omega\]</p>
+        </div>
+
+        <h3>Numerical Integration</h3>
+        <div class="key-point">
+            <p><strong>Gauss Quadrature:</strong> Integrals are evaluated numerically using Gauss points.</p>
+            <p>For 1D: \(\int_{-1}^{1} f(\xi)\,d\xi \approx \sum_{i=1}^{n_g} w_i f(\xi_i)\)</p>
+            <p>For 2D: \(\int_{-1}^{1}\int_{-1}^{1} f(\xi,\eta)\,d\xi\,d\eta \approx \sum_{i=1}^{n_g}\sum_{j=1}^{n_g} w_i w_j f(\xi_i, \eta_j)\)</p>
+            <p>Common schemes: 2×2 for bilinear quads, 3×3 for biquadratic quads.</p>
+        </div>
+
+        <h3>Element Quality and Convergence</h3>
+        <p>Element quality affects accuracy and convergence:</p>
+
+        <div class="equation-box">
+            <p><strong>Requirements for Convergence:</strong></p>
+            <ul>
+                <li><strong>Completeness:</strong> Shape functions can represent rigid body motion and constant strain</li>
+                <li><strong>Compatibility:</strong> Field variables are continuous across element boundaries</li>
+                <li><strong>Proper element shape:</strong> Avoid distorted elements (aspect ratio < 10, internal angles 30°-150°)</li>
+            </ul>
+            <p><strong>Convergence Rate:</strong> For polynomial order p, error decreases as \(O(h^{p+1})\) where h is element size.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Mesh and Shape Function Visualization</h2>
+        <p>Explore different element types, mesh refinement, and shape functions. Click on elements to see their shape functions evaluated.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="element-type">Element Type:</label>
+                <select id="element-type">
+                    <option value="quad4">4-Node Quadrilateral (Q4)</option>
+                    <option value="quad8">8-Node Quadrilateral (Q8)</option>
+                    <option value="tri3">3-Node Triangle (T3)</option>
+                    <option value="tri6">6-Node Triangle (T6)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="mesh-density">Mesh Density: <span id="mesh-density-value">2×2</span></label>
+                <input type="range" id="mesh-density" min="1" max="5" step="1" value="2">
+            </div>
+
+            <div class="control-group">
+                <label for="visualization-mode">Visualization:</label>
+                <select id="visualization-mode">
+                    <option value="mesh">Mesh Only</option>
+                    <option value="shape">Shape Functions</option>
+                    <option value="jacobian">Jacobian Determinant</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label><input type="checkbox" id="show-gauss-points" checked> Show Gauss Integration Points</label>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <h3 style="margin-top: 0;">Mesh Information:</h3>
+            <p><strong>Number of Elements:</strong> <span id="num-elements-display">4</span></p>
+            <p><strong>Number of Nodes:</strong> <span id="num-nodes-display">9</span></p>
+            <p><strong>Degrees of Freedom:</strong> <span id="dof-display">18</span></p>
+            <p><strong>Element Order:</strong> <span id="order-display">Linear</span></p>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            let elementType = 'quad4';
+            let meshDensity = 2;
+            let vizMode = 'mesh';
+            let showGaussPoints = true;
+
+            let mesh = {};
+            let selectedElement = null;
+            let selectedNode = 0;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 600);
+                canvas.parent('sketch-holder');
+
+                setupControls();
+                generateMesh();
+            };
+
+            function setupControls() {
+                document.getElementById('element-type').addEventListener('change', function() {
+                    elementType = this.value;
+                    generateMesh();
+                });
+
+                document.getElementById('mesh-density').addEventListener('input', function() {
+                    meshDensity = parseInt(this.value);
+                    document.getElementById('mesh-density-value').textContent = meshDensity + '×' + meshDensity;
+                    generateMesh();
+                });
+
+                document.getElementById('visualization-mode').addEventListener('change', function() {
+                    vizMode = this.value;
+                });
+
+                document.getElementById('show-gauss-points').addEventListener('change', function() {
+                    showGaussPoints = this.checked;
+                });
+            }
+
+            function generateMesh() {
+                mesh = {
+                    nodes: [],
+                    elements: [],
+                    type: elementType
+                };
+
+                let W = 350;
+                let H = 350;
+                let offsetX = 100;
+                let offsetY = 100;
+
+                if (elementType.startsWith('quad')) {
+                    // Generate quadrilateral mesh
+                    let nx = meshDensity + 1;
+                    let ny = meshDensity + 1;
+                    let dx = W / meshDensity;
+                    let dy = H / meshDensity;
+
+                    // Nodes
+                    for (let j = 0; j < ny; j++) {
+                        for (let i = 0; i < nx; i++) {
+                            mesh.nodes.push({
+                                x: offsetX + i * dx,
+                                y: offsetY + j * dy
+                            });
+                        }
+                    }
+
+                    // Elements
+                    for (let j = 0; j < meshDensity; j++) {
+                        for (let i = 0; i < meshDensity; i++) {
+                            let n1 = j * nx + i;
+                            let n2 = j * nx + (i + 1);
+                            let n3 = (j + 1) * nx + (i + 1);
+                            let n4 = (j + 1) * nx + i;
+
+                            if (elementType === 'quad4') {
+                                mesh.elements.push({
+                                    nodes: [n1, n2, n3, n4],
+                                    type: 'quad4'
+                                });
+                            } else if (elementType === 'quad8') {
+                                // Add mid-side nodes for Q8
+                                // This is simplified - in practice would need node renumbering
+                                mesh.elements.push({
+                                    nodes: [n1, n2, n3, n4],
+                                    type: 'quad8'
+                                });
+                            }
+                        }
+                    }
+                } else if (elementType.startsWith('tri')) {
+                    // Generate triangular mesh by dividing quads
+                    let nx = meshDensity + 1;
+                    let ny = meshDensity + 1;
+                    let dx = W / meshDensity;
+                    let dy = H / meshDensity;
+
+                    // Nodes
+                    for (let j = 0; j < ny; j++) {
+                        for (let i = 0; i < nx; i++) {
+                            mesh.nodes.push({
+                                x: offsetX + i * dx,
+                                y: offsetY + j * dy
+                            });
+                        }
+                    }
+
+                    // Elements (2 triangles per quad)
+                    for (let j = 0; j < meshDensity; j++) {
+                        for (let i = 0; i < meshDensity; i++) {
+                            let n1 = j * nx + i;
+                            let n2 = j * nx + (i + 1);
+                            let n3 = (j + 1) * nx + (i + 1);
+                            let n4 = (j + 1) * nx + i;
+
+                            mesh.elements.push({
+                                nodes: [n1, n2, n3],
+                                type: elementType
+                            });
+                            mesh.elements.push({
+                                nodes: [n1, n3, n4],
+                                type: elementType
+                            });
+                        }
+                    }
+                }
+
+                updateMeshInfo();
+            }
+
+            function updateMeshInfo() {
+                document.getElementById('num-elements-display').textContent = mesh.elements.length;
+                document.getElementById('num-nodes-display').textContent = mesh.nodes.length;
+
+                let dofPerNode = 2; // For 2D structural problem
+                document.getElementById('dof-display').textContent = mesh.nodes.length * dofPerNode;
+
+                let order = elementType.includes('8') || elementType.includes('6') ? 'Quadratic' : 'Linear';
+                document.getElementById('order-display').textContent = order;
+            }
+
+            p.draw = function() {
+                p.background(255);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(16);
+                p.textAlign(p.CENTER);
+                p.text('Finite Element Mesh - ' + getElementName(), 450, 30);
+
+                // Draw based on visualization mode
+                if (vizMode === 'mesh') {
+                    drawMesh();
+                } else if (vizMode === 'shape') {
+                    drawShapeFunctions();
+                } else if (vizMode === 'jacobian') {
+                    drawJacobian();
+                }
+
+                // Draw element info panel
+                drawInfoPanel();
+            };
+
+            function getElementName() {
+                let names = {
+                    'quad4': '4-Node Quadrilateral (Q4 - Bilinear)',
+                    'quad8': '8-Node Quadrilateral (Q8 - Biquadratic)',
+                    'tri3': '3-Node Triangle (T3 - Linear)',
+                    'tri6': '6-Node Triangle (T6 - Quadratic)'
+                };
+                return names[elementType] || elementType;
+            }
+
+            function drawMesh() {
+                // Draw elements
+                for (let i = 0; i < mesh.elements.length; i++) {
+                    let elem = mesh.elements[i];
+                    let isSelected = (i === selectedElement);
+
+                    p.fill(isSelected ? p.color(200, 220, 255) : p.color(240));
+                    p.stroke(0);
+                    p.strokeWeight(isSelected ? 3 : 1);
+
+                    p.beginShape();
+                    for (let nodeIdx of elem.nodes) {
+                        let node = mesh.nodes[nodeIdx];
+                        p.vertex(node.x, node.y);
+                    }
+                    p.endShape(p.CLOSE);
+
+                    // Element number
+                    let cx = 0, cy = 0;
+                    for (let nodeIdx of elem.nodes) {
+                        cx += mesh.nodes[nodeIdx].x;
+                        cy += mesh.nodes[nodeIdx].y;
+                    }
+                    cx /= elem.nodes.length;
+                    cy /= elem.nodes.length;
+
+                    p.fill(100);
+                    p.noStroke();
+                    p.textSize(11);
+                    p.textAlign(p.CENTER);
+                    p.text('E' + i, cx, cy + 3);
+
+                    // Gauss points
+                    if (showGaussPoints && isSelected) {
+                        drawGaussPointsForElement(elem);
+                    }
+                }
+
+                // Draw nodes
+                for (let i = 0; i < mesh.nodes.length; i++) {
+                    let node = mesh.nodes[i];
+                    p.fill(0, 100, 200);
+                    p.noStroke();
+                    p.circle(node.x, node.y, 6);
+
+                    // Node numbers
+                    p.fill(0);
+                    p.textSize(9);
+                    p.text(i, node.x + 12, node.y + 3);
+                }
+            }
+
+            function drawShapeFunctions() {
+                // Draw a 3D surface plot of selected shape function
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text('Shape Function N' + (selectedNode + 1), 650, 80);
+                p.textSize(12);
+                p.text('(Click element to cycle through nodes)', 650, 100);
+
+                // Draw the element in natural coordinates
+                drawNaturalCoordElement(550, 150);
+
+                // Draw shape function value visualization
+                drawShapeFunctionSurface(550, 350);
+            }
+
+            function drawNaturalCoordElement(x, y) {
+                p.push();
+                p.translate(x, y);
+
+                let size = 150;
+
+                // Background
+                p.fill(245);
+                p.noStroke();
+                p.rect(0, 0, size, size);
+
+                // Draw element in natural coordinates
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.noFill();
+
+                if (elementType.startsWith('quad')) {
+                    p.rect(0, 0, size, size);
+
+                    // Node positions for Q4
+                    let nodePos = [
+                        {x: 0, y: 0},
+                        {x: size, y: 0},
+                        {x: size, y: size},
+                        {x: 0, y: size}
+                    ];
+
+                    // Draw nodes
+                    for (let i = 0; i < nodePos.length; i++) {
+                        if (i === selectedNode) {
+                            p.fill(255, 0, 0);
+                        } else {
+                            p.fill(100);
+                        }
+                        p.noStroke();
+                        p.circle(nodePos[i].x, nodePos[i].y, 10);
+
+                        p.fill(0);
+                        p.textSize(12);
+                        p.textAlign(p.CENTER);
+                        p.text('N' + (i+1), nodePos[i].x, nodePos[i].y - 15);
+                    }
+                } else if (elementType.startsWith('tri')) {
+                    p.triangle(0, size, size, size, size/2, 0);
+
+                    let nodePos = [
+                        {x: 0, y: size},
+                        {x: size, y: size},
+                        {x: size/2, y: 0}
+                    ];
+
+                    for (let i = 0; i < nodePos.length; i++) {
+                        if (i === selectedNode) {
+                            p.fill(255, 0, 0);
+                        } else {
+                            p.fill(100);
+                        }
+                        p.noStroke();
+                        p.circle(nodePos[i].x, nodePos[i].y, 10);
+
+                        p.fill(0);
+                        p.textSize(12);
+                        p.textAlign(p.CENTER);
+                        let offset = (i === 2) ? -15 : 15;
+                        p.text('N' + (i+1), nodePos[i].x, nodePos[i].y + offset);
+                    }
+                }
+
+                // Natural coordinate axes
+                p.stroke(150);
+                p.strokeWeight(1);
+                p.fill(150);
+                p.textSize(10);
+                p.textAlign(p.LEFT);
+                p.text('ξ', size + 5, size/2);
+                p.textAlign(p.CENTER);
+                p.text('η', size/2, -5);
+
+                p.pop();
+            }
+
+            function drawShapeFunctionSurface(x, y) {
+                p.push();
+                p.translate(x, y);
+
+                let w = 200;
+                let h = 150;
+
+                // Draw surface as color map
+                let gridSize = 20;
+                p.noStroke();
+
+                for (let j = 0; j < gridSize; j++) {
+                    for (let i = 0; i < gridSize; i++) {
+                        let xi = -1 + 2 * i / (gridSize - 1);
+                        let eta = -1 + 2 * j / (gridSize - 1);
+
+                        let N = evaluateShapeFunction(xi, eta, selectedNode);
+
+                        // Color based on value
+                        let colorVal = p.map(N, 0, 1, 0, 255);
+                        p.fill(colorVal, 100, 255 - colorVal);
+
+                        let px = i * w / (gridSize - 1);
+                        let py = j * h / (gridSize - 1);
+                        p.rect(px, py, w / (gridSize - 1), h / (gridSize - 1));
+                    }
+                }
+
+                // Border
+                p.noFill();
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(0, 0, w, h);
+
+                // Value labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.LEFT);
+                p.text('N = 0', w + 10, h - 5);
+                p.text('N = 1', w + 10, 15);
+
+                p.pop();
+            }
+
+            function evaluateShapeFunction(xi, eta, nodeIndex) {
+                if (elementType === 'quad4') {
+                    // 4-node quad shape functions
+                    let shapes = [
+                        (1 - xi) * (1 - eta) / 4,
+                        (1 + xi) * (1 - eta) / 4,
+                        (1 + xi) * (1 + eta) / 4,
+                        (1 - xi) * (1 + eta) / 4
+                    ];
+                    return shapes[nodeIndex % 4];
+                } else if (elementType.startsWith('tri')) {
+                    // Triangle area coordinates (simplified)
+                    let L1 = 1 - xi - eta;
+                    let L2 = xi;
+                    let L3 = eta;
+                    let shapes = [L1, L2, L3];
+                    return Math.max(0, shapes[nodeIndex % 3]);
+                }
+                return 0;
+            }
+
+            function drawJacobian() {
+                // Draw Jacobian determinant for each element
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text('Jacobian Determinant (Element Quality)', 450, 480);
+
+                for (let i = 0; i < mesh.elements.length; i++) {
+                    let elem = mesh.elements[i];
+
+                    // Calculate approximate Jacobian at element center
+                    let detJ = calculateJacobian(elem);
+
+                    // Color based on quality (detJ should be > 0 and not too small)
+                    let quality = Math.min(1, Math.max(0, detJ / 10000));
+                    let col = p.color(
+                        p.map(quality, 0, 1, 255, 0),
+                        p.map(quality, 0, 1, 0, 255),
+                        0
+                    );
+
+                    p.fill(col);
+                    p.stroke(0);
+                    p.strokeWeight(1);
+
+                    p.beginShape();
+                    for (let nodeIdx of elem.nodes) {
+                        let node = mesh.nodes[nodeIdx];
+                        p.vertex(node.x, node.y);
+                    }
+                    p.endShape(p.CLOSE);
+
+                    // Display value
+                    let cx = 0, cy = 0;
+                    for (let nodeIdx of elem.nodes) {
+                        cx += mesh.nodes[nodeIdx].x;
+                        cy += mesh.nodes[nodeIdx].y;
+                    }
+                    cx /= elem.nodes.length;
+                    cy /= elem.nodes.length;
+
+                    p.fill(255);
+                    p.noStroke();
+                    p.textSize(10);
+                    p.textAlign(p.CENTER);
+                    p.text(detJ.toFixed(0), cx, cy + 3);
+                }
+
+                // Draw nodes
+                for (let node of mesh.nodes) {
+                    p.fill(0);
+                    p.noStroke();
+                    p.circle(node.x, node.y, 4);
+                }
+
+                // Legend
+                p.fill(0);
+                p.textSize(11);
+                p.textAlign(p.LEFT);
+                p.text('Green = Good, Red = Poor/Distorted', 100, 520);
+            }
+
+            function calculateJacobian(elem) {
+                // Simplified Jacobian calculation at element center
+                let nodes = elem.nodes.map(idx => mesh.nodes[idx]);
+
+                if (elementType.startsWith('quad') && nodes.length >= 4) {
+                    // For quad, approximate using corner nodes
+                    let dx_dxi = (nodes[1].x - nodes[0].x + nodes[2].x - nodes[3].x) / 2;
+                    let dy_dxi = (nodes[1].y - nodes[0].y + nodes[2].y - nodes[3].y) / 2;
+                    let dx_deta = (nodes[3].x - nodes[0].x + nodes[2].x - nodes[1].x) / 2;
+                    let dy_deta = (nodes[3].y - nodes[0].y + nodes[2].y - nodes[1].y) / 2;
+
+                    return dx_dxi * dy_deta - dx_deta * dy_dxi;
+                } else if (elementType.startsWith('tri') && nodes.length >= 3) {
+                    // For triangle, calculate area * 2
+                    let dx1 = nodes[1].x - nodes[0].x;
+                    let dy1 = nodes[1].y - nodes[0].y;
+                    let dx2 = nodes[2].x - nodes[0].x;
+                    let dy2 = nodes[2].y - nodes[0].y;
+
+                    return Math.abs(dx1 * dy2 - dx2 * dy1);
+                }
+
+                return 0;
+            }
+
+            function drawGaussPointsForElement(elem) {
+                // Draw 2x2 Gauss points for quad elements
+                let gaussPts = [
+                    [-0.577, -0.577],
+                    [0.577, -0.577],
+                    [0.577, 0.577],
+                    [-0.577, 0.577]
+                ];
+
+                let nodes = elem.nodes.map(idx => mesh.nodes[idx]);
+
+                for (let gpt of gaussPts) {
+                    let xi = gpt[0];
+                    let eta = gpt[1];
+
+                    // Map to physical coordinates
+                    let x = 0, y = 0;
+                    if (elementType === 'quad4') {
+                        for (let i = 0; i < 4; i++) {
+                            let N = evaluateShapeFunction(xi, eta, i);
+                            x += N * nodes[i].x;
+                            y += N * nodes[i].y;
+                        }
+                    }
+
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.circle(x, y, 8);
+                    p.fill(255);
+                    p.textSize(8);
+                    p.textAlign(p.CENTER);
+                    p.text('G', x, y + 3);
+                }
+            }
+
+            function drawInfoPanel() {
+                let panelX = 550;
+                let panelY = 500;
+                let panelW = 320;
+                let panelH = 80;
+
+                p.fill(240);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(panelX, panelY, panelW, panelH, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.text('Click on mesh to select element', panelX + 10, panelY + 20);
+                p.text('Gauss points shown in red (G)', panelX + 10, panelY + 40);
+                p.text('Use controls to change mesh and visualization', panelX + 10, panelY + 60);
+            }
+
+            p.mousePressed = function() {
+                // Check if clicked on an element
+                for (let i = 0; i < mesh.elements.length; i++) {
+                    let elem = mesh.elements[i];
+                    if (isPointInElement(p.mouseX, p.mouseY, elem)) {
+                        if (selectedElement === i) {
+                            // Cycle through nodes
+                            selectedNode = (selectedNode + 1) % elem.nodes.length;
+                        } else {
+                            selectedElement = i;
+                            selectedNode = 0;
+                        }
+                        break;
+                    }
+                }
+            };
+
+            function isPointInElement(px, py, elem) {
+                // Simple point-in-polygon test
+                let nodes = elem.nodes.map(idx => mesh.nodes[idx]);
+                let inside = false;
+
+                for (let i = 0, j = nodes.length - 1; i < nodes.length; j = i++) {
+                    let xi = nodes[i].x, yi = nodes[i].y;
+                    let xj = nodes[j].x, yj = nodes[j].y;
+
+                    let intersect = ((yi > py) !== (yj > py)) &&
+                                  (px < (xj - xi) * (py - yi) / (yj - yi) + xi);
+                    if (intersect) inside = !inside;
+                }
+
+                return inside;
+            }
+
+            generateMesh();
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Advanced FEM formulations enable analysis of complex engineering systems:</p>
+        <ul>
+            <li><strong>Structural Analysis:</strong> 2D plane stress/strain elements for thin structures, 3D solid elements for complex geometries. Higher-order elements (Q8, Q9) provide accurate stress predictions with fewer elements.</li>
+            <li><strong>Heat Transfer:</strong> Same element types used for thermal analysis. Isoparametric formulation allows curved boundaries to match actual geometry, critical for heat exchangers and electronics cooling.</li>
+            <li><strong>Fluid Dynamics:</strong> Mixed formulations combining velocity and pressure elements. Quadratic elements reduce spurious pressure oscillations in CFD.</li>
+            <li><strong>Electromagnetics:</strong> Edge elements for electromagnetic field analysis ensure proper field continuity. Critical for electric motor design and antenna analysis.</li>
+            <li><strong>Multi-physics:</strong> Coupled thermal-structural, fluid-structure interaction problems use different element types for different physics, requiring careful interface treatment.</li>
+            <li><strong>Mesh Generation:</strong> Automatic mesh generators create millions of elements for complex CAD geometries. Element quality checks prevent convergence problems.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Linear 1D Shape Function</td>
+                    <td>\(N_1 = \frac{1-\xi}{2}, \quad N_2 = \frac{1+\xi}{2}\)</td>
+                    <td>2-node bar element</td>
+                </tr>
+                <tr>
+                    <td>Quadratic 1D Shape Function</td>
+                    <td>\(N_1 = \frac{\xi(\xi-1)}{2}, \quad N_2 = 1-\xi^2\)</td>
+                    <td>3-node element with mid-node</td>
+                </tr>
+                <tr>
+                    <td>Q4 Shape Function</td>
+                    <td>\(N_i = \frac{(1+\xi_i\xi)(1+\eta_i\eta)}{4}\)</td>
+                    <td>Bilinear quadrilateral</td>
+                </tr>
+                <tr>
+                    <td>Isoparametric Mapping</td>
+                    <td>\(x = \sum N_i x_i, \quad y = \sum N_i y_i\)</td>
+                    <td>Geometry from same shape functions</td>
+                </tr>
+                <tr>
+                    <td>Jacobian Matrix</td>
+                    <td>\([J] = \begin{bmatrix} \frac{\partial x}{\partial \xi} & \frac{\partial y}{\partial \xi} \\ \frac{\partial x}{\partial \eta} & \frac{\partial y}{\partial \eta} \end{bmatrix}\)</td>
+                    <td>Coordinate transformation</td>
+                </tr>
+                <tr>
+                    <td>Stiffness Matrix</td>
+                    <td>\([K^e]_{ij} = \int_{\Omega^e} [B_i]^T[D][B_j]\det(J)\,d\xi\,d\eta\)</td>
+                    <td>Element stiffness (general)</td>
+                </tr>
+                <tr>
+                    <td>Gauss Quadrature</td>
+                    <td>\(\int_{-1}^{1} f(\xi)d\xi \approx \sum w_i f(\xi_i)\)</td>
+                    <td>Numerical integration</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Shape Function Evaluation</h3>
+            <p>For a 4-node quadrilateral element with nodes at (0,0), (2,0), (2,1), (0,1), evaluate: (a) all four shape functions at the element center (ξ=0, η=0), (b) the physical coordinates at this point, and (c) verify partition of unity.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>(a) Shape functions at center (ξ=0, η=0):</strong></p>
+                <p>\[N_1 = \frac{(1-0)(1-0)}{4} = \frac{1}{4}\]</p>
+                <p>\[N_2 = \frac{(1+0)(1-0)}{4} = \frac{1}{4}\]</p>
+                <p>\[N_3 = \frac{(1+0)(1+0)}{4} = \frac{1}{4}\]</p>
+                <p>\[N_4 = \frac{(1-0)(1+0)}{4} = \frac{1}{4}\]</p>
+
+                <p><strong>(b) Physical coordinates:</strong></p>
+                <p>\[x = N_1(0) + N_2(2) + N_3(2) + N_4(0) = \frac{1}{4}(0 + 2 + 2 + 0) = 1\]</p>
+                <p>\[y = N_1(0) + N_2(0) + N_3(1) + N_4(1) = \frac{1}{4}(0 + 0 + 1 + 1) = 0.5\]</p>
+                <p>Result: (1, 0.5) is indeed the center of the rectangle.</p>
+
+                <p><strong>(c) Partition of unity:</strong></p>
+                <p>\[\sum_{i=1}^4 N_i = \frac{1}{4} + \frac{1}{4} + \frac{1}{4} + \frac{1}{4} = 1 \quad ✓\]</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Jacobian Calculation</h3>
+            <p>For the element in Problem 1, calculate the Jacobian matrix at (ξ=0, η=0) and find its determinant. What does this value represent physically?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Shape function derivatives in natural coordinates:</strong></p>
+                <p>\[\frac{\partial N_1}{\partial \xi} = -\frac{(1-\eta)}{4}, \quad \frac{\partial N_1}{\partial \eta} = -\frac{(1-\xi)}{4}\]</p>
+                <p>At (ξ=0, η=0):</p>
+                <p>\[\frac{\partial N_1}{\partial \xi} = -\frac{1}{4}, \quad \frac{\partial N_1}{\partial \eta} = -\frac{1}{4}\]</p>
+
+                <p><strong>Jacobian components:</strong></p>
+                <p>\[\frac{\partial x}{\partial \xi} = \sum \frac{\partial N_i}{\partial \xi}x_i = -\frac{1}{4}(0) + \frac{1}{4}(2) + \frac{1}{4}(2) + (-\frac{1}{4})(0) = 1\]</p>
+                <p>\[\frac{\partial x}{\partial \eta} = \sum \frac{\partial N_i}{\partial \eta}x_i = -\frac{1}{4}(0) + (-\frac{1}{4})(2) + \frac{1}{4}(2) + \frac{1}{4}(0) = 0\]</p>
+                <p>\[\frac{\partial y}{\partial \xi} = 0, \quad \frac{\partial y}{\partial \eta} = 0.5\]</p>
+
+                <p><strong>Jacobian matrix:</strong></p>
+                <p>\[[J] = \begin{bmatrix} 1 & 0 \\ 0 & 0.5 \end{bmatrix}\]</p>
+                <p>\[\det(J) = 1 \times 0.5 - 0 \times 0 = 0.5\]</p>
+
+                <p><strong>Physical meaning:</strong> det(J) = 0.5 represents the local scaling factor between natural and physical coordinates. It's also half the element area (area = 2 × 1 = 2, so det(J) = 2/4 = 0.5 for this specific location).</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Gauss Quadrature</h3>
+            <p>Use 2-point Gauss quadrature to evaluate \(\int_{-1}^{1} (3x^2 + 2x + 1)dx\). Compare with the exact analytical result. The Gauss points are ξ₁ = -0.577, ξ₂ = 0.577, both with weight w = 1.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Gauss quadrature approximation:</strong></p>
+                <p>\[I \approx w_1 f(\xi_1) + w_2 f(\xi_2)\]</p>
+                <p>\[f(\xi_1) = 3(-0.577)^2 + 2(-0.577) + 1 = 3(0.333) - 1.154 + 1 = 0.845\]</p>
+                <p>\[f(\xi_2) = 3(0.577)^2 + 2(0.577) + 1 = 3(0.333) + 1.154 + 1 = 3.153\]</p>
+                <p>\[I \approx 1 \times 0.845 + 1 \times 3.153 = 3.998\]</p>
+
+                <p><strong>Exact analytical result:</strong></p>
+                <p>\[I = \int_{-1}^{1} (3x^2 + 2x + 1)dx = [x^3 + x^2 + x]_{-1}^{1}\]</p>
+                <p>\[I = (1 + 1 + 1) - (-1 + 1 - 1) = 3 - (-1) = 4\]</p>
+
+                <p><strong>Error:</strong> |4 - 3.998| / 4 = 0.05% - excellent accuracy!</p>
+                <p><strong>Explanation:</strong> 2-point Gauss quadrature is exact for polynomials up to degree 3. Our polynomial is degree 2, so the small error comes from numerical roundoff only.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the isoparametric formulation?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Using different shape functions for geometry and field variables</label>
+                    <label><input type="radio" name="q1" value="b"> b) Using the same shape functions for both geometry and field variables</label>
+                    <label><input type="radio" name="q1" value="c"> c) Using only linear elements</label>
+                    <label><input type="radio" name="q1" value="d"> d) Elements with equal parameter values</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The Jacobian matrix is used to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Calculate element stiffness directly</label>
+                    <label><input type="radio" name="q2" value="b"> b) Transform derivatives between natural and physical coordinates</label>
+                    <label><input type="radio" name="q2" value="c"> c) Determine boundary conditions</label>
+                    <label><input type="radio" name="q2" value="d"> d) Assemble the global matrix</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: A quadratic element has how many nodes compared to a linear element of the same topology?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) The same number</label>
+                    <label><input type="radio" name="q3" value="b"> b) Twice as many</label>
+                    <label><input type="radio" name="q3" value="c"> c) Additional mid-side nodes</label>
+                    <label><input type="radio" name="q3" value="d"> d) One fewer node</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Gauss quadrature is preferred over uniform sampling because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) It's easier to program</label>
+                    <label><input type="radio" name="q4" value="b"> b) It achieves higher accuracy with fewer evaluation points</label>
+                    <label><input type="radio" name="q4" value="c"> c) It works only for linear problems</label>
+                    <label><input type="radio" name="q4" value="d"> d) It requires no weight factors</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Shape functions must satisfy the partition of unity property, meaning:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Each shape function equals 1 at all points</label>
+                    <label><input type="radio" name="q5" value="b"> b) The sum of all shape functions equals 1 at any point</label>
+                    <label><input type="radio" name="q5" value="c"> c) Shape functions are always positive</label>
+                    <label><input type="radio" name="q5" value="d"> d) Shape functions are orthogonal</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'b',
+                        q3: 'c',
+                        q4: 'b',
+                        q5: 'b'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

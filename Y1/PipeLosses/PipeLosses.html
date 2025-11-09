@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipe Losses - Interactive Lecture</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Pipe Losses: Major and Minor Losses</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Head Losses in Pipe Flow</h2>
+        <p>When fluid flows through pipes, energy is lost due to friction between the fluid and pipe walls (major losses) and turbulence created by fittings, bends, and changes in flow area (minor losses). Understanding these losses is crucial for designing efficient piping systems.</p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> Total head loss in a piping system is the sum of major losses (friction in straight pipes) and minor losses (fittings, bends, valves). This lost energy must be supplied by pumps to maintain flow.</p>
+        </div>
+
+        <h3>Major Losses (Friction Losses)</h3>
+        <p>Major losses occur along the length of straight pipe due to viscous friction between the fluid and pipe walls. These are calculated using the Darcy-Weisbach equation.</p>
+
+        <div class="equation-box">
+            <p><strong>Darcy-Weisbach Equation:</strong></p>
+            <p>\[h_f = f \frac{L}{D} \frac{v^2}{2g}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(h_f\) = Head loss due to friction (m)</li>
+                <li>\(f\) = Darcy friction factor (dimensionless)</li>
+                <li>\(L\) = Pipe length (m)</li>
+                <li>\(D\) = Pipe diameter (m)</li>
+                <li>\(v\) = Average flow velocity (m/s)</li>
+                <li>\(g\) = Gravitational acceleration (9.81 m/s²)</li>
+            </ul>
+        </div>
+
+        <h3>Friction Factor</h3>
+        <p>The friction factor depends on the flow regime and pipe roughness:</p>
+        <ul>
+            <li><strong>Laminar Flow (Re < 2300):</strong> \(f = \frac{64}{Re}\)</li>
+            <li><strong>Turbulent Flow (Re > 4000):</strong> Determined from Moody diagram or approximations</li>
+        </ul>
+
+        <div class="equation-box">
+            <p><strong>Reynolds Number:</strong></p>
+            <p>\[Re = \frac{\rho v D}{\mu} = \frac{v D}{\nu}\]</p>
+            <p>Where \(\mu\) is dynamic viscosity and \(\nu\) is kinematic viscosity</p>
+        </div>
+
+        <h3>Minor Losses (Local Losses)</h3>
+        <p>Minor losses occur at pipe fittings, bends, valves, and other components that disturb the flow. Despite their name, they can be significant in systems with many fittings.</p>
+
+        <div class="equation-box">
+            <p><strong>Minor Loss Equation:</strong></p>
+            <p>\[h_L = K \frac{v^2}{2g}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(h_L\) = Head loss for the fitting (m)</li>
+                <li>\(K\) = Loss coefficient (dimensionless, depends on fitting type)</li>
+                <li>\(v\) = Flow velocity (m/s)</li>
+            </ul>
+        </div>
+
+        <h3>Typical K-values for Common Fittings</h3>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fitting Type</th>
+                        <th>K-value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Pipe entrance (sharp-edged)</td><td>0.5</td></tr>
+                    <tr><td>Pipe entrance (rounded)</td><td>0.05</td></tr>
+                    <tr><td>Pipe exit</td><td>1.0</td></tr>
+                    <tr><td>90° elbow (standard)</td><td>0.9</td></tr>
+                    <tr><td>90° elbow (long radius)</td><td>0.6</td></tr>
+                    <tr><td>45° elbow</td><td>0.4</td></tr>
+                    <tr><td>T-junction (flow through)</td><td>0.6</td></tr>
+                    <tr><td>T-junction (side branch)</td><td>1.8</td></tr>
+                    <tr><td>Gate valve (fully open)</td><td>0.2</td></tr>
+                    <tr><td>Gate valve (half open)</td><td>5.6</td></tr>
+                    <tr><td>Globe valve (fully open)</td><td>10.0</td></tr>
+                    <tr><td>Check valve</td><td>2.5</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Total Head Loss</h3>
+        <p>The total head loss in a piping system is:</p>
+        <div class="equation-box">
+            <p>\[h_{total} = h_f + \sum h_L = f \frac{L}{D} \frac{v^2}{2g} + \sum K \frac{v^2}{2g}\]</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive Pipe System Simulation</h2>
+        <p>Design a piping system and see how different fittings contribute to total head loss. Add or remove fittings to understand their impact on system performance.</p>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="pipe-length">Pipe Length (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="pipe-length" min="10" max="100" value="50" step="5">
+                        <span id="pipe-length-value" class="value-display">50</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="pipe-diameter">Pipe Diameter (mm):</label>
+                    <div class="slider-row">
+                        <input type="range" id="pipe-diameter" min="50" max="300" value="100" step="25">
+                        <span id="pipe-diameter-value" class="value-display">100</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="flow-velocity">Flow Velocity (m/s):</label>
+                    <div class="slider-row">
+                        <input type="range" id="flow-velocity" min="0.5" max="5" value="2" step="0.5">
+                        <span id="flow-velocity-value" class="value-display">2.0</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="roughness">Pipe Roughness:</label>
+                    <select id="roughness" class="slider">
+                        <option value="0.0015">Smooth (PVC)</option>
+                        <option value="0.046" selected>Commercial Steel</option>
+                        <option value="0.15">Galvanized Iron</option>
+                        <option value="0.26">Cast Iron</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+                <h4>Add Fittings to System:</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                    <button class="fitting-button" data-fitting="elbow90">90° Elbow (K=0.9)</button>
+                    <button class="fitting-button" data-fitting="elbow45">45° Elbow (K=0.4)</button>
+                    <button class="fitting-button" data-fitting="tee">T-junction (K=0.6)</button>
+                    <button class="fitting-button" data-fitting="valve">Gate Valve (K=0.2)</button>
+                    <button class="fitting-button" data-fitting="globe">Globe Valve (K=10)</button>
+                    <button class="fitting-button" id="clear-fittings" style="background: #e74c3c;">Clear All</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <p><strong>Reynolds Number:</strong> Re = <span id="reynolds">0</span> (<span id="flow-regime">Laminar</span>)</p>
+            <p><strong>Friction Factor:</strong> f = <span id="friction-factor">0</span></p>
+            <p><strong>Major Loss (friction):</strong> h<sub>f</sub> = <span id="major-loss">0</span> m</p>
+            <p><strong>Minor Loss (fittings):</strong> h<sub>L</sub> = <span id="minor-loss">0</span> m</p>
+            <p><strong>Total Head Loss:</strong> h<sub>total</sub> = <span id="total-loss">0</span> m</p>
+            <p><strong>Pressure Drop:</strong> ΔP = <span id="pressure-drop">0</span> kPa</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li><strong>Building Water Supply:</strong> Calculating required pump head to deliver water to upper floors, accounting for elevation changes and piping losses.</li>
+            <li><strong>HVAC Systems:</strong> Sizing fans and determining duct pressures in heating, ventilation, and air conditioning systems.</li>
+            <li><strong>Oil and Gas Pipelines:</strong> Determining pump station spacing and power requirements for long-distance transmission pipelines.</li>
+            <li><strong>Water Treatment Plants:</strong> Designing distribution networks to maintain adequate pressure throughout the system.</li>
+            <li><strong>Chemical Processing:</strong> Sizing pumps and selecting pipe diameters to minimize energy costs while meeting flow requirements.</li>
+            <li><strong>Fire Protection Systems:</strong> Ensuring sufficient pressure and flow at sprinkler heads despite losses in piping network.</li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Major Loss (Darcy-Weisbach)</td>
+                        <td>\(h_f = f \frac{L}{D} \frac{v^2}{2g}\)</td>
+                        <td>Friction loss in straight pipe</td>
+                    </tr>
+                    <tr>
+                        <td>Minor Loss</td>
+                        <td>\(h_L = K \frac{v^2}{2g}\)</td>
+                        <td>Loss due to fittings and components</td>
+                    </tr>
+                    <tr>
+                        <td>Reynolds Number</td>
+                        <td>\(Re = \frac{\rho v D}{\mu}\)</td>
+                        <td>Determines flow regime</td>
+                    </tr>
+                    <tr>
+                        <td>Friction Factor (Laminar)</td>
+                        <td>\(f = \frac{64}{Re}\)</td>
+                        <td>For Re < 2300</td>
+                    </tr>
+                    <tr>
+                        <td>Swamee-Jain (Turbulent)</td>
+                        <td>\(f = \frac{0.25}{[\log(\frac{\epsilon/D}{3.7} + \frac{5.74}{Re^{0.9}})]^2}\)</td>
+                        <td>Explicit friction factor approximation</td>
+                    </tr>
+                    <tr>
+                        <td>Total Head Loss</td>
+                        <td>\(h_{total} = h_f + \sum h_L\)</td>
+                        <td>Sum of major and minor losses</td>
+                    </tr>
+                    <tr>
+                        <td>Pressure Drop</td>
+                        <td>\(\Delta P = \rho g h_{total}\)</td>
+                        <td>Pressure loss due to head loss</td>
+                    </tr>
+                    <tr>
+                        <td>Velocity from Flow Rate</td>
+                        <td>\(v = \frac{4Q}{\pi D^2}\)</td>
+                        <td>Average velocity in pipe</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Major Loss Calculation</h3>
+            <p>Water flows at 3 m/s through a 150 mm diameter steel pipe that is 200 m long. The friction factor is 0.020. Calculate the head loss due to friction. (g = 9.81 m/s²)</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Velocity: v = 3 m/s</li>
+                    <li>Diameter: D = 150 mm = 0.15 m</li>
+                    <li>Length: L = 200 m</li>
+                    <li>Friction factor: f = 0.020</li>
+                </ul>
+                <p><strong>Apply Darcy-Weisbach equation:</strong></p>
+                <p>\[h_f = f \frac{L}{D} \frac{v^2}{2g} = 0.020 \times \frac{200}{0.15} \times \frac{3^2}{2 \times 9.81}\]</p>
+                <p>\[h_f = 0.020 \times 1333.33 \times \frac{9}{19.62}\]</p>
+                <p>\[h_f = 0.020 \times 1333.33 \times 0.459 = 12.24 \text{ m}\]</p>
+                <p><strong>Answer:</strong> The head loss due to friction is 12.24 m</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Minor Loss Calculation</h3>
+            <p>Water flows through a pipe system at 2.5 m/s. The system contains two 90° elbows (K = 0.9 each), one gate valve fully open (K = 0.2), and one pipe exit (K = 1.0). Calculate the total minor head loss.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Velocity: v = 2.5 m/s</li>
+                    <li>Fittings: 2 elbows (K = 0.9 each), 1 valve (K = 0.2), 1 exit (K = 1.0)</li>
+                </ul>
+                <p><strong>Step 1: Calculate total K-value:</strong></p>
+                <p>\[K_{total} = 2(0.9) + 0.2 + 1.0 = 1.8 + 0.2 + 1.0 = 3.0\]</p>
+                <p><strong>Step 2: Apply minor loss equation:</strong></p>
+                <p>\[h_L = K_{total} \frac{v^2}{2g} = 3.0 \times \frac{2.5^2}{2 \times 9.81}\]</p>
+                <p>\[h_L = 3.0 \times \frac{6.25}{19.62} = 3.0 \times 0.319 = 0.956 \text{ m}\]</p>
+                <p><strong>Answer:</strong> The total minor head loss is 0.956 m (approximately 1.0 m)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Complete System Analysis</h3>
+            <p>A water pipe system has the following specifications: L = 100 m, D = 100 mm, v = 2 m/s, f = 0.025. The system includes three 90° elbows (K = 0.9 each) and one gate valve (K = 0.2). Calculate: (a) major loss, (b) minor loss, (c) total head loss, (d) pressure drop. (ρ = 1000 kg/m³)</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong> L = 100 m, D = 0.1 m, v = 2 m/s, f = 0.025, K<sub>total</sub> = 3(0.9) + 0.2 = 2.9</p>
+                
+                <p><strong>(a) Major loss:</strong></p>
+                <p>\[h_f = f \frac{L}{D} \frac{v^2}{2g} = 0.025 \times \frac{100}{0.1} \times \frac{4}{19.62}\]</p>
+                <p>\[h_f = 0.025 \times 1000 \times 0.204 = 5.10 \text{ m}\]</p>
+                
+                <p><strong>(b) Minor loss:</strong></p>
+                <p>\[h_L = K_{total} \frac{v^2}{2g} = 2.9 \times \frac{4}{19.62} = 2.9 \times 0.204 = 0.591 \text{ m}\]</p>
+                
+                <p><strong>(c) Total head loss:</strong></p>
+                <p>\[h_{total} = h_f + h_L = 5.10 + 0.591 = 5.69 \text{ m}\]</p>
+                
+                <p><strong>(d) Pressure drop:</strong></p>
+                <p>\[\Delta P = \rho g h_{total} = 1000 \times 9.81 \times 5.69 = 55,830 \text{ Pa} = 55.8 \text{ kPa}\]</p>
+                
+                <p><strong>Answers:</strong> (a) 5.10 m, (b) 0.591 m, (c) 5.69 m, (d) 55.8 kPa</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: Major losses in pipes are primarily caused by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Pipe fittings and valves</label>
+                    <label><input type="radio" name="q1" value="b"> b) Friction between fluid and pipe walls</label>
+                    <label><input type="radio" name="q1" value="c"> c) Changes in pipe diameter</label>
+                    <label><input type="radio" name="q1" value="d"> d) Turbulence at pipe entrance</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: In the Darcy-Weisbach equation, head loss is proportional to:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Velocity (v)</label>
+                    <label><input type="radio" name="q2" value="b"> b) Square of velocity (v²)</label>
+                    <label><input type="radio" name="q2" value="c"> c) Square root of velocity (√v)</label>
+                    <label><input type="radio" name="q2" value="d"> d) Cube of velocity (v³)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: For laminar flow in a circular pipe, the friction factor f is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Constant and independent of Reynolds number</label>
+                    <label><input type="radio" name="q3" value="b"> b) Equal to 64/Re</label>
+                    <label><input type="radio" name="q3" value="c"> c) Depends only on pipe roughness</label>
+                    <label><input type="radio" name="q3" value="d"> d) Always equal to 0.02</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: A globe valve typically has a much higher K-value than a gate valve because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Globe valves are larger</label>
+                    <label><input type="radio" name="q4" value="b"> b) Globe valves create more flow restriction and turbulence</label>
+                    <label><input type="radio" name="q4" value="c"> c) Globe valves are made of rougher material</label>
+                    <label><input type="radio" name="q4" value="d"> d) Globe valves are always partially closed</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: If the flow velocity in a pipe doubles, the head loss due to friction:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Doubles</label>
+                    <label><input type="radio" name="q5" value="b"> b) Quadruples</label>
+                    <label><input type="radio" name="q5" value="c"> c) Increases by factor of 8</label>
+                    <label><input type="radio" name="q5" value="d"> d) Remains constant</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: Minor losses are called "minor" because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) They are always negligible</label>
+                    <label><input type="radio" name="q6" value="b"> b) They occur over short lengths compared to major losses</label>
+                    <label><input type="radio" name="q6" value="c"> c) They only occur in small pipes</label>
+                    <label><input type="radio" name="q6" value="d"> d) They can be ignored in calculations</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // Pipe losses simulation - JavaScript continues in separate file due to length
+    </script>
+    <script src="PipeLosses.js"></script>
+</body>
+</html>

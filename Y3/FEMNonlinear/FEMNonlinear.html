@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonlinear FEM Solvers - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Nonlinear FEM Solvers</h1>
+        <p class="subtitle">Newton-Raphson, Load Stepping, and Advanced Solution Methods</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Nonlinear FEM</h2>
+
+        <h3>Sources of Nonlinearity</h3>
+        <p>Nonlinear problems arise from three main sources, often occurring simultaneously:</p>
+
+        <div class="equation-box">
+            <p><strong>1. Material Nonlinearity:</strong> Stress-strain relationship is nonlinear</p>
+            <p>\[\sigma = f(\varepsilon) \quad \text{(e.g., plasticity, hyperelasticity)}\]</p>
+            <p><strong>2. Geometric Nonlinearity:</strong> Large displacements change equilibrium equations</p>
+            <p>\[\text{Equilibrium on deformed configuration}\]</p>
+            <p><strong>3. Contact/Boundary Nonlinearity:</strong> Changing boundary conditions</p>
+            <p>\[\text{Contact pressure active only when } g(u) \leq 0\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Nonlinear problems cannot be solved directly like linear systems. Instead, we linearize about a current state and iterate to convergence. The choice of solution algorithm (Newton-Raphson, modified Newton, arc-length) depends on the specific nonlinearity type and problem characteristics.</p>
+        </div>
+
+        <h3>Newton-Raphson Method</h3>
+        <p>The standard approach for solving nonlinear FEM equations:</p>
+
+        <div class="equation-box">
+            <p><strong>Residual Form:</strong> Find \(\{u\}\) such that</p>
+            <p>\[\{R\}(\{u\}) = \{F_{ext}\} - \{F_{int}\}(\{u\}) = \{0\}\]</p>
+            <p>where \(\{F_{int}\}\) are internal forces depending on displacement.</p>
+
+            <p><strong>Newton-Raphson Iteration:</strong></p>
+            <p>\[[K_T]^i \{\Delta u\}^{i+1} = \{R\}^i\]</p>
+            <p>\[\{u\}^{i+1} = \{u\}^i + \{\Delta u\}^{i+1}\]</p>
+            <p>where \([K_T]\) is the tangent stiffness matrix:</p>
+            <p>\[[K_T] = \frac{\partial \{R\}}{\partial \{u\}} = -\frac{\partial \{F_{int}\}}{\partial \{u\}}\]</p>
+        </div>
+
+        <h3>Tangent Stiffness Matrix</h3>
+        <p>The tangent stiffness represents the instantaneous stiffness at the current state:</p>
+
+        <div class="equation-box">
+            <p><strong>For material nonlinearity:</strong></p>
+            <p>\[[K_T] = \int_\Omega [B]^T[D_{tan}][B]d\Omega\]</p>
+            <p>where \([D_{tan}] = \frac{d\sigma}{d\varepsilon}\) is the tangent modulus</p>
+
+            <p><strong>For geometric nonlinearity:</strong></p>
+            <p>\[[K_T] = [K_L] + [K_\sigma]\]</p>
+            <p>\([K_L]\) = linear stiffness, \([K_\sigma]\) = stress stiffness (geometric stiffness)</p>
+        </div>
+
+        <h3>Convergence Criteria</h3>
+        <p>Multiple criteria ensure solution accuracy:</p>
+
+        <div class="equation-box">
+            <p><strong>1. Residual Norm (Force Equilibrium):</strong></p>
+            <p>\[\frac{\|\{R\}^i\|}{\|\{F_{ext}\}\|} < \epsilon_F \quad (\text{typically } 10^{-3} \text{ to } 10^{-6})\]</p>
+
+            <p><strong>2. Displacement Norm (Solution Change):</strong></p>
+            <p>\[\frac{\|\{\Delta u\}^i\|}{\|\{u\}^i\|} < \epsilon_u \quad (\text{typically } 10^{-4} \text{ to } 10^{-6})\]</p>
+
+            <p><strong>3. Energy Norm:</strong></p>
+            <p>\[\frac{\{\Delta u\}^T \{R\}}{\{u\}^T \{F_{ext}\}} < \epsilon_E\]</p>
+        </div>
+
+        <h3>Load Stepping and Path Following</h3>
+        <p>For problems with complex nonlinear response:</p>
+
+        <div class="equation-box">
+            <p><strong>Incremental-Iterative Method:</strong></p>
+            <ol>
+                <li>Divide total load into increments: \(F = \sum_{n=1}^{N} \Delta F_n\)</li>
+                <li>For each increment, use Newton-Raphson to find equilibrium</li>
+                <li>Use converged solution as initial guess for next increment</li>
+            </ol>
+
+            <p><strong>Adaptive Load Stepping:</strong></p>
+            <ul>
+                <li>If convergence is fast (< 5 iterations): increase load step</li>
+                <li>If convergence is slow (> 15 iterations): decrease load step</li>
+                <li>If divergence occurs: backtrack and retry with smaller step</li>
+            </ul>
+        </div>
+
+        <h3>Arc-Length Method</h3>
+        <p>For problems with snap-through or snap-back behavior:</p>
+
+        <div class="equation-box">
+            <p><strong>Constraint Equation:</strong></p>
+            <p>\[\{\Delta u\}^T \{\Delta u\} + \psi^2 \Delta\lambda^2 \|\{F_{ref}\}\|^2 = \Delta s^2\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(\Delta\lambda\) = load factor increment</li>
+                <li>\(\Delta s\) = arc-length (controls step size)</li>
+                <li>\(\psi\) = scaling parameter</li>
+            </ul>
+            <p>This allows the solution to follow the equilibrium path through limit points where load-displacement curves have vertical or negative tangents.</p>
+        </div>
+
+        <h3>Nonlinear Dynamics</h3>
+        <div class="key-point">
+            <p><strong>Implicit Dynamic Analysis:</strong> Newmark method with Newton-Raphson at each time step</p>
+            <p>\[[M]\{\ddot{u}\}_{n+1} + [C]\{\dot{u}\}_{n+1} + \{F_{int}\}(\{u\}_{n+1}) = \{F_{ext}\}_{n+1}\]</p>
+            <p>Predictor-corrector scheme:</p>
+            <ul>
+                <li><strong>Predictor:</strong> Estimate \(\{u\}_{n+1}\) from previous time steps</li>
+                <li><strong>Corrector:</strong> Newton-Raphson iterations to satisfy equilibrium</li>
+                <li>Tangent stiffness includes inertia and damping: \([K_T^{eff}] = [K_T] + a_0[M] + a_1[C]\)</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Newton-Raphson Visualization</h2>
+        <p>Watch the Newton-Raphson method solve a nonlinear spring problem. The simulation shows how the algorithm iterates to find equilibrium by linearizing about the current state.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="nonlinearity-type">Nonlinearity Type:</label>
+                <select id="nonlinearity-type">
+                    <option value="hardening">Hardening Spring (k increases)</option>
+                    <option value="softening">Softening Spring (k decreases)</option>
+                    <option value="bilinear">Bilinear (Plasticity-like)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="applied-force">Applied Force F (N): <span id="applied-force-value">100</span></label>
+                <input type="range" id="applied-force" min="20" max="200" step="10" value="100">
+            </div>
+
+            <div class="control-group">
+                <label for="load-steps">Number of Load Steps: <span id="load-steps-value">5</span></label>
+                <input type="range" id="load-steps" min="1" max="10" step="1" value="5">
+            </div>
+
+            <div class="control-group">
+                <button id="solve-btn">Solve</button>
+                <button id="step-btn">Step Iteration</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <h3 style="margin-top: 0;">Iteration Status:</h3>
+            <p><strong>Load Step:</strong> <span id="step-display">0 / 5</span></p>
+            <p><strong>Iteration:</strong> <span id="iter-display">0</span></p>
+            <p><strong>Residual:</strong> <span id="residual-display">N/A</span> N</p>
+            <p><strong>Convergence:</strong> <span id="convergence-display">Not started</span></p>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            // Problem parameters
+            let F_total = 100;      // Total force (N)
+            let numLoadSteps = 5;   // Number of load increments
+            let nonlinType = 'hardening';
+
+            // Solution state
+            let currentStep = 0;
+            let currentIter = 0;
+            let u_current = 0;      // Current displacement
+            let F_current = 0;      // Current force level
+            let residual = 0;
+            let isConverged = false;
+            let isSolving = false;
+
+            // History for plotting
+            let history = [];
+            let iterationPoints = [];
+
+            // Convergence parameters
+            let tol = 1e-3;
+            let maxIter = 20;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 650);
+                canvas.parent('sketch-holder');
+
+                setupControls();
+                reset();
+            };
+
+            function setupControls() {
+                document.getElementById('nonlinearity-type').addEventListener('change', function() {
+                    nonlinType = this.value;
+                    reset();
+                });
+
+                document.getElementById('applied-force').addEventListener('input', function() {
+                    F_total = parseFloat(this.value);
+                    document.getElementById('applied-force-value').textContent = F_total;
+                    reset();
+                });
+
+                document.getElementById('load-steps').addEventListener('input', function() {
+                    numLoadSteps = parseInt(this.value);
+                    document.getElementById('load-steps-value').textContent = numLoadSteps;
+                    reset();
+                });
+
+                document.getElementById('solve-btn').addEventListener('click', function() {
+                    isSolving = !isSolving;
+                    this.textContent = isSolving ? 'Pause' : 'Solve';
+                });
+
+                document.getElementById('step-btn').addEventListener('click', function() {
+                    if (!isConverged && currentStep < numLoadSteps) {
+                        performIteration();
+                    }
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    reset();
+                });
+            }
+
+            function reset() {
+                currentStep = 0;
+                currentIter = 0;
+                u_current = 0;
+                F_current = 0;
+                residual = 0;
+                isConverged = false;
+                isSolving = false;
+                history = [];
+                iterationPoints = [];
+                document.getElementById('solve-btn').textContent = 'Solve';
+                updateDisplay();
+            }
+
+            function getForceFromDisplacement(u) {
+                // Different nonlinear force-displacement relationships
+                switch(nonlinType) {
+                    case 'hardening':
+                        return 1000 * u + 50 * u * u * u;
+                    case 'softening':
+                        return 2000 * u - 100 * u * u * u;
+                    case 'bilinear':
+                        if (Math.abs(u) < 0.05) {
+                            return 2000 * u;
+                        } else {
+                            return 100 + 500 * (u - 0.05);
+                        }
+                    default:
+                        return 1000 * u;
+                }
+            }
+
+            function getTangentStiffness(u) {
+                // Derivative of force w.r.t. displacement
+                switch(nonlinType) {
+                    case 'hardening':
+                        return 1000 + 150 * u * u;
+                    case 'softening':
+                        return 2000 - 300 * u * u;
+                    case 'bilinear':
+                        if (Math.abs(u) < 0.05) {
+                            return 2000;
+                        } else {
+                            return 500;
+                        }
+                    default:
+                        return 1000;
+                }
+            }
+
+            function performIteration() {
+                if (currentStep >= numLoadSteps) return;
+
+                if (currentIter === 0) {
+                    // New load step
+                    currentStep++;
+                    F_current = (currentStep / numLoadSteps) * F_total;
+                    iterationPoints = [];
+                }
+
+                // Calculate residual
+                let F_int = getForceFromDisplacement(u_current);
+                residual = F_current - F_int;
+
+                // Store iteration point
+                iterationPoints.push({u: u_current, F: F_int, iter: currentIter});
+
+                // Check convergence
+                if (Math.abs(residual) / Math.max(Math.abs(F_current), 1) < tol || currentIter >= maxIter) {
+                    isConverged = true;
+                    history.push({u: u_current, F: F_current});
+                    currentIter = 0;
+                    updateDisplay();
+                    return;
+                }
+
+                // Newton-Raphson update
+                let K_T = getTangentStiffness(u_current);
+                let delta_u = residual / K_T;
+                u_current += delta_u;
+
+                currentIter++;
+                isConverged = false;
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                document.getElementById('step-display').textContent = currentStep + ' / ' + numLoadSteps;
+                document.getElementById('iter-display').textContent = currentIter;
+                document.getElementById('residual-display').textContent = residual.toFixed(4);
+
+                let status = '';
+                if (currentStep === 0) {
+                    status = 'Not started';
+                } else if (isConverged && currentStep < numLoadSteps) {
+                    status = 'Step converged ✓';
+                } else if (isConverged && currentStep >= numLoadSteps) {
+                    status = 'Solution complete ✓✓';
+                } else if (currentIter >= maxIter) {
+                    status = 'Failed to converge ✗';
+                } else {
+                    status = 'Iterating...';
+                }
+                document.getElementById('convergence-display').textContent = status;
+            }
+
+            p.draw = function() {
+                p.background(255);
+
+                // Auto-solve
+                if (isSolving && p.frameCount % 10 === 0) {
+                    if (!isConverged || currentStep < numLoadSteps) {
+                        performIteration();
+                    } else {
+                        isSolving = false;
+                        document.getElementById('solve-btn').textContent = 'Solve';
+                    }
+                }
+
+                // Draw visualizations
+                drawSpringSystem();
+                drawForcePlot();
+                drawConvergencePlot();
+            };
+
+            function drawSpringSystem() {
+                let x0 = 150;
+                let y0 = 250;
+
+                p.push();
+                p.translate(x0, y0);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(16);
+                p.textAlign(p.CENTER);
+                p.text('Nonlinear Spring System', 0, -150);
+
+                // Wall
+                p.fill(150);
+                p.rect(-30, -80, 20, 160);
+                // Hatch marks
+                for (let i = -3; i <= 3; i++) {
+                    p.line(-30, i * 20, -40, i * 20 + 10);
+                }
+
+                // Spring
+                let displacement = u_current * 500; // Scale for visualization
+                p.stroke(0, 100, 200);
+                p.strokeWeight(3);
+                p.noFill();
+                let coils = 10;
+                let springLength = 100 + displacement;
+                p.beginShape();
+                p.vertex(-10, 0);
+                for (let i = 0; i <= coils; i++) {
+                    let x = -10 + (springLength / coils) * i;
+                    let y = (i % 2 === 0) ? -15 : 15;
+                    p.vertex(x, y);
+                }
+                p.vertex(-10 + springLength, 0);
+                p.endShape();
+
+                // Mass
+                p.fill(200, 50, 50);
+                p.stroke(0);
+                p.strokeWeight(2);
+                let massX = -10 + springLength;
+                p.rect(massX, -25, 50, 50, 5);
+
+                // Applied force
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                let arrowLen = F_current * 0.8;
+                if (arrowLen > 1) {
+                    p.line(massX + 50, 0, massX + 50 + arrowLen, 0);
+                    p.triangle(massX + 50 + arrowLen, 0,
+                              massX + 50 + arrowLen - 8, -5,
+                              massX + 50 + arrowLen - 8, 5);
+                    p.noStroke();
+                    p.textSize(12);
+                    p.textAlign(p.LEFT);
+                    p.text('F = ' + F_current.toFixed(1) + ' N', massX + 50 + arrowLen + 10, 5);
+                }
+
+                // Displacement label
+                if (Math.abs(displacement) > 1) {
+                    p.stroke(100);
+                    p.strokeWeight(1);
+                    p.drawingContext.setLineDash([5, 5]);
+                    p.line(0, 60, massX, 60);
+                    p.line(0, 55, 0, 65);
+                    p.line(massX, 55, massX, 65);
+                    p.drawingContext.setLineDash([]);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textSize(11);
+                    p.textAlign(p.CENTER);
+                    p.text('u = ' + u_current.toFixed(4) + ' m', massX/2, 75);
+                }
+
+                p.pop();
+            }
+
+            function drawForcePlot() {
+                let plotX = 450;
+                let plotY = 50;
+                let plotW = 400;
+                let plotH = 250;
+
+                p.push();
+                p.translate(plotX, plotY);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text('Force vs Displacement (Newton-Raphson Path)', plotW/2, -10);
+
+                // Background
+                p.fill(245);
+                p.rect(0, 0, plotW, plotH);
+
+                // Grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 5; i++) {
+                    let xx = i * plotW / 5;
+                    p.line(xx, 0, xx, plotH);
+                    let yy = i * plotH / 5;
+                    p.line(0, yy, plotW, yy);
+                }
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(0, plotH, plotW, plotH);
+                p.line(0, 0, 0, plotH);
+
+                // Plot nonlinear curve
+                let maxU = 0.25;
+                p.noFill();
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.beginShape();
+                for (let i = 0; i <= 100; i++) {
+                    let u = (i / 100) * maxU;
+                    let F = getForceFromDisplacement(u);
+                    let px = p.map(u, 0, maxU, 0, plotW);
+                    let py = p.map(F, 0, F_total * 1.2, plotH, 0);
+                    p.vertex(px, py);
+                }
+                p.endShape();
+
+                // Plot solution history
+                p.stroke(0, 200, 0);
+                p.strokeWeight(3);
+                for (let i = 1; i < history.length; i++) {
+                    let u1 = history[i-1].u;
+                    let F1 = history[i-1].F;
+                    let u2 = history[i].u;
+                    let F2 = history[i].F;
+                    let px1 = p.map(u1, 0, maxU, 0, plotW);
+                    let py1 = p.map(F1, 0, F_total * 1.2, plotH, 0);
+                    let px2 = p.map(u2, 0, maxU, 0, plotW);
+                    let py2 = p.map(F2, 0, F_total * 1.2, plotH, 0);
+                    p.line(px1, py1, px2, py2);
+                }
+
+                // Plot converged points
+                p.fill(0, 200, 0);
+                p.noStroke();
+                for (let pt of history) {
+                    let px = p.map(pt.u, 0, maxU, 0, plotW);
+                    let py = p.map(pt.F, 0, F_total * 1.2, plotH, 0);
+                    p.circle(px, py, 8);
+                }
+
+                // Plot current iteration path
+                if (iterationPoints.length > 1) {
+                    p.stroke(255, 0, 0);
+                    p.strokeWeight(2);
+                    for (let i = 1; i < iterationPoints.length; i++) {
+                        let u1 = iterationPoints[i-1].u;
+                        let F1 = iterationPoints[i-1].F;
+                        let u2 = iterationPoints[i].u;
+
+                        let px1 = p.map(u1, 0, maxU, 0, plotW);
+                        let py1 = p.map(F1, 0, F_total * 1.2, plotH, 0);
+                        let px2 = p.map(u2, 0, maxU, 0, plotW);
+
+                        // Draw tangent line and vertical line to show Newton step
+                        p.line(px1, py1, px2, py1); // Horizontal to next guess
+                        let F2 = getForceFromDisplacement(u2);
+                        let py2 = p.map(F2, 0, F_total * 1.2, plotH, 0);
+                        p.line(px2, py1, px2, py2); // Vertical to curve
+                    }
+                }
+
+                // Current point
+                if (currentStep > 0) {
+                    let px = p.map(u_current, 0, maxU, 0, plotW);
+                    let py = p.map(getForceFromDisplacement(u_current), 0, F_total * 1.2, plotH, 0);
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    p.circle(px, py, 10);
+                }
+
+                // Target force line
+                if (F_current > 0) {
+                    p.stroke(255, 0, 0);
+                    p.strokeWeight(1);
+                    p.drawingContext.setLineDash([5, 5]);
+                    let py_target = p.map(F_current, 0, F_total * 1.2, plotH, 0);
+                    p.line(0, py_target, plotW, py_target);
+                    p.drawingContext.setLineDash([]);
+                }
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('Displacement u (m)', plotW/2, plotH + 20);
+                p.textAlign(p.RIGHT);
+                for (let i = 0; i <= 5; i++) {
+                    let F = (i / 5) * F_total * 1.2;
+                    let yy = p.map(F, 0, F_total * 1.2, plotH, 0);
+                    p.text(F.toFixed(0), -5, yy + 4);
+                }
+
+                p.pop();
+            }
+
+            function drawConvergencePlot() {
+                let plotX = 450;
+                let plotY = 350;
+                let plotW = 400;
+                let plotH = 200;
+
+                p.push();
+                p.translate(plotX, plotY);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text('Residual Convergence', plotW/2, -10);
+
+                // Background
+                p.fill(245);
+                p.rect(0, 0, plotW, plotH);
+
+                // Plot residuals for current load step
+                if (iterationPoints.length > 0) {
+                    let maxRes = 0;
+                    for (let pt of iterationPoints) {
+                        let r = Math.abs(F_current - getForceFromDisplacement(pt.u));
+                        maxRes = Math.max(maxRes, r);
+                    }
+
+                    // Grid
+                    p.stroke(220);
+                    p.strokeWeight(1);
+                    for (let i = 0; i <= 5; i++) {
+                        let xx = i * plotW / 5;
+                        p.line(xx, 0, xx, plotH);
+                    }
+
+                    // Log scale lines
+                    let logLevels = [1, 0.1, 0.01, 0.001, 0.0001];
+                    for (let level of logLevels) {
+                        if (level * maxRes > tol * F_total) {
+                            let yy = p.map(Math.log10(level * maxRes), Math.log10(tol * F_total), Math.log10(maxRes), plotH, 0);
+                            p.stroke(220);
+                            p.line(0, yy, plotW, yy);
+                            p.fill(150);
+                            p.noStroke();
+                            p.textSize(9);
+                            p.textAlign(p.RIGHT);
+                            p.text((level * maxRes).toFixed(4), plotW - 5, yy - 2);
+                        }
+                    }
+
+                    // Tolerance line
+                    let tolVal = tol * Math.max(F_total, 1);
+                    let py_tol = p.map(Math.log10(tolVal), Math.log10(tol * F_total), Math.log10(maxRes), plotH, 0);
+                    p.stroke(0, 200, 0);
+                    p.strokeWeight(2);
+                    p.drawingContext.setLineDash([5, 5]);
+                    p.line(0, py_tol, plotW, py_tol);
+                    p.drawingContext.setLineDash([]);
+
+                    // Plot convergence history
+                    p.noFill();
+                    p.stroke(255, 0, 0);
+                    p.strokeWeight(3);
+                    p.beginShape();
+                    for (let i = 0; i < iterationPoints.length; i++) {
+                        let pt = iterationPoints[i];
+                        let r = Math.abs(F_current - getForceFromDisplacement(pt.u));
+                        let px = p.map(i, 0, maxIter, 0, plotW);
+                        let py = p.map(Math.log10(r), Math.log10(tol * F_total), Math.log10(maxRes), plotH, 0);
+                        p.vertex(px, py);
+                    }
+                    p.endShape();
+
+                    // Points
+                    p.fill(255, 0, 0);
+                    p.noStroke();
+                    for (let i = 0; i < iterationPoints.length; i++) {
+                        let pt = iterationPoints[i];
+                        let r = Math.abs(F_current - getForceFromDisplacement(pt.u));
+                        let px = p.map(i, 0, maxIter, 0, plotW);
+                        let py = p.map(Math.log10(r), Math.log10(tol * F_total), Math.log10(maxRes), plotH, 0);
+                        p.circle(px, py, 6);
+                    }
+                }
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(0, plotH, plotW, plotH);
+                p.line(0, 0, 0, plotH);
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('Iteration Number', plotW/2, plotH + 20);
+                p.textAlign(p.LEFT);
+                p.text('|Residual| (log)', 5, 15);
+
+                p.pop();
+            }
+
+            updateDisplay();
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Nonlinear FEM solvers are essential for modern engineering analysis:</p>
+        <ul>
+            <li><strong>Plasticity and Metal Forming:</strong> Stamping, forging, and deep drawing processes involve large plastic deformations. Nonlinear material models (von Mises, Tresca) with isotropic/kinematic hardening require Newton-Raphson with load stepping.</li>
+            <li><strong>Rubber and Hyperelastic Materials:</strong> Seals, tires, and vibration isolators use hyperelastic models (Neo-Hookean, Mooney-Rivlin) that are highly nonlinear. Geometric nonlinearity is also significant due to large strains.</li>
+            <li><strong>Buckling and Post-Buckling:</strong> Thin-walled structures (aircraft fuselage, pressure vessels) exhibit snap-through behavior. Arc-length methods are required to trace the equilibrium path through buckling.</li>
+            <li><strong>Contact Problems:</strong> Gear teeth, bearing surfaces, and crash simulations involve contact boundaries that change during analysis. Contact constraints are highly nonlinear and require careful treatment.</li>
+            <li><strong>Cable and Membrane Structures:</strong> Tension-only elements (cables, fabric) have zero stiffness in compression, creating severe nonlinearity. Suspension bridges and tensile fabric structures require nonlinear analysis.</li>
+            <li><strong>Biomechanics:</strong> Soft tissue (muscle, tendon, blood vessels) exhibits extreme material and geometric nonlinearity. Patient-specific finite element models guide surgical planning and medical device design.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Residual</td>
+                    <td>\(\{R\} = \{F_{ext}\} - \{F_{int}\}(\{u\})\)</td>
+                    <td>Out-of-balance force</td>
+                </tr>
+                <tr>
+                    <td>Newton-Raphson Update</td>
+                    <td>\([K_T]^i \{\Delta u\}^{i+1} = \{R\}^i\)</td>
+                    <td>Linearized equilibrium</td>
+                </tr>
+                <tr>
+                    <td>Tangent Stiffness</td>
+                    <td>\([K_T] = -\frac{\partial \{F_{int}\}}{\partial \{u\}}\)</td>
+                    <td>Instantaneous stiffness</td>
+                </tr>
+                <tr>
+                    <td>Residual Convergence</td>
+                    <td>\(\frac{\|\{R\}\|}{\|\{F_{ext}\}\|} < \epsilon_F\)</td>
+                    <td>Force equilibrium criterion</td>
+                </tr>
+                <tr>
+                    <td>Displacement Convergence</td>
+                    <td>\(\frac{\|\{\Delta u\}\|}{\|\{u\}\|} < \epsilon_u\)</td>
+                    <td>Solution change criterion</td>
+                </tr>
+                <tr>
+                    <td>Arc-Length Constraint</td>
+                    <td>\(\{\Delta u\}^T\{\Delta u\} + \psi^2\Delta\lambda^2 = \Delta s^2\)</td>
+                    <td>Path-following method</td>
+                </tr>
+                <tr>
+                    <td>Effective Stiffness (Dynamics)</td>
+                    <td>\([K_T^{eff}] = [K_T] + a_0[M] + a_1[C]\)</td>
+                    <td>Includes inertia and damping</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Manual Newton-Raphson Iteration</h3>
+            <p>A nonlinear spring has force-displacement relation F = 1000u + 200u³ (N, m). An external force F = 150 N is applied. Perform three Newton-Raphson iterations starting from u⁰ = 0. Calculate the residual and tangent stiffness at each iteration.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Iteration 0: u⁰ = 0</strong></p>
+                <p>F_int = 1000(0) + 200(0)³ = 0</p>
+                <p>R⁰ = 150 - 0 = 150 N</p>
+                <p>K_T = dF/du = 1000 + 600u² = 1000 N/m</p>
+                <p>Δu¹ = R⁰/K_T = 150/1000 = 0.15 m</p>
+                <p>u¹ = 0 + 0.15 = 0.15 m</p>
+
+                <p><strong>Iteration 1: u¹ = 0.15</strong></p>
+                <p>F_int = 1000(0.15) + 200(0.15)³ = 150 + 0.675 = 150.675 N</p>
+                <p>R¹ = 150 - 150.675 = -0.675 N</p>
+                <p>K_T = 1000 + 600(0.15)² = 1000 + 13.5 = 1013.5 N/m</p>
+                <p>Δu² = -0.675/1013.5 = -0.000666 m</p>
+                <p>u² = 0.15 - 0.000666 = 0.149334 m</p>
+
+                <p><strong>Iteration 2: u² = 0.149334</strong></p>
+                <p>F_int = 1000(0.149334) + 200(0.149334)³ = 149.334 + 0.666 = 150.0 N</p>
+                <p>R² = 150 - 150.0 ≈ 0 N</p>
+
+                <p><strong>Convergence:</strong> After just 3 iterations, |R| < 0.001 N. The solution is u ≈ 0.1493 m.</p>
+                <p>Note the quadratic convergence: residual decreases from 150 → 0.675 → 0, demonstrating Newton-Raphson's efficiency.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Load Stepping Strategy</h3>
+            <p>For the problem above, if the full load F = 150 N requires 3 iterations to converge, estimate how many total iterations would be needed using: (a) 1 load step (apply full load), (b) 3 equal load steps, (c) 5 equal load steps. Assume convergence requires 3-5 iterations per step.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>(a) 1 load step (full load):</strong></p>
+                <p>Iterations: 3 (as shown in Problem 1)</p>
+
+                <p><strong>(b) 3 equal load steps (F = 50, 100, 150 N):</strong></p>
+                <p>Each smaller load increment typically converges faster (2-3 iterations)</p>
+                <p>Estimated total: 3 steps × 3 iter = 9 iterations</p>
+
+                <p><strong>(c) 5 equal load steps (F = 30, 60, 90, 120, 150 N):</strong></p>
+                <p>Very small increments converge quickly (2 iterations each)</p>
+                <p>Estimated total: 5 steps × 2 iter = 10 iterations</p>
+
+                <p><strong>Analysis:</strong></p>
+                <p>For this mildly nonlinear problem, 1 load step is most efficient (3 iterations). However, for severely nonlinear problems (plasticity, contact), multiple load steps are essential:</p>
+                <ul>
+                    <li>Large steps may not converge at all (divergence)</li>
+                    <li>Small steps guarantee convergence but cost more iterations</li>
+                    <li>Adaptive stepping (increase/decrease based on convergence rate) is optimal</li>
+                </ul>
+                <p>Rule of thumb: Use 5-10 load steps for plasticity, 20-50 for contact problems.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Tangent vs Secant Stiffness</h3>
+            <p>For a nonlinear spring F = ku + αu³, compare the tangent stiffness K_T = dF/du with the secant stiffness K_S = F/u. For k = 1000, α = 100, and u = 0.2 m, calculate both values. Which would converge faster in Newton-Raphson iterations?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Calculate force at u = 0.2 m:</strong></p>
+                <p>\[F = 1000(0.2) + 100(0.2)^3 = 200 + 0.8 = 200.8 \text{ N}\]</p>
+
+                <p><strong>Tangent stiffness:</strong></p>
+                <p>\[K_T = \frac{dF}{du} = k + 3\alpha u^2 = 1000 + 3(100)(0.2)^2\]</p>
+                <p>\[K_T = 1000 + 3(100)(0.04) = 1000 + 12 = 1012 \text{ N/m}\]</p>
+
+                <p><strong>Secant stiffness:</strong></p>
+                <p>\[K_S = \frac{F}{u} = \frac{200.8}{0.2} = 1004 \text{ N/m}\]</p>
+
+                <p><strong>Comparison:</strong></p>
+                <p>• Tangent stiffness (1012 N/m) is 0.8% higher than secant (1004 N/m)</p>
+                <p>• Tangent stiffness represents the local slope at current displacement</p>
+                <p>• Secant stiffness represents the average slope from origin</p>
+
+                <p><strong>Convergence:</strong></p>
+                <p>Newton-Raphson with tangent stiffness converges quadratically (very fast). Using secant stiffness (Modified Newton or Secant method) converges linearly (slower but avoids recalculating K_T every iteration).</p>
+                <p>Trade-off: Tangent requires computing K_T each iteration (expensive) but needs fewer iterations. For expensive K_T calculations (large FEM models), Modified Newton (reuse K_T for several iterations) is often more efficient overall.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What are the three main sources of nonlinearity in FEM?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Element type, mesh density, boundary conditions</label>
+                    <label><input type="radio" name="q1" value="b"> b) Material, geometric, and contact/boundary nonlinearity</label>
+                    <label><input type="radio" name="q1" value="c"> c) Stiffness, mass, and damping matrices</label>
+                    <label><input type="radio" name="q1" value="d"> d) Time step, load step, convergence tolerance</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: The tangent stiffness matrix in Newton-Raphson represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) The average stiffness over the entire loading history</label>
+                    <label><input type="radio" name="q2" value="b"> b) The initial linear stiffness</label>
+                    <label><input type="radio" name="q2" value="c"> c) The instantaneous stiffness at the current displacement state</label>
+                    <label><input type="radio" name="q2" value="d"> d) The final converged stiffness</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Load stepping is used because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) It's required by all FEM codes</label>
+                    <label><input type="radio" name="q3" value="b"> b) It improves convergence for highly nonlinear problems</label>
+                    <label><input type="radio" name="q3" value="c"> c) It reduces computational cost</label>
+                    <label><input type="radio" name="q3" value="d"> d) It eliminates the need for iterations</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: The arc-length method is useful for:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a> Linear problems only</label>
+                    <label><input type="radio" name="q4" value="b"> b) Problems with snap-through or snap-back behavior</label>
+                    <label><input type="radio" name="q4" value="c"> c) Reducing the number of elements</label>
+                    <label><input type="radio" name="q4" value="d"> d) Eliminating convergence checks</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Convergence in Newton-Raphson is typically checked using:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Only the residual norm</label>
+                    <label><input type="radio" name="q5" value="b"> b) Only the displacement norm</label>
+                    <label><input type="radio" name="q5" value="c"> c) Multiple criteria including residual, displacement, and sometimes energy norms</label>
+                    <label><input type="radio" name="q5" value="d"> d) The determinant of the stiffness matrix</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'c',
+                        q3: 'b',
+                        q4: 'b',
+                        q5: 'c'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

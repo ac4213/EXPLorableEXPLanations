@@ -1320,12 +1320,77 @@ document.getElementById('submit-quiz').addEventListener('click', function() {
 - ✅ Show current parameter values
 - ✅ Add legends for color-coded elements
 - ✅ Make canvas responsive
+- ✅ **Use canvas-overlaid infoboxes for simulation results/parameters** instead of HTML panels below the canvas
 
 **DON'T:**
 - ❌ Start animation automatically
 - ❌ Hide parameter controls
 - ❌ Use unclear color schemes
 - ❌ Make canvas too small for mobile
+- ❌ Place critical simulation information in HTML panels that require scrolling to view
+
+#### Canvas Infoboxes vs HTML Results Panels
+
+**IMPORTANT:** When displaying simulation results, flow parameters, or real-time data, **always prefer canvas-overlaid infoboxes** over HTML results panels placed outside the canvas.
+
+**Why Canvas Infoboxes Are Better:**
+- Always visible while user interacts with simulation (no scrolling required)
+- Provides immediate visual feedback
+- Keeps user's attention focused on the simulation
+- Professional appearance similar to professional simulation software
+- Better mobile experience (no need to scroll between canvas and info)
+
+**Example - Canvas Infobox (PREFERRED):**
+```javascript
+function drawInfoOverlay() {
+    // Semi-transparent background box
+    p.fill(255, 255, 255, 230);
+    p.stroke(50);
+    p.strokeWeight(1);
+    p.rect(p.width - 260, 10, 250, 110, 5);
+
+    // Text content
+    p.fill(0);
+    p.noStroke();
+    p.textSize(13);
+    p.textAlign(p.LEFT);
+
+    let x = p.width - 250;
+    let y = 30;
+    let lineHeight = 20;
+
+    p.textStyle(p.BOLD);
+    p.text('Flow Parameters:', x, y);
+    p.textStyle(p.NORMAL);
+
+    y += lineHeight;
+    p.text('Reynolds Number: ' + Re.toFixed(0), x, y);
+
+    y += lineHeight;
+    p.text('Regime: ' + flowRegime, x, y);
+}
+
+// Call in draw() function
+p.draw = function() {
+    p.background(240);
+    // ... simulation drawing code ...
+    drawInfoOverlay(); // Draw info last (on top)
+};
+```
+
+**Example - HTML Panel (AVOID for real-time data):**
+```html
+<!-- This requires scrolling and is not visible while interacting with canvas -->
+<div style="margin-top: 20px; padding: 15px; background: #f0f0f0;">
+    <h3>Flow Parameters:</h3>
+    <p><strong>Reynolds Number:</strong> <span id="reynolds-display">40</span></p>
+    <p><strong>Flow Regime:</strong> <span id="regime-display">Laminar</span></p>
+</div>
+```
+
+**When to use each approach:**
+- **Canvas Infobox:** Real-time simulation data, current parameters, dynamic values, critical feedback
+- **HTML Panel:** Static explanatory text, detailed instructions, supplementary information that doesn't change during simulation
 
 ### 6. Accessibility
 

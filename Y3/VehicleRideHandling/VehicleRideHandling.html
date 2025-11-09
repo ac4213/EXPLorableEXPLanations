@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Ride and Handling - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Vehicle Ride and Handling</h1>
+        <p class="subtitle">Understanding Suspension Systems and Ride Comfort</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Vehicle Ride and Handling</h2>
+
+        <h3>What is Ride and Handling?</h3>
+        <p>Ride quality refers to how well a vehicle isolates occupants from road disturbances, while handling describes the vehicle's responsiveness to driver inputs. These objectives often conflict: soft suspensions improve ride comfort but reduce handling precision, creating a fundamental trade-off in suspension design.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> The suspension system is the critical interface between vehicle and road. It must simultaneously provide comfort (isolate from bumps), maintain tire contact (for traction), control body motion (for handling), and support vehicle weight. Understanding this multi-objective optimization is key to suspension design.</p>
+        </div>
+
+        <h3>Quarter-Car Model</h3>
+        <p>The quarter-car model represents one corner of the vehicle as a two-degree-of-freedom system:</p>
+
+        <div class="equation-box">
+            <p><strong>Sprung Mass (Vehicle Body) Equation:</strong></p>
+            <p>\[m_s \ddot{z}_s = -k(z_s - z_u) - c(\dot{z}_s - \dot{z}_u)\]</p>
+            <p><strong>Unsprung Mass (Wheel/Tire) Equation:</strong></p>
+            <p>\[m_u \ddot{z}_u = k(z_s - z_u) + c(\dot{z}_s - \dot{z}_u) - k_t(z_u - z_r)\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(m_s\) = sprung mass (kg) - approximately 1/4 vehicle mass</li>
+                <li>\(m_u\) = unsprung mass (kg) - wheel, tire, brake, suspension components</li>
+                <li>\(k\) = suspension spring stiffness (N/m)</li>
+                <li>\(c\) = suspension damping coefficient (N·s/m)</li>
+                <li>\(k_t\) = tire stiffness (N/m), typically 200,000-300,000 N/m</li>
+                <li>\(z_s, z_u, z_r\) = sprung, unsprung, and road displacements (m)</li>
+            </ul>
+        </div>
+
+        <h3>Natural Frequencies</h3>
+        <p>The suspension system has two natural frequencies corresponding to sprung and unsprung mass modes:</p>
+
+        <div class="equation-box">
+            <p><strong>Sprung Mass Natural Frequency (Body Bounce):</strong></p>
+            <p>\[f_s = \frac{1}{2\pi}\sqrt{\frac{k}{m_s}} \approx 1-1.5 \text{ Hz (typical)}\]</p>
+            <p><strong>Unsprung Mass Natural Frequency (Wheel Hop):</strong></p>
+            <p>\[f_u = \frac{1}{2\pi}\sqrt{\frac{k + k_t}{m_u}} \approx 10-15 \text{ Hz (typical)}\]</p>
+            <p>The large frequency separation ensures that wheel hop doesn't couple strongly with body motion.</p>
+        </div>
+
+        <h3>Damping Ratio and Ride Quality</h3>
+        <p>The damping ratio controls how quickly oscillations decay:</p>
+
+        <div class="equation-box">
+            <p>\[\zeta = \frac{c}{2\sqrt{km_s}}\]</p>
+            <p><strong>Typical Values:</strong></p>
+            <ul>
+                <li>\(\zeta = 0.2-0.3\): Comfort-oriented (luxury sedans) - soft, floaty ride</li>
+                <li>\(\zeta = 0.3-0.4\): Balanced (family cars) - compromise comfort/handling</li>
+                <li>\(\zeta = 0.4-0.5\): Sport-oriented (performance cars) - firm, controlled ride</li>
+            </ul>
+            <p>Underdamping (\(\zeta < 1\)) is always used because critical damping (\(\zeta = 1\)) transmits too much high-frequency road harshness.</p>
+        </div>
+
+        <h3>Frequency Response and Transmissibility</h3>
+        <p>The transmissibility function describes how road inputs are transmitted to the vehicle body:</p>
+
+        <div class="equation-box">
+            <p>\[T(\omega) = \left|\frac{Z_s(\omega)}{Z_r(\omega)}\right| = \frac{\sqrt{1 + (2\zeta r)^2}}{\sqrt{(1-r^2)^2 + (2\zeta r)^2}}\]</p>
+            <p>where \(r = \omega/\omega_n\) is the frequency ratio.</p>
+            <p><strong>Key Observations:</strong></p>
+            <ul>
+                <li>At low frequencies (r << 1): T ≈ 1 (body follows road)</li>
+                <li>At resonance (r ≈ 1): T > 1 (amplification, reduced by damping)</li>
+                <li>At high frequencies (r >> 1): T → 0 (isolation, body stays still)</li>
+            </ul>
+        </div>
+
+        <h3>Roll Dynamics</h3>
+        <p>During cornering, the vehicle body rolls about its roll axis:</p>
+
+        <div class="equation-box">
+            <p><strong>Roll Angle:</strong></p>
+            <p>\[\phi = \frac{m h a_y}{K_\phi}\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(m\) = vehicle mass (kg)</li>
+                <li>\(h\) = CG height above roll axis (m)</li>
+                <li>\(a_y\) = lateral acceleration (m/s²)</li>
+                <li>\(K_\phi = k_{f} t_f^2 + k_r t_r^2\) = roll stiffness (N·m/rad)</li>
+                <li>\(t_f, t_r\) = front and rear track widths (m)</li>
+            </ul>
+            <p><strong>Anti-Roll Bars:</strong> Additional torsional springs connecting left/right wheels to increase roll stiffness without affecting ride stiffness.</p>
+        </div>
+
+        <h3>Ride-Handling Trade-off</h3>
+        <div class="key-point">
+            <p><strong>The Fundamental Compromise:</strong></p>
+            <ul>
+                <li><strong>Soft Suspension (Low k, Low c):</strong> Better ride comfort, isolates high-frequency bumps, but more body roll, pitch, and slower response to driver inputs</li>
+                <li><strong>Stiff Suspension (High k, High c):</strong> Better handling, reduced body motion, precise control, but transmits more road harshness and reduces comfort</li>
+                <li><strong>Solution:</strong> Adaptive/active suspensions that vary damping in real-time based on road conditions and driving style</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Quarter-Car Suspension Model</h2>
+        <p>This simulation shows a quarter-car model responding to a road bump. Adjust suspension parameters to see the trade-off between ride comfort and wheel control.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="spring-stiffness">Spring Stiffness k (kN/m): <span id="spring-stiffness-value">20</span></label>
+                <input type="range" id="spring-stiffness" min="10" max="50" step="5" value="20">
+            </div>
+
+            <div class="control-group">
+                <label for="damping-ratio">Damping Ratio ζ: <span id="damping-ratio-value">0.30</span></label>
+                <input type="range" id="damping-ratio" min="0.10" max="0.70" step="0.05" value="0.30">
+            </div>
+
+            <div class="control-group">
+                <label for="road-input">Road Input Type:</label>
+                <select id="road-input">
+                    <option value="step">Step Bump</option>
+                    <option value="sine">Sine Wave</option>
+                    <option value="random">Random Road</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="vehicle-speed">Vehicle Speed (km/h): <span id="vehicle-speed-value">60</span></label>
+                <input type="range" id="vehicle-speed" min="20" max="120" step="10" value="60">
+            </div>
+
+            <div class="control-group">
+                <button id="reset-sim">Reset Simulation</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <h3 style="margin-top: 0;">Suspension Performance:</h3>
+            <p><strong>Sprung Mass Frequency fs:</strong> <span id="freq-display">1.00</span> Hz</p>
+            <p><strong>Peak Body Acceleration:</strong> <span id="accel-display">0.00</span> m/s² (<span id="g-display">0.00</span>g)</p>
+            <p><strong>Ride Character:</strong> <span id="character-display">Comfort</span></p>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            // System parameters
+            let ms = 400;           // Sprung mass (kg)
+            let mu = 50;            // Unsprung mass (kg)
+            let k = 20000;          // Spring stiffness (N/m)
+            let c = 2000;           // Damping (N·s/m)
+            let kt = 200000;        // Tire stiffness (N/m)
+            let zeta = 0.30;        // Damping ratio
+
+            // State variables
+            let zs = 0, zs_dot = 0;     // Sprung mass position and velocity
+            let zu = 0, zu_dot = 0;     // Unsprung mass position and velocity
+            let t = 0;
+
+            // Road input
+            let roadType = 'step';
+            let speed = 60;  // km/h
+            let roadHistory = [];
+            let stateHistory = [];
+
+            // Simulation
+            let dt = 0.002;
+            let maxTime = 3.0;
+            let isRunning = true;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 650);
+                canvas.parent('sketch-holder');
+
+                setupControls();
+                resetSimulation();
+            };
+
+            function setupControls() {
+                document.getElementById('spring-stiffness').addEventListener('input', function() {
+                    k = parseFloat(this.value) * 1000;
+                    document.getElementById('spring-stiffness-value').textContent = (k/1000).toFixed(0);
+                    updateDamping();
+                    resetSimulation();
+                });
+
+                document.getElementById('damping-ratio').addEventListener('input', function() {
+                    zeta = parseFloat(this.value);
+                    document.getElementById('damping-ratio-value').textContent = zeta.toFixed(2);
+                    updateDamping();
+                    resetSimulation();
+                });
+
+                document.getElementById('road-input').addEventListener('change', function() {
+                    roadType = this.value;
+                    resetSimulation();
+                });
+
+                document.getElementById('vehicle-speed').addEventListener('input', function() {
+                    speed = parseFloat(this.value);
+                    document.getElementById('vehicle-speed-value').textContent = speed;
+                    resetSimulation();
+                });
+
+                document.getElementById('reset-sim').addEventListener('click', function() {
+                    resetSimulation();
+                });
+            }
+
+            function updateDamping() {
+                c = zeta * 2 * Math.sqrt(k * ms);
+                updateDisplay();
+            }
+
+            function updateDisplay() {
+                let fs = 1 / (2 * Math.PI) * Math.sqrt(k / ms);
+                document.getElementById('freq-display').textContent = fs.toFixed(2);
+
+                let character = '';
+                if (zeta < 0.25) {
+                    character = 'Very Soft (Luxury)';
+                } else if (zeta < 0.35) {
+                    character = 'Comfort-Oriented';
+                } else if (zeta < 0.45) {
+                    character = 'Balanced';
+                } else {
+                    character = 'Sport-Oriented (Firm)';
+                }
+                document.getElementById('character-display').textContent = character;
+            }
+
+            function resetSimulation() {
+                zs = 0;
+                zs_dot = 0;
+                zu = 0;
+                zu_dot = 0;
+                t = 0;
+                roadHistory = [];
+                stateHistory = [];
+                isRunning = true;
+            }
+
+            function getRoadHeight(time) {
+                let position = (speed / 3.6) * time; // m
+
+                switch(roadType) {
+                    case 'step':
+                        return (position > 10 && position < 10.5) ? 0.1 : 0;
+                    case 'sine':
+                        if (position > 10 && position < 20) {
+                            return 0.05 * Math.sin(2 * Math.PI * (position - 10) / 2);
+                        }
+                        return 0;
+                    case 'random':
+                        // Random bumps
+                        let val = 0;
+                        if (position > 10) {
+                            val = 0.02 * (Math.sin(position * 0.5) + 0.5 * Math.sin(position * 1.3) +
+                                         0.3 * Math.sin(position * 2.7));
+                        }
+                        return val;
+                    default:
+                        return 0;
+                }
+            }
+
+            p.draw = function() {
+                p.background(255);
+
+                if (isRunning && t < maxTime) {
+                    // Integrate equations of motion (4th order Runge-Kutta)
+                    let zr = getRoadHeight(t);
+
+                    for (let step = 0; step < 5; step++) {
+                        // Forces
+                        let Fspring = k * (zu - zs);
+                        let Fdamper = c * (zu_dot - zs_dot);
+                        let Ftire = kt * (zr - zu);
+
+                        // Accelerations
+                        let zs_ddot = (Fspring + Fdamper) / ms;
+                        let zu_ddot = (-Fspring - Fdamper + Ftire) / mu;
+
+                        // Euler integration (simple for stability)
+                        zs_dot += zs_ddot * dt;
+                        zs += zs_dot * dt;
+                        zu_dot += zu_ddot * dt;
+                        zu += zu_dot * dt;
+
+                        t += dt;
+
+                        // Store history every few steps
+                        if (step === 0) {
+                            roadHistory.push({t: t, z: zr});
+                            stateHistory.push({
+                                t: t,
+                                zs: zs,
+                                zu: zu,
+                                zr: zr,
+                                accel: zs_ddot
+                            });
+                        }
+                    }
+
+                    // Calculate peak acceleration
+                    if (stateHistory.length > 0) {
+                        let maxAccel = Math.max(...stateHistory.map(s => Math.abs(s.accel)));
+                        document.getElementById('accel-display').textContent = maxAccel.toFixed(2);
+                        document.getElementById('g-display').textContent = (maxAccel / 9.81).toFixed(2);
+                    }
+                }
+
+                // Draw visualizations
+                drawQuarterCarModel();
+                drawResponsePlots();
+            };
+
+            function drawQuarterCarModel() {
+                let modelX = 150;
+                let modelY = 200;
+                let scale = 1000; // pixels per meter
+
+                p.push();
+                p.translate(modelX, modelY);
+
+                // Current road height
+                let zr = getRoadHeight(t);
+
+                // Ground
+                p.fill(100);
+                p.noStroke();
+                p.rect(-100, 150 + zr * scale, 200, 20);
+
+                // Tire (vertical spring)
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.noFill();
+                let tireTop = 150 + zr * scale;
+                let tireBottom = 150 + zu * scale;
+                drawSpring(0, tireTop, 0, tireBottom, 8);
+
+                // Wheel/Unsprung mass
+                p.fill(80);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.circle(0, 150 + zu * scale, 40);
+
+                // Suspension spring
+                p.stroke(0, 100, 200);
+                p.strokeWeight(3);
+                p.noFill();
+                drawSpring(0, 150 + zu * scale - 20, 0, 150 + zs * scale + 50, 12);
+
+                // Damper
+                p.stroke(200, 50, 0);
+                p.strokeWeight(4);
+                let damperX = 30;
+                p.line(damperX, 150 + zu * scale - 20, damperX, 150 + zs * scale + 30);
+                p.fill(200, 50, 0);
+                p.rect(damperX - 10, 150 + zs * scale + 30, 20, 20);
+                p.rect(damperX - 6, 150 + zu * scale - 20, 12, -20);
+
+                // Sprung mass (car body)
+                p.fill(0, 100, 200);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rect(-60, 150 + zs * scale, 120, 50, 10);
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.LEFT);
+                p.text('ms = ' + ms + ' kg', 70, 150 + zs * scale + 25);
+                p.text('mu = ' + mu + ' kg', 50, 150 + zu * scale);
+                p.textAlign(p.CENTER);
+                p.text('k, c', -20, 150 + (zu * scale + zs * scale) / 2 + 15);
+                p.text('kt', 0, 150 + (zr * scale + zu * scale) / 2);
+
+                // Displacement indicators
+                p.stroke(200, 0, 0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.line(-80, 150, 80, 150); // Reference
+                p.drawingContext.setLineDash([]);
+
+                p.pop();
+            }
+
+            function drawSpring(x1, y1, x2, y2, coils) {
+                p.beginShape();
+                p.vertex(x1, y1);
+                let springLength = y2 - y1;
+                let coilHeight = springLength / coils;
+                let amplitude = 10;
+                for (let i = 0; i < coils; i++) {
+                    let y = y1 + i * coilHeight;
+                    p.vertex(x1 - amplitude, y + coilHeight * 0.25);
+                    p.vertex(x1 + amplitude, y + coilHeight * 0.75);
+                }
+                p.vertex(x2, y2);
+                p.endShape();
+            }
+
+            function drawResponsePlots() {
+                let plotX = 400;
+                let plotY = 50;
+                let plotW = 450;
+                let plotH = 150;
+
+                // Displacement plot
+                drawPlot(plotX, plotY, plotW, plotH, 'Displacement vs Time',
+                         'Time (s)', 'Position (m)', stateHistory, -0.05, 0.15);
+
+                // Acceleration plot
+                drawPlot(plotX, plotY + 200, plotW, plotH, 'Acceleration vs Time',
+                         'Time (s)', 'Accel (m/s²)', stateHistory.map(s => ({t: s.t, zs: s.accel, zu: 0, zr: 0})),
+                         -5, 10);
+
+                // Frequency response (conceptual)
+                drawFrequencyResponse(plotX, plotY + 400, plotW, plotH);
+            }
+
+            function drawPlot(x, y, w, h, title, xlabel, ylabel, data, ymin, ymax) {
+                p.push();
+                p.translate(x, y);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text(title, w/2, -10);
+
+                // Background
+                p.fill(245);
+                p.rect(0, 0, w, h);
+
+                // Grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 5; i++) {
+                    let yy = i * h / 5;
+                    p.line(0, yy, w, yy);
+                }
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(0, h, w, h);
+                p.line(0, 0, 0, h);
+
+                if (data.length > 0) {
+                    // Plot road input
+                    p.noFill();
+                    p.stroke(150);
+                    p.strokeWeight(2);
+                    p.beginShape();
+                    for (let pt of data) {
+                        let px = p.map(pt.t, 0, maxTime, 0, w);
+                        let py = p.map(pt.zr, ymin, ymax, h, 0);
+                        p.vertex(px, py);
+                    }
+                    p.endShape();
+
+                    // Plot unsprung mass
+                    p.stroke(255, 100, 0);
+                    p.strokeWeight(2);
+                    p.beginShape();
+                    for (let pt of data) {
+                        let px = p.map(pt.t, 0, maxTime, 0, w);
+                        let py = p.map(pt.zu, ymin, ymax, h, 0);
+                        p.vertex(px, py);
+                    }
+                    p.endShape();
+
+                    // Plot sprung mass
+                    p.stroke(0, 100, 200);
+                    p.strokeWeight(3);
+                    p.beginShape();
+                    for (let pt of data) {
+                        let px = p.map(pt.t, 0, maxTime, 0, w);
+                        let py = p.map(pt.zs, ymin, ymax, h, 0);
+                        p.vertex(px, py);
+                    }
+                    p.endShape();
+                }
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text(xlabel, w/2, h + 20);
+                p.textAlign(p.LEFT);
+                p.text(ylabel, 5, 15);
+
+                // Legend
+                p.textAlign(p.RIGHT);
+                p.fill(150);
+                p.text('Road', w - 5, 20);
+                p.fill(255, 100, 0);
+                p.text('Wheel', w - 5, 35);
+                p.fill(0, 100, 200);
+                p.text('Body', w - 5, 50);
+
+                p.pop();
+            }
+
+            function drawFrequencyResponse(x, y, w, h) {
+                p.push();
+                p.translate(x, y);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text('Transmissibility vs Frequency', w/2, -10);
+
+                p.fill(245);
+                p.rect(0, 0, w, h);
+
+                // Calculate and plot transmissibility
+                let wn = Math.sqrt(k / ms);
+                p.noFill();
+                p.stroke(0, 100, 200);
+                p.strokeWeight(2);
+                p.beginShape();
+                for (let i = 0; i <= 200; i++) {
+                    let freq = i / 10; // Hz
+                    let omega = freq * 2 * Math.PI;
+                    let r = omega / wn;
+                    let T = Math.sqrt((1 + Math.pow(2 * zeta * r, 2)) /
+                                     (Math.pow(1 - r*r, 2) + Math.pow(2 * zeta * r, 2)));
+                    let px = p.map(freq, 0, 20, 0, w);
+                    let py = p.map(T, 0, 3, h, 0);
+                    p.vertex(px, py);
+                }
+                p.endShape();
+
+                // Resonance line
+                let fs = wn / (2 * Math.PI);
+                let px = p.map(fs, 0, 20, 0, w);
+                p.stroke(255, 0, 0);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.line(px, 0, px, h);
+                p.drawingContext.setLineDash([]);
+
+                // Axes labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('Frequency (Hz)', w/2, h + 20);
+                p.textAlign(p.LEFT);
+                p.text('|T|', 5, 15);
+
+                p.pop();
+            }
+
+            updateDamping();
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Ride and handling engineering impacts vehicle design across all segments:</p>
+        <ul>
+            <li><strong>Luxury Vehicles:</strong> Air suspension systems provide variable ride height and softness. Adaptive dampers adjust in milliseconds to road conditions, maximizing comfort on smooth roads while maintaining control on rough surfaces.</li>
+            <li><strong>Sports Cars:</strong> Stiff, low suspensions minimize body roll and maximize tire contact during cornering. Active anti-roll bars and magnetorheological dampers provide adjustable stiffness for track vs street driving.</li>
+            <li><strong>SUVs and Trucks:</strong> Longer suspension travel accommodates off-road terrain while maintaining on-road stability. Passive or active load-leveling maintains ride height under varying payload.</li>
+            <li><strong>Commercial Vehicles:</strong> Air suspension in trucks and buses protects cargo and improves passenger comfort. Trailer suspensions must balance load capacity with ride quality.</li>
+            <li><strong>Active Suspension Systems:</strong> Formula 1 and high-end road cars use hydraulic or electromagnetic actuators to completely control wheel motion, eliminating the ride-handling trade-off but at high cost and complexity.</li>
+            <li><strong>Durability Testing:</strong> Proving grounds use standardized road profiles to simulate millions of miles of customer use, validating suspension component life using ride dynamics models.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Sprung Mass EOM</td>
+                    <td>\(m_s \ddot{z}_s = -k(z_s - z_u) - c(\dot{z}_s - \dot{z}_u)\)</td>
+                    <td>Vehicle body motion</td>
+                </tr>
+                <tr>
+                    <td>Unsprung Mass EOM</td>
+                    <td>\(m_u \ddot{z}_u = k(z_s - z_u) + c(\dot{z}_s - \dot{z}_u) - k_t(z_u - z_r)\)</td>
+                    <td>Wheel/tire motion</td>
+                </tr>
+                <tr>
+                    <td>Natural Frequency</td>
+                    <td>\(f_n = \frac{1}{2\pi}\sqrt{\frac{k}{m_s}}\)</td>
+                    <td>Body bounce frequency</td>
+                </tr>
+                <tr>
+                    <td>Damping Ratio</td>
+                    <td>\(\zeta = \frac{c}{2\sqrt{km_s}}\)</td>
+                    <td>Oscillation decay rate</td>
+                </tr>
+                <tr>
+                    <td>Transmissibility</td>
+                    <td>\(T = \frac{\sqrt{1 + (2\zeta r)^2}}{\sqrt{(1-r^2)^2 + (2\zeta r)^2}}\)</td>
+                    <td>Road-to-body amplitude ratio</td>
+                </tr>
+                <tr>
+                    <td>Roll Angle</td>
+                    <td>\(\phi = \frac{m h a_y}{K_\phi}\)</td>
+                    <td>Body roll during cornering</td>
+                </tr>
+                <tr>
+                    <td>Roll Stiffness</td>
+                    <td>\(K_\phi = k_f t_f^2 + k_r t_r^2\)</td>
+                    <td>Resistance to roll</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Suspension Natural Frequency</h3>
+            <p>A quarter-car model has sprung mass ms = 400 kg and spring stiffness k = 25,000 N/m. Calculate: (a) the natural frequency in Hz, (b) the damping coefficient for ζ = 0.35, and (c) the period of oscillation.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>(a) Natural frequency:</strong></p>
+                <p>\[\omega_n = \sqrt{\frac{k}{m_s}} = \sqrt{\frac{25000}{400}} = \sqrt{62.5} = 7.91 \text{ rad/s}\]</p>
+                <p>\[f_n = \frac{\omega_n}{2\pi} = \frac{7.91}{2\pi} = 1.26 \text{ Hz}\]</p>
+
+                <p><strong>(b) Damping coefficient:</strong></p>
+                <p>\[c = 2\zeta\sqrt{km_s} = 2 \times 0.35 \times \sqrt{25000 \times 400}\]</p>
+                <p>\[c = 0.7 \times \sqrt{10,000,000} = 0.7 \times 3162 = 2213 \text{ N·s/m}\]</p>
+
+                <p><strong>(c) Period of oscillation:</strong></p>
+                <p>\[T = \frac{1}{f_n} = \frac{1}{1.26} = 0.79 \text{ seconds}\]</p>
+
+                <p><strong>Interpretation:</strong> This 1.26 Hz frequency is typical for comfort-oriented vehicles. The body completes one oscillation in 0.79 seconds, which feels smooth to occupants.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Transmissibility Analysis</h3>
+            <p>For the suspension in Problem 1 with ζ = 0.35, calculate the transmissibility at: (a) low frequency (0.5 Hz), (b) resonance (1.26 Hz), and (c) high frequency (10 Hz). At what frequency does the suspension start providing isolation (T < 1)?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>(a) At f = 0.5 Hz:</strong></p>
+                <p>\[r = \frac{f}{f_n} = \frac{0.5}{1.26} = 0.40\]</p>
+                <p>\[T = \frac{\sqrt{1 + (2 \times 0.35 \times 0.40)^2}}{\sqrt{(1-0.40^2)^2 + (2 \times 0.35 \times 0.40)^2}}\]</p>
+                <p>\[T = \frac{\sqrt{1 + 0.078}}{\sqrt{0.705 + 0.078}} = \frac{1.04}{0.88} = 1.18\]</p>
+
+                <p><strong>(b) At resonance, f = fn = 1.26 Hz (r = 1):</strong></p>
+                <p>\[T = \frac{\sqrt{1 + (2 \times 0.35)^2}}{\sqrt{0 + (2 \times 0.35)^2}} = \frac{\sqrt{1.49}}{\sqrt{0.49}} = \frac{1.22}{0.70} = 1.74\]</p>
+
+                <p><strong>(c) At f = 10 Hz:</strong></p>
+                <p>\[r = \frac{10}{1.26} = 7.94\]</p>
+                <p>\[T = \frac{\sqrt{1 + (2 \times 0.35 \times 7.94)^2}}{\sqrt{(1-7.94^2)^2 + (2 \times 0.35 \times 7.94)^2}}\]</p>
+                <p>\[T \approx \frac{5.56}{62.4} = 0.089\]</p>
+
+                <p><strong>Isolation threshold:</strong> T < 1 when \(r > \sqrt{2} = 1.41\)</p>
+                <p>\[f_{isolation} = 1.41 \times f_n = 1.41 \times 1.26 = 1.78 \text{ Hz}\]</p>
+
+                <p>Above 1.78 Hz, the suspension provides isolation. The 10 Hz result shows excellent isolation (91% reduction) at high frequencies.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Roll Angle Calculation</h3>
+            <p>A 1500 kg vehicle has CG height h = 0.55 m above the roll axis, front track tf = 1.5 m, rear track tr = 1.5 m, and equal spring rates kf = kr = 25,000 N/m. Calculate the roll angle during a 0.8g lateral acceleration corner. What would be the effect of adding anti-roll bars that double the effective roll stiffness?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Step 1: Calculate roll stiffness:</strong></p>
+                <p>\[K_\phi = k_f t_f^2 + k_r t_r^2 = 25000 \times 1.5^2 + 25000 \times 1.5^2\]</p>
+                <p>\[K_\phi = 2 \times 25000 \times 2.25 = 112,500 \text{ N·m/rad}\]</p>
+
+                <p><strong>Step 2: Calculate roll angle:</strong></p>
+                <p>\[\phi = \frac{m h a_y}{K_\phi} = \frac{1500 \times 0.55 \times 0.8 \times 9.81}{112,500}\]</p>
+                <p>\[\phi = \frac{6474}{112,500} = 0.0575 \text{ rad} = 3.30°\]</p>
+
+                <p><strong>Step 3: With doubled roll stiffness:</strong></p>
+                <p>\[K_\phi' = 2 \times 112,500 = 225,000 \text{ N·m/rad}\]</p>
+                <p>\[\phi' = \frac{6474}{225,000} = 0.0288 \text{ rad} = 1.65°\]</p>
+
+                <p><strong>Conclusion:</strong> Anti-roll bars halve the roll angle from 3.3° to 1.65°, improving handling feel and reducing lateral load transfer. However, they don't affect the ride frequency (ride comfort) since they only act on asymmetric (left-right) motion, not symmetric (both wheels together) bounce.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the typical natural frequency range for passenger car suspensions?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) 0.1-0.5 Hz</label>
+                    <label><input type="radio" name="q1" value="b"> b) 1-1.5 Hz</label>
+                    <label><input type="radio" name="q1" value="c"> c) 5-10 Hz</label>
+                    <label><input type="radio" name="q1" value="d"> d) 15-20 Hz</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: A damping ratio ζ = 0.25 would be characteristic of:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Sport-oriented suspension</label>
+                    <label><input type="radio" name="q2" value="b"> b) Comfort-oriented suspension</label>
+                    <label><input type="radio" name="q2" value="c"> c) Critically damped suspension</label>
+                    <label><input type="radio" name="q2" value="d"> d) Undamped suspension</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Transmissibility less than 1 (isolation) occurs when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Excitation frequency is below natural frequency</label>
+                    <label><input type="radio" name="q3" value="b"> b) Excitation frequency equals natural frequency</label>
+                    <label><input type="radio" name="q3" value="c"> c) Excitation frequency is above √2 times natural frequency</label>
+                    <label><input type="radio" name="q3" value="d"> d) Damping ratio is zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Anti-roll bars improve handling by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Increasing ride stiffness</label>
+                    <label><input type="radio" name="q4" value="b"> b) Decreasing damping</label>
+                    <label><input type="radio" name="q4" value="c"> c) Increasing roll stiffness without affecting ride</label>
+                    <label><input type="radio" name="q4" value="d"> d) Reducing unsprung mass</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The fundamental ride-handling trade-off exists because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Soft suspensions improve both ride and handling</label>
+                    <label><input type="radio" name="q5" value="b"> b) Stiff suspensions improve ride but reduce handling</label>
+                    <label><input type="radio" name="q5" value="c"> c) Soft suspensions improve ride but reduce handling response</label>
+                    <label><input type="radio" name="q5" value="d"> d) There is no trade-off with modern suspensions</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'b',
+                        q3: 'c',
+                        q4: 'c',
+                        q5: 'c'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Dynamics - Interactive Lecture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+</head>
+<body>
+    <header>
+        <h1>Vehicle Dynamics</h1>
+        <p class="subtitle">Understanding Longitudinal and Lateral Vehicle Motion</p>
+    </header>
+
+    <div class="content-section">
+        <h2>Understanding Vehicle Dynamics</h2>
+
+        <h3>What is Vehicle Dynamics?</h3>
+        <p>Vehicle dynamics studies the motion of vehicles under various driving conditions, including acceleration, braking, and cornering. It combines rigid body dynamics, tire mechanics, and control theory to predict and optimize vehicle behavior for safety, performance, and comfort.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> Vehicle behavior is governed by the interaction between tires and road surface. Understanding these forces and how they affect vehicle motion is essential for designing safe, responsive, and stable vehicles in all driving conditions.</p>
+        </div>
+
+        <h3>Coordinate Systems and Degrees of Freedom</h3>
+        <p>Vehicle motion is described in multiple coordinate systems:</p>
+
+        <div class="equation-box">
+            <p><strong>Vehicle-Fixed Coordinates:</strong></p>
+            <ul style="list-style: none;">
+                <li>\(x\): Longitudinal (forward)</li>
+                <li>\(y\): Lateral (left)</li>
+                <li>\(z\): Vertical (up)</li>
+            </ul>
+            <p><strong>Primary DOFs:</strong></p>
+            <ul style="list-style: none;">
+                <li>Longitudinal velocity: \(u\) (m/s)</li>
+                <li>Lateral velocity: \(v\) (m/s)</li>
+                <li>Yaw rate: \(r\) (rad/s) - rotation about vertical axis</li>
+            </ul>
+        </div>
+
+        <h3>Bicycle Model</h3>
+        <p>The bicycle model is a simplified 2D representation that captures essential lateral dynamics:</p>
+
+        <div class="equation-box">
+            <p><strong>Lateral Force Balance:</strong></p>
+            <p>\[m(\dot{v} + ur) = F_{yf} + F_{yr}\]</p>
+            <p><strong>Yaw Moment Balance:</strong></p>
+            <p>\[I_z \dot{r} = l_f F_{yf} - l_r F_{yr}\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(m\) = vehicle mass (kg)</li>
+                <li>\(I_z\) = yaw moment of inertia (kg·m²)</li>
+                <li>\(F_{yf}, F_{yr}\) = front and rear lateral tire forces (N)</li>
+                <li>\(l_f, l_r\) = distances from CG to front/rear axles (m)</li>
+            </ul>
+        </div>
+
+        <h3>Tire Forces and Slip Angles</h3>
+        <p>Tire forces depend on the slip angle, which is the difference between tire orientation and direction of travel:</p>
+
+        <div class="equation-box">
+            <p><strong>Front Slip Angle:</strong></p>
+            <p>\[\alpha_f = \delta - \frac{v + l_f r}{u}\]</p>
+            <p><strong>Rear Slip Angle:</strong></p>
+            <p>\[\alpha_r = -\frac{v - l_r r}{u}\]</p>
+            <p>where \(\delta\) is the front wheel steering angle.</p>
+            <p><strong>Linear Tire Model:</strong></p>
+            <p>\[F_y = -C_\alpha \alpha\]</p>
+            <p>where \(C_\alpha\) is the cornering stiffness (N/rad), typically 50,000-100,000 N/rad for passenger cars.</p>
+        </div>
+
+        <h3>Understeer and Oversteer</h3>
+        <p>The steady-state cornering behavior is characterized by the understeer gradient:</p>
+
+        <div class="equation-box">
+            <p><strong>Understeer Gradient:</strong></p>
+            <p>\[K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\]</p>
+            <p>where \(L = l_f + l_r\) is the wheelbase.</p>
+            <p><strong>Classification:</strong></p>
+            <ul>
+                <li>\(K > 0\): Understeer (stable) - requires more steering as speed increases</li>
+                <li>\(K = 0\): Neutral steer - constant steering angle at all speeds</li>
+                <li>\(K < 0\): Oversteer (unstable) - requires less steering as speed increases</li>
+            </ul>
+        </div>
+
+        <h3>Longitudinal Dynamics</h3>
+        <p>Acceleration and braking performance depend on force balance:</p>
+
+        <div class="equation-box">
+            <p><strong>Longitudinal Equation of Motion:</strong></p>
+            <p>\[m\dot{u} = F_x - F_{drag} - F_{roll} - F_{grade}\]</p>
+            <p>where:</p>
+            <ul style="list-style: none;">
+                <li>\(F_x\) = tractive/braking force (N)</li>
+                <li>\(F_{drag} = \frac{1}{2}\rho C_D A u^2\) = aerodynamic drag</li>
+                <li>\(F_{roll} = \mu_{roll} mg\cos\theta\) = rolling resistance</li>
+                <li>\(F_{grade} = mg\sin\theta\) = gravitational force on slope</li>
+            </ul>
+            <p><strong>Weight Transfer During Braking:</strong></p>
+            <p>\[\Delta F_z = \frac{m\dot{u} h}{L}\]</p>
+            <p>where \(h\) is the CG height above ground.</p>
+        </div>
+
+        <h3>Critical Speed</h3>
+        <div class="key-point">
+            <p><strong>For an oversteering vehicle, there exists a critical speed:</strong></p>
+            <p>\[u_{crit} = \sqrt{\frac{-L}{mK}}\]</p>
+            <p>Above this speed, the vehicle becomes directionally unstable and cannot maintain steady cornering. This is why most production vehicles are designed with understeer.</p>
+        </div>
+    </div>
+
+    <div class="simulation-section">
+        <h2>Interactive Vehicle Dynamics Simulation</h2>
+        <p>This simulation shows a top-down view of a vehicle performing various maneuvers. Adjust parameters to see how vehicle characteristics affect handling behavior.</p>
+
+        <div class="controls-container">
+            <div class="control-group">
+                <label for="maneuver-type">Maneuver:</label>
+                <select id="maneuver-type">
+                    <option value="steady-turn">Steady Turn</option>
+                    <option value="lane-change">Lane Change</option>
+                    <option value="braking">Emergency Braking</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="vehicle-speed">Speed (km/h): <span id="vehicle-speed-value">80</span></label>
+                <input type="range" id="vehicle-speed" min="40" max="140" step="10" value="80">
+            </div>
+
+            <div class="control-group">
+                <label for="understeer-gradient">Understeer Gradient K: <span id="understeer-gradient-value">0.002</span></label>
+                <input type="range" id="understeer-gradient" min="-0.005" max="0.010" step="0.001" value="0.002">
+            </div>
+
+            <div class="control-group">
+                <label for="friction-coeff">Tire-Road Friction μ: <span id="friction-coeff-value">0.85</span></label>
+                <input type="range" id="friction-coeff" min="0.3" max="1.0" step="0.05" value="0.85">
+            </div>
+
+            <div class="control-group">
+                <button id="start-maneuver">Start Maneuver</button>
+            </div>
+        </div>
+
+        <div id="sketch-holder"></div>
+
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
+            <h3 style="margin-top: 0;">Vehicle Status:</h3>
+            <p><strong>Lateral Acceleration:</strong> <span id="lat-accel-display">0.00</span> m/s² (<span id="g-force-display">0.00</span>g)</p>
+            <p><strong>Yaw Rate:</strong> <span id="yaw-rate-display">0.00</span> deg/s</p>
+            <p><strong>Handling Character:</strong> <span id="handling-display">Understeer</span></p>
+        </div>
+    </div>
+
+    <script>
+        let sketch = new p5(function(p) {
+            // Vehicle parameters
+            let m = 1500;           // Mass (kg)
+            let L = 2.7;            // Wheelbase (m)
+            let lf = 1.2;           // Front axle to CG (m)
+            let lr = 1.5;           // Rear axle to CG (m)
+            let Iz = 2500;          // Yaw inertia (kg·m²)
+            let h = 0.5;            // CG height (m)
+
+            // Control inputs
+            let speed = 80;         // km/h
+            let K = 0.002;          // Understeer gradient
+            let mu = 0.85;          // Friction coefficient
+            let maneuverType = 'steady-turn';
+
+            // State variables
+            let x = 0, y = 0;       // Position (m)
+            let psi = 0;            // Heading angle (rad)
+            let u = 0, v = 0;       // Velocities (m/s)
+            let r = 0;              // Yaw rate (rad/s)
+            let delta = 0;          // Steering angle (rad)
+
+            // Simulation
+            let isRunning = false;
+            let time = 0;
+            let dt = 0.02;
+
+            // Visualization
+            let vehicleLength = 50;
+            let vehicleWidth = 25;
+            let path = [];
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 600);
+                canvas.parent('sketch-holder');
+
+                setupControls();
+                resetSimulation();
+            };
+
+            function setupControls() {
+                document.getElementById('maneuver-type').addEventListener('change', function() {
+                    maneuverType = this.value;
+                    resetSimulation();
+                });
+
+                document.getElementById('vehicle-speed').addEventListener('input', function() {
+                    speed = parseFloat(this.value);
+                    document.getElementById('vehicle-speed-value').textContent = speed;
+                    u = speed / 3.6; // Convert to m/s
+                });
+
+                document.getElementById('understeer-gradient').addEventListener('input', function() {
+                    K = parseFloat(this.value);
+                    document.getElementById('understeer-gradient-value').textContent = K.toFixed(4);
+                    updateHandlingDisplay();
+                });
+
+                document.getElementById('friction-coeff').addEventListener('input', function() {
+                    mu = parseFloat(this.value);
+                    document.getElementById('friction-coeff-value').textContent = mu.toFixed(2);
+                });
+
+                document.getElementById('start-maneuver').addEventListener('click', function() {
+                    isRunning = !isRunning;
+                    if (isRunning) {
+                        this.textContent = 'Stop';
+                    } else {
+                        this.textContent = 'Start Maneuver';
+                        resetSimulation();
+                    }
+                });
+            }
+
+            function resetSimulation() {
+                x = 100;
+                y = 300;
+                psi = 0;
+                u = speed / 3.6;
+                v = 0;
+                r = 0;
+                delta = 0;
+                time = 0;
+                path = [];
+                isRunning = false;
+                document.getElementById('start-maneuver').textContent = 'Start Maneuver';
+            }
+
+            function updateHandlingDisplay() {
+                let handling = '';
+                if (K > 0.001) {
+                    handling = 'Understeer (Stable)';
+                } else if (K < -0.001) {
+                    handling = 'Oversteer (Unstable)';
+                } else {
+                    handling = 'Neutral Steer';
+                }
+                document.getElementById('handling-display').textContent = handling;
+            }
+
+            function getSteeringInput(t) {
+                // Smooth steering inputs using sinusoidal ramps
+                switch(maneuverType) {
+                    case 'steady-turn':
+                        // Ramp up to steady turn over first 0.5 seconds
+                        if (t < 0.5) {
+                            return 0.1 * (1 - Math.cos(Math.PI * t / 0.5)) / 2;
+                        } else {
+                            return 0.1; // 5.7 degrees steady
+                        }
+                    case 'lane-change':
+                        // ISO 3888-1 double lane change maneuver (simplified)
+                        if (t < 0.5) {
+                            // Ramp up
+                            return 0.15 * Math.sin(Math.PI * t / 0.5);
+                        } else if (t < 1.5) {
+                            // First turn (0.5-1.5s)
+                            return 0.15 * Math.sin(Math.PI * (t - 0.5));
+                        } else if (t < 2.5) {
+                            // Counter turn (1.5-2.5s)
+                            return -0.15 * Math.sin(Math.PI * (t - 1.5));
+                        } else if (t < 3.0) {
+                            // Return to center
+                            return -0.15 * Math.sin(Math.PI * (t - 2.5) / 0.5);
+                        } else {
+                            return 0;
+                        }
+                    case 'braking':
+                        return 0; // Straight line braking
+                    default:
+                        return 0;
+                }
+            }
+
+            function updateVehicleState() {
+                if (!isRunning) return;
+
+                // Steering input
+                delta = getSteeringInput(time);
+
+                // Tire cornering stiffnesses (properly calculated from K)
+                // K = (m/L) * (lf/Car - lr/Caf)
+                // We set Caf and derive Car to achieve the desired K
+                let Caf = 60000; // Front cornering stiffness (N/rad)
+                // Car = lf / ((K*L/m) + (lr/Caf))
+                let Car = lf / ((K * L / m) + (lr / Caf));
+
+                // Slip angles (bicycle model)
+                let alphaf = delta - (v + lf * r) / Math.max(Math.abs(u), 0.1);
+                let alphar = -(v - lr * r) / Math.max(Math.abs(u), 0.1);
+
+                // Tire forces (linear model)
+                let Fyf = -Caf * alphaf;
+                let Fyr = -Car * alphar;
+
+                // Weight transfer during braking/acceleration
+                let ax = 0; // Will be calculated after forces
+                let Fzf_static = m * 9.81 * lr / L;
+                let Fzr_static = m * 9.81 * lf / L;
+
+                // Braking force for braking maneuver
+                let Fx = 0;
+                if (maneuverType === 'braking' && time < 3.0) {
+                    Fx = -0.8 * mu * m * 9.81; // 0.8g braking
+                    // Weight transfer: DeltaFz = m*ax*h/L
+                    let ax_braking = Fx / m;
+                    let deltaFz = m * Math.abs(ax_braking) * h / L;
+                    var Fzf = Fzf_static + deltaFz;
+                    var Fzr = Fzr_static - deltaFz;
+                } else {
+                    var Fzf = Fzf_static;
+                    var Fzr = Fzr_static;
+                }
+
+                // Limit forces by friction circle
+                let maxFyf = mu * Math.abs(Fzf);
+                let maxFyr = mu * Math.abs(Fzr);
+                Fyf = Math.max(-maxFyf, Math.min(maxFyf, Fyf));
+                Fyr = Math.max(-maxFyr, Math.min(maxFyr, Fyr));
+
+                // Aerodynamic drag and rolling resistance
+                let Cd = 0.3;  // Drag coefficient
+                let A = 2.2;   // Frontal area (m²)
+                let rho = 1.2; // Air density (kg/m³)
+                let Cr = 0.015; // Rolling resistance coefficient
+
+                let Fdrag = 0.5 * rho * Cd * A * u * Math.abs(u);
+                let Froll = Cr * m * 9.81;
+
+                // State derivatives (correct bicycle model equations)
+                // m(du - vr) = Fx - Fdrag - Froll (in vehicle frame)
+                // m(dv + ur) = Fyf + Fyr
+                // Iz*dr = lf*Fyf - lr*Fyr
+                let du = (Fx - Math.sign(u)*Fdrag - Math.sign(u)*Froll) / m + v * r;
+                let dv = (Fyf + Fyr) / m - u * r;
+                let dr = (lf * Fyf - lr * Fyr) / Iz;
+                let dpsi = r;
+
+                // Integrate
+                u += du * dt;
+                v += dv * dt;
+                r += dr * dt;
+                psi += dpsi * dt;
+
+                // Position update (global frame)
+                let vx_global = u * Math.cos(psi) - v * Math.sin(psi);
+                let vy_global = u * Math.sin(psi) + v * Math.cos(psi);
+                x += vx_global * dt;
+                y += vy_global * dt;
+
+                // Store path
+                path.push({x: x, y: y});
+                if (path.length > 300) path.shift();
+
+                time += dt;
+
+                // Update display
+                let latAccel = (Fyf + Fyr) / m;
+                document.getElementById('lat-accel-display').textContent = latAccel.toFixed(2);
+                document.getElementById('g-force-display').textContent = (latAccel / 9.81).toFixed(2);
+                document.getElementById('yaw-rate-display').textContent = (r * 180 / Math.PI).toFixed(2);
+
+                // Stop if vehicle goes off screen or after 10 seconds
+                if (x > p.width + 100 || y < -100 || y > p.height + 100 || time > 10) {
+                    isRunning = false;
+                    document.getElementById('start-maneuver').textContent = 'Start Maneuver';
+                }
+            }
+
+            p.draw = function() {
+                p.background(200, 220, 200);
+
+                // Draw road
+                drawRoad();
+
+                // Update simulation
+                updateVehicleState();
+
+                // Draw path
+                p.noFill();
+                p.stroke(100, 100, 255, 150);
+                p.strokeWeight(3);
+                p.beginShape();
+                for (let pt of path) {
+                    p.vertex(pt.x, pt.y);
+                }
+                p.endShape();
+
+                // Draw vehicle
+                drawVehicle(x, y, psi);
+
+                // Draw forces (visualization)
+                if (isRunning) {
+                    drawForces();
+                }
+
+                // Instructions
+                if (!isRunning) {
+                    p.fill(0);
+                    p.noStroke();
+                    p.textSize(16);
+                    p.textAlign(p.CENTER);
+                    p.text('Click "Start Maneuver" to begin', p.width/2, 50);
+                }
+            };
+
+            function drawRoad() {
+                // Road surface
+                p.fill(100);
+                p.noStroke();
+                p.rect(0, 200, p.width, 200);
+
+                // Lane markings
+                p.stroke(255);
+                p.strokeWeight(2);
+                p.drawingContext.setLineDash([20, 10]);
+                p.line(0, 300, p.width, 300);
+                p.drawingContext.setLineDash([]);
+
+                // Road edges
+                p.stroke(255);
+                p.strokeWeight(3);
+                p.line(0, 200, p.width, 200);
+                p.line(0, 400, p.width, 400);
+            }
+
+            function drawVehicle(px, py, heading) {
+                p.push();
+                p.translate(px, py);
+                p.rotate(heading);
+
+                // Vehicle body
+                p.fill(0, 100, 200);
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.rectMode(p.CENTER);
+                p.rect(0, 0, vehicleLength, vehicleWidth, 5);
+
+                // Windows
+                p.fill(150, 200, 255);
+                p.rect(10, 0, 20, vehicleWidth - 8);
+
+                // Wheels
+                p.fill(30);
+                p.rect(15, -vehicleWidth/2 - 3, 12, 6);
+                p.rect(15, vehicleWidth/2 + 3, 12, 6);
+                p.rect(-15, -vehicleWidth/2 - 3, 12, 6);
+                p.rect(-15, vehicleWidth/2 + 3, 12, 6);
+
+                // Direction indicator
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.triangle(vehicleLength/2, 0, vehicleLength/2 + 10, -5, vehicleLength/2 + 10, 5);
+
+                // CG marker
+                p.fill(255, 255, 0);
+                p.circle(0, 0, 6);
+
+                p.pop();
+            }
+
+            function drawForces() {
+                // Calculate and draw lateral acceleration vector
+                // Lateral acceleration in vehicle frame: ay = dv + u*r
+                let ay = v * r; // Simplified approximation for visualization (centripetal component)
+                let latAccel = ay * 30; // Scaled for visualization (pixels)
+
+                p.push();
+                p.translate(x, y);
+                p.rotate(psi);
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                if (Math.abs(latAccel) > 5) {
+                    p.line(0, 0, 0, -latAccel); // Negative because y-axis points down in canvas
+                    // Arrow
+                    let arrowSize = 6;
+                    if (latAccel > 0) {
+                        p.triangle(0, -latAccel, -arrowSize, -latAccel + arrowSize, arrowSize, -latAccel + arrowSize);
+                    } else {
+                        p.triangle(0, -latAccel, -arrowSize, -latAccel - arrowSize, arrowSize, -latAccel - arrowSize);
+                    }
+                }
+                p.pop();
+            }
+
+            updateHandlingDisplay();
+        }, 'sketch-holder');
+    </script>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <p>Vehicle dynamics principles are essential across the automotive industry:</p>
+        <ul>
+            <li><strong>Automotive Design:</strong> Production vehicles are tuned for understeer to ensure stability and predictability for average drivers. Suspension geometry, tire selection, and weight distribution are optimized using vehicle dynamics models.</li>
+            <li><strong>Race Car Engineering:</strong> Formula 1 and racing vehicles push the limits of handling performance. Engineers adjust weight distribution, aerodynamics, and suspension to achieve optimal lap times while maintaining driver control.</li>
+            <li><strong>Safety Systems:</strong> Electronic Stability Control (ESC) uses yaw rate sensors and vehicle dynamics models to detect and correct oversteer/understeer by selectively braking individual wheels.</li>
+            <li><strong>Autonomous Vehicles:</strong> Self-driving cars require accurate vehicle dynamics models to predict motion during path planning and to maintain stability during emergency maneuvers.</li>
+            <li><strong>Testing and Validation:</strong> Vehicle dynamics simulators (driving simulators) use these models to test designs before building physical prototypes, reducing development cost and time.</li>
+            <li><strong>Tire Development:</strong> Tire manufacturers use vehicle dynamics testing to optimize tire design for different applications: comfort, performance, all-weather capability.</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Lateral Force Balance</td>
+                    <td>\(m(\dot{v} + ur) = F_{yf} + F_{yr}\)</td>
+                    <td>Bicycle model lateral dynamics</td>
+                </tr>
+                <tr>
+                    <td>Yaw Moment Balance</td>
+                    <td>\(I_z \dot{r} = l_f F_{yf} - l_r F_{yr}\)</td>
+                    <td>Bicycle model yaw dynamics</td>
+                </tr>
+                <tr>
+                    <td>Front Slip Angle</td>
+                    <td>\(\alpha_f = \delta - \frac{v + l_f r}{u}\)</td>
+                    <td>Tire slip at front axle</td>
+                </tr>
+                <tr>
+                    <td>Linear Tire Model</td>
+                    <td>\(F_y = -C_\alpha \alpha\)</td>
+                    <td>Lateral force from slip angle</td>
+                </tr>
+                <tr>
+                    <td>Understeer Gradient</td>
+                    <td>\(K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\)</td>
+                    <td>Steady-state handling characteristic</td>
+                </tr>
+                <tr>
+                    <td>Longitudinal Dynamics</td>
+                    <td>\(m\dot{u} = F_x - F_{drag} - F_{roll} - F_{grade}\)</td>
+                    <td>Acceleration/braking equation</td>
+                </tr>
+                <tr>
+                    <td>Weight Transfer</td>
+                    <td>\(\Delta F_z = \frac{m\dot{u} h}{L}\)</td>
+                    <td>Load transfer during accel/braking</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Understeer Gradient Calculation</h3>
+            <p>A vehicle has mass m = 1500 kg, wheelbase L = 2.7 m, lf = 1.2 m, lr = 1.5 m, and equal front/rear cornering stiffnesses Cαf = Cαr = 60,000 N/rad. Calculate the understeer gradient K and classify the vehicle's handling behavior.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Calculate understeer gradient:</strong></p>
+                <p>\[K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\]</p>
+                <p>\[K = \frac{1500}{2.7}\left(\frac{1.2}{60000} - \frac{1.5}{60000}\right)\]</p>
+                <p>\[K = 555.6 \times (0.00002 - 0.000025)\]</p>
+                <p>\[K = 555.6 \times (-0.000005) = -0.00278 \text{ rad}^{-1}\]</p>
+
+                <p><strong>Classification:</strong> K < 0, therefore the vehicle is <strong>oversteering</strong>.</p>
+                <p>This rear-weight-biased configuration (lr > lf with equal cornering stiffnesses) creates oversteer, which is less stable but more responsive. Production vehicles typically avoid this by using higher front cornering stiffness or different weight distribution.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Steady-State Cornering</h3>
+            <p>For the understeering vehicle from the lecture (K = 0.002), calculate the required steering angle to maintain a 100 m radius turn at: (a) 50 km/h, and (b) 100 km/h. How does the steering angle change with speed?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Steady-state steering angle:</strong></p>
+                <p>\[\delta = \frac{L}{R} + K u^2\]</p>
+                <p>where R = turn radius, u = speed, L = 2.7 m, K = 0.002</p>
+
+                <p><strong>(a) At 50 km/h = 13.89 m/s:</strong></p>
+                <p>\[\delta = \frac{2.7}{100} + 0.002 \times (13.89)^2\]</p>
+                <p>\[\delta = 0.027 + 0.002 \times 192.9 = 0.027 + 0.386 = 0.413 \text{ rad} = 23.7°\]</p>
+
+                <p><strong>(b) At 100 km/h = 27.78 m/s:</strong></p>
+                <p>\[\delta = \frac{2.7}{100} + 0.002 \times (27.78)^2\]</p>
+                <p>\[\delta = 0.027 + 0.002 \times 771.5 = 0.027 + 1.543 = 1.57 \text{ rad} = 89.9°\]</p>
+
+                <p><strong>Observation:</strong> Steering angle increases dramatically with speed for an understeering vehicle. At 100 km/h, nearly 90° of steering is required! This demonstrates why understeer provides a natural speed limit for safe cornering - the large steering angles required at high speed alert the driver to slow down.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Weight Transfer During Braking</h3>
+            <p>A 1600 kg vehicle with wheelbase L = 2.8 m and CG height h = 0.6 m brakes at 0.8g deceleration. Calculate: (a) the weight transfer from rear to front, and (b) the percentage of vehicle weight on the front axle during braking if the static weight distribution is 55% front / 45% rear.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>(a) Weight transfer:</strong></p>
+                <p>\[\Delta F_z = \frac{m\dot{u} h}{L} = \frac{m \times 0.8g \times h}{L}\]</p>
+                <p>\[\Delta F_z = \frac{1600 \times 0.8 \times 9.81 \times 0.6}{2.8}\]</p>
+                <p>\[\Delta F_z = \frac{7548}{2.8} = 2696 \text{ N}\]</p>
+
+                <p><strong>(b) Front axle load during braking:</strong></p>
+                <p>Static front load: \(F_{zf,static} = 0.55 \times 1600 \times 9.81 = 8629 \text{ N}\)</p>
+                <p>Dynamic front load: \(F_{zf,dynamic} = F_{zf,static} + \Delta F_z = 8629 + 2696 = 11,325 \text{ N}\)</p>
+                <p>Total weight: \(W = 1600 \times 9.81 = 15,696 \text{ N}\)</p>
+                <p>Front percentage: \(\frac{11325}{15696} = 0.722 = 72.2\%\)</p>
+
+                <p><strong>Interpretation:</strong> During hard braking, the front axle load increases from 55% to 72%, while the rear decreases from 45% to 28%. This is why front brakes are larger and why anti-lock braking systems (ABS) are essential - the rear wheels are more prone to lockup due to reduced normal force.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: In the bicycle model, what does the slip angle represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) The steering wheel angle</label>
+                    <label><input type="radio" name="q1" value="b"> b) The difference between tire orientation and direction of travel</label>
+                    <label><input type="radio" name="q1" value="c"> c) The yaw rate of the vehicle</label>
+                    <label><input type="radio" name="q1" value="d"> d) The roll angle of the vehicle</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: An understeering vehicle (K > 0) is characterized by:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Requiring less steering as speed increases</label>
+                    <label><input type="radio" name="q2" value="b"> b) Requiring more steering as speed increases</label>
+                    <label><input type="radio" name="q2" value="c"> c) Constant steering angle regardless of speed</label>
+                    <label><input type="radio" name="q2" value="d"> d) Directional instability</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: Weight transfer during braking causes:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Increased load on rear axle</label>
+                    <label><input type="radio" name="q3" value="b"> b) Increased load on front axle</label>
+                    <label><input type="radio" name="q3" value="c"> c) No change in axle loads</label>
+                    <label><input type="radio" name="q3" value="d"> d) Equal load on both axles</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Why are most production vehicles designed with understeer?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) It's cheaper to manufacture</label>
+                    <label><input type="radio" name="q4" value="b"> b) It provides better fuel economy</label>
+                    <label><input type="radio" name="q4" value="c"> c) It's more stable and safer for average drivers</label>
+                    <label><input type="radio" name="q4" value="d"> d) It provides faster lap times</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: The yaw moment balance equation for the bicycle model is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Iz·r = lf·Fyf + lr·Fyr</label>
+                    <label><input type="radio" name="q5" value="b"> b) Iz·r = lf·Fyf - lr·Fyr</label>
+                    <label><input type="radio" name="q5" value="c"> c) m·r = Fyf + Fyr</label>
+                    <label><input type="radio" name="q5" value="d"> d) Iz·v = lf·Fyf - lr·Fyr</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Common JavaScript functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <script>
+        // Quiz functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizBtn = document.getElementById('submit-quiz');
+            if (quizBtn) {
+                quizBtn.addEventListener('click', function() {
+                    const answers = {
+                        q1: 'b',
+                        q2: 'b',
+                        q3: 'b',
+                        q4: 'c',
+                        q5: 'b'
+                    };
+
+                    submitQuiz(
+                        Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                        'quiz-results'
+                    );
+                });
+            }
+        });
+    </script>
+
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+</body>
+</html>

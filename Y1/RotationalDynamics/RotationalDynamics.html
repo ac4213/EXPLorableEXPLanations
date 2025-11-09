@@ -184,19 +184,14 @@
 
     <!-- Section 2: Interactive Simulation -->
     <div class="simulation-section">
-        <h2>Interactive Simulation: Rotational Motion</h2>
-        <p>Apply torques to rotating objects and observe how moment of inertia affects angular acceleration. Watch how different shapes with the same mass respond differently to the same torque.</p>
+        <h2>Interactive Simulation: Comparing Rotational Inertia</h2>
+        <p>Watch all four shapes rotate under the same applied torque. Notice how different mass distributions lead to different angular accelerations and velocities, even with identical mass and radius!</p>
 
-        <div id="sketch-holder"></div>
+        <div class="key-point">
+            <p><strong>Key Observation:</strong> All shapes have the same mass and radius, but different moments of inertia due to mass distribution. The hollow ring accelerates slowest (largest I), while the solid sphere accelerates fastest (smallest I).</p>
+        </div>
 
         <div class="controls-panel">
-            <div class="type-selector">
-                <button class="type-button active" data-shape="disk">Solid Disk</button>
-                <button class="type-button" data-shape="ring">Hollow Ring</button>
-                <button class="type-button" data-shape="rod">Thin Rod</button>
-                <button class="type-button" data-shape="sphere">Solid Sphere</button>
-            </div>
-
             <div class="controls-grid">
                 <div class="slider-container">
                     <label for="mass">Mass (kg):</label>
@@ -227,19 +222,9 @@
                 <button id="start-btn">Start</button>
                 <button id="reset-btn">Reset</button>
             </div>
-
-            <div class="results-panel">
-                <p><strong>Moment of Inertia:</strong> <span id="inertia-display">5.00</span> kg·m²</p>
-                <p><strong>Angular Acceleration:</strong> <span id="alpha-display">2.00</span> rad/s²</p>
-                <p><strong>Angular Velocity:</strong> <span id="omega-display">0.00</span> rad/s</p>
-                <p><strong>Rotational KE:</strong> <span id="ke-display">0.00</span> J</p>
-                <p><strong>Angular Momentum:</strong> <span id="momentum-display">0.00</span> kg·m²/s</p>
-            </div>
         </div>
 
-        <div class="key-point">
-            <p><strong>Observation:</strong> For the same mass and radius, different shapes have different moments of inertia. The hollow ring has the largest \(I\) (all mass far from center), while the solid sphere has the smallest. This affects how quickly each object accelerates under the same torque.</p>
-        </div>
+        <div id="sketch-holder"></div>
     </div>
 
     <!-- Section 3: Engineering Applications -->
@@ -545,309 +530,335 @@
 
     <!-- Page-specific JavaScript for simulation -->
     <script>
-        // Rotational Dynamics Simulation
+        // Rotational Dynamics Simulation - All 4 shapes side-by-side in 3D
         let rotationSketch = function(p) {
-            let shape = 'disk'; // 'disk', 'ring', 'rod', 'sphere'
             let mass = 10; // kg
             let radius = 1; // m
             let torque = 10; // N·m
-            let omega = 0; // rad/s
-            let angle = 0; // rad
             let animating = false;
 
-            // Calculated values
-            let inertia = 5;
-            let alpha = 2;
-            let ke = 0;
-            let angularMomentum = 0;
+            // Individual states for each shape
+            let shapes = [
+                { name: 'Solid Disk', type: 'disk', omega: 0, angle: 0, I: 0, alpha: 0, ke: 0, L: 0, color: [100, 150, 255] },
+                { name: 'Hollow Ring', type: 'ring', omega: 0, angle: 0, I: 0, alpha: 0, ke: 0, L: 0, color: [255, 150, 100] },
+                { name: 'Thin Rod', type: 'rod', omega: 0, angle: 0, I: 0, alpha: 0, ke: 0, L: 0, color: [150, 100, 50] },
+                { name: 'Solid Sphere', type: 'sphere', omega: 0, angle: 0, I: 0, alpha: 0, ke: 0, L: 0, color: [255, 180, 100] }
+            ];
 
             // Simulation scale
-            let scale = 100; // pixels per meter
+            let scale = 80; // pixels per meter
+            let columnWidth = 300;
+
+            // 2D graphics buffer for overlays
+            let overlayBuffer;
 
             p.setup = function() {
-                let canvas = p.createCanvas(800, 500);
+                let canvas = p.createCanvas(1200, 600, p.WEBGL);
                 canvas.parent('sketch-holder');
+
+                // Set frame rate for smoother animation
+                p.frameRate(60);
+
+                // Create 2D graphics buffer for text/UI overlays
+                overlayBuffer = p.createGraphics(1200, 600);
+
                 setupControls();
                 calculate();
             };
 
             p.draw = function() {
+                // Clear background
                 p.background(250);
 
                 // Update rotation if animating
                 if (animating) {
                     let dt = 1/60; // 60 fps
-                    omega += alpha * dt;
-                    angle += omega * dt;
-
-                    // Update displays
-                    ke = 0.5 * inertia * omega * omega;
-                    angularMomentum = inertia * omega;
-                    updateDisplays();
+                    shapes.forEach(shape => {
+                        shape.omega += shape.alpha * dt;
+                        shape.angle += shape.omega * dt;
+                        shape.ke = 0.5 * shape.I * shape.omega * shape.omega;
+                        shape.L = shape.I * shape.omega;
+                    });
                 }
 
-                // Draw coordinate system
-                p.push();
-                p.translate(p.width / 2, p.height / 2);
+                // Set up camera: 45° azimuth angle view from top
+                // Position camera above and to the side for better 3D perspective
+                let camX = 0;
+                let camY = -400; // Above the scene
+                let camZ = 600;  // Distance from scene
+                let centerX = 0;
+                let centerY = 0;
+                let centerZ = 0;
+                p.camera(camX, camY, camZ, centerX, centerY, centerZ, 0, 1, 0);
 
-                // Draw axis of rotation
-                p.stroke(100);
-                p.strokeWeight(4);
-                p.line(0, -200, 0, 200);
-                p.fill(100);
-                p.noStroke();
-                p.circle(0, 0, 10);
+                // Set up lighting
+                p.ambientLight(100);
+                p.directionalLight(255, 255, 255, 0.3, 0.5, -1);
 
-                // Draw rotating object
-                p.rotate(angle);
-
-                if (shape === 'disk') {
-                    drawDisk();
-                } else if (shape === 'ring') {
-                    drawRing();
-                } else if (shape === 'rod') {
-                    drawRod();
-                } else if (shape === 'sphere') {
-                    drawSphere();
+                // Draw all 4 shapes side-by-side in 3D
+                for (let i = 0; i < 4; i++) {
+                    drawShape3D(shapes[i], i);
                 }
 
-                p.pop();
-
-                // Draw torque arrow
-                drawTorqueArrow();
-
-                // Draw info panel
-                drawInfoPanel();
-
-                // Draw angular velocity indicator
-                drawAngularVelocityIndicator();
+                // Draw 2D overlays (infoboxes and gauges) - must be last
+                draw2DOverlays();
             };
 
-            function drawDisk() {
-                // Solid disk
-                p.fill(100, 150, 255, 200);
-                p.stroke(0, 100, 200);
-                p.strokeWeight(2);
-                p.circle(0, 0, radius * scale * 2);
-
-                // Reference line
-                p.stroke(255, 0, 0);
-                p.strokeWeight(3);
-                p.line(0, 0, radius * scale, 0);
-
-                // Center dot
-                p.fill(0);
-                p.noStroke();
-                p.circle(0, 0, 8);
-            }
-
-            function drawRing() {
-                // Hollow ring
-                p.noFill();
-                p.stroke(0, 100, 200);
-                p.strokeWeight(15);
-                p.circle(0, 0, radius * scale * 2);
-
-                // Inner circle
-                p.strokeWeight(2);
-                p.circle(0, 0, radius * scale * 2 - 15);
-
-                // Reference line
-                p.stroke(255, 0, 0);
-                p.strokeWeight(3);
-                p.line(0, 0, radius * scale, 0);
-
-                // Center dot
-                p.fill(0);
-                p.noStroke();
-                p.circle(0, 0, 8);
-            }
-
-            function drawRod() {
-                // Thin rod (length = 2 * radius for visualization)
-                p.fill(150, 100, 50);
-                p.stroke(100, 70, 30);
-                p.strokeWeight(2);
-                p.rectMode(p.CENTER);
-                p.rect(0, 0, radius * scale * 2, 20, 5);
-
-                // Center dot
-                p.fill(0);
-                p.noStroke();
-                p.circle(0, 0, 8);
-            }
-
-            function drawSphere() {
-                // Solid sphere (shown as shaded circle with 3D effect)
-                // Gradient effect
-                for (let r = radius * scale; r > 0; r -= 2) {
-                    let shade = p.map(r, 0, radius * scale, 150, 255);
-                    p.fill(shade, 180, 100);
-                    p.noStroke();
-                    p.circle(-10, -10, r * 2);
-                }
-
-                // Outline
-                p.noFill();
-                p.stroke(0, 100, 50);
-                p.strokeWeight(2);
-                p.circle(0, 0, radius * scale * 2);
-
-                // Reference line
-                p.stroke(255, 0, 0);
-                p.strokeWeight(3);
-                p.line(0, 0, radius * scale, 0);
-
-                // Center dot
-                p.fill(0);
-                p.noStroke();
-                p.circle(0, 0, 8);
-            }
-
-            function drawTorqueArrow() {
-                if (torque === 0) return;
-
-                let x = p.width / 2 + radius * scale + 40;
-                let y = p.height / 2;
-                let arrowLen = Math.abs(torque) * 3;
+            function drawShape3D(shape, index) {
+                // Position each shape in its column
+                // Canvas is 1200 wide, 4 columns of 300 each
+                // In WEBGL mode, origin is at center, so positions are:
+                // Column 0: -450, Column 1: -150, Column 2: 150, Column 3: 450
+                let xPos = -450 + index * 300;
 
                 p.push();
-                if (torque > 0) {
-                    // Counter-clockwise (positive)
-                    p.fill(0, 200, 0);
-                    p.stroke(0, 200, 0);
-                    p.strokeWeight(2);
-                    p.noFill();
-                    p.arc(x, y, 50, 50, -p.PI/2, p.PI/2);
-                    // Arrowhead
-                    p.fill(0, 200, 0);
-                    p.noStroke();
-                    p.triangle(x, y + 25, x - 8, y + 20, x - 8, y + 30);
+                p.translate(xPos, 0, 0);
 
-                    p.fill(0, 150, 0);
-                    p.textAlign(p.LEFT);
-                    p.text('τ = +' + torque + ' N·m', x + 30, y + 5);
-                } else {
-                    // Clockwise (negative)
-                    p.fill(200, 0, 0);
-                    p.stroke(200, 0, 0);
-                    p.strokeWeight(2);
-                    p.noFill();
-                    p.arc(x, y, 50, 50, p.PI/2, -p.PI/2);
-                    // Arrowhead
-                    p.fill(200, 0, 0);
-                    p.noStroke();
-                    p.triangle(x, y - 25, x - 8, y - 20, x - 8, y - 30);
+                // Draw rotation axis
+                p.push();
+                p.stroke(100);
+                p.strokeWeight(3);
+                p.line(0, -120, 0, 0, 120, 0);
 
-                    p.fill(150, 0, 0);
-                    p.textAlign(p.LEFT);
-                    p.text('τ = ' + torque + ' N·m', x + 30, y + 5);
+                // Axis endpoint markers
+                p.fill(100);
+                p.noStroke();
+                p.translate(0, -120, 0);
+                p.sphere(4, 8, 6);
+                p.translate(0, 240, 0);
+                p.sphere(4, 8, 6);
+                p.pop();
+
+                // Apply rotation around Y axis
+                p.push();
+                p.rotateY(shape.angle);
+
+                // Draw the shape based on type
+                if (shape.type === 'disk') {
+                    drawDiskWebGL(shape.color);
+                } else if (shape.type === 'ring') {
+                    drawRingWebGL(shape.color);
+                } else if (shape.type === 'rod') {
+                    drawRodWebGL(shape.color);
+                } else if (shape.type === 'sphere') {
+                    drawSphereWebGL(shape.color);
                 }
+
+                p.pop();
                 p.pop();
             }
 
-            function drawAngularVelocityIndicator() {
-                // Show angular velocity as a speedometer-style arc
+            function drawDiskWebGL(col) {
+                // Draw solid disk as thin cylinder
+                // Cylinder is vertical by default, which is correct for a disk lying flat
                 p.push();
-                p.translate(p.width - 120, p.height - 80);
+                p.fill(col[0], col[1], col[2]);
+                p.noStroke();
+                p.cylinder(radius * scale, 10, 16, 1); // 16 segments - balanced quality/performance
+
+                // Draw reference line on top surface from center to edge
+                p.stroke(255, 0, 0);
+                p.strokeWeight(4);
+                p.line(0, -5, 0, radius * scale, -5, 0); // Top surface, along X axis
+                p.pop();
+            }
+
+            function drawRingWebGL(col) {
+                // Draw hollow ring as torus
+                p.push();
+                p.fill(col[0], col[1], col[2]);
+                p.noStroke();
+                p.rotateX(p.PI / 2); // Orient torus to rotate correctly around Y axis
+                p.torus(radius * scale * 0.85, radius * scale * 0.15, 16, 10); // Balanced quality/performance
+
+                // Draw rotation marker - red circle on tube cross-section at front
+                p.push();
+                p.translate(radius * scale * 0.85, 0, 0); // Position at front of torus
+                p.noFill();
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.circle(0, 0, radius * scale * 0.15 * 2); // Circle showing tube cross-section
+
+                // Add small sphere at top of circle for extra visibility
+                p.translate(0, radius * scale * 0.15, 0);
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.sphere(radius * scale * 0.08, 6, 5);
+                p.pop();
+
+                p.pop();
+            }
+
+            function drawRodWebGL(col) {
+                // Draw thin rod as elongated box
+                let rodLength = radius * scale * 2;
+                let rodThickness = 12;
+
+                p.push();
+                p.fill(col[0], col[1], col[2]);
+                p.noStroke();
+                p.box(rodLength, rodThickness, rodThickness);
+
+                // Draw reference line
+                p.stroke(255, 0, 0);
+                p.strokeWeight(4);
+                p.line(-rodLength/2, 0, 0, rodLength/2, 0, 0);
+                p.pop();
+            }
+
+            function drawSphereWebGL(col) {
+                // Draw solid sphere - WEBGL will handle proper centered lighting
+                p.push();
+                p.fill(col[0], col[1], col[2]);
+                p.noStroke();
+                p.sphere(radius * scale, 16, 12); // Balanced quality/performance
+
+                // Draw reference line through equator
+                p.stroke(255, 0, 0);
+                p.strokeWeight(4);
+                p.line(0, 0, 0, radius * scale, 0, 0);
+
+                // Draw horizontal equatorial circle for rotation reference
+                p.push();
+                p.noFill();
+                p.stroke(255, 0, 0);
+                p.strokeWeight(2);
+                p.rotateX(p.PI / 2);
+                p.circle(0, 0, radius * scale * 2);
+                p.pop();
+
+                // Draw vertical meridian circle (geodesic)
+                p.push();
+                p.noFill();
+                p.stroke(255, 0, 0);
+                p.strokeWeight(2);
+                p.rotateY(p.PI / 2);
+                p.circle(0, 0, radius * scale * 2);
+                p.pop();
+
+                p.pop();
+            }
+
+            function draw2DOverlays() {
+                // Clear the overlay buffer
+                overlayBuffer.clear();
+
+                // Draw gauges and infoboxes for each shape on 2D buffer
+                for (let i = 0; i < 4; i++) {
+                    let xPos = 150 + i * 300; // 2D canvas coordinates
+
+                    // Draw infobox at top
+                    drawInfoBoxOnBuffer(xPos, 80, shapes[i]);
+
+                    // Draw gauge at bottom
+                    drawGaugeOnBuffer(xPos, 480, shapes[i].omega);
+                }
+
+                // Render overlay buffer as textured plane in front of camera
+                p.push();
+
+                // Switch to orthographic projection looking straight at the plane
+                p.camera(0, 0, (p.height/2.0) / Math.tan(p.PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
+                p.ortho(-p.width/2, p.width/2, -p.height/2, p.height/2, 0, Math.max(p.width, p.height));
+
+                // Disable lighting for the overlay
+                p.noLights();
+
+                // Position plane at z=0
+                p.translate(0, 0, 0);
+
+                // Apply texture and draw plane
+                p.texture(overlayBuffer);
+                p.noStroke();
+                p.plane(p.width, p.height);
+
+                p.pop();
+            }
+
+            function drawInfoBoxOnBuffer(cx, cy, shape) {
+                overlayBuffer.push();
+                overlayBuffer.translate(cx, cy);
+
+                // Background
+                overlayBuffer.fill(255, 255, 255, 240);
+                overlayBuffer.stroke(100);
+                overlayBuffer.strokeWeight(1);
+                overlayBuffer.rect(-90, 0, 180, 100, 5);
+
+                // Text
+                overlayBuffer.fill(0);
+                overlayBuffer.noStroke();
+                overlayBuffer.textAlign(overlayBuffer.LEFT, overlayBuffer.TOP);
+                overlayBuffer.textSize(12);
+                overlayBuffer.textStyle(overlayBuffer.BOLD);
+                overlayBuffer.text(shape.name, -80, 10);
+                overlayBuffer.textStyle(overlayBuffer.NORMAL);
+                overlayBuffer.textSize(10);
+                overlayBuffer.text('I = ' + shape.I.toFixed(2) + ' kg·m²', -80, 27);
+                overlayBuffer.text('α = ' + shape.alpha.toFixed(2) + ' rad/s²', -80, 42);
+                overlayBuffer.text('KE = ' + shape.ke.toFixed(2) + ' J', -80, 57);
+                overlayBuffer.text('L = ' + shape.L.toFixed(2) + ' kg·m²/s', -80, 72);
+
+                overlayBuffer.pop();
+            }
+
+            function drawGaugeOnBuffer(cx, cy, omega) {
+                overlayBuffer.push();
+                overlayBuffer.translate(cx, cy);
 
                 // Background arc
-                p.noFill();
-                p.stroke(200);
-                p.strokeWeight(8);
-                p.arc(0, 0, 80, 80, p.PI, 2 * p.PI);
+                overlayBuffer.noFill();
+                overlayBuffer.stroke(200);
+                overlayBuffer.strokeWeight(6);
+                overlayBuffer.arc(0, 0, 60, 60, overlayBuffer.PI, 2 * overlayBuffer.PI);
 
                 // Velocity arc
-                let maxOmega = 10; // rad/s for display
+                let maxOmega = 10;
                 let omegaClamped = p.constrain(Math.abs(omega), 0, maxOmega);
-                let arcAngle = p.map(omegaClamped, 0, maxOmega, 0, p.PI);
+                let arcAngle = p.map(omegaClamped, 0, maxOmega, 0, overlayBuffer.PI);
 
                 if (omega > 0) {
-                    p.stroke(0, 200, 0);
+                    overlayBuffer.stroke(0, 200, 0);
                 } else if (omega < 0) {
-                    p.stroke(200, 0, 0);
+                    overlayBuffer.stroke(200, 0, 0);
                 } else {
-                    p.stroke(150);
+                    overlayBuffer.stroke(150);
                 }
-                p.strokeWeight(8);
-                p.arc(0, 0, 80, 80, p.PI, p.PI + arcAngle);
+                overlayBuffer.strokeWeight(6);
+                overlayBuffer.arc(0, 0, 60, 60, overlayBuffer.PI, overlayBuffer.PI + arcAngle);
 
                 // Label
-                p.fill(0);
-                p.noStroke();
-                p.textAlign(p.CENTER);
-                p.textSize(10);
-                p.text('ω', 0, -50);
-                p.textSize(12);
-                p.text(omega.toFixed(2) + ' rad/s', 0, 15);
+                overlayBuffer.fill(0);
+                overlayBuffer.noStroke();
+                overlayBuffer.textAlign(overlayBuffer.CENTER, overlayBuffer.CENTER);
+                overlayBuffer.textSize(10);
+                overlayBuffer.text('ω (rad/s)', 0, -40);
+                overlayBuffer.textSize(11);
+                overlayBuffer.textStyle(overlayBuffer.BOLD);
+                overlayBuffer.text(omega.toFixed(2), 0, 12);
 
-                p.pop();
-            }
-
-            function drawInfoPanel() {
-                p.fill(255, 255, 255, 230);
-                p.stroke(100);
-                p.strokeWeight(1);
-                p.rect(10, 10, 200, 100, 5);
-
-                p.fill(0);
-                p.noStroke();
-                p.textAlign(p.LEFT);
-                p.textSize(14);
-                p.text('Shape: ' + shape.toUpperCase(), 20, 30);
-                p.textSize(12);
-                p.text('Mass: ' + mass + ' kg', 20, 50);
-                p.text('Radius: ' + radius.toFixed(1) + ' m', 20, 68);
-                p.text('I = ' + inertia.toFixed(2) + ' kg·m²', 20, 86);
-                p.text('α = ' + alpha.toFixed(2) + ' rad/s²', 20, 104);
+                overlayBuffer.pop();
             }
 
             function calculate() {
-                // Calculate moment of inertia based on shape
-                if (shape === 'disk') {
-                    inertia = 0.5 * mass * radius * radius;
-                } else if (shape === 'ring') {
-                    inertia = mass * radius * radius;
-                } else if (shape === 'rod') {
-                    // Using rod length = 2*radius
-                    let length = 2 * radius;
-                    inertia = (1/12) * mass * length * length;
-                } else if (shape === 'sphere') {
-                    inertia = 0.4 * mass * radius * radius; // 2/5 * m * r^2
-                }
+                // Calculate for each shape
+                shapes.forEach(shape => {
+                    if (shape.type === 'disk') {
+                        shape.I = 0.5 * mass * radius * radius;
+                    } else if (shape.type === 'ring') {
+                        shape.I = mass * radius * radius;
+                    } else if (shape.type === 'rod') {
+                        let length = 2 * radius;
+                        shape.I = (1/12) * mass * length * length;
+                    } else if (shape.type === 'sphere') {
+                        shape.I = 0.4 * mass * radius * radius; // 2/5
+                    }
 
-                // Calculate angular acceleration
-                if (inertia > 0) {
-                    alpha = torque / inertia;
-                } else {
-                    alpha = 0;
-                }
-
-                // Update displays
-                updateDisplays();
-            }
-
-            function updateDisplays() {
-                document.getElementById('inertia-display').textContent = inertia.toFixed(2);
-                document.getElementById('alpha-display').textContent = alpha.toFixed(2);
-                document.getElementById('omega-display').textContent = omega.toFixed(2);
-                document.getElementById('ke-display').textContent = ke.toFixed(2);
-                document.getElementById('momentum-display').textContent = angularMomentum.toFixed(2);
+                    shape.alpha = shape.I > 0 ? torque / shape.I : 0;
+                });
             }
 
             function setupControls() {
-                // Shape selector buttons
-                document.querySelectorAll('.type-button').forEach(button => {
-                    button.addEventListener('click', function() {
-                        document.querySelectorAll('.type-button').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        this.classList.add('active');
-                        shape = this.dataset.shape;
-                        calculate();
-                    });
-                });
-
                 // Mass slider
                 document.getElementById('mass').addEventListener('input', function() {
                     mass = parseFloat(this.value);
@@ -878,12 +889,13 @@
                 // Reset button
                 document.getElementById('reset-btn').addEventListener('click', function() {
                     animating = false;
-                    omega = 0;
-                    angle = 0;
-                    ke = 0;
-                    angularMomentum = 0;
+                    shapes.forEach(shape => {
+                        shape.omega = 0;
+                        shape.angle = 0;
+                        shape.ke = 0;
+                        shape.L = 0;
+                    });
                     document.getElementById('start-btn').textContent = 'Start';
-                    updateDisplays();
                 });
             }
         };

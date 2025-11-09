@@ -640,8 +640,15 @@
                     }
                 }
 
-                display(offsetX, offsetY) {
-                    p.fill(220, 50, 50, 200);
+                display(offsetX, offsetY, temp) {
+                    // Color based on temperature: blue (cold) to red (hot)
+                    // Temperature range: 200K (blue) to 600K (red)
+                    let tempNorm = p.constrain(p.map(temp, 200, 600, 0, 1), 0, 1);
+                    let r = p.lerp(50, 255, tempNorm);
+                    let g = p.lerp(100, 50, tempNorm);
+                    let b = p.lerp(255, 50, tempNorm);
+
+                    p.fill(r, g, b, 200);
                     p.noStroke();
                     p.circle(offsetX + this.x, offsetY + this.y, this.radius * 2);
                 }
@@ -668,12 +675,15 @@
 
             function initializeParticles() {
                 particles = [];
-                let boxWidth = leftPanelWidth * 0.7;
-                let boxHeight = 300;
+                let cylinderWidth = leftPanelWidth * 0.5;
+                let maxCylinderHeight = 320;
+                let minCylinderHeight = 80;
+                let cylinderHeight = p.map(volume, 5, 30, minCylinderHeight, maxCylinderHeight);
+
                 for (let i = 0; i < numParticles; i++) {
                     particles.push(new Particle(
-                        p.random(10, boxWidth - 10),
-                        p.random(10, boxHeight - 10)
+                        p.random(10, cylinderWidth - 10),
+                        p.random(10, cylinderHeight - 10)
                     ));
                 }
             }
@@ -935,31 +945,54 @@
                 p.text('Piston-Cylinder System', centerX, 30);
 
                 // Box dimensions based on volume
-                let maxBoxWidth = leftPanelWidth * 0.7;
-                let boxHeight = 300;
-                let boxWidth = p.map(volume, 5, 30, maxBoxWidth * 0.3, maxBoxWidth);
-                let boxX = centerX - boxWidth / 2;
-                let boxY = topY;
+                // Fixed width, variable height controlled by piston position
+                let cylinderWidth = leftPanelWidth * 0.5;
+                let maxCylinderHeight = 320;
+                let minCylinderHeight = 80;
 
-                // Draw cylinder
-                p.fill(220, 230, 240);
+                // Volume determines cylinder height (piston position)
+                let cylinderHeight = p.map(volume, 5, 30, minCylinderHeight, maxCylinderHeight);
+
+                let cylinderX = centerX - cylinderWidth / 2;
+                let cylinderBottomY = topY + maxCylinderHeight;
+                let pistonY = cylinderBottomY - cylinderHeight;
+
+                // Draw cylinder walls (fixed)
+                p.fill(180, 190, 200);
+                p.stroke(80);
+                p.strokeWeight(3);
+                // Left wall
+                p.rect(cylinderX - 8, topY, 8, maxCylinderHeight);
+                // Right wall
+                p.rect(cylinderX + cylinderWidth, topY, 8, maxCylinderHeight);
+                // Bottom wall
+                p.rect(cylinderX - 8, cylinderBottomY, cylinderWidth + 16, 8);
+
+                // Draw gas chamber (inside cylinder)
+                p.fill(220, 230, 240, 150);
                 p.stroke(80);
                 p.strokeWeight(2);
-                p.rect(boxX, boxY, boxWidth, boxHeight);
+                p.rect(cylinderX, pistonY, cylinderWidth, cylinderHeight);
 
-                // Draw piston
+                // Draw piston (movable)
                 p.fill(150, 160, 170);
-                p.rect(boxX, boxY, boxWidth, 15);
+                p.stroke(80);
+                p.strokeWeight(2);
+                p.rect(cylinderX, pistonY - 12, cylinderWidth, 12);
 
                 // Piston handle
                 p.stroke(100);
                 p.strokeWeight(4);
-                p.line(centerX, boxY + 7, centerX, boxY - 20);
+                p.line(centerX, pistonY - 12, centerX, pistonY - 35);
+                // Handle knob
+                p.fill(120);
+                p.noStroke();
+                p.circle(centerX, pistonY - 35, 12);
 
                 // Update and draw particles
                 for (let particle of particles) {
-                    particle.update(boxWidth, boxHeight - 20, temperature);
-                    particle.display(boxX, boxY + 15);
+                    particle.update(cylinderWidth, cylinderHeight, temperature);
+                    particle.display(cylinderX, pistonY, temperature);
                 }
 
                 // Display state information
@@ -967,15 +1000,16 @@
                 p.noStroke();
                 p.textAlign(p.LEFT);
                 p.textSize(13);
-                let infoY = boxY + boxHeight + 30;
-                p.text(`P = ${pressure.toFixed(1)} kPa`, boxX, infoY);
-                p.text(`V = ${volume.toFixed(1)} L`, boxX, infoY + 20);
-                p.text(`T = ${temperature.toFixed(0)} K`, boxX, infoY + 40);
+                let infoY = cylinderBottomY + 25;
+                p.text(`P = ${pressure.toFixed(1)} kPa`, cylinderX, infoY);
+                p.text(`V = ${volume.toFixed(1)} L`, cylinderX, infoY + 20);
+                p.text(`T = ${temperature.toFixed(0)} K`, cylinderX, infoY + 40);
 
-                // Particle speed indicator
+                // Particle speed and color indicators
                 p.textSize(11);
                 p.fill(100);
-                p.text('Particle speed ∝ √T', boxX, infoY + 65);
+                p.text('Particle speed ∝ √T', cylinderX, infoY + 65);
+                p.text('Color: Blue (cold) → Red (hot)', cylinderX, infoY + 80);
             }
 
             function drawRightPanel() {

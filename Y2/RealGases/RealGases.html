@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Gases - Interactive Lecture</title>
+    <meta name="description" content="Real gas behavior using Van der Waals and Redlich-Kwong equations of state">
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Real Gases and Equations of State</h1>
+        <p class="subtitle">Van der Waals, Redlich-Kwong Models, and Compressibility Factor</p>
+    </header>
+    <nav class="breadcrumb"><a href="/">Home</a> &gt; <a href="/">Y2</a> &gt; <span>Real Gases</span></nav>
+
+    <div class="content-section">
+        <h2>Introduction to Real Gas Behavior</h2>
+        <p>The ideal gas law \(PV = nRT\) works well at low pressures and high temperatures, but real gases deviate significantly at high pressures or near condensation points.</p>
+
+        <div class="key-point">
+            <p><strong>Key Insight:</strong> Real gases experience intermolecular forces (attractive) and molecular volume (repulsive) that the ideal gas law ignores. Equations of state correct for these effects.</p>
+        </div>
+
+        <h3>1. Ideal Gas Law (Review)</h3>
+        <div class="equation-box">
+            <p>\[PV = nRT\]</p>
+            <p>Assumptions: No intermolecular forces, negligible molecular volume</p>
+        </div>
+
+        <h3>2. Van der Waals Equation</h3>
+        <p>The Van der Waals equation accounts for molecular size and attractions:</p>
+        <div class="equation-box">
+            <p>\[\left(P + \frac{an^2}{V^2}\right)(V - nb) = nRT\]</p>
+            <p>Or per mole: \(\left(P + \frac{a}{v^2}\right)(v - b) = RT\)</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(a\) = Van der Waals constant for intermolecular attraction (Pa·m⁶/mol²)</li>
+                <li>\(b\) = Volume excluded by molecules (m³/mol)</li>
+                <li>\(v = V/n\) = Molar volume (m³/mol)</li>
+            </ul>
+            <p><strong>Physical meaning:</strong></p>
+            <ul>
+                <li>\(\frac{an^2}{V^2}\) = Pressure correction for attractive forces</li>
+                <li>\(nb\) = Volume correction for molecular size</li>
+            </ul>
+        </div>
+
+        <h3>3. Redlich-Kwong Equation</h3>
+        <p>An improvement over Van der Waals with better accuracy:</p>
+        <div class="equation-box">
+            <p>\[P = \frac{RT}{v-b} - \frac{a}{\sqrt{T} \cdot v(v+b)}\]</p>
+            <p>Or: \(\left(P + \frac{a}{\sqrt{T} \cdot v(v+b)}\right)(v - b) = RT\)</p>
+            <p>More accurate for high pressures and wider temperature ranges</p>
+        </div>
+
+        <h3>4. Compressibility Factor (Z)</h3>
+        <div class="equation-box">
+            <p>\[Z = \frac{PV}{nRT} = \frac{Pv}{RT}\]</p>
+            <p>For ideal gas: \(Z = 1\)</p>
+            <p>For real gas: \(Z \neq 1\)</p>
+            <ul>
+                <li>\(Z < 1\): Attractive forces dominate (low P, low T)</li>
+                <li>\(Z > 1\): Repulsive forces dominate (high P, high T)</li>
+                <li>\(Z = 1\): Ideal behavior</li>
+            </ul>
+        </div>
+
+        <h3>5. Critical Point</h3>
+        <div class="equation-box">
+            <p><strong>Critical Properties (Van der Waals):</strong></p>
+            <p>\[P_c = \frac{a}{27b^2}, \quad V_c = 3b, \quad T_c = \frac{8a}{27Rb}\]</p>
+            <p><strong>Reduced Properties:</strong></p>
+            <p>\[P_r = \frac{P}{P_c}, \quad V_r = \frac{V}{V_c}, \quad T_r = \frac{T}{T_c}\]</p>
+            <p>Law of Corresponding States: Gases at same \((P_r, T_r)\) have same \(Z\)</p>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Interactive Simulation: pV Diagram Comparison</h2>
+        <div class="simulation-container">
+            <div class="controls-panel">
+                <div class="slider-container">
+                    <label for="temperature">Temperature: <span id="temp-val">300</span> K</label>
+                    <input type="range" id="temperature" min="200" max="600" value="300">
+                </div>
+                <div class="slider-container">
+                    <label for="gas-select">Gas:</label>
+                    <select id="gas-select">
+                        <option value="co2">CO₂</option>
+                        <option value="n2">N₂</option>
+                        <option value="h2o">H₂O</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin: 15px 0;">
+                <label><input type="checkbox" id="show-ideal" checked> Ideal Gas</label>
+                <label><input type="checkbox" id="show-vdw" checked> Van der Waals</label>
+                <label><input type="checkbox" id="show-rk" checked> Redlich-Kwong</label>
+            </div>
+            <div id="sketch-holder"></div>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                <h4>Compressibility at V = 0.01 m³/mol:</h4>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div>Ideal: Z = <span id="z-ideal">1.000</span></div>
+                    <div>VdW: Z = <span id="z-vdw">0.950</span></div>
+                    <div>RK: Z = <span id="z-rk">0.955</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <h3>1. Natural Gas Industry</h3>
+        <ul>
+            <li><strong>Pipeline design:</strong> Accurate flow calculations using real gas equations</li>
+            <li><strong>Storage:</strong> Predicting capacity in high-pressure vessels</li>
+            <li><strong>LNG:</strong> Behavior near condensation point</li>
+        </ul>
+
+        <h3>2. Refrigeration and Air Conditioning</h3>
+        <ul>
+            <li><strong>Refrigerant properties:</strong> VdW for phase transitions</li>
+            <li><strong>Compressor design:</strong> Real gas corrections for efficiency</li>
+            <li><strong>Heat pump cycles:</strong> Accurate enthalpy calculations</li>
+        </ul>
+
+        <h3>3. Chemical Processing</h3>
+        <ul>
+            <li><strong>Reactor design:</strong> High-pressure synthesis reactions</li>
+            <li><strong>Distillation:</strong> Vapor-liquid equilibrium</li>
+            <li><strong>Gas separation:</strong> Membrane and cryogenic processes</li>
+        </ul>
+    </div>
+
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead><tr><th>Model</th><th>Equation</th><th>Accuracy</th></tr></thead>
+                <tbody>
+                    <tr><td>Ideal Gas</td><td>\(PV = nRT\)</td><td>Low P, high T</td></tr>
+                    <tr><td>Van der Waals</td><td>\((P + \frac{a}{v^2})(v-b) = RT\)</td><td>Moderate P, T</td></tr>
+                    <tr><td>Redlich-Kwong</td><td>\(P = \frac{RT}{v-b} - \frac{a}{\sqrt{T}v(v+b)}\)</td><td>High P, wide T</td></tr>
+                    <tr><td>Compressibility</td><td>\(Z = \frac{Pv}{RT}\)</td><td>All conditions</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+        <div class="practice-problems">
+            <h3>Problem 1: Van der Waals Calculation</h3>
+            <p>For CO₂ (a = 0.365 Pa·m⁶/mol², b = 4.27×10⁻⁵ m³/mol) at T = 300 K, v = 0.001 m³/mol, find pressure using VdW equation.</p>
+            <p class="toggle-section" onclick="toggleSolution('sol1')">Show Solution</p>
+            <div id="sol1" class="hidden">
+                <p>\(P = \frac{RT}{v-b} - \frac{a}{v^2}\)</p>
+                <p>\(P = \frac{8.314 \times 300}{0.001 - 4.27 \times 10^{-5}} - \frac{0.365}{0.001^2}\)</p>
+                <p>\(P = \frac{2494.2}{0.0009573} - 365{,}000 = 2.605 \times 10^6 - 3.65 \times 10^5 = 2.24 \text{ MPa}\)</p>
+                <p>Ideal gas would give: \(P = RT/v = 2.494 \text{ MPa}\) (11% error!)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Compressibility Factor</h3>
+            <p>Calculate Z for nitrogen at P = 10 MPa, T = 300 K (a = 0.137, b = 3.87×10⁻⁵).</p>
+            <p class="toggle-section" onclick="toggleSolution('sol2')">Show Solution</p>
+            <div id="sol2" class="hidden">
+                <p>Using VdW: Solve iteratively or use \(v = \frac{RT}{P}(1 + \frac{bP}{RT} - \frac{a}{vRT})\)</p>
+                <p>First approximation: \(v \approx RT/P = 2.494 \times 10^{-4}\) m³/mol</p>
+                <p>Refined: \(v \approx 2.4 \times 10^{-4}\) m³/mol</p>
+                <p>\(Z = \frac{Pv}{RT} = \frac{10 \times 10^6 \times 2.4 \times 10^{-4}}{8.314 \times 300} = 0.964\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Critical Point</h3>
+            <p>For a gas with a = 0.5 Pa·m⁶/mol², b = 5×10⁻⁵ m³/mol, find critical temperature and pressure.</p>
+            <p class="toggle-section" onclick="toggleSolution('sol3')">Show Solution</p>
+            <div id="sol3" class="hidden">
+                <p>\(T_c = \frac{8a}{27Rb} = \frac{8 \times 0.5}{27 \times 8.314 \times 5 \times 10^{-5}} = 356.5 \text{ K}\)</p>
+                <p>\(P_c = \frac{a}{27b^2} = \frac{0.5}{27 \times (5 \times 10^{-5})^2} = 7.41 \text{ MPa}\)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Q1: In Van der Waals equation, parameter 'a' accounts for:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> (a) Molecular volume</label>
+                    <label><input type="radio" name="q1" value="b"> (b) Intermolecular attractions</label>
+                    <label><input type="radio" name="q1" value="c"> (c) Temperature effects</label>
+                    <label><input type="radio" name="q1" value="d"> (d) Pressure corrections</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q2: Compressibility factor Z < 1 indicates:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> (a) Ideal behavior</label>
+                    <label><input type="radio" name="q2" value="b"> (b) Attractive forces dominate</label>
+                    <label><input type="radio" name="q2" value="c"> (c) Repulsive forces dominate</label>
+                    <label><input type="radio" name="q2" value="d"> (d) High temperature</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q3: Redlich-Kwong is more accurate than Van der Waals because:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> (a) It has more parameters</label>
+                    <label><input type="radio" name="q3" value="b"> (b) It includes temperature dependence in attraction term</label>
+                    <label><input type="radio" name="q3" value="c"> (c) It's simpler</label>
+                    <label><input type="radio" name="q3" value="d"> (d) It ignores molecular volume</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q4: At the critical point:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> (a) Gas and liquid phases are indistinguishable</label>
+                    <label><input type="radio" name="q4" value="b"> (b) Z = 0</label>
+                    <label><input type="radio" name="q4" value="c"> (c) Pressure is zero</label>
+                    <label><input type="radio" name="q4" value="d"> (d) Ideal gas law is exact</label>
+                </div>
+            </div>
+            <div class="quiz-question">
+                <h3>Q5: Real gases behave most like ideal gases at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> (a) High P, low T</label>
+                    <label><input type="radio" name="q5" value="b"> (b) Low P, high T</label>
+                    <label><input type="radio" name="q5" value="c"> (c) Critical point</label>
+                    <label><input type="radio" name="q5" value="d"> (d) Low P, low T</label>
+                </div>
+            </div>
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <footer><script src="/assets/common/footer.js"></script></footer>
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+    <script>
+        let sketch = new p5(function(p) {
+            let T = 300, gas = 'co2';
+            let showIdeal = true, showVdW = true, showRK = true;
+            let canvasW, canvasH;
+            let gasProps = {
+                co2: {a: 0.365, b: 4.27e-5},
+                n2: {a: 0.137, b: 3.87e-5},
+                h2o: {a: 0.545, b: 3.05e-5}
+            };
+
+            p.setup = function() {
+                canvasW = Math.min(900, p.windowWidth - 40);
+                canvasH = 500;
+                p.createCanvas(canvasW, canvasH).parent('sketch-holder');
+                setupListeners();
+            };
+
+            function setupListeners() {
+                document.getElementById('temperature').addEventListener('input', e => {
+                    T = parseFloat(e.target.value);
+                    document.getElementById('temp-val').textContent = T;
+                });
+                document.getElementById('gas-select').addEventListener('change', e => {
+                    gas = e.target.value;
+                });
+                document.getElementById('show-ideal').addEventListener('change', e => showIdeal = e.target.checked);
+                document.getElementById('show-vdw').addEventListener('change', e => showVdW = e.target.checked);
+                document.getElementById('show-rk').addEventListener('change', e => showRK = e.target.checked);
+            }
+
+            p.draw = function() {
+                p.background(250);
+                p.fill(0); p.textAlign(p.CENTER); p.textSize(16);
+                p.text('P-V Diagram: Gas Equation Comparison', canvasW/2, 25);
+
+                let margin = {l: 70, r: 30, t: 50, b: 60};
+                let plotW = canvasW - margin.l - margin.r;
+                let plotH = canvasH - margin.t - margin.b;
+                let plotX = margin.l, plotY = margin.t;
+
+                // Axes
+                p.stroke(0); p.strokeWeight(2);
+                p.line(plotX, plotY + plotH, plotX + plotW, plotY + plotH);
+                p.line(plotX, plotY, plotX, plotY + plotH);
+
+                p.fill(0); p.noStroke(); p.textSize(12); p.textAlign(p.CENTER);
+                p.text('Volume (m³/mol)', plotX + plotW/2, plotY + plotH + 45);
+                p.push();
+                p.translate(plotX - 50, plotY + plotH/2);
+                p.rotate(-p.PI/2);
+                p.text('Pressure (MPa)', 0, 0);
+                p.pop();
+
+                let vMin = 0.0001, vMax = 0.01, pMin = 0, pMax = 30;
+                let R = 8.314, a = gasProps[gas].a, b = gasProps[gas].b;
+
+                // Plot curves
+                if (showIdeal) plotCurve(v => R*T/v / 1e6, vMin, vMax, pMin, pMax, plotX, plotY, plotW, plotH, p.color(0, 150, 0));
+                if (showVdW) plotCurve(v => (R*T/(v-b) - a/(v*v)) / 1e6, vMin, vMax, pMin, pMax, plotX, plotY, plotW, plotH, p.color(255, 0, 0));
+                if (showRK) plotCurve(v => (R*T/(v-b) - a/(Math.sqrt(T)*v*(v+b))) / 1e6, vMin, vMax, pMin, pMax, plotX, plotY, plotW, plotH, p.color(0, 0, 255));
+
+                // Update Z values
+                let v0 = 0.001;
+                let P_ideal = R*T/v0 / 1e6;
+                let P_vdw = (R*T/(v0-b) - a/(v0*v0)) / 1e6;
+                let P_rk = (R*T/(v0-b) - a/(Math.sqrt(T)*v0*(v0+b))) / 1e6;
+
+                document.getElementById('z-ideal').textContent = (1.000).toFixed(3);
+                document.getElementById('z-vdw').textContent = (P_vdw*v0/(R*T/1e6)).toFixed(3);
+                document.getElementById('z-rk').textContent = (P_rk*v0/(R*T/1e6)).toFixed(3);
+
+                // Legend
+                let lx = plotX + 10, ly = plotY + 20;
+                if (showIdeal) drawLegendItem(lx, ly, 'Ideal', p.color(0, 150, 0), ly += 20);
+                if (showVdW) drawLegendItem(lx, ly, 'VdW', p.color(255, 0, 0), ly += 20);
+                if (showRK) drawLegendItem(lx, ly, 'RK', p.color(0, 0, 255), ly += 20);
+            };
+
+            function plotCurve(pFunc, vMin, vMax, pMin, pMax, x, y, w, h, col) {
+                p.stroke(col); p.strokeWeight(2); p.noFill();
+                p.beginShape();
+                for (let v = vMin; v <= vMax; v += (vMax-vMin)/200) {
+                    let pVal = pFunc(v);
+                    if (pVal >= pMin && pVal <= pMax) {
+                        let px = x + p.map(v, vMin, vMax, 0, w);
+                        let py = y + h - p.map(pVal, pMin, pMax, 0, h);
+                        p.vertex(px, py);
+                    }
+                }
+                p.endShape();
+            }
+
+            function drawLegendItem(x, y, label, col) {
+                p.stroke(col); p.strokeWeight(2);
+                p.line(x, y, x + 30, y);
+                p.fill(0); p.noStroke(); p.textAlign(p.LEFT); p.textSize(11);
+                p.text(label, x + 35, y + 4);
+            }
+
+            p.windowResized = function() {
+                canvasW = Math.min(900, p.windowWidth - 40);
+                p.resizeCanvas(canvasW, canvasH);
+            };
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'b',
+                q4: 'a',
+                q5: 'b'
+            };
+
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
+        });
+    </script>
+</body>
+</html>

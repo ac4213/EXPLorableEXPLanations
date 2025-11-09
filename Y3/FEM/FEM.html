@@ -87,329 +87,503 @@
         </ul>
     </div>
 
-    <div class="simulation-section">
-        <h2>Interactive 1D Bar Element Simulation</h2>
-        <p>This simulation demonstrates a 1D bar divided into multiple elements. Adjust the parameters to see how the displacement, strain, and stress distributions change.</p>
+    <div class="simulation-container">
+        <h2>Stepped Shaft Analysis: Exact vs FEM Solution</h2>
+        <p>This simulation compares the exact analytical solution with the FEM solution for a stepped shaft under axial loading. The shaft has two sections with different diameters.</p>
 
-        <div class="controls-container">
-            <div class="control-group">
-                <label for="num-elements">Number of Elements: <span id="num-elements-value">4</span></label>
-                <input type="range" id="num-elements" min="1" max="10" step="1" value="4">
+        <div class="controls-grid">
+            <div class="slider-container">
+                <label for="num-elements">Number of Elements: <span id="num-elements-value" class="value-display">8</span></label>
+                <input type="range" id="num-elements" min="2" max="40" step="2" value="8" class="slider">
             </div>
 
-            <div class="control-group">
-                <label for="modulus">Young's Modulus E (GPa): <span id="modulus-value">200</span></label>
-                <input type="range" id="modulus" min="50" max="400" step="10" value="200">
+            <div class="slider-container">
+                <label for="diameter1">Diameter d₁ (mm): <span id="diameter1-value" class="value-display">30</span></label>
+                <input type="range" id="diameter1" min="20" max="60" step="5" value="30" class="slider">
             </div>
 
-            <div class="control-group">
-                <label for="area">Cross-sectional Area A (mm²): <span id="area-value">100</span></label>
-                <input type="range" id="area" min="50" max="500" step="10" value="100">
+            <div class="slider-container">
+                <label for="diameter2">Diameter d₂ (mm): <span id="diameter2-value" class="value-display">15</span></label>
+                <input type="range" id="diameter2" min="10" max="50" step="5" value="15" class="slider">
             </div>
 
-            <div class="control-group">
-                <label for="load">Applied Load P (kN): <span id="load-value">50</span></label>
-                <input type="range" id="load" min="10" max="200" step="5" value="50">
+            <div class="slider-container">
+                <label for="step-position">Step Position (%): <span id="step-position-value" class="value-display">50</span></label>
+                <input type="range" id="step-position" min="20" max="80" step="5" value="50" class="slider">
             </div>
 
-            <div class="control-group">
-                <label for="length">Bar Length L (m): <span id="length-value">1.0</span></label>
-                <input type="range" id="length" min="0.5" max="3.0" step="0.1" value="1.0">
+            <div class="slider-container">
+                <label for="modulus">Young's Modulus E (GPa): <span id="modulus-value" class="value-display">200</span></label>
+                <input type="range" id="modulus" min="50" max="400" step="10" value="200" class="slider">
+            </div>
+
+            <div class="slider-container">
+                <label for="load">Applied Load P (kN): <span id="load-value" class="value-display">10</span></label>
+                <input type="range" id="load" min="1" max="50" step="1" value="10" class="slider">
             </div>
         </div>
 
         <div id="sketch-holder"></div>
+
+        <div class="results-panel">
+            <strong>Solution Comparison:</strong>
+            <div id="solution-info">Adjust parameters to see displacement and stress distributions...</div>
+        </div>
     </div>
 
     <script>
-        // Simulation parameters
-        let numElements = 4;
-        let E = 200; // GPa
-        let A = 100; // mm²
-        let P = 50; // kN
-        let L = 1.0; // m
+        // p5.js stepped shaft simulation
+        let sketch = new p5(function(p) {
+            // Simulation parameters
+            let numElements = 8;
+            let E = 200; // GPa
+            let d1 = 30; // mm - larger diameter
+            let d2 = 15; // mm - smaller diameter
+            let stepPos = 0.5; // Position of step as fraction of total length (0-1)
+            let P = 10; // kN
+            const L = 1.0; // m - total length
 
-        // Solution arrays
-        let displacements = [];
-        let strains = [];
-        let stresses = [];
-        let positions = [];
+            // Solution arrays - FEM
+            let femDisplacements = [];
+            let femStresses = [];
+            let femPositions = [];
 
-        function setupSliders() {
-            document.getElementById('num-elements').addEventListener('input', function() {
-                numElements = parseInt(this.value);
-                document.getElementById('num-elements-value').textContent = numElements;
-                solveFEM();
-            });
+            // Solution arrays - Exact
+            let exactDisplacements = [];
+            let exactStresses = [];
+            let exactPositions = [];
 
-            document.getElementById('modulus').addEventListener('input', function() {
-                E = parseFloat(this.value);
-                document.getElementById('modulus-value').textContent = E;
-                solveFEM();
-            });
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 900);
+                canvas.parent('sketch-holder');
+                setupSliders();
+                solveProblem();
+            };
 
-            document.getElementById('area').addEventListener('input', function() {
-                A = parseFloat(this.value);
-                document.getElementById('area-value').textContent = A;
-                solveFEM();
-            });
+            p.draw = function() {
+                p.background(255);
 
-            document.getElementById('load').addEventListener('input', function() {
-                P = parseFloat(this.value);
-                document.getElementById('load-value').textContent = P;
-                solveFEM();
-            });
+                // Draw stepped shaft geometry
+                drawSteppedShaft();
 
-            document.getElementById('length').addEventListener('input', function() {
-                L = parseFloat(this.value);
-                document.getElementById('length-value').textContent = L.toFixed(1);
-                solveFEM();
-            });
-        }
+                // Draw displacement plot
+                drawComparisonPlot(50, 300, 800, 150, "Displacement (mm)",
+                    exactPositions, exactDisplacements.map(d => d * 1000),
+                    femPositions, femDisplacements.map(d => d * 1000));
 
-        function solveFEM() {
-            // Element length
-            let Le = L / numElements;
+                // Draw stress plot
+                drawComparisonPlot(50, 520, 800, 150, "Stress (MPa)",
+                    exactPositions, exactStresses,
+                    femPositions, femStresses);
+            };
 
-            // Element stiffness
-            let ke = (E * 1e9 * A * 1e-6) / Le; // Convert to N/m
+            function setupSliders() {
+                document.getElementById('num-elements').addEventListener('input', function() {
+                    numElements = parseInt(this.value);
+                    document.getElementById('num-elements-value').textContent = numElements;
+                    solveProblem();
+                });
 
-            // Assemble global stiffness matrix (simple for uniform bar)
-            let n = numElements + 1; // Number of nodes
-            let K = Array(n).fill(0).map(() => Array(n).fill(0));
+                document.getElementById('diameter1').addEventListener('input', function() {
+                    d1 = parseFloat(this.value);
+                    document.getElementById('diameter1-value').textContent = d1;
+                    solveProblem();
+                });
 
-            for (let i = 0; i < numElements; i++) {
-                K[i][i] += ke;
-                K[i][i+1] -= ke;
-                K[i+1][i] -= ke;
-                K[i+1][i+1] += ke;
+                document.getElementById('diameter2').addEventListener('input', function() {
+                    d2 = parseFloat(this.value);
+                    document.getElementById('diameter2-value').textContent = d2;
+                    solveProblem();
+                });
+
+                document.getElementById('step-position').addEventListener('input', function() {
+                    stepPos = parseFloat(this.value) / 100;
+                    document.getElementById('step-position-value').textContent = this.value;
+                    solveProblem();
+                });
+
+                document.getElementById('modulus').addEventListener('input', function() {
+                    E = parseFloat(this.value);
+                    document.getElementById('modulus-value').textContent = E;
+                    solveProblem();
+                });
+
+                document.getElementById('load').addEventListener('input', function() {
+                    P = parseFloat(this.value);
+                    document.getElementById('load-value').textContent = P;
+                    solveProblem();
+                });
             }
 
-            // Apply boundary condition (u[0] = 0)
-            K[0][0] = 1e20;
-
-            // Force vector
-            let F = Array(n).fill(0);
-            F[n-1] = P * 1000; // Convert kN to N
-
-            // Solve for displacements using Gaussian elimination
-            displacements = gaussianElimination(K, F);
-
-            // Calculate strains and stresses
-            positions = [];
-            strains = [];
-            stresses = [];
-
-            for (let i = 0; i < numElements; i++) {
-                positions.push(i * Le);
-                let strain = (displacements[i+1] - displacements[i]) / Le;
-                strains.push(strain);
-                stresses.push(E * 1e9 * strain / 1e6); // Convert to MPa
+            function solveProblem() {
+                solveExact();
+                solveFEM();
+                updateSolutionInfo();
             }
-            positions.push(L);
-        }
 
-        function gaussianElimination(A, b) {
-            let n = b.length;
-            let x = Array(n).fill(0);
+            function solveExact() {
+                // Calculate areas (convert mm to m)
+                let A1 = Math.PI * (d1 * 1e-3) * (d1 * 1e-3) / 4; // m^2
+                let A2 = Math.PI * (d2 * 1e-3) * (d2 * 1e-3) / 4; // m^2
 
-            // Forward elimination
-            for (let i = 0; i < n; i++) {
-                for (let j = i + 1; j < n; j++) {
-                    let factor = A[j][i] / A[i][i];
-                    for (let k = i; k < n; k++) {
-                        A[j][k] -= factor * A[i][k];
+                let L1 = L * stepPos; // Position of step
+                let L2 = L - L1;
+
+                let E_Pa = E * 1e9; // Convert GPa to Pa
+                let P_N = P * 1000; // Convert kN to N
+
+                // Generate exact solution points
+                exactPositions = [];
+                exactDisplacements = [];
+                exactStresses = [];
+
+                let numPoints = 100;
+                for (let i = 0; i <= numPoints; i++) {
+                    let x = (i / numPoints) * L;
+                    exactPositions.push(x);
+
+                    let u, sigma;
+                    if (x <= L1) {
+                        // Section 1
+                        u = (P_N * x) / (E_Pa * A1);
+                        sigma = P_N / A1;
+                    } else {
+                        // Section 2
+                        u = (P_N * L1) / (E_Pa * A1) + (P_N * (x - L1)) / (E_Pa * A2);
+                        sigma = P_N / A2;
                     }
-                    b[j] -= factor * b[i];
+
+                    exactDisplacements.push(u);
+                    exactStresses.push(sigma / 1e6); // Convert to MPa
                 }
             }
 
-            // Back substitution
-            for (let i = n - 1; i >= 0; i--) {
-                x[i] = b[i];
-                for (let j = i + 1; j < n; j++) {
-                    x[i] -= A[i][j] * x[j];
+            function solveFEM() {
+                // Element length
+                let Le = L / numElements;
+
+                // Calculate areas
+                let A1 = Math.PI * (d1 * 1e-3) * (d1 * 1e-3) / 4; // m^2
+                let A2 = Math.PI * (d2 * 1e-3) * (d2 * 1e-3) / 4; // m^2
+
+                let L1 = L * stepPos;
+                let E_Pa = E * 1e9;
+                let P_N = P * 1000;
+
+                // Assemble global stiffness matrix
+                let n = numElements + 1; // Number of nodes
+                let K = Array(n).fill(0).map(() => Array(n).fill(0));
+
+                for (let i = 0; i < numElements; i++) {
+                    // Determine which area this element has
+                    let elemCenter = (i + 0.5) * Le;
+                    let A_elem = elemCenter <= L1 ? A1 : A2;
+
+                    // Element stiffness
+                    let ke = (E_Pa * A_elem) / Le;
+
+                    // Add to global matrix
+                    K[i][i] += ke;
+                    K[i][i+1] -= ke;
+                    K[i+1][i] -= ke;
+                    K[i+1][i+1] += ke;
                 }
-                x[i] /= A[i][i];
+
+                // Apply boundary condition (u[0] = 0)
+                // Replace first row with constraint equation
+                K[0] = Array(n).fill(0);
+                K[0][0] = 1;
+
+                // Force vector
+                let F = Array(n).fill(0);
+                F[0] = 0; // Boundary condition
+                F[n-1] = P_N;
+
+                // Solve for displacements using Gaussian elimination
+                femDisplacements = gaussianElimination(K, F);
+
+                // Calculate stresses at element centers
+                femPositions = [];
+                femStresses = [];
+
+                for (let i = 0; i < numElements; i++) {
+                    let xCenter = (i + 0.5) * Le;
+                    femPositions.push(xCenter);
+
+                    // Determine area for this element
+                    let A_elem = xCenter <= L1 ? A1 : A2;
+
+                    // Calculate strain and stress
+                    let strain = (femDisplacements[i+1] - femDisplacements[i]) / Le;
+                    let stress = E_Pa * strain;
+
+                    femStresses.push(stress / 1e6); // Convert to MPa
+                }
             }
 
-            return x;
-        }
+            function gaussianElimination(A, b) {
+                let n = b.length;
+                let Aug = A.map((row, i) => [...row, b[i]]); // Augmented matrix
 
-        function setup() {
-            let canvas = createCanvas(900, 700);
-            canvas.parent('sketch-holder');
-            canvas.style('display', 'block');
-            canvas.style('margin', '0 auto');
+                // Forward elimination
+                for (let i = 0; i < n; i++) {
+                    // Find pivot
+                    let maxRow = i;
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(Aug[k][i]) > Math.abs(Aug[maxRow][i])) {
+                            maxRow = k;
+                        }
+                    }
+                    [Aug[i], Aug[maxRow]] = [Aug[maxRow], Aug[i]];
 
-            setupSliders();
-            solveFEM();
-        }
+                    // Make all rows below this one 0 in current column
+                    for (let k = i + 1; k < n; k++) {
+                        if (Math.abs(Aug[i][i]) > 1e-10) {
+                            let factor = Aug[k][i] / Aug[i][i];
+                            for (let j = i; j <= n; j++) {
+                                Aug[k][j] -= factor * Aug[i][j];
+                            }
+                        }
+                    }
+                }
 
-        function draw() {
-            background(255);
+                // Back substitution
+                let x = Array(n).fill(0);
+                for (let i = n - 1; i >= 0; i--) {
+                    x[i] = Aug[i][n];
+                    for (let j = i + 1; j < n; j++) {
+                        x[i] -= Aug[i][j] * x[j];
+                    }
+                    if (Math.abs(Aug[i][i]) > 1e-10) {
+                        x[i] /= Aug[i][i];
+                    }
+                }
 
-            // Draw bar geometry
-            drawBarGeometry();
-
-            // Draw displacement plot
-            drawPlot(50, 250, 800, 120, "Displacement (mm)", positions, displacements.map(d => d * 1000));
-
-            // Draw strain plot
-            let strainPositions = positions.slice(0, -1).map((p, i) => p + (positions[i+1] - p) / 2);
-            drawPlot(50, 420, 800, 120, "Strain (µε)", strainPositions, strains.map(s => s * 1e6));
-
-            // Draw stress plot
-            drawPlot(50, 590, 800, 120, "Stress (MPa)", strainPositions, stresses);
-        }
-
-        function drawBarGeometry() {
-            push();
-            translate(50, 100);
-
-            // Title
-            fill(0);
-            textAlign(CENTER);
-            textSize(16);
-            text("Bar Element Mesh", 400, -30);
-
-            // Draw bar
-            let barWidth = 800;
-            let barHeight = 60;
-            let elementWidth = barWidth / numElements;
-
-            // Fixed support
-            fill(100);
-            rect(-20, 0, 20, barHeight);
-
-            // Elements
-            for (let i = 0; i < numElements; i++) {
-                stroke(0);
-                strokeWeight(2);
-                noFill();
-                rect(i * elementWidth, 0, elementWidth, barHeight);
-
-                // Node numbers
-                fill(0);
-                noStroke();
-                textSize(12);
-                textAlign(CENTER);
-                text(i, i * elementWidth, barHeight + 15);
-                circle(i * elementWidth, barHeight / 2, 8);
+                return x;
             }
 
-            // Last node
-            text(numElements, barWidth, barHeight + 15);
-            circle(barWidth, barHeight / 2, 8);
+            function updateSolutionInfo() {
+                // Get max displacements
+                let maxDispExact = Math.max(...exactDisplacements) * 1000; // mm
+                let maxDispFEM = Math.max(...femDisplacements) * 1000; // mm
 
-            // Applied load
-            stroke(255, 0, 0);
-            strokeWeight(3);
-            fill(255, 0, 0);
-            line(barWidth, barHeight / 2, barWidth + 50, barHeight / 2);
-            // Arrow
-            triangle(barWidth + 50, barHeight / 2, barWidth + 40, barHeight / 2 - 5, barWidth + 40, barHeight / 2 + 5);
+                // Calculate error
+                let error = Math.abs((maxDispFEM - maxDispExact) / maxDispExact * 100);
 
-            noStroke();
-            textAlign(LEFT);
-            text("P = " + P + " kN", barWidth + 55, barHeight / 2 + 5);
-
-            // Dimensions
-            stroke(0);
-            strokeWeight(1);
-            line(0, -15, barWidth, -15);
-            line(0, -20, 0, -10);
-            line(barWidth, -20, barWidth, -10);
-            fill(0);
-            noStroke();
-            textAlign(CENTER);
-            text("L = " + L + " m", barWidth / 2, -20);
-
-            pop();
-        }
-
-        function drawPlot(x, y, w, h, title, xData, yData) {
-            push();
-            translate(x, y);
-
-            // Title
-            fill(0);
-            textAlign(CENTER);
-            textSize(14);
-            text(title, w / 2, -10);
-
-            // Background
-            fill(240);
-            noStroke();
-            rect(0, 0, w, h);
-
-            // Find data range
-            let yMin = Math.min(...yData);
-            let yMax = Math.max(...yData);
-            let yRange = yMax - yMin;
-            if (yRange < 1e-10) yRange = 1;
-            yMin -= yRange * 0.1;
-            yMax += yRange * 0.1;
-
-            // Grid
-            stroke(220);
-            strokeWeight(1);
-            for (let i = 0; i <= 10; i++) {
-                let xPos = map(i / 10, 0, 1, 0, w);
-                line(xPos, 0, xPos, h);
-            }
-            for (let i = 0; i <= 5; i++) {
-                let yPos = map(i / 5, 0, 1, h, 0);
-                line(0, yPos, w, yPos);
+                let info = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div><strong>Max Displacement (Exact):</strong> ${maxDispExact.toFixed(4)} mm</div>
+                        <div><strong>Max Displacement (FEM):</strong> ${maxDispFEM.toFixed(4)} mm</div>
+                        <div><strong>Percentage Error:</strong> ${error.toFixed(3)}%</div>
+                        <div><strong>Number of Elements:</strong> ${numElements}</div>
+                    </div>
+                `;
+                document.getElementById('solution-info').innerHTML = info;
             }
 
-            // Axes
-            stroke(0);
-            strokeWeight(2);
-            line(0, h, w, h);
-            line(0, 0, 0, h);
+            function drawSteppedShaft() {
+                p.push();
+                p.translate(50, 120);
 
-            // Y-axis labels
-            fill(0);
-            noStroke();
-            textSize(10);
-            textAlign(RIGHT);
-            for (let i = 0; i <= 5; i++) {
-                let yPos = map(i / 5, 0, 1, h, 0);
-                let yVal = map(i / 5, 0, 1, yMin, yMax);
-                text(yVal.toFixed(2), -5, yPos + 3);
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text("Stepped Shaft Geometry", 400, -30);
+
+                let barWidth = 800;
+                let L1_px = barWidth * stepPos;
+
+                // Calculate visual heights based on diameters
+                let maxD = Math.max(d1, d2);
+                let h1 = 60 * (d1 / maxD);
+                let h2 = 60 * (d2 / maxD);
+
+                let centerY = 40;
+
+                // Fixed support
+                p.fill(100);
+                p.rect(-20, centerY - 30, 20, 60);
+
+                // Hatching for fixed support
+                p.stroke(80);
+                p.strokeWeight(1);
+                for (let i = -20; i < 0; i += 3) {
+                    p.line(i, centerY - 30, i + 10, centerY + 30);
+                }
+
+                // Section 1 (larger diameter)
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.fill(200, 220, 255);
+                p.rect(0, centerY - h1/2, L1_px, h1);
+
+                // Section 2 (smaller diameter)
+                p.fill(255, 220, 200);
+                p.rect(L1_px, centerY - h2/2, barWidth - L1_px, h2);
+
+                // Step indicator
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(L1_px, centerY - 35, L1_px, centerY + 35);
+                p.fill(0);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.text("Step", L1_px, centerY + 45);
+
+                // Diameter labels
+                p.textSize(12);
+                p.text(`d₁=${d1}mm`, L1_px/2, centerY);
+                p.text(`d₂=${d2}mm`, L1_px + (barWidth - L1_px)/2, centerY);
+
+                // Applied load
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                p.line(barWidth, centerY, barWidth + 50, centerY);
+                p.triangle(barWidth + 50, centerY, barWidth + 40, centerY - 5, barWidth + 40, centerY + 5);
+
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.text(`P = ${P} kN`, barWidth + 55, centerY + 5);
+
+                // Length dimension
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.line(0, -15, barWidth, -15);
+                p.line(0, -20, 0, -10);
+                p.line(barWidth, -20, barWidth, -10);
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.text(`L = ${L} m`, barWidth / 2, -20);
+
+                // Element mesh overlay
+                let elementWidth = barWidth / numElements;
+                p.stroke(100, 100, 100, 100);
+                p.strokeWeight(1);
+                for (let i = 1; i < numElements; i++) {
+                    let x = i * elementWidth;
+                    p.line(x, centerY - 35, x, centerY + 35);
+                }
+
+                // Node markers
+                p.noStroke();
+                p.fill(0, 0, 255);
+                for (let i = 0; i <= numElements; i++) {
+                    let x = i * elementWidth;
+                    p.circle(x, centerY, 5);
+                }
+
+                p.pop();
             }
 
-            // X-axis labels
-            textAlign(CENTER);
-            for (let i = 0; i <= 5; i++) {
-                let xPos = map(i / 5 * L, 0, L, 0, w);
-                text((i / 5 * L).toFixed(2) + " m", xPos, h + 15);
-            }
+            function drawComparisonPlot(x, y, w, h, title, exactX, exactY, femX, femY) {
+                p.push();
+                p.translate(x, y);
 
-            // Plot data
-            stroke(0, 0, 255);
-            strokeWeight(2);
-            noFill();
-            beginShape();
-            for (let i = 0; i < xData.length; i++) {
-                let px = map(xData[i], 0, L, 0, w);
-                let py = map(yData[i], yMin, yMax, h, 0);
-                vertex(px, py);
-            }
-            endShape();
+                // Title
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(14);
+                p.text(title, w / 2, -10);
 
-            // Data points
-            fill(0, 0, 255);
-            noStroke();
-            for (let i = 0; i < xData.length; i++) {
-                let px = map(xData[i], 0, L, 0, w);
-                let py = map(yData[i], yMin, yMax, h, 0);
-                circle(px, py, 6);
-            }
+                // Background
+                p.fill(250);
+                p.noStroke();
+                p.rect(0, 0, w, h);
 
-            pop();
-        }
+                // Find data range
+                let allY = [...exactY, ...femY];
+                let yMin = Math.min(...allY);
+                let yMax = Math.max(...allY);
+                let yRange = yMax - yMin;
+                if (yRange < 1e-10) yRange = 1;
+                yMin -= yRange * 0.1;
+                yMax += yRange * 0.1;
+
+                // Grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 10; i++) {
+                    let xPos = p.map(i / 10, 0, 1, 0, w);
+                    p.line(xPos, 0, xPos, h);
+                }
+                for (let i = 0; i <= 5; i++) {
+                    let yPos = p.map(i / 5, 0, 1, h, 0);
+                    p.line(0, yPos, w, yPos);
+                }
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(0, h, w, h);
+                p.line(0, 0, 0, h);
+
+                // Y-axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.RIGHT);
+                for (let i = 0; i <= 5; i++) {
+                    let yPos = p.map(i / 5, 0, 1, h, 0);
+                    let yVal = p.map(i / 5, 0, 1, yMin, yMax);
+                    p.text(yVal.toFixed(3), -5, yPos + 3);
+                }
+
+                // X-axis labels
+                p.textAlign(p.CENTER);
+                for (let i = 0; i <= 5; i++) {
+                    let xPos = p.map(i / 5 * L, 0, L, 0, w);
+                    p.text((i / 5 * L).toFixed(2) + " m", xPos, h + 15);
+                }
+
+                // Plot exact solution (green line)
+                p.stroke(0, 150, 0);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < exactX.length; i++) {
+                    let px = p.map(exactX[i], 0, L, 0, w);
+                    let py = p.map(exactY[i], yMin, yMax, h, 0);
+                    p.vertex(px, py);
+                }
+                p.endShape();
+
+                // Plot FEM solution (blue/orange dots and line)
+                let femColor = title.includes("Stress") ? [255, 140, 0] : [0, 0, 255];
+                p.stroke(...femColor);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < femX.length; i++) {
+                    let px = p.map(femX[i], 0, L, 0, w);
+                    let py = p.map(femY[i], yMin, yMax, h, 0);
+                    p.vertex(px, py);
+                }
+                p.endShape();
+
+                // FEM data points
+                p.fill(...femColor);
+                p.noStroke();
+                for (let i = 0; i < femX.length; i++) {
+                    let px = p.map(femX[i], 0, L, 0, w);
+                    let py = p.map(femY[i], yMin, yMax, h, 0);
+                    p.circle(px, py, 7);
+                }
+
+                // Legend
+                p.textAlign(p.LEFT);
+                p.textSize(11);
+                p.fill(0, 150, 0);
+                p.text("— Exact", w - 120, 20);
+                p.fill(...femColor);
+                p.text("● FEM", w - 120, 35);
+
+                p.pop();
+            }
+        }, 'sketch-holder');
     </script>
 
     <div class="content-section">

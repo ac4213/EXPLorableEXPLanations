@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bending of Asymmetric Sections - Interactive Lecture</title>
+    <meta name="description" content="Interactive lecture on bending stress in asymmetric beam sections, principal axes, and neutral axis location">
+    <meta name="keywords" content="bending, asymmetric sections, principal axes, neutral axis, stress distribution, structural analysis">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Bending of Asymmetric Sections</h1>
+        <p class="subtitle">Principal Axes, Neutral Axis Location, and Stress Distribution</p>
+    </header>
+
+    <!-- Navigation breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="/">Home</a> &gt;
+        <a href="/">Y2</a> &gt;
+        <span>Bending of Asymmetric Sections</span>
+    </nav>
+
+    <!-- Introduction & Theory Section -->
+    <div class="content-section">
+        <h2>Introduction to Asymmetric Bending</h2>
+
+        <p>When a beam has an <strong>asymmetric cross-section</strong> or when bending moments are applied about axes other than principal axes, the neutral axis does not align with the applied moment, and stress distribution becomes more complex than simple beam bending theory.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> In asymmetric bending, the neutral axis orientation depends on both the geometry of the cross-section and the direction of applied moments. Understanding principal axes is essential for predicting stress distribution and deflection accurately.</p>
+        </div>
+
+        <h3>Review: Symmetric Bending</h3>
+        <p>For symmetric sections with moment applied about a principal axis:</p>
+
+        <div class="equation-box">
+            <p><strong>Bending Stress (Flexure Formula):</strong></p>
+            <p>\[\sigma = -\frac{My}{I}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\sigma\) = Normal stress at distance \(y\) from neutral axis (Pa)</li>
+                <li>\(M\) = Bending moment (N·m)</li>
+                <li>\(y\) = Distance from neutral axis (m)</li>
+                <li>\(I\) = Second moment of area about bending axis (m⁴)</li>
+            </ul>
+            <p><strong>Neutral Axis:</strong> Coincides with centroidal axis perpendicular to applied moment</p>
+        </div>
+
+        <h3>Principal Axes</h3>
+        <p><strong>Principal axes</strong> are orthogonal axes through the centroid about which the product moment of area is zero.</p>
+
+        <div class="equation-box">
+            <p><strong>Product Moment of Area:</strong></p>
+            <p>\[I_{xy} = \int\int xy \, dA\]</p>
+            <p><strong>For principal axes:</strong> \(I_{xy} = 0\)</p>
+            <p><strong>Principal Moments of Inertia:</strong></p>
+            <p>\[I_1, I_2 = \frac{I_x + I_y}{2} \pm \sqrt{\left(\frac{I_x - I_y}{2}\right)^2 + I_{xy}^2}\]</p>
+            <p><strong>Principal Angle:</strong></p>
+            <p>\[\tan(2\theta_p) = \frac{2I_{xy}}{I_x - I_y}\]</p>
+        </div>
+
+        <h3>Asymmetric Bending Theory</h3>
+        <p>When moments are applied about non-principal axes or for asymmetric sections:</p>
+
+        <div class="equation-box">
+            <p><strong>General Bending Stress Formula:</strong></p>
+            <p>\[\sigma = -\frac{M_x y}{I_x} - \frac{M_y x}{I_y} + \frac{(M_x I_{xy} + M_y I_{xy})}{I_x I_y - I_{xy}^2}(xy)\]</p>
+            <p><strong>Simplified for principal axes:</strong></p>
+            <p>\[\sigma = -\frac{M_1 y_1}{I_1} - \frac{M_2 y_2}{I_2}\]</p>
+            <p>Where \((y_1, y_2)\) are coordinates in principal axis system</p>
+        </div>
+
+        <h3>Neutral Axis Location</h3>
+        <p>The neutral axis is the locus of points where \(\sigma = 0\):</p>
+
+        <div class="equation-box">
+            <p><strong>Neutral Axis Equation:</strong></p>
+            <p>\[\frac{M_1 y_1}{I_1} + \frac{M_2 y_2}{I_2} = 0\]</p>
+            <p><strong>Neutral Axis Inclination:</strong></p>
+            <p>\[\tan(\alpha) = -\frac{M_1 I_2}{M_2 I_1}\]</p>
+            <p>where \(\alpha\) is angle of neutral axis from reference axis</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Important Observation:</strong> The neutral axis is perpendicular to the applied moment vector ONLY when bending occurs about a principal axis. For asymmetric bending, the neutral axis rotates away from the perpendicular.</p>
+        </div>
+
+        <h3>Mohr's Circle for Second Moments of Area</h3>
+        <p>Similar to stress transformation, moments of inertia can be visualized using Mohr's circle:</p>
+
+        <div class="equation-box">
+            <p><strong>Transformation Equations:</strong></p>
+            <p>\[I_{\xi} = \frac{I_x + I_y}{2} + \frac{I_x - I_y}{2}\cos(2\theta) - I_{xy}\sin(2\theta)\]</p>
+            <p>\[I_{\eta} = \frac{I_x + I_y}{2} - \frac{I_x - I_y}{2}\cos(2\theta) + I_{xy}\sin(2\theta)\]</p>
+            <p>\[I_{\xi\eta} = \frac{I_x - I_y}{2}\sin(2\theta) + I_{xy}\cos(2\theta)\]</p>
+        </div>
+
+        <h3>Design Considerations</h3>
+        <p>For asymmetric sections under bending:</p>
+        <ul>
+            <li><strong>Maximum stress</strong> occurs at the point farthest from the neutral axis</li>
+            <li><strong>Orientation matters:</strong> Rotating the section changes stress distribution</li>
+            <li><strong>Combined loading:</strong> Moments about both axes must be considered</li>
+            <li><strong>Deflection direction:</strong> Not necessarily perpendicular to applied load</li>
+        </ul>
+    </div>
+
+    <!-- Interactive Simulation Section -->
+    <div class="content-section">
+        <h2>Interactive Simulation: Asymmetric Section Bending</h2>
+
+        <p>Explore how neutral axis location and stress distribution change with section geometry and moment direction.</p>
+
+        <div class="simulation-container">
+            <!-- Control Panel -->
+            <div class="controls-panel" style="margin-bottom: 20px;">
+                <div class="slider-container">
+                    <label for="section-type">Cross-Section:</label>
+                    <select id="section-type" style="padding: 5px; font-size: 14px;">
+                        <option value="L-shape">L-Shape (Angle)</option>
+                        <option value="T-shape">T-Shape</option>
+                        <option value="Z-shape">Z-Shape (Channel)</option>
+                        <option value="rectangle">Rectangle (Symmetric)</option>
+                    </select>
+                </div>
+
+                <div class="slider-container">
+                    <label for="moment-angle">Moment Direction (°): <span id="moment-angle-value">0</span></label>
+                    <input type="range" id="moment-angle" min="0" max="90" step="5" value="0">
+                </div>
+
+                <div class="slider-container">
+                    <label for="moment-mag">Moment Magnitude (kN·m): <span id="moment-mag-value">10</span></label>
+                    <input type="range" id="moment-mag" min="5" max="50" step="5" value="10">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="show-principal" checked> Show Principal Axes
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="show-neutral" checked> Show Neutral Axis
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px;">
+                    <input type="checkbox" id="show-stress" checked> Show Stress
+                </label>
+            </div>
+
+            <!-- Simulation Canvas -->
+            <div id="sketch-holder"></div>
+
+            <!-- Analysis Results -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h4 style="margin-top: 0;">Section Properties:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div><strong>I<sub>x</sub>:</strong> <span id="display-Ix">-</span> cm⁴</div>
+                    <div><strong>I<sub>y</sub>:</strong> <span id="display-Iy">-</span> cm⁴</div>
+                    <div><strong>I<sub>xy</sub>:</strong> <span id="display-Ixy">-</span> cm⁴</div>
+                    <div><strong>Principal I<sub>1</sub>:</strong> <span id="display-I1">-</span> cm⁴</div>
+                    <div><strong>Principal I<sub>2</sub>:</strong> <span id="display-I2">-</span> cm⁴</div>
+                    <div><strong>Principal Angle:</strong> <span id="display-theta">-</span>°</div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                    <strong>Stress Analysis:</strong>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                        <div>Max Tension: <span id="max-tension">-</span> MPa</div>
+                        <div>Max Compression: <span id="max-compression">-</span> MPa</div>
+                        <div>Neutral Axis Angle: <span id="neutral-angle">-</span>°</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engineering Applications Section -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Steel Structural Members</h3>
+        <p>Asymmetric sections are common in steel construction:</p>
+        <ul>
+            <li><strong>Angle sections (L-shapes):</strong> Used in trusses, bracing, and connections</li>
+            <li><strong>Channel sections (C-shapes):</strong> Floor joists, purlins, and secondary beams</li>
+            <li><strong>Unequal flanges:</strong> Optimized for unidirectional loading</li>
+            <li><strong>Z-sections:</strong> Roof purlins with torsional resistance</li>
+        </ul>
+
+        <h3>2. Aircraft Wing Structures</h3>
+        <p>Aircraft components often have highly asymmetric cross-sections:</p>
+        <ul>
+            <li><strong>Wing spars:</strong> Carry bending and shear from lift distribution</li>
+            <li><strong>Stiffeners:</strong> Asymmetric profiles for buckling resistance</li>
+            <li><strong>Fuselage frames:</strong> Optimized for internal pressure and bending</li>
+            <li><strong>Weight optimization:</strong> Material placed where stresses are highest</li>
+        </ul>
+
+        <h3>3. Automotive Chassis Components</h3>
+        <p>Vehicle structures use asymmetric sections for efficiency:</p>
+        <ul>
+            <li><strong>Frame rails:</strong> Non-uniform cross-sections for crash performance</li>
+            <li><strong>Suspension arms:</strong> Optimized for multi-axis loading</li>
+            <li><strong>Roll cages:</strong> Tubes with variable wall thickness</li>
+            <li><strong>Bumper beams:</strong> Shaped for energy absorption</li>
+        </ul>
+
+        <h3>4. Bridge Design</h3>
+        <p>Bridge components experience complex bending:</p>
+        <ul>
+            <li><strong>Box girders:</strong> Asymmetric due to deck overhang</li>
+            <li><strong>Curved bridges:</strong> Combined bending and torsion</li>
+            <li><strong>Cable-stayed bridges:</strong> Eccentric loading from cables</li>
+            <li><strong>Composite sections:</strong> Steel-concrete with different properties</li>
+        </ul>
+
+        <h3>5. Mechanical Components</h3>
+        <p>Machine elements with asymmetric loading:</p>
+        <ul>
+            <li><strong>Crane booms:</strong> Lifting loads at various angles</li>
+            <li><strong>Robot arms:</strong> Multi-axis bending from payload</li>
+            <li><strong>Press frames:</strong> C-frame presses with eccentric loads</li>
+            <li><strong>Conveyor supports:</strong> Asymmetric loading patterns</li>
+        </ul>
+    </div>
+
+    <!-- Summary of Key Equations Section -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Bending Stress</strong></td>
+                        <td>\(\sigma = -\frac{M_x y}{I_x} - \frac{M_y x}{I_y}\)</td>
+                        <td>General formula (principal axes)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Product of Inertia</strong></td>
+                        <td>\(I_{xy} = \int\int xy \, dA\)</td>
+                        <td>Measure of asymmetry</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Principal Moments</strong></td>
+                        <td>\(I_{1,2} = \frac{I_x + I_y}{2} \pm R\)</td>
+                        <td>\(R = \sqrt{((I_x-I_y)/2)^2 + I_{xy}^2}\)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Principal Angle</strong></td>
+                        <td>\(\tan(2\theta_p) = \frac{2I_{xy}}{I_x - I_y}\)</td>
+                        <td>Orientation of principal axes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Neutral Axis Angle</strong></td>
+                        <td>\(\tan(\alpha) = -\frac{M_1 I_2}{M_2 I_1}\)</td>
+                        <td>For principal axis system</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Important Relationships</h3>
+            <ul>
+                <li>Parallel axis theorem: \(I = I_c + Ad^2\)</li>
+                <li>For principal axes: \(I_{xy} = 0\)</li>
+                <li>Maximum and minimum \(I\) occur at principal axes</li>
+                <li>Neutral axis passes through centroid (pure bending)</li>
+                <li>Stress varies linearly from neutral axis</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Practice Problems Section -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: L-Section Bending</h3>
+            <p>An L-shaped angle section (100mm × 100mm × 10mm) experiences a bending moment of 5 kN·m about the horizontal axis. The section properties about centroidal axes are: \(I_x = 1.8 \times 10^6\) mm⁴, \(I_y = 1.8 \times 10^6\) mm⁴, \(I_{xy} = 1.2 \times 10^6\) mm⁴. Calculate:</p>
+            <p>(a) Principal moments of inertia<br>
+               (b) Principal angle<br>
+               (c) Maximum bending stress</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol1')">Show Solution</p>
+            <div id="sol1" class="hidden">
+                <p><strong>(a) Principal Moments of Inertia:</strong></p>
+                <p>\[I_{avg} = \frac{I_x + I_y}{2} = \frac{1.8 + 1.8}{2} = 1.8 \times 10^6 \text{ mm}^4\]</p>
+                <p>\[R = \sqrt{\left(\frac{I_x - I_y}{2}\right)^2 + I_{xy}^2} = \sqrt{0 + (1.2 \times 10^6)^2} = 1.2 \times 10^6 \text{ mm}^4\]</p>
+                <p>\[I_1 = 1.8 \times 10^6 + 1.2 \times 10^6 = 3.0 \times 10^6 \text{ mm}^4\]</p>
+                <p>\[I_2 = 1.8 \times 10^6 - 1.2 \times 10^6 = 0.6 \times 10^6 \text{ mm}^4\]</p>
+
+                <p><strong>(b) Principal Angle:</strong></p>
+                <p>\[\tan(2\theta_p) = \frac{2I_{xy}}{I_x - I_y} = \frac{2(1.2 \times 10^6)}{1.8 - 1.8} = \infty\]</p>
+                <p>This means \(2\theta_p = 90°\), so \(\theta_p = 45°\)</p>
+
+                <p><strong>(c) Maximum Bending Stress:</strong></p>
+                <p>For moment about x-axis, resolve into principal components:</p>
+                <p>\(M_1 = M\cos(45°) = 5000 \times 0.707 = 3536\) N·m</p>
+                <p>\(M_2 = M\sin(45°) = 3536\) N·m</p>
+                <p>Maximum distance from centroid ≈ 70.7 mm (corner)</p>
+                <p>\[\sigma_{max} = \frac{M_1 c_1}{I_1} + \frac{M_2 c_2}{I_2}\]</p>
+                <p>Approximating: \(\sigma_{max} \approx \frac{5000 \times 10^3 \times 70.7}{0.6 \times 10^6} = 590\) MPa (critical at corner)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Neutral Axis Location</h3>
+            <p>A beam with principal moments \(I_1 = 50 \times 10^6\) mm⁴ and \(I_2 = 20 \times 10^6\) mm⁴ is subjected to moments \(M_1 = 8\) kN·m and \(M_2 = 3\) kN·m about the principal axes. Find the angle of the neutral axis relative to axis 1.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol2')">Show Solution</p>
+            <div id="sol2" class="hidden">
+                <p><strong>Neutral Axis Angle:</strong></p>
+                <p>\[\tan(\alpha) = -\frac{M_1 I_2}{M_2 I_1} = -\frac{8 \times 20 \times 10^6}{3 \times 50 \times 10^6}\]</p>
+                <p>\[\tan(\alpha) = -\frac{160}{150} = -1.067\]</p>
+                <p>\[\alpha = \arctan(-1.067) = -46.8°\]</p>
+                <p>The neutral axis is inclined at 46.8° clockwise from principal axis 1.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Stress Calculation</h3>
+            <p>For a T-section with moment applied 30° from horizontal, calculate the stress at a point (x = 30mm, y = 40mm) from the centroid. Given: \(I_x = 2.0 \times 10^6\) mm⁴, \(I_y = 0.8 \times 10^6\) mm⁴, \(I_{xy} = 0\), \(M = 10\) kN·m.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol3')">Show Solution</p>
+            <div id="sol3" class="hidden">
+                <p><strong>Moment Components:</strong></p>
+                <p>\(M_x = M\sin(30°) = 10 \times 0.5 = 5\) kN·m</p>
+                <p>\(M_y = M\cos(30°) = 10 \times 0.866 = 8.66\) kN·m</p>
+
+                <p><strong>Stress Formula (I<sub>xy</sub> = 0):</strong></p>
+                <p>\[\sigma = -\frac{M_x y}{I_x} - \frac{M_y x}{I_y}\]</p>
+                <p>\[\sigma = -\frac{5 \times 10^6 \times 40}{2.0 \times 10^6} - \frac{8.66 \times 10^6 \times 30}{0.8 \times 10^6}\]</p>
+                <p>\[\sigma = -100 - 324.75 = -424.75 \text{ MPa (compression)}\]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Check Quiz Section -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Q1: Principal axes are defined as axes where:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> (a) Moment of inertia is maximum</label>
+                    <label><input type="radio" name="q1" value="b"> (b) Moment of inertia is minimum</label>
+                    <label><input type="radio" name="q1" value="c"> (c) Product of inertia is zero</label>
+                    <label><input type="radio" name="q1" value="d"> (d) Stress is zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q2: For asymmetric bending, the neutral axis:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> (a) Is always horizontal</label>
+                    <label><input type="radio" name="q2" value="b"> (b) Is perpendicular to applied moment</label>
+                    <label><input type="radio" name="q2" value="c"> (c) Depends on both geometry and moment direction</label>
+                    <label><input type="radio" name="q2" value="d"> (d) Passes through the corner</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q3: The product of inertia I<sub>xy</sub> is zero when:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> (a) Section is circular</label>
+                    <label><input type="radio" name="q3" value="b"> (b) Axes are principal axes</label>
+                    <label><input type="radio" name="q3" value="c"> (c) Section has at least one axis of symmetry aligned with coordinate axes</label>
+                    <label><input type="radio" name="q3" value="d"> (d) Both b and c</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q4: In Mohr's circle for moments of inertia, the radius represents:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> (a) Average moment of inertia</label>
+                    <label><input type="radio" name="q4" value="b"> (b) Difference between principal moments</label>
+                    <label><input type="radio" name="q4" value="c"> (c) Product of inertia</label>
+                    <label><input type="radio" name="q4" value="d"> (d) \(\sqrt{((I_x-I_y)/2)^2 + I_{xy}^2}\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q5: Maximum bending stress in an asymmetric section occurs at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> (a) The centroid</label>
+                    <label><input type="radio" name="q5" value="b"> (b) The point farthest from neutral axis</label>
+                    <label><input type="radio" name="q5" value="c"> (c) The top fiber</label>
+                    <label><input type="radio" name="q5" value="d"> (d) The neutral axis</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q6: For an L-section with equal legs, the principal axes are oriented at:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> (a) 0° and 90°</label>
+                    <label><input type="radio" name="q6" value="b"> (b) 30° and 120°</label>
+                    <label><input type="radio" name="q6" value="c"> (c) 45° and 135°</label>
+                    <label><input type="radio" name="q6" value="d"> (d) Depends on leg thickness</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q7: When bending moment is applied about a principal axis:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> (a) Neutral axis is perpendicular to the moment</label>
+                    <label><input type="radio" name="q7" value="b"> (b) No stress develops</label>
+                    <label><input type="radio" name="q7" value="c"> (c) Section rotates</label>
+                    <label><input type="radio" name="q7" value="d"> (d) Stress is uniform</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q8: The parallel axis theorem for I<sub>xy</sub> is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> (a) \(I_{xy} = I_{xy,c} + A \bar{x} \bar{y}\)</label>
+                    <label><input type="radio" name="q8" value="b"> (b) \(I_{xy} = I_{xy,c} + Ad^2\)</label>
+                    <label><input type="radio" name="q8" value="c"> (c) \(I_{xy} = I_x + I_y\)</label>
+                    <label><input type="radio" name="q8" value="d"> (d) \(I_{xy} = 0\)</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript for Simulation -->
+    <script>
+        let sketch = new p5(function(p) {
+            let sectionType = 'L-shape';
+            let momentAngle = 0;
+            let momentMag = 10;
+            let showPrincipal = true;
+            let showNeutral = true;
+            let showStress = true;
+
+            let Ix, Iy, Ixy, I1, I2, thetaP;
+            let canvasWidth, canvasHeight;
+
+            p.setup = function() {
+                canvasWidth = Math.min(1000, p.windowWidth - 40);
+                canvasHeight = 550;
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('sketch-holder');
+                setupEventListeners();
+                calculateProperties();
+            };
+
+            function setupEventListeners() {
+                document.getElementById('section-type').addEventListener('change', function() {
+                    sectionType = this.value;
+                    calculateProperties();
+                });
+                document.getElementById('moment-angle').addEventListener('input', function() {
+                    momentAngle = parseFloat(this.value);
+                    document.getElementById('moment-angle-value').textContent = momentAngle;
+                    calculateProperties();
+                });
+                document.getElementById('moment-mag').addEventListener('input', function() {
+                    momentMag = parseFloat(this.value);
+                    document.getElementById('moment-mag-value').textContent = momentMag;
+                    calculateProperties();
+                });
+                document.getElementById('show-principal').addEventListener('change', function() {
+                    showPrincipal = this.checked;
+                });
+                document.getElementById('show-neutral').addEventListener('change', function() {
+                    showNeutral = this.checked;
+                });
+                document.getElementById('show-stress').addEventListener('change', function() {
+                    showStress = this.checked;
+                });
+            }
+
+            function calculateProperties() {
+                if (sectionType === 'L-shape') {
+                    Ix = 1.8; Iy = 1.8; Ixy = 1.2;
+                } else if (sectionType === 'T-shape') {
+                    Ix = 3.0; Iy = 1.0; Ixy = 0;
+                } else if (sectionType === 'Z-shape') {
+                    Ix = 2.5; Iy = 1.5; Ixy = 0.8;
+                } else {
+                    Ix = 2.0; Iy = 1.5; Ixy = 0;
+                }
+
+                let R = Math.sqrt(Math.pow((Ix - Iy)/2, 2) + Ixy*Ixy);
+                I1 = (Ix + Iy)/2 + R;
+                I2 = (Ix + Iy)/2 - R;
+                thetaP = 0.5 * Math.atan2(2*Ixy, Ix - Iy) * 180/Math.PI;
+
+                document.getElementById('display-Ix').textContent = (Ix * 1e6).toExponential(2);
+                document.getElementById('display-Iy').textContent = (Iy * 1e6).toExponential(2);
+                document.getElementById('display-Ixy').textContent = (Ixy * 1e6).toExponential(2);
+                document.getElementById('display-I1').textContent = (I1 * 1e6).toExponential(2);
+                document.getElementById('display-I2').textContent = (I2 * 1e6).toExponential(2);
+                document.getElementById('display-theta').textContent = thetaP.toFixed(1);
+
+                let theta = momentAngle * Math.PI/180;
+                let M1 = momentMag * Math.cos(theta - thetaP * Math.PI/180);
+                let M2 = momentMag * Math.sin(theta - thetaP * Math.PI/180);
+                let neutralAngle = -Math.atan2(M1 * I2, M2 * I1) * 180/Math.PI + thetaP;
+
+                document.getElementById('max-tension').textContent = (momentMag * 100 / Math.min(I1, I2)).toFixed(1);
+                document.getElementById('max-compression').textContent = (momentMag * 100 / Math.min(I1, I2)).toFixed(1);
+                document.getElementById('neutral-angle').textContent = neutralAngle.toFixed(1);
+            }
+
+            p.draw = function() {
+                p.background(250);
+                let cx = canvasWidth / 2;
+                let cy = canvasHeight / 2;
+
+                p.fill(0);
+                p.textAlign(p.CENTER);
+                p.textSize(16);
+                p.text('Cross-Section and Stress Distribution', cx, 25);
+
+                drawSection(cx, cy);
+                if (showPrincipal) drawPrincipalAxes(cx, cy);
+                if (showNeutral) drawNeutralAxis(cx, cy);
+                drawMomentVector(cx, cy);
+                if (showStress) drawStressDistribution(cx + 250, cy);
+            };
+
+            function drawSection(cx, cy) {
+                let scale = 2;
+                p.fill(200, 220, 240);
+                p.stroke(50);
+                p.strokeWeight(2);
+
+                if (sectionType === 'L-shape') {
+                    p.rect(cx - 50*scale, cy - 50*scale, 20*scale, 100*scale);
+                    p.rect(cx - 50*scale, cy + 30*scale, 100*scale, 20*scale);
+                } else if (sectionType === 'T-shape') {
+                    p.rect(cx - 60*scale, cy - 50*scale, 120*scale, 15*scale);
+                    p.rect(cx - 15*scale, cy - 35*scale, 30*scale, 85*scale);
+                } else if (sectionType === 'Z-shape') {
+                    p.rect(cx - 50*scale, cy - 40*scale, 100*scale, 10*scale);
+                    p.rect(cx - 5*scale, cy - 30*scale, 10*scale, 60*scale);
+                    p.rect(cx - 50*scale, cy + 30*scale, 100*scale, 10*scale);
+                } else {
+                    p.rect(cx - 40*scale, cy - 60*scale, 80*scale, 120*scale);
+                }
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.circle(cx, cy, 8);
+            }
+
+            function drawPrincipalAxes(cx, cy) {
+                p.stroke(0, 100, 255);
+                p.strokeWeight(2);
+                p.drawingContext.setLineDash([5, 5]);
+                let len = 150;
+                let angle = thetaP * Math.PI/180;
+                p.line(cx - len*Math.cos(angle), cy - len*Math.sin(angle),
+                       cx + len*Math.cos(angle), cy + len*Math.sin(angle));
+                p.line(cx + len*Math.sin(angle), cy - len*Math.cos(angle),
+                       cx - len*Math.sin(angle), cy + len*Math.cos(angle));
+                p.drawingContext.setLineDash([]);
+            }
+
+            function drawNeutralAxis(cx, cy) {
+                let theta = momentAngle * Math.PI/180;
+                let M1 = momentMag * Math.cos(theta - thetaP * Math.PI/180);
+                let M2 = momentMag * Math.sin(theta - thetaP * Math.PI/180);
+                let alpha = -Math.atan2(M1 * I2, M2 * I1) + thetaP * Math.PI/180;
+
+                p.stroke(0, 200, 0);
+                p.strokeWeight(3);
+                let len = 200;
+                p.line(cx - len*Math.cos(alpha), cy - len*Math.sin(alpha),
+                       cx + len*Math.cos(alpha), cy + len*Math.sin(alpha));
+            }
+
+            function drawMomentVector(cx, cy) {
+                let theta = momentAngle * Math.PI/180;
+                let len = momentMag * 5;
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                let ex = cx + len * Math.cos(theta);
+                let ey = cy - len * Math.sin(theta);
+                p.line(cx, cy, ex, ey);
+                drawArrow(ex, ey, theta);
+
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.textSize(12);
+                p.text('M', ex + 20, ey - 10);
+            }
+
+            function drawArrow(x, y, angle) {
+                p.push();
+                p.translate(x, y);
+                p.rotate(angle);
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.triangle(0, 0, -10, -5, -10, 5);
+                p.pop();
+            }
+
+            function drawStressDistribution(cx, cy) {
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.textSize(14);
+                p.text('Stress Distribution', cx, cy - 150);
+
+                p.fill(240);
+                p.stroke(100);
+                p.rect(cx - 100, cy - 100, 200, 200);
+
+                let theta = momentAngle * Math.PI/180 - thetaP * Math.PI/180;
+                let maxStress = momentMag * 100 / Math.min(I1, I2);
+
+                for (let i = -4; i <= 4; i++) {
+                    let y = cy + i * 20;
+                    let stress = -i * maxStress / 4;
+                    let barLen = stress * 50 / maxStress;
+                    let col = stress > 0 ? p.color(255, 100, 100) : p.color(100, 100, 255);
+                    p.fill(col);
+                    p.noStroke();
+                    p.rect(cx, y - 2, barLen, 4);
+                }
+
+                p.fill(0);
+                p.textSize(11);
+                p.text('Tension', cx + 80, cy - 80);
+                p.text('Compression', cx - 80, cy + 90);
+            }
+
+            p.windowResized = function() {
+                canvasWidth = Math.min(1000, p.windowWidth - 40);
+                p.resizeCanvas(canvasWidth, canvasHeight);
+            };
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',
+                q2: 'c',
+                q3: 'd',
+                q4: 'd',
+                q5: 'b',
+                q6: 'c',
+                q7: 'a',
+                q8: 'a'
+            };
+
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
+        });
+    </script>
+</body>
+</html>

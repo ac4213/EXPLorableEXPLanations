@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermodynamic State Variables - Interactive Lecture</title>
+    <meta name="description" content="Interactive lecture on thermodynamic state variables including enthalpy, entropy, Gibbs free energy, and Helmholtz free energy">
+    <meta name="keywords" content="thermodynamics, enthalpy, entropy, Gibbs free energy, Helmholtz free energy, state functions, engineering">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Thermodynamic State Variables</h1>
+        <p class="subtitle">Understanding Enthalpy, Entropy, Gibbs Free Energy, and Helmholtz Free Energy</p>
+    </header>
+
+    <!-- Navigation breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="/">Home</a> &gt;
+        <a href="/">Y1</a> &gt;
+        <span>Thermodynamic State Variables</span>
+    </nav>
+
+    <!-- Introduction & Theory Section -->
+    <div class="content-section">
+        <h2>Introduction to Thermodynamic State Variables</h2>
+
+        <p>Thermodynamic <strong>state variables</strong> (or state functions) are properties that depend only on the current state of a system, not on how the system reached that state. These variables are essential for characterizing thermodynamic systems and predicting their behavior under various conditions.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> State variables are path-independent. The change in a state variable between two equilibrium states is the same regardless of the process path taken. This is fundamentally different from path functions like heat and work, which depend on the specific process.</p>
+        </div>
+
+        <h3>Fundamental State Variables</h3>
+        <p>The basic state variables include:</p>
+        <ul>
+            <li><strong>Pressure</strong> (\(P\)) - Force per unit area</li>
+            <li><strong>Volume</strong> (\(V\)) - Space occupied by the system</li>
+            <li><strong>Temperature</strong> (\(T\)) - Measure of thermal energy</li>
+            <li><strong>Internal Energy</strong> (\(U\)) - Total microscopic energy</li>
+        </ul>
+
+        <p>From these fundamental variables, we derive composite state functions that provide deeper insights into system behavior.</p>
+
+        <h3>1. Enthalpy (H)</h3>
+        <p><strong>Enthalpy</strong> is a state function particularly useful for processes occurring at constant pressure, which are common in engineering applications.</p>
+
+        <div class="equation-box">
+            <p><strong>Definition:</strong></p>
+            <p>\[H = U + PV\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(H\) = Enthalpy (J)</li>
+                <li>\(U\) = Internal energy (J)</li>
+                <li>\(P\) = Pressure (Pa)</li>
+                <li>\(V\) = Volume (m³)</li>
+            </ul>
+            <p><strong>Differential form:</strong></p>
+            <p>\[dH = dU + PdV + VdP\]</p>
+            <p><strong>For constant pressure processes:</strong></p>
+            <p>\[\Delta H = Q_P\]</p>
+            <p>The enthalpy change equals the heat transferred at constant pressure.</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Meaning:</strong> Enthalpy represents the total heat content of a system at constant pressure. It accounts for both the internal energy and the energy required to "make room" for the system (the \(PV\) term represents flow work).</p>
+        </div>
+
+        <h3>2. Entropy (S)</h3>
+        <p><strong>Entropy</strong> is a measure of disorder or energy dispersal in a system. It is central to the Second Law of Thermodynamics.</p>
+
+        <div class="equation-box">
+            <p><strong>Thermodynamic Definition:</strong></p>
+            <p>\[dS = \frac{\delta Q_{rev}}{T}\]</p>
+            <p>For a reversible process between states 1 and 2:</p>
+            <p>\[\Delta S = \int_1^2 \frac{\delta Q_{rev}}{T}\]</p>
+            <p><strong>Statistical Definition (Boltzmann):</strong></p>
+            <p>\[S = k_B \ln(\Omega)\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(S\) = Entropy (J/K)</li>
+                <li>\(\delta Q_{rev}\) = Infinitesimal reversible heat transfer (J)</li>
+                <li>\(T\) = Absolute temperature (K)</li>
+                <li>\(k_B\) = Boltzmann constant = \(1.381 \times 10^{-23}\) J/K</li>
+                <li>\(\Omega\) = Number of microstates</li>
+            </ul>
+            <p><strong>Second Law of Thermodynamics:</strong></p>
+            <p>\[\Delta S_{universe} \geq 0\]</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Meaning:</strong> Entropy quantifies the degree of disorder or randomness. Systems naturally evolve toward states of higher entropy (greater disorder). Entropy also represents the unavailability of energy to do useful work.</p>
+        </div>
+
+        <h3>3. Gibbs Free Energy (G)</h3>
+        <p>The <strong>Gibbs free energy</strong> determines the spontaneity of processes at constant temperature and pressure - the most common conditions in chemistry and biology.</p>
+
+        <div class="equation-box">
+            <p><strong>Definition:</strong></p>
+            <p>\[G = H - TS = U + PV - TS\]</p>
+            <p><strong>Differential form:</strong></p>
+            <p>\[dG = dH - TdS - SdT\]</p>
+            <p><strong>At constant temperature and pressure:</strong></p>
+            <p>\[dG = VdP - SdT\]</p>
+            <p>\[\Delta G = \Delta H - T\Delta S\]</p>
+            <p><strong>Criterion for Spontaneity:</strong></p>
+            <ul>
+                <li>\(\Delta G < 0\): Process is spontaneous</li>
+                <li>\(\Delta G = 0\): System is at equilibrium</li>
+                <li>\(\Delta G > 0\): Process is non-spontaneous</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Meaning:</strong> Gibbs free energy represents the maximum useful work obtainable from a system at constant temperature and pressure. It balances the enthalpy drive (energy release) against the entropy drive (disorder increase).</p>
+        </div>
+
+        <h3>4. Helmholtz Free Energy (A or F)</h3>
+        <p>The <strong>Helmholtz free energy</strong> is useful for processes at constant temperature and volume, common in theoretical studies and closed rigid systems.</p>
+
+        <div class="equation-box">
+            <p><strong>Definition:</strong></p>
+            <p>\[A = U - TS\]</p>
+            <p><strong>Differential form:</strong></p>
+            <p>\[dA = dU - TdS - SdT\]</p>
+            <p><strong>At constant temperature and volume:</strong></p>
+            <p>\[dA = -PdV - SdT\]</p>
+            <p>\[\Delta A = \Delta U - T\Delta S\]</p>
+            <p><strong>Criterion for Spontaneity (constant T, V):</strong></p>
+            <ul>
+                <li>\(\Delta A < 0\): Process is spontaneous</li>
+                <li>\(\Delta A = 0\): System is at equilibrium</li>
+                <li>\(\Delta A > 0\): Process is non-spontaneous</li>
+            </ul>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Physical Meaning:</strong> Helmholtz free energy represents the maximum useful work obtainable from a system at constant temperature and volume (excluding expansion work). It's the "free" energy available to do non-expansion work.</p>
+        </div>
+
+        <h3>Maxwell Relations</h3>
+        <p>The four thermodynamic potentials lead to important mathematical relationships called Maxwell relations:</p>
+
+        <div class="equation-box">
+            <p><strong>From Internal Energy \(dU = TdS - PdV\):</strong></p>
+            <p>\[\left(\frac{\partial T}{\partial V}\right)_S = -\left(\frac{\partial P}{\partial S}\right)_V\]</p>
+
+            <p><strong>From Enthalpy \(dH = TdS + VdP\):</strong></p>
+            <p>\[\left(\frac{\partial T}{\partial P}\right)_S = \left(\frac{\partial V}{\partial S}\right)_P\]</p>
+
+            <p><strong>From Helmholtz Free Energy \(dA = -SdT - PdV\):</strong></p>
+            <p>\[\left(\frac{\partial S}{\partial V}\right)_T = \left(\frac{\partial P}{\partial T}\right)_V\]</p>
+
+            <p><strong>From Gibbs Free Energy \(dG = -SdT + VdP\):</strong></p>
+            <p>\[\left(\frac{\partial S}{\partial P}\right)_T = -\left(\frac{\partial V}{\partial T}\right)_P\]</p>
+        </div>
+
+        <h3>Relationships Between State Variables</h3>
+        <p>These state functions are intimately related through thermodynamic identities:</p>
+
+        <div class="equation-box">
+            <p>\[G = H - TS = U + PV - TS = A + PV\]</p>
+            <p>\[A = U - TS = G - PV\]</p>
+            <p>\[H = U + PV = G + TS\]</p>
+            <p>\[U = H - PV = A + TS = G - PV + TS\]</p>
+        </div>
+    </div>
+
+    <!-- Interactive Simulation Section -->
+    <div class="content-section">
+        <h2>Interactive Simulation: State Variables During Thermodynamic Processes</h2>
+
+        <p>Explore how thermodynamic state variables change during different processes. The simulation shows an ideal gas undergoing various transformations, with real-time tracking of all state variables.</p>
+
+        <div class="simulation-container">
+            <!-- Control Panel -->
+            <div class="controls-panel" style="margin-bottom: 20px;">
+                <div class="slider-container">
+                    <label for="process-type">Process Type:</label>
+                    <select id="process-type" style="padding: 5px; font-size: 14px;">
+                        <option value="isothermal">Isothermal (Constant T)</option>
+                        <option value="isobaric">Isobaric (Constant P)</option>
+                        <option value="isochoric">Isochoric (Constant V)</option>
+                        <option value="adiabatic">Adiabatic (Q = 0)</option>
+                    </select>
+                </div>
+
+                <div class="slider-container">
+                    <label for="gas-type">Gas Type:</label>
+                    <select id="gas-type" style="padding: 5px; font-size: 14px;">
+                        <option value="monatomic">Monatomic (γ = 1.67)</option>
+                        <option value="diatomic">Diatomic (γ = 1.40)</option>
+                        <option value="polyatomic">Polyatomic (γ = 1.33)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="controls-panel" style="margin-bottom: 15px;">
+                <div class="slider-container">
+                    <label for="volume-slider">Volume (L): <span id="volume-value">10.0</span></label>
+                    <input type="range" id="volume-slider" min="5" max="30" step="0.1" value="10">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+                <button id="expand-btn">Expand Gas</button>
+                <button id="compress-btn">Compress Gas</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+
+            <!-- Simulation Canvas -->
+            <div id="sketch-holder"></div>
+
+            <!-- State Variables Display -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                <h4 style="margin-top: 0;">State Variables:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Pressure (P):</strong> <span id="display-pressure">100.0 kPa</span>
+                    </div>
+                    <div>
+                        <strong>Volume (V):</strong> <span id="display-volume">10.0 L</span>
+                    </div>
+                    <div>
+                        <strong>Temperature (T):</strong> <span id="display-temperature">300 K</span>
+                    </div>
+                    <div>
+                        <strong>Internal Energy (U):</strong> <span id="display-internal-energy">3740 J</span>
+                    </div>
+                    <div>
+                        <strong>Enthalpy (H):</strong> <span id="display-enthalpy">4987 J</span>
+                    </div>
+                    <div>
+                        <strong>Entropy (S):</strong> <span id="display-entropy">0.00 J/K</span>
+                    </div>
+                    <div>
+                        <strong>Gibbs Free Energy (G):</strong> <span id="display-gibbs">0 J</span>
+                    </div>
+                    <div>
+                        <strong>Helmholtz Free Energy (A):</strong> <span id="display-helmholtz">0 J</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                    <strong>Changes from Initial State:</strong>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; font-size: 14px;">
+                        <div>ΔU = <span id="delta-U">0 J</span></div>
+                        <div>ΔH = <span id="delta-H">0 J</span></div>
+                        <div>ΔS = <span id="delta-S">0.00 J/K</span></div>
+                        <div>ΔG = <span id="delta-G">0 J</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Engineering Applications Section -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+
+        <h3>1. Chemical Reactions and Gibbs Free Energy</h3>
+        <p>In chemical engineering, Gibbs free energy determines reaction spontaneity and equilibrium:</p>
+        <ul>
+            <li><strong>Reaction feasibility:</strong> \(\Delta G < 0\) indicates a spontaneous reaction at given T and P</li>
+            <li><strong>Equilibrium constant:</strong> \(\Delta G° = -RT\ln(K)\) relates standard Gibbs energy to equilibrium</li>
+            <li><strong>Electrochemical cells:</strong> \(\Delta G = -nFE\) connects free energy to cell voltage</li>
+            <li><strong>Process optimization:</strong> Minimizing Gibbs free energy identifies optimal operating conditions</li>
+        </ul>
+
+        <h3>2. Phase Transitions and Enthalpy</h3>
+        <p>Enthalpy changes are crucial in phase change processes:</p>
+        <ul>
+            <li><strong>Melting/freezing:</strong> \(\Delta H_{fusion}\) quantifies latent heat of fusion</li>
+            <li><strong>Boiling/condensation:</strong> \(\Delta H_{vaporization}\) determines cooling requirements</li>
+            <li><strong>HVAC systems:</strong> Enthalpy diagrams (Mollier charts) optimize refrigeration cycles</li>
+            <li><strong>Steam power plants:</strong> Enthalpy balances calculate turbine work output</li>
+        </ul>
+
+        <h3>3. Entropy in Energy Systems</h3>
+        <p>Entropy analysis reveals energy quality and irreversibilities:</p>
+        <ul>
+            <li><strong>Heat engines:</strong> Entropy generation quantifies irreversibilities and efficiency losses</li>
+            <li><strong>Exergy analysis:</strong> Combined with entropy to assess useful work potential</li>
+            <li><strong>Information theory:</strong> Shannon entropy measures information content in communications</li>
+            <li><strong>Second Law efficiency:</strong> Compares actual performance to reversible ideal</li>
+        </ul>
+
+        <h3>4. Helmholtz Free Energy in Materials Science</h3>
+        <p>Helmholtz free energy governs material stability and phase equilibria:</p>
+        <ul>
+            <li><strong>Phase diagrams:</strong> Phase boundaries determined by \(A\) minimization at constant T, V</li>
+            <li><strong>Elastic deformation:</strong> Strain energy related to Helmholtz energy changes</li>
+            <li><strong>Statistical mechanics:</strong> Partition function \(Z\) relates to \(A = -kT\ln(Z)\)</li>
+            <li><strong>Surface tension:</strong> Surface free energy governs interface phenomena</li>
+        </ul>
+
+        <h3>5. Thermodynamic Cycles</h3>
+        <p>State functions simplify analysis of cyclic processes:</p>
+        <ul>
+            <li><strong>Carnot cycle:</strong> Maximum efficiency derived from entropy considerations</li>
+            <li><strong>Rankine cycle:</strong> Steam power generation optimized using enthalpy analysis</li>
+            <li><strong>Brayton cycle:</strong> Gas turbine performance evaluated with state functions</li>
+            <li><strong>Otto/Diesel cycles:</strong> Internal combustion engine efficiency from \(T\) and \(S\)</li>
+        </ul>
+    </div>
+
+    <!-- Summary of Key Equations Section -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>State Variable</th>
+                        <th>Definition</th>
+                        <th>Differential Form</th>
+                        <th>Physical Meaning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Internal Energy (U)</strong></td>
+                        <td>Fundamental property</td>
+                        <td>\(dU = TdS - PdV\)</td>
+                        <td>Total microscopic energy</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enthalpy (H)</strong></td>
+                        <td>\(H = U + PV\)</td>
+                        <td>\(dH = TdS + VdP\)</td>
+                        <td>Heat content at constant P</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Entropy (S)</strong></td>
+                        <td>\(dS = \frac{\delta Q_{rev}}{T}\)</td>
+                        <td>\(dS \geq \frac{\delta Q}{T}\)</td>
+                        <td>Measure of disorder</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gibbs Free Energy (G)</strong></td>
+                        <td>\(G = H - TS\)</td>
+                        <td>\(dG = VdP - SdT\)</td>
+                        <td>Available work at const. T, P</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Helmholtz Free Energy (A)</strong></td>
+                        <td>\(A = U - TS\)</td>
+                        <td>\(dA = -PdV - SdT\)</td>
+                        <td>Available work at const. T, V</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <h3>Important Relationships</h3>
+            <ul>
+                <li>Fundamental thermodynamic identity: \(dU = TdS - PdV\)</li>
+                <li>Gibbs-Helmholtz relation: \(G = A + PV\)</li>
+                <li>Spontaneity criterion (const. T, P): \(\Delta G < 0\)</li>
+                <li>Spontaneity criterion (const. T, V): \(\Delta A < 0\)</li>
+                <li>Maxwell relations connect partial derivatives of state variables</li>
+                <li>For ideal gas: \(U = nC_VT\) and \(H = nC_PT\)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Practice Problems Section -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Enthalpy Change in Isobaric Heating</h3>
+            <p>Two moles of nitrogen gas (diatomic, \(C_P = 29.1\) J/(mol·K)) are heated from 300 K to 500 K at constant pressure of 200 kPa. Calculate:</p>
+            <p>(a) The change in internal energy<br>
+               (b) The change in enthalpy<br>
+               (c) The work done by the gas<br>
+               (d) The heat transferred</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol1')">Show Solution</p>
+            <div id="sol1" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(n = 2\) mol</li>
+                    <li>\(C_P = 29.1\) J/(mol·K)</li>
+                    <li>\(T_1 = 300\) K, \(T_2 = 500\) K</li>
+                    <li>\(P = 200\) kPa (constant)</li>
+                    <li>\(C_V = C_P - R = 29.1 - 8.314 = 20.786\) J/(mol·K)</li>
+                </ul>
+
+                <p><strong>(a) Change in Internal Energy:</strong></p>
+                <p>\[\Delta U = nC_V\Delta T = 2 \times 20.786 \times (500 - 300)\]</p>
+                <p>\[\Delta U = 2 \times 20.786 \times 200 = 8{,}314 \text{ J}\]</p>
+
+                <p><strong>(b) Change in Enthalpy:</strong></p>
+                <p>\[\Delta H = nC_P\Delta T = 2 \times 29.1 \times 200\]</p>
+                <p>\[\Delta H = 11{,}640 \text{ J}\]</p>
+
+                <p><strong>(c) Work Done by Gas:</strong></p>
+                <p>For isobaric process: \(W = P\Delta V = nR\Delta T\)</p>
+                <p>\[W = 2 \times 8.314 \times 200 = 3{,}326 \text{ J}\]</p>
+
+                <p><strong>(d) Heat Transferred:</strong></p>
+                <p>At constant pressure: \(Q = \Delta H\)</p>
+                <p>\[Q = 11{,}640 \text{ J}\]</p>
+                <p>Verify with First Law: \(Q = \Delta U + W = 8{,}314 + 3{,}326 = 11{,}640\) J ✓</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Entropy Change in Isothermal Expansion</h3>
+            <p>One mole of an ideal gas expands isothermally at 400 K from volume 10 L to 30 L. Calculate:</p>
+            <p>(a) The entropy change of the gas<br>
+               (b) The heat transferred<br>
+               (c) Is this process reversible or irreversible if it occurs spontaneously?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol2')">Show Solution</p>
+            <div id="sol2" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(n = 1\) mol</li>
+                    <li>\(T = 400\) K (constant)</li>
+                    <li>\(V_1 = 10\) L = 0.01 m³</li>
+                    <li>\(V_2 = 30\) L = 0.03 m³</li>
+                </ul>
+
+                <p><strong>(a) Entropy Change:</strong></p>
+                <p>For isothermal expansion of ideal gas:</p>
+                <p>\[\Delta S = nR\ln\left(\frac{V_2}{V_1}\right) = 1 \times 8.314 \times \ln\left(\frac{30}{10}\right)\]</p>
+                <p>\[\Delta S = 8.314 \times \ln(3) = 8.314 \times 1.099 = 9.13 \text{ J/K}\]</p>
+
+                <p><strong>(b) Heat Transferred:</strong></p>
+                <p>For isothermal process: \(\Delta U = 0\), so \(Q = W\)</p>
+                <p>\[Q = nRT\ln\left(\frac{V_2}{V_1}\right) = 1 \times 8.314 \times 400 \times 1.099\]</p>
+                <p>\[Q = 3{,}653 \text{ J}\]</p>
+                <p>Alternative: \(Q = T\Delta S = 400 \times 9.13 = 3{,}652\) J ✓</p>
+
+                <p><strong>(c) Reversibility:</strong></p>
+                <p>The gas entropy increases by 9.13 J/K. If the expansion is into a vacuum (free expansion), no heat is transferred from surroundings, so:</p>
+                <p>\[\Delta S_{total} = \Delta S_{gas} + \Delta S_{surroundings} = 9.13 + 0 = 9.13 \text{ J/K} > 0\]</p>
+                <p>Since \(\Delta S_{total} > 0\), the process is <strong>irreversible</strong>.</p>
+                <p>For a reversible isothermal expansion, heat would be transferred from a reservoir at 400 K, giving \(\Delta S_{surroundings} = -Q/T = -9.13\) J/K, making \(\Delta S_{total} = 0\).</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Gibbs Free Energy and Reaction Spontaneity</h3>
+            <p>A chemical reaction at 298 K and 1 atm has \(\Delta H = -92.4\) kJ and \(\Delta S = -198.7\) J/K. Calculate:</p>
+            <p>(a) The Gibbs free energy change at 298 K<br>
+               (b) Is the reaction spontaneous at 298 K?<br>
+               (c) At what temperature does the reaction become non-spontaneous?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol3')">Show Solution</p>
+            <div id="sol3" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(\Delta H = -92.4\) kJ = -92,400 J</li>
+                    <li>\(\Delta S = -198.7\) J/K</li>
+                    <li>\(T = 298\) K</li>
+                </ul>
+
+                <p><strong>(a) Gibbs Free Energy Change:</strong></p>
+                <p>\[\Delta G = \Delta H - T\Delta S\]</p>
+                <p>\[\Delta G = -92{,}400 - 298 \times (-198.7)\]</p>
+                <p>\[\Delta G = -92{,}400 + 59{,}213 = -33{,}187 \text{ J} = -33.2 \text{ kJ}\]</p>
+
+                <p><strong>(b) Spontaneity at 298 K:</strong></p>
+                <p>Since \(\Delta G = -33.2\) kJ \(< 0\), the reaction is <strong>spontaneous</strong> at 298 K.</p>
+
+                <p><strong>(c) Temperature at Which Reaction Becomes Non-spontaneous:</strong></p>
+                <p>The reaction becomes non-spontaneous when \(\Delta G > 0\).</p>
+                <p>At the transition point: \(\Delta G = 0\)</p>
+                <p>\[0 = \Delta H - T\Delta S\]</p>
+                <p>\[T = \frac{\Delta H}{\Delta S} = \frac{-92{,}400}{-198.7} = 465 \text{ K}\]</p>
+                <p>The reaction is spontaneous below 465 K and becomes non-spontaneous above 465 K.</p>
+                <p><strong>Interpretation:</strong> This is an exothermic reaction (\(\Delta H < 0\)) with decreasing entropy (\(\Delta S < 0\)). At low temperatures, the enthalpy term dominates, making it spontaneous. At high temperatures, the entropy term dominates, making it non-spontaneous.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: State Functions in a Thermodynamic Cycle</h3>
+            <p>An ideal gas undergoes a cycle consisting of three processes:</p>
+            <ul>
+                <li>Process 1→2: Isothermal expansion at 400 K from 1 L to 3 L</li>
+                <li>Process 2→3: Isochoric cooling to 300 K</li>
+                <li>Process 3→1: Isobaric compression back to initial state</li>
+            </ul>
+            <p>For 1 mole of gas with \(C_V = 12.5\) J/(mol·K), calculate the total change in:</p>
+            <p>(a) Internal energy for the complete cycle<br>
+               (b) Enthalpy for the complete cycle<br>
+               (c) Entropy for the complete cycle</p>
+
+            <p class="toggle-section" onclick="toggleSolution('sol4')">Show Solution</p>
+            <div id="sol4" class="hidden">
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(n = 1\) mol</li>
+                    <li>\(C_V = 12.5\) J/(mol·K), \(C_P = C_V + R = 20.814\) J/(mol·K)</li>
+                    <li>State 1: \(T_1 = 400\) K, \(V_1 = 1\) L</li>
+                    <li>State 2: \(T_2 = 400\) K, \(V_2 = 3\) L</li>
+                    <li>State 3: \(T_3 = 300\) K, \(V_3 = 3\) L</li>
+                </ul>
+
+                <p><strong>Key Insight:</strong> \(U\), \(H\), and \(S\) are state functions, so their changes over a complete cycle must be zero!</p>
+
+                <p><strong>(a) Total Change in Internal Energy:</strong></p>
+                <p>\[\Delta U_{cycle} = U_1 - U_1 = 0\]</p>
+                <p>For any thermodynamic cycle, \(\Delta U = 0\) because the system returns to its initial state.</p>
+
+                <p><strong>Verification by calculating each process:</strong></p>
+                <p>Process 1→2 (isothermal): \(\Delta U_{12} = 0\) (constant T)</p>
+                <p>Process 2→3 (isochoric): \(\Delta U_{23} = nC_V\Delta T = 1 \times 12.5 \times (300-400) = -1{,}250\) J</p>
+                <p>Process 3→1 (isobaric): \(\Delta U_{31} = nC_V\Delta T = 1 \times 12.5 \times (400-300) = 1{,}250\) J</p>
+                <p>Total: \(\Delta U_{cycle} = 0 - 1{,}250 + 1{,}250 = 0\) ✓</p>
+
+                <p><strong>(b) Total Change in Enthalpy:</strong></p>
+                <p>\[\Delta H_{cycle} = H_1 - H_1 = 0\]</p>
+                <p>Same reasoning: state function over a cycle equals zero.</p>
+
+                <p><strong>(c) Total Change in Entropy:</strong></p>
+                <p>\[\Delta S_{cycle} = S_1 - S_1 = 0\]</p>
+                <p>Again, state function over a cycle equals zero.</p>
+
+                <p><strong>Important Conclusion:</strong> This problem illustrates the fundamental property of state functions: their change depends only on the initial and final states, not the path. Over any complete cycle, all state functions return to their original values, giving zero net change.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Check Quiz Section -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Q1: Which of the following is NOT a state function?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> (a) Internal energy</label>
+                    <label><input type="radio" name="q1" value="b"> (b) Enthalpy</label>
+                    <label><input type="radio" name="q1" value="c"> (c) Heat transferred</label>
+                    <label><input type="radio" name="q1" value="d"> (d) Entropy</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q2: Enthalpy is defined as:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> (a) \(H = U - PV\)</label>
+                    <label><input type="radio" name="q2" value="b"> (b) \(H = U + PV\)</label>
+                    <label><input type="radio" name="q2" value="c"> (c) \(H = U - TS\)</label>
+                    <label><input type="radio" name="q2" value="d"> (d) \(H = U + TS\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q3: For a spontaneous process at constant temperature and pressure:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> (a) \(\Delta G > 0\)</label>
+                    <label><input type="radio" name="q3" value="b"> (b) \(\Delta G = 0\)</label>
+                    <label><input type="radio" name="q3" value="c"> (c) \(\Delta G < 0\)</label>
+                    <label><input type="radio" name="q3" value="d"> (d) \(\Delta H < 0\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q4: The Second Law of Thermodynamics states that for an isolated system:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> (a) Entropy always decreases</label>
+                    <label><input type="radio" name="q4" value="b"> (b) Entropy remains constant</label>
+                    <label><input type="radio" name="q4" value="c"> (c) Entropy never decreases</label>
+                    <label><input type="radio" name="q4" value="d"> (d) Enthalpy never decreases</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q5: Helmholtz free energy is most useful for processes at constant:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> (a) Temperature and pressure</label>
+                    <label><input type="radio" name="q5" value="b"> (b) Temperature and volume</label>
+                    <label><input type="radio" name="q5" value="c"> (c) Pressure and volume</label>
+                    <label><input type="radio" name="q5" value="d"> (d) Pressure and entropy</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q6: For a complete thermodynamic cycle, the change in internal energy is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> (a) Maximum</label>
+                    <label><input type="radio" name="q6" value="b"> (b) Minimum</label>
+                    <label><input type="radio" name="q6" value="c"> (c) Zero</label>
+                    <label><input type="radio" name="q6" value="d"> (d) Equal to work done</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q7: The relationship \(G = H - TS\) shows that Gibbs free energy:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> (a) Increases with temperature</label>
+                    <label><input type="radio" name="q7" value="b"> (b) Balances enthalpy and entropy contributions</label>
+                    <label><input type="radio" name="q7" value="c"> (c) Is independent of temperature</label>
+                    <label><input type="radio" name="q7" value="d"> (d) Equals enthalpy at absolute zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Q8: At constant pressure, the heat transferred equals:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> (a) Change in internal energy</label>
+                    <label><input type="radio" name="q8" value="b"> (b) Change in enthalpy</label>
+                    <label><input type="radio" name="q8" value="c"> (c) Change in entropy</label>
+                    <label><input type="radio" name="q8" value="d"> (d) Work done</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript for Simulation -->
+    <script>
+        // Thermodynamic State Variables Simulation
+        let sketch = new p5(function(p) {
+            // Constants
+            const R = 8.314; // J/(mol·K)
+            const n = 1; // moles
+
+            // Heat capacity ratios
+            const gammaValues = {
+                monatomic: 1.67,
+                diatomic: 1.40,
+                polyatomic: 1.33
+            };
+
+            // State variables
+            let volume = 10; // L
+            let pressure, temperature;
+            let gasType = 'diatomic';
+            let gamma = gammaValues[gasType];
+            let processType = 'isothermal';
+
+            // Initial state
+            let V0 = 10, P0, T0, U0, H0, S0, G0, A0;
+
+            // Canvas dimensions
+            let canvasWidth, canvasHeight;
+
+            p.setup = function() {
+                canvasWidth = Math.min(1000, p.windowWidth - 40);
+                canvasHeight = 600;
+                let canvas = p.createCanvas(canvasWidth, canvasHeight);
+                canvas.parent('sketch-holder');
+
+                // Initialize state
+                T0 = 300; // K
+                V0 = 10; // L
+                P0 = (n * R * T0) / (V0 * 0.001) / 1000; // kPa
+
+                resetToInitial();
+                setupEventListeners();
+                updateStateVariables();
+            };
+
+            function resetToInitial() {
+                volume = V0;
+                temperature = T0;
+                pressure = P0;
+
+                // Calculate initial thermodynamic potentials (relative values)
+                U0 = calculateU(T0);
+                H0 = calculateH(T0, P0);
+                S0 = 0; // Reference state
+                G0 = H0 - T0 * S0;
+                A0 = U0 - T0 * S0;
+            }
+
+            function calculateCV() {
+                // For ideal gas
+                if (gasType === 'monatomic') return 12.5; // 3R/2
+                if (gasType === 'diatomic') return 20.8; // 5R/2
+                return 25.0; // Polyatomic approximation
+            }
+
+            function calculateCP() {
+                return calculateCV() + R;
+            }
+
+            function calculateU(T) {
+                return n * calculateCV() * T;
+            }
+
+            function calculateH(T, P) {
+                return calculateU(T) + P * 1000 * volume * 0.001; // Convert kPa·L to J
+            }
+
+            function calculateS(V, T) {
+                // Entropy relative to initial state
+                return n * calculateCV() * Math.log(T/T0) + n * R * Math.log(V/V0);
+            }
+
+            function setupEventListeners() {
+                document.getElementById('process-type').addEventListener('change', function() {
+                    processType = this.value;
+                    resetToInitial();
+                    updateStateVariables();
+                });
+
+                document.getElementById('gas-type').addEventListener('change', function() {
+                    gasType = this.value;
+                    gamma = gammaValues[gasType];
+                    resetToInitial();
+                    updateStateVariables();
+                });
+
+                document.getElementById('volume-slider').addEventListener('input', function() {
+                    volume = parseFloat(this.value);
+                    updateFromVolume();
+                });
+
+                document.getElementById('expand-btn').addEventListener('click', function() {
+                    volume = Math.min(30, volume + 2);
+                    document.getElementById('volume-slider').value = volume;
+                    updateFromVolume();
+                });
+
+                document.getElementById('compress-btn').addEventListener('click', function() {
+                    volume = Math.max(5, volume - 2);
+                    document.getElementById('volume-slider').value = volume;
+                    updateFromVolume();
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', function() {
+                    resetToInitial();
+                    document.getElementById('volume-slider').value = volume;
+                    updateStateVariables();
+                });
+            }
+
+            function updateFromVolume() {
+                // Update P and T based on process type
+                switch(processType) {
+                    case 'isothermal':
+                        // T constant, PV = constant
+                        temperature = T0;
+                        pressure = (n * R * temperature) / (volume * 0.001) / 1000;
+                        break;
+
+                    case 'isobaric':
+                        // P constant, V/T = constant
+                        pressure = P0;
+                        temperature = (pressure * 1000 * volume * 0.001) / (n * R);
+                        break;
+
+                    case 'isochoric':
+                        // V should not change, reset to V0
+                        volume = V0;
+                        temperature = T0;
+                        pressure = P0;
+                        break;
+
+                    case 'adiabatic':
+                        // PV^gamma = constant
+                        pressure = P0 * Math.pow(V0/volume, gamma);
+                        temperature = (pressure * 1000 * volume * 0.001) / (n * R);
+                        break;
+                }
+
+                updateStateVariables();
+            }
+
+            function updateStateVariables() {
+                // Update display
+                document.getElementById('volume-value').textContent = volume.toFixed(1);
+                document.getElementById('display-pressure').textContent = pressure.toFixed(1) + ' kPa';
+                document.getElementById('display-volume').textContent = volume.toFixed(1) + ' L';
+                document.getElementById('display-temperature').textContent = temperature.toFixed(0) + ' K';
+
+                // Calculate state variables
+                let U = calculateU(temperature);
+                let H = calculateH(temperature, pressure);
+                let S = calculateS(volume, temperature);
+                let G = H - temperature * S;
+                let A = U - temperature * S;
+
+                document.getElementById('display-internal-energy').textContent = U.toFixed(0) + ' J';
+                document.getElementById('display-enthalpy').textContent = H.toFixed(0) + ' J';
+                document.getElementById('display-entropy').textContent = S.toFixed(2) + ' J/K';
+                document.getElementById('display-gibbs').textContent = G.toFixed(0) + ' J';
+                document.getElementById('display-helmholtz').textContent = A.toFixed(0) + ' J';
+
+                // Calculate changes from initial state
+                let deltaU = U - U0;
+                let deltaH = H - H0;
+                let deltaS = S - S0;
+                let deltaG = G - G0;
+
+                document.getElementById('delta-U').textContent = deltaU.toFixed(0) + ' J';
+                document.getElementById('delta-H').textContent = deltaH.toFixed(0) + ' J';
+                document.getElementById('delta-S').textContent = deltaS.toFixed(2) + ' J/K';
+                document.getElementById('delta-G').textContent = deltaG.toFixed(0) + ' J';
+            }
+
+            p.draw = function() {
+                p.background(250);
+
+                // Draw title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(18);
+                p.text('State Variables Visualization', canvasWidth/2, 30);
+
+                // Draw two panels
+                drawLeftPanel(); // State diagrams
+                drawRightPanel(); // Bar charts
+            };
+
+            function drawLeftPanel() {
+                let panelX = 50;
+                let panelY = 60;
+                let panelW = canvasWidth/2 - 80;
+                let panelH = canvasHeight - 100;
+
+                // Draw P-V diagram
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text('P-V Diagram', panelX + panelW/2, panelY + 20);
+
+                let plotX = panelX + 60;
+                let plotY = panelY + 50;
+                let plotW = panelW - 80;
+                let plotH = (panelH - 100) / 2;
+
+                drawPVDiagram(plotX, plotY, plotW, plotH);
+
+                // Draw T-S diagram
+                plotY = panelY + panelH/2 + 20;
+                p.fill(0);
+                p.text('T-S Diagram', panelX + panelW/2, plotY);
+                plotY += 20;
+                drawTSDiagram(plotX, plotY, plotW, plotH);
+            }
+
+            function drawPVDiagram(x, y, w, h) {
+                let vMin = 5, vMax = 30;
+                let pMin = 30, pMax = 300;
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(x, y + h, x + w, y + h); // V axis
+                p.line(x, y, x, y + h); // P axis
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.CENTER);
+                p.text('V (L)', x + w/2, y + h + 30);
+                p.push();
+                p.translate(x - 40, y + h/2);
+                p.rotate(-p.PI/2);
+                p.text('P (kPa)', 0, 0);
+                p.pop();
+
+                // Grid
+                p.stroke(230);
+                p.strokeWeight(1);
+                for (let v = 10; v <= 30; v += 10) {
+                    let px = x + p.map(v, vMin, vMax, 0, w);
+                    p.line(px, y, px, y + h);
+                }
+                for (let pv = 50; pv <= 250; pv += 50) {
+                    let py = y + h - p.map(pv, pMin, pMax, 0, h);
+                    p.line(x, py, x + w, py);
+                }
+
+                // Draw isotherms as reference
+                p.stroke(200, 200, 255, 100);
+                p.strokeWeight(1.5);
+                p.noFill();
+                for (let T = 250; T <= 450; T += 50) {
+                    p.beginShape();
+                    for (let v = vMin; v <= vMax; v += 0.5) {
+                        let pCalc = (n * R * T) / (v * 0.001) / 1000;
+                        if (pCalc >= pMin && pCalc <= pMax) {
+                            let px = x + p.map(v, vMin, vMax, 0, w);
+                            let py = y + h - p.map(pCalc, pMin, pMax, 0, h);
+                            p.vertex(px, py);
+                        }
+                    }
+                    p.endShape();
+                }
+
+                // Draw initial state
+                let x0 = x + p.map(V0, vMin, vMax, 0, w);
+                let y0 = y + h - p.map(P0, pMin, pMax, 0, h);
+                p.fill(0, 150, 0);
+                p.noStroke();
+                p.circle(x0, y0, 8);
+
+                // Draw current state
+                let xc = x + p.map(volume, vMin, vMax, 0, w);
+                let yc = y + h - p.map(pressure, pMin, pMax, 0, h);
+                p.fill(255, 0, 0);
+                p.circle(xc, yc, 10);
+
+                // Draw path
+                p.stroke(255, 100, 0);
+                p.strokeWeight(2);
+                p.line(x0, y0, xc, yc);
+            }
+
+            function drawTSDiagram(x, y, w, h) {
+                let sMin = -5, sMax = 15;
+                let tMin = 200, tMax = 500;
+
+                // Axes
+                p.stroke(0);
+                p.strokeWeight(2);
+                p.line(x, y + h, x + w, y + h);
+                p.line(x, y, x, y + h);
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.CENTER);
+                p.text('S (J/K)', x + w/2, y + h + 30);
+                p.push();
+                p.translate(x - 40, y + h/2);
+                p.rotate(-p.PI/2);
+                p.text('T (K)', 0, 0);
+                p.pop();
+
+                // Grid
+                p.stroke(230);
+                p.strokeWeight(1);
+                for (let s = 0; s <= 15; s += 5) {
+                    let px = x + p.map(s, sMin, sMax, 0, w);
+                    p.line(px, y, px, y + h);
+                }
+                for (let t = 250; t <= 450; t += 50) {
+                    let py = y + h - p.map(t, tMin, tMax, 0, h);
+                    p.line(x, py, x + w, py);
+                }
+
+                // Draw initial state
+                let x0 = x + p.map(S0, sMin, sMax, 0, w);
+                let y0 = y + h - p.map(T0, tMin, tMax, 0, h);
+                p.fill(0, 150, 0);
+                p.noStroke();
+                p.circle(x0, y0, 8);
+
+                // Draw current state
+                let S = calculateS(volume, temperature);
+                let xc = x + p.map(S, sMin, sMax, 0, w);
+                let yc = y + h - p.map(temperature, tMin, tMax, 0, h);
+                p.fill(255, 0, 0);
+                p.circle(xc, yc, 10);
+
+                // Draw path
+                p.stroke(255, 100, 0);
+                p.strokeWeight(2);
+                p.line(x0, y0, xc, yc);
+            }
+
+            function drawRightPanel() {
+                let panelX = canvasWidth/2 + 30;
+                let panelY = 60;
+                let panelW = canvasWidth/2 - 80;
+                let panelH = canvasHeight - 100;
+
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.fill(0);
+                p.text('State Variable Changes', panelX + panelW/2, panelY + 20);
+
+                // Calculate changes
+                let U = calculateU(temperature);
+                let H = calculateH(temperature, pressure);
+                let S = calculateS(volume, temperature);
+                let G = H - temperature * S;
+                let A = U - temperature * S;
+
+                let deltaU = U - U0;
+                let deltaH = H - H0;
+                let deltaS = S - S0;
+                let deltaG = G - G0;
+                let deltaA = A - A0;
+
+                // Draw bar chart
+                let barY = panelY + 60;
+                let barH = 40;
+                let spacing = 70;
+                let maxWidth = panelW - 100;
+
+                let values = [
+                    {label: 'ΔU', value: deltaU, unit: 'J', scale: 5000},
+                    {label: 'ΔH', value: deltaH, unit: 'J', scale: 5000},
+                    {label: 'ΔS', value: deltaS, unit: 'J/K', scale: 10},
+                    {label: 'ΔG', value: deltaG, unit: 'J', scale: 5000},
+                    {label: 'ΔA', value: deltaA, unit: 'J', scale: 5000}
+                ];
+
+                values.forEach((item, i) => {
+                    let yPos = barY + i * spacing;
+
+                    // Label
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.LEFT);
+                    p.textSize(13);
+                    p.text(item.label + ':', panelX, yPos + barH/2 + 5);
+
+                    // Bar
+                    let barWidth = p.map(Math.abs(item.value), 0, item.scale, 0, maxWidth);
+                    barWidth = p.constrain(barWidth, 0, maxWidth);
+
+                    let barX = panelX + 50;
+                    if (item.value >= 0) {
+                        p.fill(0, 150, 200);
+                    } else {
+                        p.fill(200, 100, 0);
+                        barX = panelX + 50 - barWidth;
+                    }
+                    p.rect(barX, yPos, Math.abs(barWidth), barH, 3);
+
+                    // Value text
+                    p.fill(0);
+                    p.textAlign(p.LEFT);
+                    p.textSize(11);
+                    p.text(item.value.toFixed(1) + ' ' + item.unit, panelX + 50 + maxWidth + 10, yPos + barH/2 + 4);
+
+                    // Zero line
+                    p.stroke(100);
+                    p.strokeWeight(1);
+                    p.line(panelX + 50, yPos, panelX + 50, yPos + barH);
+                });
+
+                // Legend
+                p.textSize(11);
+                p.fill(0, 150, 200);
+                p.rect(panelX, barY + 5 * spacing + 20, 15, 15);
+                p.fill(0);
+                p.textAlign(p.LEFT);
+                p.text('Positive change', panelX + 20, barY + 5 * spacing + 32);
+
+                p.fill(200, 100, 0);
+                p.rect(panelX + 150, barY + 5 * spacing + 20, 15, 15);
+                p.fill(0);
+                p.text('Negative change', panelX + 170, barY + 5 * spacing + 32);
+            }
+
+            p.windowResized = function() {
+                if (p.width > 100) {
+                    canvasWidth = Math.min(1000, p.windowWidth - 40);
+                    p.resizeCanvas(canvasWidth, canvasHeight);
+                }
+            };
+
+        }, 'sketch-holder');
+
+        // Quiz submission
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'c',
+                q2: 'b',
+                q3: 'c',
+                q4: 'c',
+                q5: 'b',
+                q6: 'c',
+                q7: 'b',
+                q8: 'b'
+            };
+
+            submitQuiz(
+                Object.entries(answers).map(([name, correct]) => ({name, correctAnswer: correct})),
+                'quiz-results'
+            );
+        });
+    </script>
+</body>
+</html>
