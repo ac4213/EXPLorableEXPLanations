@@ -136,11 +136,13 @@
             </div>
         </div>
 
-        <!-- Results Panel -->
-        <div class="results-panel">
-            <p><strong>Maximum Tension:</strong> <span id="max-tension">0</span> kN</p>
-            <p><strong>Maximum Compression:</strong> <span id="max-compression">0</span> kN</p>
-            <p><strong>Status:</strong> <span id="solver-status">Click nodes to set forces and constraints</span></p>
+        <!-- Controls for deflection -->
+        <div style="max-width: 400px; margin: 20px auto; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <label style="font-weight: bold; display: block; margin-bottom: 8px;">Deflection Scale:</label>
+            <input type="range" id="deflection-scale" min="0" max="100" value="0" step="1" style="width: 100%;">
+            <div style="text-align: center; margin-top: 5px; color: #666;">
+                <span id="deflection-value">0</span>x (0 = no deflection)
+            </div>
         </div>
 
         <!-- Legend -->
@@ -393,16 +395,27 @@
             let members = [];
             let memberForces = [];
             let isSolved = false;
+            let deflectionScale = 0;
+            let nodeDeflections = []; // Store calculated deflections
+            let systemStatus = 'unknown'; // 'isostatic', 'hyperstatic', 'hypostatic'
+            let solverMessage = ''; // Message explaining solver status
+            let numEquations = 0;
+            let numMembers = 0;
 
             p.setup = function() {
                 let canvasWidth = Math.min(900, p.windowWidth - 40);
                 p.createCanvas(canvasWidth, 500);
                 initializeTruss();
                 setupNodeEditor();
+                setupDeflectionSlider();
             };
 
             p.draw = function() {
                 p.background(240);
+
+                // Draw info panel first (in screen coordinates)
+                drawInfoPanel();
+
                 p.translate(50, 350);
 
                 // Draw members first (behind nodes)
@@ -445,7 +458,7 @@
                         y: 0,
                         fx: 0,
                         fy: 0,
-                        constraint: i === 0 ? 'pin' : (i === numSpans ? 'roller-x' : 'none')
+                        constraint: i === 0 ? 'pin' : (i === numSpans ? 'roller-y' : 'none')
                     });
                 }
 
@@ -455,7 +468,7 @@
                         x: (i + 0.5) * spanLength,
                         y: -trussHeight,
                         fx: 0,
-                        fy: i === Math.floor(numSpans / 2) ? -10 : 0, // Apply 10 kN downward at center
+                        fy: i === Math.floor(numSpans / 2) ? -10 : 0, // Apply -10 kN (downward, following convention: down = negative)
                         constraint: 'none'
                     });
                 }
@@ -484,10 +497,10 @@
                 solveTruss();
             }
 
-            function solveTruss() {
+            function solveTruss(skipUpdateResults = false) {
                 // Build global equilibrium matrix using method of joints
                 const numNodes = nodes.length;
-                const numMembers = members.length;
+                numMembers = members.length;
 
                 // Count degrees of freedom
                 let dofCount = 0;
@@ -506,11 +519,22 @@
                     }
                 }
 
-                const numEquations = dofCount;
+                numEquations = dofCount;
+
+                // Determine system status
+                if (numEquations === numMembers) {
+                    systemStatus = 'isostatic';
+                } else if (numEquations < numMembers) {
+                    systemStatus = 'hyperstatic';
+                } else {
+                    systemStatus = 'hypostatic';
+                }
+
                 if (numEquations === 0) {
                     memberForces = members.map(() => 0);
                     isSolved = true;
-                    updateResults();
+                    solverMessage = 'Fully constrained (no unknowns)';
+                    if (!skipUpdateResults) updateResults();
                     return;
                 }
 
@@ -556,9 +580,12 @@
                 if (numEquations !== numMembers) {
                     memberForces = members.map(() => 0);
                     isSolved = false;
-                    document.getElementById('solver-status').textContent =
-                        `System indeterminate: ${numEquations} equations, ${numMembers} members`;
-                    updateResults();
+                    if (systemStatus === 'hyperstatic') {
+                        solverMessage = 'System is indeterminate (too few equations)';
+                    } else if (systemStatus === 'hypostatic') {
+                        solverMessage = 'System is under-constrained (mechanism)';
+                    }
+                    if (!skipUpdateResults) updateResults();
                     return;
                 }
 
@@ -566,14 +593,15 @@
                 try {
                     memberForces = gaussianElimination(A, b);
                     isSolved = true;
-                    document.getElementById('solver-status').textContent = 'Solved successfully';
+                    solverMessage = 'System solved successfully';
                 } catch (e) {
                     memberForces = members.map(() => 0);
                     isSolved = false;
-                    document.getElementById('solver-status').textContent = 'Solution failed: ' + e.message;
+                    solverMessage = 'System is unstable (singular matrix)';
+                    console.log('Solver error:', e.message);
                 }
 
-                updateResults();
+                if (!skipUpdateResults) updateResults();
             }
 
             function gaussianElimination(A, b) {
@@ -621,18 +649,25 @@
             }
 
             function drawMembers() {
-                if (!isSolved) return;
-
-                let maxForce = Math.max(...memberForces.map(f => Math.abs(f)), 1);
+                let maxForce = isSolved ? Math.max(...memberForces.map(f => Math.abs(f)), 1) : 1;
 
                 for (let i = 0; i < members.length; i++) {
                     let member = members[i];
-                    let force = memberForces[i];
+                    let force = isSolved ? memberForces[i] : 0;
                     let n1 = nodes[member.start];
                     let n2 = nodes[member.end];
 
+                    // Apply deflection if enabled
+                    let def1 = deflectionScale > 0 && nodeDeflections[member.start] ? nodeDeflections[member.start] : {x: 0, y: 0};
+                    let def2 = deflectionScale > 0 && nodeDeflections[member.end] ? nodeDeflections[member.end] : {x: 0, y: 0};
+
+                    let x1 = (n1.x + def1.x * deflectionScale * 0.01) * scale;
+                    let y1 = (n1.y + def1.y * deflectionScale * 0.01) * scale;
+                    let x2 = (n2.x + def2.x * deflectionScale * 0.01) * scale;
+                    let y2 = (n2.y + def2.y * deflectionScale * 0.01) * scale;
+
                     // Color and thickness based on force
-                    if (Math.abs(force) < 0.1) {
+                    if (!isSolved || Math.abs(force) < 0.1) {
                         p.stroke(0);
                         p.strokeWeight(2);
                     } else if (force > 0) {
@@ -643,12 +678,12 @@
                         p.strokeWeight(p.map(Math.abs(force), 0, maxForce, 2, 10));
                     }
 
-                    p.line(n1.x * scale, n1.y * scale, n2.x * scale, n2.y * scale);
+                    p.line(x1, y1, x2, y2);
 
                     // Draw force magnitude at midpoint
-                    if (Math.abs(force) > 0.1) {
-                        let midX = (n1.x + n2.x) / 2 * scale;
-                        let midY = (n1.y + n2.y) / 2 * scale;
+                    if (isSolved && Math.abs(force) > 0.1) {
+                        let midX = (x1 + x2) / 2;
+                        let midY = (y1 + y2) / 2;
                         p.noStroke();
                         p.fill(0);
                         p.textAlign(p.CENTER, p.CENTER);
@@ -662,65 +697,83 @@
                 for (let i = 0; i < nodes.length; i++) {
                     let node = nodes[i];
 
+                    // Apply deflection if enabled
+                    let def = deflectionScale > 0 && nodeDeflections[i] ? nodeDeflections[i] : {x: 0, y: 0};
+                    let nodeX = (node.x + def.x * deflectionScale * 0.01) * scale;
+                    let nodeY = (node.y + def.y * deflectionScale * 0.01) * scale;
+
                     // Highlight selected node
                     if (i === selectedNodeIndex) {
                         p.fill(40, 167, 69); // Green
                         p.noStroke();
-                        p.ellipse(node.x * scale, node.y * scale, 20, 20);
+                        p.ellipse(nodeX, nodeY, 20, 20);
                     }
 
                     p.fill(0);
                     p.noStroke();
-                    p.ellipse(node.x * scale, node.y * scale, 10, 10);
+                    p.ellipse(nodeX, nodeY, 10, 10);
 
                     // Draw node number
                     p.fill(100);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.textSize(10);
-                    p.text(i, node.x * scale, node.y * scale + 20);
+                    p.text(i, nodeX, nodeY + 20);
                 }
             }
 
             function drawSupports() {
                 for (let i = 0; i < nodes.length; i++) {
                     let node = nodes[i];
+
+                    // Apply deflection if enabled
+                    let def = deflectionScale > 0 && nodeDeflections[i] ? nodeDeflections[i] : {x: 0, y: 0};
+                    let nodeX = (node.x + def.x * deflectionScale * 0.01) * scale;
+                    let nodeY = (node.y + def.y * deflectionScale * 0.01) * scale;
+
                     if (node.constraint === 'pin') {
                         p.fill(100);
                         p.noStroke();
                         p.triangle(
-                            node.x * scale - 12, node.y * scale,
-                            node.x * scale + 12, node.y * scale,
-                            node.x * scale, node.y * scale + 18
+                            nodeX - 12, nodeY,
+                            nodeX + 12, nodeY,
+                            nodeX, nodeY + 18
                         );
                     } else if (node.constraint === 'roller-x') {
                         p.fill(100);
                         p.noStroke();
                         p.triangle(
-                            node.x * scale - 12, node.y * scale,
-                            node.x * scale + 12, node.y * scale,
-                            node.x * scale, node.y * scale + 18
+                            nodeX - 12, nodeY,
+                            nodeX + 12, nodeY,
+                            nodeX, nodeY + 18
                         );
-                        p.ellipse(node.x * scale, node.y * scale + 23, 10, 10);
+                        p.ellipse(nodeX, nodeY + 23, 10, 10);
                     } else if (node.constraint === 'roller-y') {
                         p.fill(100);
                         p.noStroke();
                         p.triangle(
-                            node.x * scale, node.y * scale - 12,
-                            node.x * scale, node.y * scale + 12,
-                            node.x * scale - 18, node.y * scale
+                            nodeX, nodeY - 12,
+                            nodeX, nodeY + 12,
+                            nodeX - 18, nodeY
                         );
-                        p.ellipse(node.x * scale - 23, node.y * scale, 10, 10);
+                        p.ellipse(nodeX - 23, nodeY, 10, 10);
                     }
                 }
             }
 
             function drawAppliedForces() {
-                for (let node of nodes) {
+                for (let i = 0; i < nodes.length; i++) {
+                    let node = nodes[i];
+
+                    // Apply deflection if enabled
+                    let def = deflectionScale > 0 && nodeDeflections[i] ? nodeDeflections[i] : {x: 0, y: 0};
+                    let nodeX = (node.x + def.x * deflectionScale * 0.01) * scale;
+                    let nodeY = (node.y + def.y * deflectionScale * 0.01) * scale;
+
                     if (Math.abs(node.fx) > 0.01) {
-                        drawForceArrow(node.x * scale, node.y * scale, node.fx, 0);
+                        drawForceArrow(nodeX, nodeY, node.fx, 0);
                     }
                     if (Math.abs(node.fy) > 0.01) {
-                        drawForceArrow(node.x * scale, node.y * scale, 0, node.fy);
+                        drawForceArrow(nodeX, nodeY, 0, node.fy);
                     }
                 }
             }
@@ -732,8 +785,11 @@
 
                 let arrowLen = 40;
                 let mag = Math.sqrt(fx * fx + fy * fy);
+                // Note: in canvas coords, Y increases downward
+                // But we want positive fy to point upward, negative fy to point downward
+                // So we negate fy for the canvas
                 let dx = fx / mag * arrowLen;
-                let dy = fy / mag * arrowLen;
+                let dy = -fy / mag * arrowLen; // Negate to match canvas coordinates
 
                 // Arrow line
                 p.line(x - dx, y - dy, x, y);
@@ -746,12 +802,18 @@
                 p.triangle(0, 0, -10, -5, -10, 5);
                 p.pop();
 
-                // Label
+                // Label - show force components with proper signs
                 p.noStroke();
                 p.fill(0);
                 p.textAlign(p.CENTER);
                 p.textSize(11);
-                p.text(mag.toFixed(1) + " kN", x - dx - 15 * Math.cos(angle), y - dy - 15 * Math.sin(angle));
+                let labelText = '';
+                if (Math.abs(fx) > 0.01) labelText = 'Fx: ' + fx.toFixed(1) + ' kN';
+                if (Math.abs(fy) > 0.01) {
+                    if (labelText) labelText += ', ';
+                    labelText += 'Fy: ' + fy.toFixed(1) + ' kN';
+                }
+                p.text(labelText, x - dx - 15 * Math.cos(angle), y - dy - 15 * Math.sin(angle));
             }
 
             function updateResults() {
@@ -763,8 +825,201 @@
                     if (force < maxCompression) maxCompression = force;
                 }
 
-                document.getElementById("max-tension").textContent = maxTension.toFixed(2);
-                document.getElementById("max-compression").textContent = Math.abs(maxCompression).toFixed(2);
+                // Also calculate deflections
+                if (isSolved) {
+                    calculateDeflections();
+                }
+            }
+
+            function drawInfoPanel() {
+                // Draw info panel in top-right corner (before translate)
+                p.push();
+                p.resetMatrix();
+
+                let panelWidth = 240;
+                let panelHeight = 140;
+                let panelX = p.width - panelWidth - 15;
+                let panelY = 15;
+
+                p.fill(255, 255, 255, 250);
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.rect(panelX, panelY, panelWidth, panelHeight, 8);
+
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(13);
+                p.textStyle(p.BOLD);
+                p.text('Truss Analysis', panelX + 12, panelY + 22);
+
+                p.textStyle(p.NORMAL);
+                p.textSize(11);
+
+                let lineY = panelY + 42;
+                let lineSpacing = 16;
+
+                // System status
+                let statusColor;
+                let statusText = systemStatus.charAt(0).toUpperCase() + systemStatus.slice(1);
+                if (systemStatus === 'isostatic') {
+                    statusColor = p.color(40, 167, 69);
+                } else if (systemStatus === 'hyperstatic') {
+                    statusColor = p.color(200, 100, 0);
+                } else {
+                    statusColor = p.color(220, 50, 50);
+                }
+
+                p.fill(statusColor);
+                p.text('System: ' + statusText, panelX + 12, lineY);
+                p.text('(' + numEquations + ' eq, ' + numMembers + ' members)', panelX + 12, lineY + lineSpacing * 0.8);
+
+                p.fill(0);
+                lineY += lineSpacing * 1.8;
+
+                // Force results and solver status
+                if (isSolved && memberForces.length > 0) {
+                    let maxTension = 0;
+                    let maxCompression = 0;
+                    for (let force of memberForces) {
+                        if (force > maxTension) maxTension = force;
+                        if (force < maxCompression) maxCompression = force;
+                    }
+
+                    p.text('Max Tension: ' + maxTension.toFixed(2) + ' kN', panelX + 12, lineY);
+                    p.text('Max Compression: ' + Math.abs(maxCompression).toFixed(2) + ' kN', panelX + 12, lineY + lineSpacing);
+
+                    p.fill(40, 167, 69);
+                    p.textSize(10);
+                    p.text('✓ ' + solverMessage, panelX + 12, lineY + lineSpacing * 2 + 3);
+                } else {
+                    // Show solver message or instructions
+                    if (solverMessage) {
+                        p.fill(220, 50, 50);
+                        p.textSize(10);
+                        p.text('✗ ' + solverMessage, panelX + 12, lineY);
+                        p.fill(100);
+                        p.text('Adjust constraints to solve', panelX + 12, lineY + lineSpacing);
+                    } else {
+                        p.fill(100);
+                        p.textSize(10);
+                        p.text('Click nodes to set forces', panelX + 12, lineY);
+                        p.text('and constraints', panelX + 12, lineY + lineSpacing);
+                    }
+                }
+
+                p.pop();
+            }
+
+            function calculateDeflections() {
+                // Proper virtual work method for deflection calculation
+                // Assume E (Young's modulus) = 200 GPa, A (area) = 0.001 m²
+                const E = 200e9; // Pa
+                const A = 0.001; // m²
+                const EA = E * A;
+
+                // Initialize deflections
+                nodeDeflections = nodes.map(() => ({x: 0, y: 0}));
+
+                // Store original state
+                let originalForces = [...nodes.map(n => ({fx: n.fx, fy: n.fy}))];
+                let actualForces = [...memberForces];
+                let wasSolved = isSolved;
+
+                // Calculate deflections for each node
+                for (let i = 0; i < nodes.length; i++) {
+                    let defX = 0, defY = 0;
+
+                    // Calculate horizontal deflection (X direction)
+                    // Skip if X is constrained
+                    if (nodes[i].constraint !== 'pin' && nodes[i].constraint !== 'roller-x') {
+                        // Clear all loads
+                        for (let j = 0; j < nodes.length; j++) {
+                            nodes[j].fx = 0;
+                            nodes[j].fy = 0;
+                        }
+                        // Apply unit horizontal load at node i (positive = rightward)
+                        nodes[i].fx = 1.0; // 1 kN rightward
+
+                        // Solve for virtual forces
+                        solveTruss(true);
+                        if (isSolved) {
+                            let virtualForces = [...memberForces];
+
+                            // Calculate horizontal deflection using virtual work
+                            for (let m = 0; m < members.length; m++) {
+                                let member = members[m];
+                                let n1 = nodes[member.start];
+                                let n2 = nodes[member.end];
+                                let dx = n2.x - n1.x;
+                                let dy = n2.y - n1.y;
+                                let L = Math.sqrt(dx * dx + dy * dy);
+
+                                let F_actual = actualForces[m];
+                                let f_virtual = virtualForces[m];
+
+                                defX += F_actual * f_virtual * L * 1000 / EA;
+                            }
+                        }
+                    }
+
+                    // Calculate vertical deflection (Y direction)
+                    // Skip if Y is constrained
+                    if (nodes[i].constraint !== 'pin' && nodes[i].constraint !== 'roller-y') {
+                        // Clear all loads
+                        for (let j = 0; j < nodes.length; j++) {
+                            nodes[j].fx = 0;
+                            nodes[j].fy = 0;
+                        }
+                        // Apply unit vertical load at node i (negative = downward per convention)
+                        nodes[i].fy = -1.0; // 1 kN downward
+
+                        // Solve for virtual forces
+                        solveTruss(true);
+                        if (isSolved) {
+                            let virtualForces = [...memberForces];
+
+                            // Calculate vertical deflection using virtual work
+                            for (let m = 0; m < members.length; m++) {
+                                let member = members[m];
+                                let n1 = nodes[member.start];
+                                let n2 = nodes[member.end];
+                                let dx = n2.x - n1.x;
+                                let dy = n2.y - n1.y;
+                                let L = Math.sqrt(dx * dx + dy * dy);
+
+                                let F_actual = actualForces[m];
+                                let f_virtual = virtualForces[m];
+
+                                defY += F_actual * f_virtual * L * 1000 / EA;
+                            }
+                        }
+                    }
+
+                    // Store deflections (amplified 1000x for visibility)
+                    nodeDeflections[i] = {x: defX * 1000, y: defY * 1000};
+                }
+
+                // Restore original state
+                for (let j = 0; j < nodes.length; j++) {
+                    nodes[j].fx = originalForces[j].fx;
+                    nodes[j].fy = originalForces[j].fy;
+                }
+                memberForces = actualForces;
+                isSolved = wasSolved;
+
+                // Debug: log deflections
+                console.log('Deflections calculated:', nodeDeflections);
+            }
+
+            function setupDeflectionSlider() {
+                let slider = document.getElementById('deflection-scale');
+                let valueDisplay = document.getElementById('deflection-value');
+
+                slider.addEventListener('input', function() {
+                    deflectionScale = parseFloat(this.value);
+                    valueDisplay.textContent = deflectionScale.toFixed(0);
+                });
             }
 
             function openNodeEditor(nodeIndex) {
@@ -846,45 +1101,63 @@
                             let dy = otherNode.y - node.y;
                             let angle = Math.atan2(dy, dx);
 
-                            // Force acts on this node in direction away from node (tension) or toward node (compression)
-                            let arrowLen = 60;
+                            // Calculate arrow endpoints
+                            let arrowLen = 70;
                             let arrowDx = arrowLen * Math.cos(angle);
                             let arrowDy = arrowLen * Math.sin(angle);
 
-                            // If compression, reverse direction
-                            if (force < 0) {
-                                arrowDx = -arrowDx;
-                                arrowDy = -arrowDy;
+                            // Set color
+                            let arrowColor = force > 0 ? fbd.color(255, 0, 0) : (force < 0 ? fbd.color(0, 0, 255) : fbd.color(0));
+                            fbd.stroke(arrowColor);
+                            fbd.strokeWeight(3);
+                            fbd.fill(arrowColor);
+
+                            // Draw arrow line and head
+                            if (force >= 0) {
+                                // TENSION: arrow points away from node (along member direction)
+                                fbd.line(0, 0, arrowDx, arrowDy);
+                                // Arrowhead at far end
+                                fbd.push();
+                                fbd.translate(arrowDx, arrowDy);
+                                fbd.rotate(angle);
+                                fbd.triangle(0, 0, -10, -5, -10, 5);
+                                fbd.pop();
+                            } else {
+                                // COMPRESSION: arrow points toward node (opposite to member direction)
+                                fbd.line(arrowDx, arrowDy, 0, 0);
+                                // Arrowhead at node (origin)
+                                fbd.push();
+                                fbd.translate(0, 0);
+                                fbd.rotate(angle + fbd.PI); // Point opposite direction
+                                fbd.triangle(0, 0, -10, -5, -10, 5);
+                                fbd.pop();
                             }
 
-                            // Draw arrow
-                            fbd.stroke(force > 0 ? fbd.color(255, 0, 0) : (force < 0 ? fbd.color(0, 0, 255) : fbd.color(0)));
-                            fbd.strokeWeight(3);
-                            fbd.line(0, 0, arrowDx, arrowDy);
-
-                            // Arrow head
-                            fbd.fill(force > 0 ? fbd.color(255, 0, 0) : (force < 0 ? fbd.color(0, 0, 255) : fbd.color(0)));
-                            fbd.push();
-                            fbd.translate(arrowDx, arrowDy);
-                            fbd.rotate(Math.atan2(arrowDy, arrowDx));
-                            fbd.triangle(0, 0, -10, -5, -10, 5);
-                            fbd.pop();
-
-                            // Label
+                            // Label - position perpendicular to arrow to avoid overlap
                             fbd.noStroke();
                             fbd.fill(0);
                             fbd.textSize(11);
-                            let labelX = arrowDx * 0.7;
-                            let labelY = arrowDy * 0.7 - 12;
+                            fbd.textAlign(fbd.CENTER, fbd.CENTER);
+
+                            // Calculate perpendicular offset based on arrow angle
+                            let perpAngle = angle + fbd.PI / 2;
+                            let labelDist = 0.55; // Distance along arrow
+                            let perpOffset = 20; // Perpendicular offset
+
+                            let labelX = arrowDx * labelDist + Math.cos(perpAngle) * perpOffset;
+                            let labelY = arrowDy * labelDist + Math.sin(perpAngle) * perpOffset;
+
                             fbd.text("F" + cm.index + " = " + Math.abs(force).toFixed(1) + " kN", labelX, labelY);
+                            fbd.textSize(9);
                             fbd.text(force > 0 ? "(T)" : (force < 0 ? "(C)" : ""), labelX, labelY + 12);
                         }
 
                         // Draw applied forces
                         if (Math.abs(node.fx) > 0.01 || Math.abs(node.fy) > 0.01) {
                             let mag = Math.sqrt(node.fx * node.fx + node.fy * node.fy);
-                            let angle = Math.atan2(node.fy, node.fx);
-                            let arrowLen = 70;
+                            // Negate fy for canvas coordinates (positive fy = upward, negative canvas dy)
+                            let angle = Math.atan2(-node.fy, node.fx);
+                            let arrowLen = 80;
                             let arrowDx = arrowLen * Math.cos(angle);
                             let arrowDy = arrowLen * Math.sin(angle);
 
@@ -902,7 +1175,24 @@
                             fbd.noStroke();
                             fbd.fill(0);
                             fbd.textSize(11);
-                            fbd.text("Applied: " + mag.toFixed(1) + " kN", arrowDx * 0.7, arrowDy * 0.7 + 15);
+                            fbd.textAlign(fbd.CENTER);
+
+                            // Show components with proper signs
+                            let labelX = arrowDx * 0.75;
+                            let labelY = arrowDy * 0.75;
+
+                            // Position label perpendicular to avoid arrow
+                            let perpAngle = angle + fbd.PI / 2;
+                            labelX += Math.cos(perpAngle) * 25;
+                            labelY += Math.sin(perpAngle) * 25;
+
+                            fbd.text("Applied Force", labelX, labelY - 12);
+                            if (Math.abs(node.fx) > 0.01) {
+                                fbd.text("Fx: " + node.fx.toFixed(1) + " kN", labelX, labelY + 2);
+                            }
+                            if (Math.abs(node.fy) > 0.01) {
+                                fbd.text("Fy: " + node.fy.toFixed(1) + " kN", labelX, labelY + 14);
+                            }
                         }
 
                         // Draw reaction forces if constrained

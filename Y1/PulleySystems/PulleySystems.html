@@ -144,14 +144,14 @@
                         <span id="friction-coeff-value" class="value-display">0.10</span>
                     </div>
                 </div>
-            </div>
 
-            <div class="results-panel">
-                <p><strong>Effort Force Required:</strong> <span id="effort-force">200.0</span> N</p>
-                <p><strong>Ideal MA:</strong> <span id="ima-display">1</span></p>
-                <p><strong>Actual MA:</strong> <span id="ama-display">1.00</span></p>
-                <p><strong>Efficiency:</strong> <span id="efficiency-display">100.0</span>%</p>
-                <p><strong>Distance Ratio:</strong> Pull <span id="distance-ratio">1.0</span>m of rope to lift load 1.0m</p>
+                <div class="slider-container">
+                    <label for="rope-pull">Pull Rope (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="rope-pull" min="0" max="100" value="0" step="1">
+                        <span id="rope-pull-value" class="value-display">0.00</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -431,8 +431,7 @@
             let pulleyType = 'fixed'; // 'fixed', 'movable', 'compound'
             let loadWeight = 200; // N
             let frictionCoeff = 0.1;
-            let ropePosition = 0; // 0 to 1, represents rope pull position
-            let animating = false;
+            let ropePulled = 0; // Distance rope has been pulled (in meters)
 
             // Calculated values
             let effortForce = 200;
@@ -440,6 +439,7 @@
             let ama = 1;
             let efficiency = 100;
             let distanceRatio = 1;
+            let loadHeight = 0; // How much the load has been lifted
 
             p.setup = function() {
                 let canvas = p.createCanvas(800, 500);
@@ -460,14 +460,28 @@
                     drawCompoundPulley();
                 }
 
-                // Draw force labels
-                drawForceLabels();
+                // Draw info panel in corner
+                drawInfoPanel();
             };
+
+            // Helper function to draw rope wrapping around pulley
+            function drawRopeArc(pulleyX, pulleyY, radius, startAngle, endAngle) {
+                p.noFill();
+                p.stroke(139, 69, 19);
+                p.strokeWeight(3);
+                p.arc(pulleyX, pulleyY, radius * 2, radius * 2, startAngle, endAngle);
+            }
 
             function drawFixedPulley() {
                 let centerX = p.width / 2;
                 let pulleyY = 100;
                 let pulleyRadius = 30;
+
+                // Calculate load position based on rope pulled (MA = 1, so load moves same distance)
+                let loadBaseY = 350;
+                let maxLift = loadBaseY - pulleyY - pulleyRadius - 70; // Max lift = distance to pulley minus offset
+                let actualRopePulled = Math.min(ropePulled, maxLift / 20); // Constrain rope pull
+                let currentLoadY = loadBaseY - (actualRopePulled * 20); // Scale for visibility
 
                 // Support structure
                 p.fill(100);
@@ -483,50 +497,60 @@
                 p.fill(150);
                 p.circle(centerX, pulleyY, 15);
 
-                // Rope
+                // Rope - wrapping around pulley
                 p.stroke(139, 69, 19);
                 p.strokeWeight(3);
-                // Left side (effort)
-                p.line(centerX - pulleyRadius, pulleyY, centerX - pulleyRadius, 400);
-                // Right side (load)
-                p.line(centerX + pulleyRadius, pulleyY, centerX + pulleyRadius, 350);
+                // Left side (effort) - straight down
+                let effortRopeBottom = 400 + (actualRopePulled * 20);
+                p.line(centerX - pulleyRadius, pulleyY, centerX - pulleyRadius, effortRopeBottom);
+                // Arc around pulley (top half)
+                drawRopeArc(centerX, pulleyY, pulleyRadius, p.PI, p.TWO_PI);
+                // Right side (load) - to the load
+                p.line(centerX + pulleyRadius, pulleyY, centerX + pulleyRadius, currentLoadY);
 
                 // Load
                 p.fill(220, 100, 100);
                 p.stroke(0);
                 p.strokeWeight(2);
-                p.rect(centerX + pulleyRadius - 25, 350, 50, 60);
+                p.rect(centerX + pulleyRadius - 25, currentLoadY, 50, 60);
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.CENTER);
-                p.text(loadWeight + ' N', centerX + pulleyRadius, 385);
+                p.textSize(12);
+                p.text(loadWeight + ' N', centerX + pulleyRadius, currentLoadY + 35);
 
                 // Effort force arrow
                 p.stroke(255, 0, 0);
                 p.strokeWeight(3);
                 p.fill(255, 0, 0);
-                let arrowY = 400;
-                p.line(centerX - pulleyRadius, arrowY, centerX - pulleyRadius, arrowY + 40);
+                let arrowY = effortRopeBottom;
+                p.line(centerX - pulleyRadius, arrowY, centerX - pulleyRadius, arrowY + 30);
                 // Arrowhead
                 p.triangle(
-                    centerX - pulleyRadius, arrowY + 40,
-                    centerX - pulleyRadius - 8, arrowY + 28,
-                    centerX - pulleyRadius + 8, arrowY + 28
+                    centerX - pulleyRadius, arrowY + 30,
+                    centerX - pulleyRadius - 8, arrowY + 20,
+                    centerX - pulleyRadius + 8, arrowY + 20
                 );
 
                 // Label
                 p.fill(255, 0, 0);
                 p.noStroke();
                 p.textAlign(p.CENTER);
-                p.text('Effort\n' + effortForce.toFixed(1) + ' N', centerX - pulleyRadius, arrowY + 60);
+                p.textSize(11);
+                p.text('Effort\n' + effortForce.toFixed(1) + ' N', centerX - pulleyRadius, arrowY + 50);
             }
 
             function drawMovablePulley() {
                 let leftX = p.width / 2 - 80;
                 let rightX = p.width / 2 + 80;
                 let fixedPulleyY = 100;
-                let movablePulleyY = 300;
                 let pulleyRadius = 25;
+
+                // MA = 2, so load moves half the distance of rope pulled
+                let baseMovableY = 300;
+                let maxLift = baseMovableY - fixedPulleyY - pulleyRadius * 2 - 70; // Max lift before hitting fixed pulleys
+                let actualRopePulled = Math.min(ropePulled, maxLift / 20 * 2); // Constrain (times 2 because MA=2)
+                let movablePulleyY = baseMovableY - (actualRopePulled * 20 / 2);
 
                 // Support structure
                 p.fill(100);
@@ -544,23 +568,33 @@
                 p.circle(rightX, fixedPulleyY, 12);
 
                 // Movable pulley
-                p.fill(200);
+                p.fill(220, 220, 255);
                 p.stroke(0);
+                p.strokeWeight(2);
                 p.circle(p.width / 2, movablePulleyY, pulleyRadius * 2);
                 p.fill(150);
                 p.circle(p.width / 2, movablePulleyY, 12);
 
-                // Rope
+                // Rope - wrapping around pulleys
                 p.stroke(139, 69, 19);
                 p.strokeWeight(3);
-                // Left segment
-                p.line(leftX, fixedPulleyY + pulleyRadius, leftX, movablePulleyY - pulleyRadius);
-                p.line(leftX, movablePulleyY - pulleyRadius, p.width / 2 - pulleyRadius, movablePulleyY);
-                // Right segment
-                p.line(p.width / 2 + pulleyRadius, movablePulleyY, rightX, movablePulleyY - pulleyRadius);
-                p.line(rightX, movablePulleyY - pulleyRadius, rightX, fixedPulleyY + pulleyRadius);
+
+                // Left segment - from left support down to movable pulley (left side)
+                p.line(leftX, fixedPulleyY, leftX, movablePulleyY);
+
+                // Arc around bottom of movable pulley (left to right, bottom half)
+                drawRopeArc(p.width / 2, movablePulleyY, pulleyRadius, p.PI, p.TWO_PI);
+
+                // Right segment - from movable pulley (right side) up to right fixed pulley
+                p.line(p.width / 2 + pulleyRadius, movablePulleyY, rightX, movablePulleyY);
+                p.line(rightX, movablePulleyY, rightX, fixedPulleyY);
+
+                // Arc around top of right fixed pulley
+                drawRopeArc(rightX, fixedPulleyY, pulleyRadius, -p.HALF_PI, p.HALF_PI);
+
                 // Effort side
-                p.line(rightX, fixedPulleyY + pulleyRadius, rightX, 430);
+                let effortRopeEnd = 430 + (actualRopePulled * 20);
+                p.line(rightX, fixedPulleyY + pulleyRadius, rightX, effortRopeEnd);
 
                 // Load attached to movable pulley
                 p.fill(220, 100, 100);
@@ -570,118 +604,160 @@
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.CENTER);
+                p.textSize(12);
                 p.text(loadWeight + ' N', p.width / 2, movablePulleyY + pulleyRadius + 45);
 
                 // Effort force arrow
                 p.stroke(255, 0, 0);
                 p.strokeWeight(3);
                 p.fill(255, 0, 0);
-                let arrowY = 430;
-                p.line(rightX, arrowY, rightX, arrowY + 30);
-                p.triangle(rightX, arrowY + 30, rightX - 8, arrowY + 18, rightX + 8, arrowY + 18);
+                let arrowY = effortRopeEnd;
+                p.line(rightX, arrowY, rightX, arrowY + 25);
+                p.triangle(rightX, arrowY + 25, rightX - 7, arrowY + 15, rightX + 7, arrowY + 15);
 
                 p.fill(255, 0, 0);
                 p.noStroke();
-                p.text('Effort\n' + effortForce.toFixed(1) + ' N', rightX, arrowY + 48);
+                p.textSize(11);
+                p.text('Effort\n' + effortForce.toFixed(1) + ' N', rightX, arrowY + 42);
             }
 
             function drawCompoundPulley() {
                 let centerX = p.width / 2;
                 let topY = 80;
-                let midY = 200;
-                let bottomY = 340;
                 let pulleyRadius = 25;
+
+                // Pulley positions
+                let topLeft = centerX - 60;
+                let topRight = centerX + 60;
+
+                // MA = 4, so load moves 1/4 the distance of rope pulled
+                let baseMovableY = 300;
+                let maxLift = baseMovableY - topY - pulleyRadius * 2 - 80;
+                let actualRopePulled = Math.min(ropePulled, maxLift / 20 * 4); // Constrain (times 4 because MA=4)
+                let movableY = baseMovableY - (actualRopePulled * 20 / 4);
+
+                let movableLeft = centerX - 60;
+                let movableRight = centerX + 60;
 
                 // Support
                 p.fill(100);
-                p.rect(centerX - 100, 20, 20, 40);
-                p.rect(centerX + 80, 20, 20, 40);
+                p.rect(topLeft - 10, 20, 20, 40);
+                p.rect(topRight - 10, 20, 20, 40);
 
                 // Top pulleys (fixed)
                 p.fill(200);
                 p.stroke(0);
                 p.strokeWeight(2);
-                p.circle(centerX - 90, topY, pulleyRadius * 2);
-                p.circle(centerX + 90, topY, pulleyRadius * 2);
+                p.circle(topLeft, topY, pulleyRadius * 2);
+                p.circle(topRight, topY, pulleyRadius * 2);
                 p.fill(150);
-                p.circle(centerX - 90, topY, 12);
-                p.circle(centerX + 90, topY, 12);
+                p.circle(topLeft, topY, 12);
+                p.circle(topRight, topY, 12);
 
-                // Middle pulleys (movable)
+                // Bottom pulleys (movable - attached to load)
                 p.fill(220, 220, 255);
                 p.stroke(0);
-                p.circle(centerX - 50, midY, pulleyRadius * 2);
-                p.circle(centerX + 50, midY, pulleyRadius * 2);
+                p.circle(movableLeft, movableY, pulleyRadius * 2);
+                p.circle(movableRight, movableY, pulleyRadius * 2);
                 p.fill(150);
-                p.circle(centerX - 50, midY, 12);
-                p.circle(centerX + 50, midY, 12);
+                p.circle(movableLeft, movableY, 12);
+                p.circle(movableRight, movableY, 12);
 
-                // Bottom pulley (movable)
-                p.fill(220, 220, 255);
-                p.stroke(0);
-                p.circle(centerX, bottomY, pulleyRadius * 2);
-                p.fill(150);
-                p.circle(centerX, bottomY, 12);
-
-                // Rope (4 segments supporting load)
+                // Rope - 4 supporting segments for MA=4
                 p.stroke(139, 69, 19);
                 p.strokeWeight(3);
-                // Segment 1
-                p.line(centerX - 90, topY + pulleyRadius, centerX - 90, midY - pulleyRadius);
-                p.line(centerX - 90, midY - pulleyRadius, centerX - 50 - pulleyRadius, midY);
-                // Segment 2
-                p.line(centerX - 50 + pulleyRadius, midY, centerX - 10, midY + 70);
-                p.line(centerX - 10, midY + 70, centerX - pulleyRadius, bottomY);
-                // Segment 3
-                p.line(centerX + pulleyRadius, bottomY, centerX + 10, midY + 70);
-                p.line(centerX + 10, midY + 70, centerX + 50 - pulleyRadius, midY);
-                // Segment 4
-                p.line(centerX + 50 + pulleyRadius, midY, centerX + 90, midY - pulleyRadius);
-                p.line(centerX + 90, midY - pulleyRadius, centerX + 90, topY + pulleyRadius);
-                // Effort line
-                p.line(centerX + 90, topY + pulleyRadius, centerX + 90, 450);
 
-                // Load
+                // Rope starts fixed at top left support
+                // Segment 1: From top anchor down to left movable pulley
+                p.line(topLeft, topY - pulleyRadius, topLeft, movableY);
+
+                // Arc around left bottom of left movable pulley
+                drawRopeArc(movableLeft, movableY, pulleyRadius, p.PI, p.TWO_PI);
+
+                // Segment 2: From right of left movable up to top left fixed pulley
+                p.line(movableLeft + pulleyRadius, movableY, topLeft, topY);
+
+                // Arc around top of left fixed pulley
+                drawRopeArc(topLeft, topY, pulleyRadius, -p.HALF_PI, p.HALF_PI);
+
+                // Segment 3: Down to right movable pulley
+                p.line(topLeft + pulleyRadius, topY, movableRight - pulleyRadius, movableY);
+
+                // Arc around left bottom of right movable pulley
+                drawRopeArc(movableRight, movableY, pulleyRadius, p.PI, p.TWO_PI);
+
+                // Segment 4: From right of right movable up to top right fixed pulley
+                p.line(movableRight + pulleyRadius, movableY, topRight - pulleyRadius, topY);
+
+                // Arc around top of right fixed pulley
+                drawRopeArc(topRight, topY, pulleyRadius, -p.HALF_PI, p.HALF_PI);
+
+                // Effort rope down
+                let effortRopeEnd = 420 + (actualRopePulled * 20);
+                p.line(topRight + pulleyRadius, topY, topRight + pulleyRadius, effortRopeEnd);
+
+                // Load attached to movable pulleys
                 p.fill(220, 100, 100);
                 p.stroke(0);
                 p.strokeWeight(2);
-                p.rect(centerX - 30, bottomY + pulleyRadius + 10, 60, 60);
+                // Draw bar connecting movable pulleys
+                p.rect(movableLeft - 10, movableY + pulleyRadius + 5, (movableRight - movableLeft) + 20, 15);
+                // Draw load box
+                p.rect(centerX - 30, movableY + pulleyRadius + 25, 60, 60);
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.CENTER);
-                p.text(loadWeight + ' N', centerX, bottomY + pulleyRadius + 45);
+                p.textSize(12);
+                p.text(loadWeight + ' N', centerX, movableY + pulleyRadius + 60);
 
                 // Effort arrow
                 p.stroke(255, 0, 0);
                 p.strokeWeight(3);
                 p.fill(255, 0, 0);
-                let arrowY = 450;
-                p.line(centerX + 90, arrowY, centerX + 90, arrowY + 25);
-                p.triangle(centerX + 90, arrowY + 25, centerX + 82, arrowY + 15, centerX + 98, arrowY + 15);
+                let arrowY = effortRopeEnd;
+                p.line(topRight + pulleyRadius, arrowY, topRight + pulleyRadius, arrowY + 20);
+                p.triangle(topRight + pulleyRadius, arrowY + 20, topRight + pulleyRadius - 7, arrowY + 12, topRight + pulleyRadius + 7, arrowY + 12);
 
                 p.fill(255, 0, 0);
                 p.noStroke();
-                p.text('Effort: ' + effortForce.toFixed(1) + ' N', centerX + 90, arrowY + 42);
+                p.textSize(11);
+                p.text('Effort: ' + effortForce.toFixed(1) + ' N', topRight + pulleyRadius, arrowY + 35);
             }
 
-            function drawForceLabels() {
-                // Info panel
-                p.fill(255, 255, 255, 230);
+            function drawInfoPanel() {
+                // Info panel in top-right corner
+                let panelWidth = 260;
+                let panelHeight = 170;
+                let panelX = p.width - panelWidth - 10;
+                let panelY = 10;
+
+                p.fill(255, 255, 255, 240);
                 p.stroke(100);
-                p.strokeWeight(1);
-                p.rect(10, 10, 180, 120, 5);
+                p.strokeWeight(2);
+                p.rect(panelX, panelY, panelWidth, panelHeight, 8);
 
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.LEFT);
-                p.textSize(14);
-                p.text('System: ' + pulleyType.toUpperCase(), 20, 30);
+                p.textSize(13);
+                p.textStyle(p.BOLD);
+                p.text('System: ' + pulleyType.toUpperCase(), panelX + 12, panelY + 22);
+
+                p.textStyle(p.NORMAL);
                 p.textSize(12);
-                p.text('Load: ' + loadWeight + ' N', 20, 50);
-                p.text('IMA: ' + ima, 20, 68);
-                p.text('AMA: ' + ama.toFixed(2), 20, 86);
-                p.text('Efficiency: ' + efficiency.toFixed(1) + '%', 20, 104);
-                p.text('Friction: ' + (frictionCoeff * 100).toFixed(0) + '%', 20, 122);
+                let lineY = panelY + 44;
+                let lineSpacing = 18;
+
+                p.text('Load Weight: ' + loadWeight + ' N', panelX + 12, lineY);
+                p.text('Effort Force: ' + effortForce.toFixed(1) + ' N', panelX + 12, lineY + lineSpacing);
+                p.text('Ideal MA: ' + ima, panelX + 12, lineY + lineSpacing * 2);
+                p.text('Actual MA: ' + ama.toFixed(2), panelX + 12, lineY + lineSpacing * 3);
+                p.text('Efficiency: ' + efficiency.toFixed(1) + '%', panelX + 12, lineY + lineSpacing * 4);
+
+                // Show rope pulled and load lifted
+                p.textStyle(p.BOLD);
+                p.text('Rope Pulled: ' + (ropePulled / 100).toFixed(2) + ' m', panelX + 12, lineY + lineSpacing * 5);
+                p.text('Load Lifted: ' + (ropePulled / ima / 100).toFixed(2) + ' m', panelX + 12, lineY + lineSpacing * 6);
             }
 
             function calculate() {
@@ -709,12 +785,8 @@
                 // Distance ratio
                 distanceRatio = ima;
 
-                // Update displays
-                document.getElementById('effort-force').textContent = effortForce.toFixed(1);
-                document.getElementById('ima-display').textContent = ima;
-                document.getElementById('ama-display').textContent = ama.toFixed(2);
-                document.getElementById('efficiency-display').textContent = efficiency.toFixed(1);
-                document.getElementById('distance-ratio').textContent = distanceRatio.toFixed(1);
+                // Calculate load height (how much load has been lifted)
+                loadHeight = ropePulled / ima;
             }
 
             function setupControls() {
@@ -726,6 +798,10 @@
                         });
                         this.classList.add('active');
                         pulleyType = this.dataset.type;
+                        // Reset rope position when changing type
+                        ropePulled = 0;
+                        document.getElementById('rope-pull').value = 0;
+                        document.getElementById('rope-pull-value').textContent = '0.00';
                         calculate();
                     });
                 });
@@ -741,6 +817,13 @@
                 document.getElementById('friction-coeff').addEventListener('input', function() {
                     frictionCoeff = parseFloat(this.value);
                     document.getElementById('friction-coeff-value').textContent = frictionCoeff.toFixed(2);
+                    calculate();
+                });
+
+                // Rope pull slider
+                document.getElementById('rope-pull').addEventListener('input', function() {
+                    ropePulled = parseFloat(this.value);
+                    document.getElementById('rope-pull-value').textContent = (ropePulled / 100).toFixed(2);
                     calculate();
                 });
             }

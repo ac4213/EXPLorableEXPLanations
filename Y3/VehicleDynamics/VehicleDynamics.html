@@ -133,8 +133,8 @@
             </div>
 
             <div class="control-group">
-                <label for="vehicle-speed">Speed (km/h): <span id="vehicle-speed-value">80</span></label>
-                <input type="range" id="vehicle-speed" min="40" max="140" step="10" value="80">
+                <label for="initial-speed">Initial Speed (km/h): <span id="initial-speed-value">80</span></label>
+                <input type="range" id="initial-speed" min="40" max="140" step="10" value="80">
             </div>
 
             <div class="control-group">
@@ -143,23 +143,17 @@
             </div>
 
             <div class="control-group">
-                <label for="friction-coeff">Tire-Road Friction μ: <span id="friction-coeff-value">0.85</span></label>
-                <input type="range" id="friction-coeff" min="0.3" max="1.0" step="0.05" value="0.85">
+                <label for="friction-coeff">Tire-Road Friction μ: <span id="friction-coeff-value">0.95</span></label>
+                <input type="range" id="friction-coeff" min="0.3" max="1.0" step="0.05" value="0.95">
             </div>
 
             <div class="control-group">
                 <button id="start-maneuver">Start Maneuver</button>
+                <button id="reset-maneuver">Reset</button>
             </div>
         </div>
 
         <div id="sketch-holder"></div>
-
-        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 8px;">
-            <h3 style="margin-top: 0;">Vehicle Status:</h3>
-            <p><strong>Lateral Acceleration:</strong> <span id="lat-accel-display">0.00</span> m/s² (<span id="g-force-display">0.00</span>g)</p>
-            <p><strong>Yaw Rate:</strong> <span id="yaw-rate-display">0.00</span> deg/s</p>
-            <p><strong>Handling Character:</strong> <span id="handling-display">Understeer</span></p>
-        </div>
     </div>
 
     <script>
@@ -172,11 +166,16 @@
             let Iz = 2500;          // Yaw inertia (kg·m²)
             let h = 0.5;            // CG height (m)
 
-            // Control inputs
-            let speed = 80;         // km/h
-            let K = 0.002;          // Understeer gradient
-            let mu = 0.85;          // Friction coefficient
-            let maneuverType = 'steady-turn';
+            // Control inputs (with defaults)
+            const defaultSpeed = 80;
+            const defaultK = 0.002;
+            const defaultMu = 0.95;
+            const defaultManeuver = 'steady-turn';
+
+            let speed = defaultSpeed;         // km/h
+            let K = defaultK;                 // Understeer gradient
+            let mu = defaultMu;               // Friction coefficient (dry road)
+            let maneuverType = defaultManeuver;
 
             // State variables
             let x = 0, y = 0;       // Position (m)
@@ -184,22 +183,32 @@
             let u = 0, v = 0;       // Velocities (m/s)
             let r = 0;              // Yaw rate (rad/s)
             let delta = 0;          // Steering angle (rad)
+            let latAccel = 0;       // Lateral acceleration (m/s²)
 
             // Simulation
             let isRunning = false;
             let time = 0;
-            let dt = 0.02;
+            let dt = 0.01;  // Reduced from 0.02 to 0.01 for stability
 
             // Visualization
             let vehicleLength = 50;
             let vehicleWidth = 25;
             let path = [];
 
+            // Data history for plots
+            let timeHistory = [];
+            let steeringHistory = [];
+            let latAccelHistory = [];
+            let yawRateHistory = [];
+            let speedHistory = [];
+            let maxHistoryPoints = 200;
+
             p.setup = function() {
                 let canvas = p.createCanvas(900, 600);
                 canvas.parent('sketch-holder');
 
                 setupControls();
+                updateHandlingDisplay();
                 resetSimulation();
             };
 
@@ -209,10 +218,9 @@
                     resetSimulation();
                 });
 
-                document.getElementById('vehicle-speed').addEventListener('input', function() {
+                document.getElementById('initial-speed').addEventListener('input', function() {
                     speed = parseFloat(this.value);
-                    document.getElementById('vehicle-speed-value').textContent = speed;
-                    u = speed / 3.6; // Convert to m/s
+                    document.getElementById('initial-speed-value').textContent = speed;
                 });
 
                 document.getElementById('understeer-gradient').addEventListener('input', function() {
@@ -235,9 +243,15 @@
                         resetSimulation();
                     }
                 });
+
+                document.getElementById('reset-maneuver').addEventListener('click', function() {
+                    resetSimulation();
+                });
             }
 
             function resetSimulation() {
+                // Only reset simulation state, NOT the control inputs
+                // This allows users to keep their settings and run multiple tests
                 x = 100;
                 y = 300;
                 psi = 0;
@@ -247,48 +261,64 @@
                 delta = 0;
                 time = 0;
                 path = [];
+
+                // Clear history
+                timeHistory = [];
+                steeringHistory = [];
+                latAccelHistory = [];
+                yawRateHistory = [];
+                speedHistory = [];
+
                 isRunning = false;
                 document.getElementById('start-maneuver').textContent = 'Start Maneuver';
             }
 
             function updateHandlingDisplay() {
-                let handling = '';
-                if (K > 0.001) {
-                    handling = 'Understeer (Stable)';
-                } else if (K < -0.001) {
-                    handling = 'Oversteer (Unstable)';
-                } else {
-                    handling = 'Neutral Steer';
-                }
-                document.getElementById('handling-display').textContent = handling;
+            //    let handling = '';
+            //    if (K > 0.001) {
+            //        handling = 'Understeer (Stable)';
+            //    } else if (K < -0.001) {
+            //        handling = 'Oversteer (Unstable)';
+            //    } else {
+            //        handling = 'Neutral Steer';
+            //    }
+            //    document.getElementById('handling-display').textContent = handling;
             }
 
             function getSteeringInput(t) {
-                // Smooth steering inputs using sinusoidal ramps
+                // Smooth steering inputs for various maneuvers
+                // Reduced angles to stay within linear tire region (~0.5g lateral accel)
                 switch(maneuverType) {
                     case 'steady-turn':
-                        // Ramp up to steady turn over first 0.5 seconds
-                        if (t < 0.5) {
-                            return 0.1 * (1 - Math.cos(Math.PI * t / 0.5)) / 2;
+                        // Gentle ramp to steady turn over first 1.5 seconds
+                        if (t < 1.5) {
+                            // Smooth S-curve ramp using (1 - cos(pi*t))/2
+                            return 0.025 * (1 - Math.cos(Math.PI * t / 1.5)) / 2;
                         } else {
-                            return 0.1; // 5.7 degrees steady
+                            return 0.025; // Hold 1.4 degrees steady turn (~0.5g at 80 km/h)
                         }
                     case 'lane-change':
-                        // ISO 3888-1 double lane change maneuver (simplified)
-                        if (t < 0.5) {
-                            // Ramp up
-                            return 0.15 * Math.sin(Math.PI * t / 0.5);
-                        } else if (t < 1.5) {
-                            // First turn (0.5-1.5s)
-                            return 0.15 * Math.sin(Math.PI * (t - 0.5));
+                        // Double lane change: left then right
+                        let steerAngle = 0.04; // 2.3 degrees - gentle lane change
+                        if (t < 1.0) {
+                            // Smooth ramp to left turn (0-1s)
+                            return steerAngle * (1 - Math.cos(Math.PI * t / 1.0)) / 2;
                         } else if (t < 2.5) {
-                            // Counter turn (1.5-2.5s)
-                            return -0.15 * Math.sin(Math.PI * (t - 1.5));
-                        } else if (t < 3.0) {
-                            // Return to center
-                            return -0.15 * Math.sin(Math.PI * (t - 2.5) / 0.5);
+                            // Hold left turn (1-2.5s)
+                            return steerAngle;
+                        } else if (t < 4.0) {
+                            // Smooth transition from left to right (2.5-4.0s)
+                            let progress = (t - 2.5) / 1.5;
+                            return steerAngle * (1 - 2 * progress);
+                        } else if (t < 5.5) {
+                            // Hold right turn (4.0-5.5s)
+                            return -steerAngle;
+                        } else if (t < 6.5) {
+                            // Smooth return to center (5.5-6.5s)
+                            let progress = (t - 5.5) / 1.0;
+                            return -steerAngle * (1 - progress);
                         } else {
-                            return 0;
+                            return 0; // Center
                         }
                     case 'braking':
                         return 0; // Straight line braking
@@ -303,20 +333,21 @@
                 // Steering input
                 delta = getSteeringInput(time);
 
-                // Tire cornering stiffnesses (properly calculated from K)
-                // K = (m/L) * (lf/Car - lr/Caf)
-                // We set Caf and derive Car to achieve the desired K
-                let Caf = 60000; // Front cornering stiffness (N/rad)
-                // Car = lf / ((K*L/m) + (lr/Caf))
-                let Car = lf / ((K * L / m) + (lr / Caf));
+                // Tire cornering stiffnesses (reduced for stability)
+                // K = (m/L) * (lr/Caf - lf/Car)  [CORRECTED FORMULA]
+                // Using lower stiffness reduces numerical stiffness
+                let Caf = 40000; // Front cornering stiffness (N/rad) - reduced from 60000
+                // Rearranged: Car = lf / ((lr/Caf) - (K*L/m))
+                let Car = lf / ((lr / Caf) - (K * L / m));
 
                 // Slip angles (bicycle model)
                 let alphaf = delta - (v + lf * r) / Math.max(Math.abs(u), 0.1);
                 let alphar = -(v - lr * r) / Math.max(Math.abs(u), 0.1);
 
                 // Tire forces (linear model)
-                let Fyf = -Caf * alphaf;
-                let Fyr = -Car * alphar;
+                // Note: With slip angle convention (delta - vy/u), forces are positive coefficient
+                let Fyf = Caf * alphaf;
+                let Fyr = Car * alphar;
 
                 // Weight transfer during braking/acceleration
                 let ax = 0; // Will be calculated after forces
@@ -337,11 +368,33 @@
                     var Fzr = Fzr_static;
                 }
 
-                // Limit forces by friction circle
+                // Limit forces by friction circle with gentle saturation
                 let maxFyf = mu * Math.abs(Fzf);
                 let maxFyr = mu * Math.abs(Fzr);
-                Fyf = Math.max(-maxFyf, Math.min(maxFyf, Fyf));
-                Fyr = Math.max(-maxFyr, Math.min(maxFyr, Fyr));
+
+                // Gentle saturation that only activates near the limit
+                // Linear up to 95% of limit, then smooth transition
+                function saturateTireForce(F, Fmax) {
+                    let absF = Math.abs(F);
+                    let signF = Math.sign(F);
+
+                    if (absF < 0.95 * Fmax) {
+                        // Linear region - no saturation
+                        return F;
+                    } else if (absF < Fmax) {
+                        // Smooth transition region (95% to 100%)
+                        // Use cubic blend: keeps continuous derivative
+                        let x = (absF - 0.95*Fmax) / (0.05*Fmax); // 0 to 1
+                        let blend = 1 - 0.5*x*x + 0.5*x*x*x; // Smooth interpolation
+                        return signF * (0.95*Fmax + 0.05*Fmax*blend);
+                    } else {
+                        // Hard limit at Fmax
+                        return signF * Fmax;
+                    }
+                }
+
+                Fyf = saturateTireForce(Fyf, maxFyf);
+                Fyr = saturateTireForce(Fyr, maxFyr);
 
                 // Aerodynamic drag and rolling resistance
                 let Cd = 0.3;  // Drag coefficient
@@ -356,8 +409,13 @@
                 // m(du - vr) = Fx - Fdrag - Froll (in vehicle frame)
                 // m(dv + ur) = Fyf + Fyr
                 // Iz*dr = lf*Fyf - lr*Fyr
+
+                // Add damping to lateral velocity for numerical stability
+                let dampingCoeff = 50; // N·s/m - artificial damping
+                let Fdamping = -dampingCoeff * v;
+
                 let du = (Fx - Math.sign(u)*Fdrag - Math.sign(u)*Froll) / m + v * r;
-                let dv = (Fyf + Fyr) / m - u * r;
+                let dv = (Fyf + Fyr + Fdamping) / m - u * r;
                 let dr = (lf * Fyf - lr * Fyr) / Iz;
                 let dpsi = r;
 
@@ -377,13 +435,31 @@
                 path.push({x: x, y: y});
                 if (path.length > 300) path.shift();
 
+                // Calculate lateral acceleration for display and visualization
+                latAccel = (Fyf + Fyr) / m;
+
+                // Store data for plots
+                timeHistory.push(time);
+                steeringHistory.push(delta * 180 / Math.PI); // Convert to degrees
+                latAccelHistory.push(latAccel);
+                yawRateHistory.push(r * 180 / Math.PI); // Convert to deg/s
+                speedHistory.push(u * 3.6); // Convert to km/h
+
+                // Limit history size
+                if (timeHistory.length > maxHistoryPoints) {
+                    timeHistory.shift();
+                    steeringHistory.shift();
+                    latAccelHistory.shift();
+                    yawRateHistory.shift();
+                    speedHistory.shift();
+                }
+
                 time += dt;
 
                 // Update display
-                let latAccel = (Fyf + Fyr) / m;
-                document.getElementById('lat-accel-display').textContent = latAccel.toFixed(2);
-                document.getElementById('g-force-display').textContent = (latAccel / 9.81).toFixed(2);
-                document.getElementById('yaw-rate-display').textContent = (r * 180 / Math.PI).toFixed(2);
+                //document.getElementById('lat-accel-display').textContent = latAccel.toFixed(2);
+                //document.getElementById('g-force-display').textContent = (latAccel / 9.81).toFixed(2);
+                //document.getElementById('yaw-rate-display').textContent = (r * 180 / Math.PI).toFixed(2);
 
                 // Stop if vehicle goes off screen or after 10 seconds
                 if (x > p.width + 100 || y < -100 || y > p.height + 100 || time > 10) {
@@ -418,6 +494,10 @@
                 if (isRunning) {
                     drawForces();
                 }
+
+                // Draw canvas overlays (always visible for learning)
+                drawInfoBox();
+                drawPlots();
 
                 // Instructions
                 if (!isRunning) {
@@ -472,10 +552,10 @@
                 p.rect(-15, -vehicleWidth/2 - 3, 12, 6);
                 p.rect(-15, vehicleWidth/2 + 3, 12, 6);
 
-                // Direction indicator
+                // Direction indicator (arrow pointing forward)
                 p.fill(255, 0, 0);
                 p.noStroke();
-                p.triangle(vehicleLength/2, 0, vehicleLength/2 + 10, -5, vehicleLength/2 + 10, 5);
+                p.triangle(vehicleLength/2 + 10, 0, vehicleLength/2, -5, vehicleLength/2, 5);
 
                 // CG marker
                 p.fill(255, 255, 0);
@@ -485,10 +565,9 @@
             }
 
             function drawForces() {
-                // Calculate and draw lateral acceleration vector
-                // Lateral acceleration in vehicle frame: ay = dv + u*r
-                let ay = v * r; // Simplified approximation for visualization (centripetal component)
-                let latAccel = ay * 30; // Scaled for visualization (pixels)
+                // Draw lateral acceleration vector in vehicle frame (centripetal, points toward center of turn)
+                // Scale for visualization (pixels per m/s²)
+                let latAccelScaled = latAccel * 5; // 5 pixels per m/s²
 
                 p.push();
                 p.translate(x, y);
@@ -496,17 +575,197 @@
                 p.stroke(255, 0, 0);
                 p.strokeWeight(3);
                 p.fill(255, 0, 0);
-                if (Math.abs(latAccel) > 5) {
-                    p.line(0, 0, 0, -latAccel); // Negative because y-axis points down in canvas
-                    // Arrow
-                    let arrowSize = 6;
-                    if (latAccel > 0) {
-                        p.triangle(0, -latAccel, -arrowSize, -latAccel + arrowSize, arrowSize, -latAccel + arrowSize);
+
+                if (Math.abs(latAccelScaled) > 5) {
+                    // Draw line from CG toward center of curvature (positive y in vehicle frame = left)
+                    p.line(0, 0, 0, latAccelScaled);
+
+                    // Draw arrowhead at the end of the line
+                    let arrowSize = 8;
+                    let tipY = latAccelScaled;
+
+                    if (latAccelScaled > 0) {
+                        // Acceleration to the left (left turn, positive latAccel)
+                        // Arrow points down in canvas coords (positive y = left in vehicle frame)
+                        p.triangle(0, tipY, -arrowSize, tipY - arrowSize, arrowSize, tipY - arrowSize);
                     } else {
-                        p.triangle(0, -latAccel, -arrowSize, -latAccel - arrowSize, arrowSize, -latAccel - arrowSize);
+                        // Acceleration to the right (right turn, negative latAccel)
+                        // Arrow points up in canvas coords (negative y = right in vehicle frame)
+                        p.triangle(0, tipY, -arrowSize, tipY + arrowSize, arrowSize, tipY + arrowSize);
                     }
                 }
                 p.pop();
+            }
+
+            function drawInfoBox() {
+                // Top-left infobox with current parameters
+                let boxW = 240;
+                let boxH = 250;
+                let boxX = 10;
+                let boxY = 10;
+
+                p.fill(255, 255, 255, 240);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rect(boxX, boxY, boxW, boxH, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(11);
+                p.textStyle(p.BOLD);
+                p.text('Vehicle State', boxX + 10, boxY + 18);
+                p.textStyle(p.NORMAL);
+
+                let textX = boxX + 10;
+                let textY = boxY + 35;
+                let lineH = 16;
+
+                p.text('Speed: ' + (u * 3.6).toFixed(1) + ' km/h', textX, textY);
+                textY += lineH;
+                p.text('Steering: ' + (delta * 180 / Math.PI).toFixed(2) + '°', textX, textY);
+                textY += lineH;
+                let latAccelVal = latAccelHistory.length > 0 ? latAccelHistory[latAccelHistory.length-1] : 0;
+                let latAccelG = latAccelVal / 9.81;
+                p.text('Lat Accel: ' + latAccelVal.toFixed(2) + ' m/s² (' + latAccelG.toFixed(2) + 'g)', textX, textY);
+                textY += lineH;
+                p.text('Yaw Rate: ' + (r * 180 / Math.PI).toFixed(1) + ' °/s', textX, textY);
+                textY += lineH;
+                p.text('Lat Vel: ' + v.toFixed(2) + ' m/s', textX, textY);
+                textY += lineH;
+                p.text('Sideslip: ' + (Math.atan2(v, u) * 180 / Math.PI).toFixed(1) + '°', textX, textY);
+                textY += lineH;
+
+                // Radius of curvature
+                if (Math.abs(r) > 0.001) {
+                    let radius = Math.abs(u / r);
+                    p.text('Turn Radius: ' + radius.toFixed(1) + ' m', textX, textY);
+                } else {
+                    p.text('Turn Radius: ∞ (straight)', textX, textY);
+                }
+                textY += lineH;
+
+                p.text('Time: ' + time.toFixed(2) + ' s', textX, textY);
+                textY += lineH + 5;
+
+                // Maneuver info
+                p.textStyle(p.BOLD);
+                p.textSize(10);
+                p.text('Maneuver: ' + maneuverType, textX, textY);
+                p.textStyle(p.NORMAL);
+                textY += lineH - 2;
+                p.text('K = ' + K.toFixed(4) + ', μ = ' + mu.toFixed(2), textX, textY);
+                textY += lineH - 2;
+
+                // Critical speed (for oversteer vehicles)
+                if (K < -0.0001) {
+                    let u_crit = Math.sqrt(L / (-K)) * 3.6; // Convert to km/h
+                    p.fill(200, 0, 0); // Red for warning
+                    p.text('Critical Speed: ' + u_crit.toFixed(1) + ' km/h', textX, textY);
+                    p.fill(0); // Reset to black
+                } else if (K > 0.0001) {
+                    p.fill(0, 150, 0); // Green for stable
+                    p.text('Critical Speed: N/A (stable)', textX, textY);
+                    p.fill(0); // Reset to black
+                } else {
+                    p.text('Critical Speed: N/A (neutral)', textX, textY);
+                }
+            }
+
+            function drawPlots() {
+                // Top-right plots showing maneuver data (always visible for learning)
+                let plotsW = 280;
+                let plotsH = 240;
+                let plotsX = p.width - plotsW - 10;
+                let plotsY = 10;
+
+                // Background
+                p.fill(255, 255, 255, 240);
+                p.stroke(50);
+                p.strokeWeight(2);
+                p.rect(plotsX, plotsY, plotsW, plotsH, 5);
+
+                // If no data yet, show placeholder
+                if (timeHistory.length < 2) {
+                    p.fill(100);
+                    p.noStroke();
+                    p.textAlign(p.CENTER);
+                    p.textSize(12);
+                    p.text('Real-time plots will appear here', plotsX + plotsW/2, plotsY + plotsH/2);
+                    return;
+                }
+
+                // Plot area dimensions
+                let plotMargin = 35;
+                let plotW = plotsW - 2 * plotMargin;
+                let plotH1 = 50; // Height for each mini plot
+                let plotX = plotsX + plotMargin;
+                let startY = plotsY + 25;
+
+                // Plot 1: Steering Angle
+                drawMiniPlot(plotX, startY, plotW, plotH1, timeHistory, steeringHistory,
+                    'Steering (°)', [255, 100, 0]);
+
+                // Plot 2: Lateral Acceleration
+                drawMiniPlot(plotX, startY + plotH1 + 30, plotW, plotH1, timeHistory, latAccelHistory,
+                    'Lat Accel (m/s²)', [0, 150, 200]);
+
+                // Plot 3: Yaw Rate
+                drawMiniPlot(plotX, startY + 2*(plotH1 + 30), plotW, plotH1, timeHistory, yawRateHistory,
+                    'Yaw Rate (°/s)', [100, 200, 100]);
+            }
+
+            function drawMiniPlot(px, py, pw, ph, xData, yData, label, color) {
+                // Draw plot background
+                p.fill(250);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(px, py, pw, ph);
+
+                // Find data range
+                let yMin = Math.min(...yData);
+                let yMax = Math.max(...yData);
+                let yRange = yMax - yMin;
+                if (yRange < 0.01) {
+                    yRange = 1;
+                    yMin = yMin - 0.5;
+                    yMax = yMax + 0.5;
+                }
+
+                // Draw data line
+                p.stroke(color[0], color[1], color[2]);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < xData.length; i++) {
+                    let plotX = p.map(xData[i], xData[0], xData[xData.length - 1], px, px + pw);
+                    let plotY = p.map(yData[i], yMin, yMax, py + ph, py);
+                    p.vertex(plotX, plotY);
+                }
+                p.endShape();
+
+                // Draw zero line if range crosses zero
+                if (yMin < 0 && yMax > 0) {
+                    let zeroY = p.map(0, yMin, yMax, py + ph, py);
+                    p.stroke(150);
+                    p.strokeWeight(1);
+                    p.drawingContext.setLineDash([5, 5]);
+                    p.line(px, zeroY, px + pw, zeroY);
+                    p.drawingContext.setLineDash([]);
+                }
+
+                // Label
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(10);
+                p.text(label, px, py - 5);
+
+                // Y-axis labels
+                p.textAlign(p.RIGHT);
+                p.textSize(9);
+                p.text(yMax.toFixed(1), px - 3, py + 10);
+                p.text(yMin.toFixed(1), px - 3, py + ph);
             }
 
             updateHandlingDisplay();

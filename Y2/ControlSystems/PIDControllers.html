@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PID Controllers - Interactive Lecture</title>
+
+    <!-- External CSS (always in this order) -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>PID Controllers</h1>
+        <p class="subtitle">Interactive Lecture & Simulation</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding PID Controllers</h2>
+        <p>A PID controller (Proportional-Integral-Derivative controller) is one of the most widely used feedback control mechanisms in industrial control systems. The controller calculates an error value as the difference between a measured process variable and a desired setpoint, then applies a correction based on proportional, integral, and derivative terms.</p>
+
+        <div class="key-point">
+            <p><strong>Core Insight:</strong> PID control provides a practical, robust, and widely applicable method for achieving desired system behavior. The proportional term reacts to current error, the integral term eliminates steady-state error by accounting for past errors, and the derivative term predicts future error based on its rate of change.</p>
+        </div>
+
+        <h3>The PID Control Equation</h3>
+        <p>The PID controller output is calculated using the following equation:</p>
+
+        <div class="equation-box">
+            <p>\[u(t) = K_p e(t) + K_i \int_0^t e(\tau) \, d\tau + K_d \frac{de(t)}{dt}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(u(t)\) = Control output (controller signal)</li>
+                <li>\(e(t)\) = Error signal (setpoint - process variable)</li>
+                <li>\(K_p\) = Proportional gain</li>
+                <li>\(K_i\) = Integral gain</li>
+                <li>\(K_d\) = Derivative gain</li>
+            </ul>
+        </div>
+
+        <h3>The Three Terms Explained</h3>
+
+        <h4>Proportional Term (P)</h4>
+        <p>The proportional term produces an output proportional to the current error:</p>
+        <div class="equation-box">
+            <p>\[u_p(t) = K_p e(t)\]</p>
+            <p><strong>Effect:</strong> Larger \(K_p\) gives faster response but may cause overshoot and oscillation. Too small \(K_p\) results in slow response and steady-state error.</p>
+        </div>
+
+        <h4>Integral Term (I)</h4>
+        <p>The integral term accumulates past errors over time:</p>
+        <div class="equation-box">
+            <p>\[u_i(t) = K_i \int_0^t e(\tau) \, d\tau\]</p>
+            <p><strong>Effect:</strong> Eliminates steady-state error by continuing to increase the control output as long as error persists. However, excessive \(K_i\) can cause overshoot and oscillations.</p>
+        </div>
+
+        <h4>Derivative Term (D)</h4>
+        <p>The derivative term predicts future error based on the rate of change:</p>
+        <div class="equation-box">
+            <p>\[u_d(t) = K_d \frac{de(t)}{dt}\]</p>
+            <p><strong>Effect:</strong> Provides damping by opposing rapid changes in error. Reduces overshoot and improves stability. However, amplifies measurement noise.</p>
+        </div>
+
+        <h3>Transfer Function Representation</h3>
+        <p>In the Laplace domain, the PID controller transfer function is:</p>
+        <div class="equation-box">
+            <p>\[C(s) = K_p + \frac{K_i}{s} + K_d s\]</p>
+            <p>Or in standard form:</p>
+            <p>\[C(s) = K_p \left(1 + \frac{1}{T_i s} + T_d s\right)\]</p>
+            <p>Where \(T_i = K_p/K_i\) (integral time) and \(T_d = K_d/K_p\) (derivative time)</p>
+        </div>
+
+        <h3>Tuning PID Controllers</h3>
+        <p>Several methods exist for tuning PID parameters:</p>
+        <ul>
+            <li><strong>Ziegler-Nichols Method:</strong> Based on inducing oscillations at the ultimate gain</li>
+            <li><strong>Cohen-Coon Method:</strong> Uses open-loop step response characteristics</li>
+            <li><strong>Manual Tuning:</strong> Iterative adjustment based on observed performance</li>
+            <li><strong>Software Tools:</strong> Auto-tuning algorithms in modern controllers</li>
+        </ul>
+
+        <div class="equation-box">
+            <p><strong>Ziegler-Nichols Closed-Loop Tuning:</strong></p>
+            <table style="width: 100%; margin-top: 10px;">
+                <tr>
+                    <th>Controller</th>
+                    <th>\(K_p\)</th>
+                    <th>\(T_i\)</th>
+                    <th>\(T_d\)</th>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>\(0.5 K_u\)</td>
+                    <td>\(\infty\)</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>PI</td>
+                    <td>\(0.45 K_u\)</td>
+                    <td>\(P_u / 1.2\)</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>PID</td>
+                    <td>\(0.6 K_u\)</td>
+                    <td>\(P_u / 2\)</td>
+                    <td>\(P_u / 8\)</td>
+                </tr>
+            </table>
+            <p>Where \(K_u\) is the ultimate gain and \(P_u\) is the ultimate period</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive PID Simulation</h2>
+        <p>Adjust the PID gains to see how they affect the system response. The simulation shows a second-order system controlled by a PID controller responding to a step change in setpoint.</p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="kp">Proportional Gain (Kp):</label>
+                    <input type="range" id="kp" min="0" max="5" step="0.1" value="1">
+                    <span id="kp-value" class="value-display">1.0</span>
+                </div>
+                <div class="slider-container">
+                    <label for="ki">Integral Gain (Ki):</label>
+                    <input type="range" id="ki" min="0" max="2" step="0.05" value="0.5">
+                    <span id="ki-value" class="value-display">0.50</span>
+                </div>
+                <div class="slider-container">
+                    <label for="kd">Derivative Gain (Kd):</label>
+                    <input type="range" id="kd" min="0" max="2" step="0.05" value="0.2">
+                    <span id="kd-value" class="value-display">0.20</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Simulation Controls -->
+        <div id="button-container">
+            <button id="reset-btn" class="control-button">Reset Simulation</button>
+            <button id="p-only-btn" class="control-button">P Only (Ki=0, Kd=0)</button>
+            <button id="pi-btn" class="control-button">PI (Kd=0)</button>
+            <button id="pid-btn" class="control-button active">Full PID</button>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li><strong>Temperature Control:</strong> HVAC systems, chemical reactors, ovens, and furnaces use PID to maintain precise temperatures</li>
+            <li><strong>Motor Speed Control:</strong> Electric motors in robotics, CNC machines, and industrial automation maintain constant speed under varying loads</li>
+            <li><strong>Aircraft Autopilot:</strong> Altitude, heading, and speed control in modern aircraft rely on PID controllers</li>
+            <li><strong>Process Control:</strong> Chemical plants use PID for flow rate, pressure, level, and concentration control</li>
+            <li><strong>Cruise Control:</strong> Automotive systems maintain desired vehicle speed on highways</li>
+            <li><strong>Position Control:</strong> Servo systems in robotics and manufacturing equipment precisely control position</li>
+            <li><strong>Power Systems:</strong> Voltage and frequency regulation in electrical grids</li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Error Signal</td>
+                        <td>\(e(t) = r(t) - y(t)\)</td>
+                        <td>Difference between setpoint and process variable</td>
+                    </tr>
+                    <tr>
+                        <td>PID Control Law</td>
+                        <td>\(u(t) = K_p e(t) + K_i \int e(\tau)d\tau + K_d \frac{de}{dt}\)</td>
+                        <td>Complete PID controller output</td>
+                    </tr>
+                    <tr>
+                        <td>Proportional</td>
+                        <td>\(u_p = K_p e(t)\)</td>
+                        <td>Output proportional to current error</td>
+                    </tr>
+                    <tr>
+                        <td>Integral</td>
+                        <td>\(u_i = K_i \int_0^t e(\tau)d\tau\)</td>
+                        <td>Accumulated error over time</td>
+                    </tr>
+                    <tr>
+                        <td>Derivative</td>
+                        <td>\(u_d = K_d \frac{de(t)}{dt}\)</td>
+                        <td>Rate of change of error</td>
+                    </tr>
+                    <tr>
+                        <td>Transfer Function</td>
+                        <td>\(C(s) = K_p + \frac{K_i}{s} + K_d s\)</td>
+                        <td>PID in Laplace domain</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Proportional Controller Design</h3>
+            <p>A temperature control system has a steady-state error of 5°C when using a proportional controller with \(K_p = 2\). What value of \(K_p\) would reduce the steady-state error to 2°C, assuming the system behavior remains linear?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Initial \(K_p = 2\), steady-state error \(e_{ss1} = 5\)°C</li>
+                    <li>Desired steady-state error \(e_{ss2} = 2\)°C</li>
+                </ul>
+                <p><strong>Analysis:</strong></p>
+                <p>For a proportional controller, steady-state error is inversely proportional to \(K_p\):</p>
+                <p>\[\frac{e_{ss1}}{e_{ss2}} = \frac{K_{p2}}{K_{p1}}\]</p>
+                <p><strong>Calculation:</strong></p>
+                <p>\[\frac{5}{2} = \frac{K_{p2}}{2}\]</p>
+                <p>\[K_{p2} = 2 \times \frac{5}{2} = 5\]</p>
+                <p><strong>Answer:</strong> \(K_p = 5\) would reduce steady-state error to 2°C</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Integral Action</h3>
+            <p>A PI controller has \(K_p = 3\) and \(K_i = 0.5\). If the error is constant at \(e(t) = 4\) for 10 seconds, what is the total control output \(u(t)\) at \(t = 10\)s?</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(K_p = 3\), \(K_i = 0.5\)</li>
+                    <li>\(e(t) = 4\) (constant)</li>
+                    <li>\(t = 10\) seconds</li>
+                </ul>
+                <p><strong>Formula:</strong></p>
+                <p>\[u(t) = K_p e(t) + K_i \int_0^t e(\tau) d\tau\]</p>
+                <p><strong>Calculation:</strong></p>
+                <p>Proportional term: \(u_p = 3 \times 4 = 12\)</p>
+                <p>Integral term: \(u_i = 0.5 \times \int_0^{10} 4 \, d\tau = 0.5 \times 4 \times 10 = 20\)</p>
+                <p>Total output: \(u(10) = 12 + 20 = 32\)</p>
+                <p><strong>Answer:</strong> Control output at t = 10s is 32</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Ziegler-Nichols Tuning</h3>
+            <p>A system is tested using the Ziegler-Nichols closed-loop method. The ultimate gain is found to be \(K_u = 8\) and the ultimate period is \(P_u = 2\) seconds. Calculate the PID parameters using the Ziegler-Nichols tuning rules.</p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Ultimate gain: \(K_u = 8\)</li>
+                    <li>Ultimate period: \(P_u = 2\) s</li>
+                </ul>
+                <p><strong>Ziegler-Nichols PID Tuning Rules:</strong></p>
+                <ul>
+                    <li>\(K_p = 0.6 K_u\)</li>
+                    <li>\(T_i = P_u / 2\)</li>
+                    <li>\(T_d = P_u / 8\)</li>
+                </ul>
+                <p><strong>Calculations:</strong></p>
+                <p>Proportional gain: \(K_p = 0.6 \times 8 = 4.8\)</p>
+                <p>Integral time: \(T_i = 2 / 2 = 1\) s</p>
+                <p>Integral gain: \(K_i = K_p / T_i = 4.8 / 1 = 4.8\)</p>
+                <p>Derivative time: \(T_d = 2 / 8 = 0.25\) s</p>
+                <p>Derivative gain: \(K_d = K_p \times T_d = 4.8 \times 0.25 = 1.2\)</p>
+                <p><strong>Answer:</strong> \(K_p = 4.8\), \(K_i = 4.8\), \(K_d = 1.2\)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary purpose of the integral term in a PID controller?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Reduce overshoot</label>
+                    <label><input type="radio" name="q1" value="b"> b) Eliminate steady-state error</label>
+                    <label><input type="radio" name="q1" value="c"> c) Speed up response time</label>
+                    <label><input type="radio" name="q1" value="d"> d) Filter measurement noise</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: What effect does increasing the derivative gain (Kd) have on the system?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Increases steady-state error</label>
+                    <label><input type="radio" name="q2" value="b"> b) Reduces damping and increases oscillations</label>
+                    <label><input type="radio" name="q2" value="c"> c) Improves damping and reduces overshoot</label>
+                    <label><input type="radio" name="q2" value="d"> d) Eliminates steady-state error</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: In the PID control equation \(u(t) = K_p e(t) + K_i \int e d\tau + K_d \frac{de}{dt}\), what does \(e(t)\) represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Controller output</label>
+                    <label><input type="radio" name="q3" value="b"> b) Process variable</label>
+                    <label><input type="radio" name="q3" value="c"> c) Error signal (setpoint - process variable)</label>
+                    <label><input type="radio" name="q3" value="d"> d) Setpoint value</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: A purely proportional (P) controller typically results in:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Zero steady-state error</label>
+                    <label><input type="radio" name="q4" value="b"> b) Non-zero steady-state error</label>
+                    <label><input type="radio" name="q4" value="c"> c) Infinite oscillations</label>
+                    <label><input type="radio" name="q4" value="d"> d) No response to setpoint changes</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: Which tuning method uses induced oscillations to determine controller parameters?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Cohen-Coon method</label>
+                    <label><input type="radio" name="q5" value="b"> b) Trial and error</label>
+                    <label><input type="radio" name="q5" value="c"> c) Ziegler-Nichols closed-loop method</label>
+                    <label><input type="radio" name="q5" value="d"> d) Open-loop step response method</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer (auto-generated) -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // PID Simulation
+        let sketch = new p5(function(p) {
+            // Simulation parameters
+            let Kp = 1.0, Ki = 0.5, Kd = 0.2;
+            let setpoint = 1.0;
+            let processVariable = 0.0;
+            let integral = 0.0;
+            let prevError = 0.0;
+            let time = 0;
+            let dt = 0.02;
+
+            // System parameters (second-order plant)
+            let velocity = 0;
+            let mass = 1.0;
+            let damping = 0.5;
+            let stiffness = 1.0;
+
+            // Data arrays for plotting
+            let timeHistory = [];
+            let pvHistory = [];
+            let spHistory = [];
+            let maxDataPoints = 400;
+
+            p.setup = function() {
+                let canvasWidth = Math.min(900, p.windowWidth - 40);
+                p.createCanvas(canvasWidth, 500);
+                setupControls();
+                resetSimulation();
+            };
+
+            p.draw = function() {
+                p.background(240);
+
+                // Update simulation
+                updatePID();
+
+                // Draw plot
+                drawPlot();
+
+                // Draw info overlay
+                drawInfoPanel();
+
+                // Update time
+                time += dt;
+            };
+
+            function updatePID() {
+                // Calculate error
+                let error = setpoint - processVariable;
+
+                // PID calculations
+                integral += error * dt;
+                let derivative = (error - prevError) / dt;
+
+                let controlOutput = Kp * error + Ki * integral + Kd * derivative;
+
+                // Update plant (second-order system: mass-spring-damper)
+                let acceleration = (controlOutput - damping * velocity - stiffness * processVariable) / mass;
+                velocity += acceleration * dt;
+                processVariable += velocity * dt;
+
+                // Store history
+                timeHistory.push(time);
+                pvHistory.push(processVariable);
+                spHistory.push(setpoint);
+
+                // Limit array size
+                if (timeHistory.length > maxDataPoints) {
+                    timeHistory.shift();
+                    pvHistory.shift();
+                    spHistory.shift();
+                }
+
+                prevError = error;
+            }
+
+            function drawPlot() {
+                // Plot area
+                let plotX = 60;
+                let plotY = 50;
+                let plotWidth = p.width - 120;
+                let plotHeight = 350;
+
+                // Draw plot background
+                p.fill(255);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(plotX, plotY, plotWidth, plotHeight);
+
+                // Draw grid
+                p.stroke(200);
+                for (let i = 0; i <= 4; i++) {
+                    let y = plotY + i * plotHeight / 4;
+                    p.line(plotX, y, plotX + plotWidth, y);
+                }
+
+                // Draw axes labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER);
+                p.textSize(12);
+                p.text('Time (s)', plotX + plotWidth / 2, plotY + plotHeight + 35);
+
+                p.push();
+                p.translate(plotX - 45, plotY + plotHeight / 2);
+                p.rotate(-p.PI / 2);
+                p.text('Process Variable', 0, 0);
+                p.pop();
+
+                // Plot setpoint line
+                let spY = p.map(setpoint, 0, 2, plotY + plotHeight, plotY);
+                p.stroke(200, 0, 0);
+                p.strokeWeight(2);
+                p.setLineDash([5, 5]);
+                p.line(plotX, spY, plotX + plotWidth, spY);
+                p.setLineDash([]);
+
+                // Plot process variable
+                if (timeHistory.length > 1) {
+                    p.stroke(0, 100, 200);
+                    p.strokeWeight(3);
+                    p.noFill();
+
+                    p.beginShape();
+                    for (let i = 0; i < timeHistory.length; i++) {
+                        let x = p.map(timeHistory[i], time - maxDataPoints * dt, time, plotX, plotX + plotWidth);
+                        let y = p.map(pvHistory[i], 0, 2, plotY + plotHeight, plotY);
+                        p.vertex(x, y);
+                    }
+                    p.endShape();
+                }
+
+                // Legend
+                p.textAlign(p.LEFT);
+                p.fill(200, 0, 0);
+                p.noStroke();
+                p.text('Setpoint', plotX + 10, plotY + 20);
+                p.fill(0, 100, 200);
+                p.text('Process Variable', plotX + 10, plotY + 35);
+            }
+
+            function drawInfoPanel() {
+                // Info panel in top-right corner
+                let panelWidth = 240;
+                let panelHeight = 140;
+                let panelX = p.width - panelWidth - 10;
+                let panelY = 10;
+
+                p.fill(255, 255, 255, 240);
+                p.stroke(50);
+                p.strokeWeight(1);
+                p.rect(panelX, panelY, panelWidth, panelHeight, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(13);
+                p.textAlign(p.LEFT);
+
+                let x = panelX + 12;
+                let y = panelY + 25;
+                let lineHeight = 20;
+
+                p.textStyle(p.BOLD);
+                p.text('PID Parameters:', x, y);
+                p.textStyle(p.NORMAL);
+
+                y += lineHeight;
+                p.text('Kp = ' + Kp.toFixed(2), x, y);
+                y += lineHeight;
+                p.text('Ki = ' + Ki.toFixed(2), x, y);
+                y += lineHeight;
+                p.text('Kd = ' + Kd.toFixed(2), x, y);
+
+                y += lineHeight * 1.2;
+                let error = setpoint - processVariable;
+                let errorPercent = (Math.abs(error) / setpoint * 100).toFixed(1);
+                p.text('Error: ' + errorPercent + '%', x, y);
+
+                y += lineHeight;
+                p.text('PV: ' + processVariable.toFixed(3), x, y);
+            }
+
+            // Custom function for dashed lines
+            p.setLineDash = function(list) {
+                p.drawingContext.setLineDash(list);
+            };
+
+            function setupControls() {
+                // Kp slider
+                document.getElementById("kp").addEventListener("input", function() {
+                    Kp = parseFloat(this.value);
+                    document.getElementById("kp-value").textContent = Kp.toFixed(2);
+                });
+
+                // Ki slider
+                document.getElementById("ki").addEventListener("input", function() {
+                    Ki = parseFloat(this.value);
+                    document.getElementById("ki-value").textContent = Ki.toFixed(2);
+                });
+
+                // Kd slider
+                document.getElementById("kd").addEventListener("input", function() {
+                    Kd = parseFloat(this.value);
+                    document.getElementById("kd-value").textContent = Kd.toFixed(2);
+                });
+
+                // Reset button
+                document.getElementById("reset-btn").addEventListener("click", function() {
+                    resetSimulation();
+                });
+
+                // P only button
+                document.getElementById("p-only-btn").addEventListener("click", function() {
+                    Kp = 1.5;
+                    Ki = 0;
+                    Kd = 0;
+                    updateSliders();
+                    resetSimulation();
+                    updateButtonStates(this);
+                });
+
+                // PI button
+                document.getElementById("pi-btn").addEventListener("click", function() {
+                    Kp = 1.5;
+                    Ki = 0.8;
+                    Kd = 0;
+                    updateSliders();
+                    resetSimulation();
+                    updateButtonStates(this);
+                });
+
+                // PID button
+                document.getElementById("pid-btn").addEventListener("click", function() {
+                    Kp = 1.0;
+                    Ki = 0.5;
+                    Kd = 0.2;
+                    updateSliders();
+                    resetSimulation();
+                    updateButtonStates(this);
+                });
+            }
+
+            function updateSliders() {
+                document.getElementById("kp").value = Kp;
+                document.getElementById("kp-value").textContent = Kp.toFixed(2);
+                document.getElementById("ki").value = Ki;
+                document.getElementById("ki-value").textContent = Ki.toFixed(2);
+                document.getElementById("kd").value = Kd;
+                document.getElementById("kd-value").textContent = Kd.toFixed(2);
+            }
+
+            function updateButtonStates(activeButton) {
+                document.querySelectorAll('.control-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                activeButton.classList.add('active');
+            }
+
+            function resetSimulation() {
+                time = 0;
+                processVariable = 0;
+                velocity = 0;
+                integral = 0;
+                prevError = 0;
+                timeHistory = [];
+                pvHistory = [];
+                spHistory = [];
+            }
+
+        }, 'sketch-holder');
+
+        // Quiz submission handler
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Eliminate steady-state error
+                q2: 'c',  // Improves damping and reduces overshoot
+                q3: 'c',  // Error signal
+                q4: 'b',  // Non-zero steady-state error
+                q5: 'c'   // Ziegler-Nichols closed-loop
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption && selectedOption.value === correctAnswer) {
+                    score++;
+                    resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                } else {
+                    resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>
