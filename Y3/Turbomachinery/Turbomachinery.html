@@ -152,6 +152,9 @@
             let beta1, beta2;
             let work, power, reaction;
 
+            // Animation variables
+            let rotationAngle = 0;
+
             p.setup = function() {
                 let canvas = p.createCanvas(900, 700);
                 canvas.parent('sketch-holder');
@@ -254,6 +257,9 @@
             p.draw = function() {
                 p.background(255);
 
+                // Update rotation angle for animation
+                rotationAngle += 0.02;
+
                 // Title
                 p.fill(0);
                 p.noStroke();
@@ -268,10 +274,10 @@
                 // Draw outlet triangle
                 drawVelocityTriangle(550, 200, 'Outlet', V2, Va, Vtheta2, W2, Wtheta2, U, alpha2, beta2);
 
-                // Draw blade cascade
+                // Draw blade cascade with rotation
                 drawBladeCascade();
 
-                // Draw info overlay
+                // Draw info overlay (moved to bottom right)
                 drawInfoOverlay();
             };
 
@@ -369,7 +375,7 @@
 
             function drawBladeCascade() {
                 let cascadeX = 450;
-                let cascadeY = 520;
+                let cascadeY = 500;
 
                 p.push();
                 p.translate(cascadeX, cascadeY);
@@ -379,117 +385,285 @@
                 p.noStroke();
                 p.textSize(16);
                 p.textAlign(p.CENTER);
-                p.text('Blade Cascade (Side View)', 0, -100);
+                p.text('Blade Cascade - Unwrapped Cylinder View', 0, -110);
 
-                // Draw flow direction and blade motion indicators
+                // Draw outer casing (top and bottom walls)
+                p.stroke(60);
+                p.strokeWeight(4);
+                p.line(-400, -70, 400, -70);  // Top wall
+                p.line(-400, 70, 400, 70);    // Bottom wall
+
+                // INLET label
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.textSize(13);
+                p.textAlign(p.CENTER);
+                p.text('INLET', -350, 0);
+
+                // OUTLET label
+                p.fill(0, 150, 0);
+                p.text('OUTLET', 350, 0);
+
+                // ========== STATOR SECTION (STATIONARY) ==========
+                let statorX = -220;
+
+                p.push();
+                p.translate(statorX, 0);
+
+                // Stator region background
+                p.fill(100, 150, 200, 50);
+                p.noStroke();
+                p.rect(-60, -70, 120, 140);
+
+                // Stator label
+                p.fill(0);
                 p.textSize(12);
-                if (machineType === 'turbine') {
-                    p.text('← Blade Motion (U)', -200, -70);
-                } else {
-                    p.text('→ Blade Motion (U)', 200, -70);
-                }
+                p.textAlign(p.CENTER);
+                p.text('STATOR', 0, -85);
+                p.textSize(10);
+                p.text('(stationary)', 0, 90);
 
-                // Draw multiple blades oriented at correct angles
-                let numBlades = 5;
-                let bladeSpacing = 100;
-                let bladeChordLength = 80;
+                // Draw 4 stator vanes in cascade
+                let numStatorVanes = 4;
+                let statorPitch = 35; // vertical spacing between vanes
 
-                for (let i = 0; i < numBlades; i++) {
-                    let x = (i - 2) * bladeSpacing;
+                for (let i = 0; i < numStatorVanes; i++) {
+                    let yPos = (i - 1.5) * statorPitch;
 
-                    // Use average beta for blade orientation
-                    let bladeBeta = (beta1 + beta2) / 2;
-                    let bladeAngleRad = bladeBeta * Math.PI / 180;
-
-                    // Draw blade profile
                     p.push();
-                    p.translate(x, 0);
+                    p.translate(0, yPos);
 
-                    // Rotate blade to align with flow
-                    p.rotate(bladeAngleRad);
+                    // Rotate to align with flow angle α1
+                    let statorAngle = -alpha1 * Math.PI / 180;
+                    p.rotate(statorAngle);
 
-                    // Draw symmetric airfoil shape
-                    p.stroke(0);
+                    // Draw stator vane (airfoil shape)
+                    p.stroke(50);
                     p.strokeWeight(2);
-                    p.fill(180, 200, 220);
+                    p.fill(130, 160, 190);
 
                     p.beginShape();
                     // Leading edge (rounded)
-                    for (let t = -Math.PI/2; t <= Math.PI/2; t += 0.2) {
-                        let r = 8;
-                        p.vertex(-bladeChordLength/2 + r * Math.cos(t), r * Math.sin(t));
-                    }
+                    p.vertex(-8, 0);
+                    p.bezierVertex(-8, -3, -5, -4, 0, -4);
                     // Upper surface
-                    for (let t = 0; t <= 1; t += 0.1) {
-                        let px = -bladeChordLength/2 + t * bladeChordLength;
-                        let thickness = 10 * Math.sin(t * Math.PI); // Airfoil thickness distribution
-                        p.vertex(px, -thickness/2);
-                    }
+                    p.bezierVertex(20, -4, 40, -3, 55, -1);
                     // Trailing edge (sharp)
-                    p.vertex(bladeChordLength/2, 0);
+                    p.vertex(55, 0);
                     // Lower surface
-                    for (let t = 1; t >= 0; t -= 0.1) {
-                        let px = -bladeChordLength/2 + t * bladeChordLength;
-                        let thickness = 10 * Math.sin(t * Math.PI);
-                        p.vertex(px, thickness/2);
-                    }
+                    p.bezierVertex(40, 1, 20, 2, 0, 2);
+                    p.bezierVertex(-5, 2, -8, 1, -8, 0);
                     p.endShape(p.CLOSE);
 
                     p.pop();
+                }
 
-                    // Draw flow vectors on middle blade
-                    if (i === 2) {
-                        let arrowLen = 35;
+                p.pop(); // End stator
 
-                        // Inlet relative velocity direction (β1)
-                        p.push();
-                        p.translate(x - bladeSpacing/2, -30);
-                        let beta1Rad = beta1 * Math.PI / 180;
-                        p.rotate(beta1Rad);
-                        p.stroke(0, 0, 255);
-                        p.strokeWeight(3);
-                        p.fill(0, 0, 255);
-                        p.line(-arrowLen, 0, 0, 0);
-                        p.triangle(0, 0, -8, -4, -8, 4);
-                        p.pop();
+                // Draw inlet flow arrow (V1 - absolute velocity)
+                p.push();
+                p.translate(-320, -20);
+                let v1Angle = -alpha1 * Math.PI / 180;
+                p.rotate(v1Angle);
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                p.fill(255, 0, 0);
+                p.line(0, 0, 50, 0);
+                drawArrowHead(50, 0, 0, p.color(255, 0, 0));
+                p.pop();
 
-                        // Label
-                        p.fill(0, 0, 255);
-                        p.noStroke();
-                        p.textSize(11);
-                        p.textAlign(p.CENTER);
-                        p.text('W₁ (β₁=' + beta1.toFixed(0) + '°)', x - bladeSpacing/2, -45);
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('V₁', -320, -35);
+                p.textSize(9);
+                p.text('α₁=' + alpha1.toFixed(0) + '°', -320, -25);
 
-                        // Outlet relative velocity direction (β2)
-                        p.push();
-                        p.translate(x + bladeSpacing/2, 30);
-                        let beta2Rad = beta2 * Math.PI / 180;
-                        p.rotate(beta2Rad);
-                        p.stroke(0, 150, 0);
-                        p.strokeWeight(3);
-                        p.fill(0, 150, 0);
-                        p.line(0, 0, arrowLen, 0);
-                        p.triangle(arrowLen, 0, arrowLen-8, -4, arrowLen-8, 4);
-                        p.pop();
+                // ========== ROTOR SECTION (ROTATING) ==========
+                let rotorX = 70;
 
-                        // Label
-                        p.fill(0, 150, 0);
-                        p.noStroke();
-                        p.textSize(11);
-                        p.textAlign(p.CENTER);
-                        p.text('W₂ (β₂=' + beta2.toFixed(0) + '°)', x + bladeSpacing/2, 45);
+                p.push();
+                p.translate(rotorX, 0);
+
+                // Rotor region background
+                p.fill(200, 150, 100, 50);
+                p.noStroke();
+                p.rect(-90, -70, 180, 140);
+
+                // Rotor label
+                p.fill(0);
+                p.textSize(12);
+                p.textAlign(p.CENTER);
+                p.text('ROTOR', 0, -85);
+                p.textSize(10);
+                p.text('(rotating ↓↑)', 0, 90);
+
+                // Show rotation with animated motion indicator
+                p.push();
+                p.translate(-110, 0);
+
+                // Vertical motion arrows showing blade rotation
+                let arrowOffset = (rotationAngle * 30) % 30;
+
+                for (let i = -1; i < 3; i++) {
+                    let arrowY = i * 30 + arrowOffset - 45;
+                    if (arrowY > -80 && arrowY < 80) {
+                        p.stroke(0, 120, 0);
+                        p.strokeWeight(2);
+                        p.fill(0, 120, 0);
+                        p.line(-5, arrowY, -5, arrowY - 20);
+                        p.triangle(-5, arrowY, -8, arrowY - 6, -2, arrowY - 6);
                     }
                 }
+
+                p.fill(0, 120, 0);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.text('U', -5, 15);
+                p.pop();
+
+                // Draw 4 rotor blades in cascade
+                let numRotorBlades = 4;
+                let rotorPitch = 35; // vertical spacing
+
+                for (let i = 0; i < numRotorBlades; i++) {
+                    // Animate vertical position to show rotation
+                    let baseY = (i - 1.5) * rotorPitch;
+                    let animatedY = baseY + (rotationAngle * 5.5) % rotorPitch;
+
+                    // Wrap around
+                    if (animatedY > 80) animatedY -= numRotorBlades * rotorPitch;
+                    if (animatedY < -80) animatedY += numRotorBlades * rotorPitch;
+
+                    if (animatedY > -75 && animatedY < 75) {
+                        p.push();
+                        p.translate(0, animatedY);
+
+                        // Rotate to align with average relative flow angle
+                        let rotorBeta = (beta1 + beta2) / 2;
+                        let rotorAngle = -rotorBeta * Math.PI / 180;
+                        p.rotate(rotorAngle);
+
+                        // Draw rotor blade (airfoil shape)
+                        p.stroke(40);
+                        p.strokeWeight(2);
+                        p.fill(210, 170, 120);
+
+                        p.beginShape();
+                        // Leading edge
+                        p.vertex(-10, 0);
+                        p.bezierVertex(-10, -4, -6, -5, 0, -5);
+                        // Upper surface
+                        p.bezierVertex(25, -5, 50, -4, 70, -1.5);
+                        // Trailing edge
+                        p.vertex(70, 0);
+                        // Lower surface
+                        p.bezierVertex(50, 1.5, 25, 2.5, 0, 2.5);
+                        p.bezierVertex(-6, 2.5, -10, 1.5, -10, 0);
+                        p.endShape(p.CLOSE);
+
+                        p.pop();
+                    }
+                }
+
+                p.pop(); // End rotor
+
+                // Draw W1 (relative velocity at rotor inlet)
+                p.push();
+                p.translate(rotorX - 100, -25);
+                let w1Angle = -beta1 * Math.PI / 180;
+                p.rotate(w1Angle);
+                p.stroke(0, 0, 255);
+                p.strokeWeight(3);
+                p.fill(0, 0, 255);
+                p.line(0, 0, 45, 0);
+                drawArrowHead(45, 0, 0, p.color(0, 0, 255));
+                p.pop();
+
+                p.fill(0, 0, 255);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('W₁', rotorX - 100, -45);
+                p.textSize(9);
+                p.text('β₁=' + beta1.toFixed(0) + '°', rotorX - 100, -35);
+
+                // Draw W2 (relative velocity at rotor outlet)
+                p.push();
+                p.translate(rotorX + 100, 30);
+                let w2Angle = -beta2 * Math.PI / 180;
+                p.rotate(w2Angle);
+                p.stroke(0, 0, 255);
+                p.strokeWeight(3);
+                p.fill(0, 0, 255);
+                p.line(0, 0, 45, 0);
+                drawArrowHead(45, 0, 0, p.color(0, 0, 255));
+                p.pop();
+
+                p.fill(0, 0, 255);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('W₂', rotorX + 100, 50);
+                p.textSize(9);
+                p.text('β₂=' + beta2.toFixed(0) + '°', rotorX + 100, 60);
+
+                // Draw outlet flow arrow (V2 - absolute velocity)
+                p.push();
+                p.translate(280, 20);
+                let v2Angle = -alpha2 * Math.PI / 180;
+                p.rotate(v2Angle);
+                p.stroke(0, 150, 0);
+                p.strokeWeight(3);
+                p.fill(0, 150, 0);
+                p.line(0, 0, 50, 0);
+                drawArrowHead(50, 0, 0, p.color(0, 150, 0));
+                p.pop();
+
+                p.fill(0, 150, 0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('V₂', 280, 40);
+                p.textSize(9);
+                p.text('α₂=' + alpha2.toFixed(0) + '°', 280, 50);
+
+                // Flow direction arrow at bottom
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.fill(100);
+                p.line(-350, 95, 350, 95);
+                p.triangle(350, 95, 340, 92, 340, 98);
+
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text('Axial Flow Direction', 0, 92);
 
                 p.pop();
             }
 
+            function drawArrowHead(x, y, rotation, col) {
+                p.push();
+                p.translate(x, y);
+                p.rotate(rotation);
+                p.fill(col);
+                p.noStroke();
+                p.triangle(0, 0, -8, -4, -8, 4);
+                p.pop();
+            }
+
             function drawInfoOverlay() {
-                // Semi-transparent background
+                // Semi-transparent background - middle right position
+                let boxHeight = 135;
+                let boxY = (p.height - boxHeight) / 2;
+
                 p.fill(255, 255, 255, 240);
                 p.stroke(50);
                 p.strokeWeight(1);
-                p.rect(p.width - 270, 10, 260, 135, 5);
+                p.rect(p.width - 270, boxY, 260, boxHeight, 5);
 
                 // Text
                 p.fill(0);
@@ -498,7 +672,7 @@
                 p.textAlign(p.LEFT);
 
                 let x = p.width - 260;
-                let y = 30;
+                let y = boxY + 20;
                 let lineHeight = 22;
 
                 p.textStyle(p.BOLD);

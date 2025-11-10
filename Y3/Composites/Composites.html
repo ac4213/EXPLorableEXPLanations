@@ -62,12 +62,90 @@
             margin-bottom: 30px;
         }
 
+        /* Compact layout styles */
+        .slider-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .slider-row .slider-container {
+            margin: 0;
+        }
+
+        .overlay-info {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 10;
+            max-width: 280px;
+            font-size: 0.9em;
+        }
+
+        .overlay-info h4 {
+            margin: 0 0 8px 0;
+            font-size: 1em;
+        }
+
+        .overlay-info p {
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        .overlay-top-left {
+            top: 10px;
+            left: 10px;
+        }
+
+        .overlay-top-right {
+            top: 10px;
+            right: 10px;
+        }
+
+        .overlay-bottom-left {
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .overlay-bottom-right {
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .plot-wrapper {
+            position: relative;
+            min-height: 400px;
+        }
+
+        .compact-controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .compact-controls h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+        }
+
         @media (max-width: 768px) {
             .simulation-container {
                 grid-template-columns: 1fr;
             }
             .plot-container {
                 height: 300px;
+            }
+            .slider-row {
+                grid-template-columns: 1fr;
+            }
+            .overlay-info {
+                max-width: 200px;
+                font-size: 0.8em;
+                padding: 8px 10px;
             }
         }
     </style>
@@ -127,47 +205,41 @@
             <p>\[G_{12} = G_m \frac{1 + \xi \eta V_f}{1 - \eta V_f}, \quad \eta = \frac{G_f/G_m - 1}{G_f/G_m + \xi}\]</p>
         </div>
 
-        <div class="simulation-container">
-            <div class="simulation-controls">
-                <h3 style="margin-top:0;">Constituent Properties</h3>
-
-                <div class="info-box info-box-blue">
-                    <h4>Fibre Properties</h4>
-                    <div class="slider-container">
-                        <label for="fiber-modulus">Fibre Modulus \(E_f\) (GPa):</label>
-                        <input type="range" id="fiber-modulus" min="50" max="400" value="230" step="10">
-                        <span id="fiber-modulus-value" class="slider-value">230</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="fiber-poisson">Fibre Poisson's Ratio \(\nu_f\):</label>
-                        <input type="range" id="fiber-poisson" min="0.15" max="0.35" value="0.20" step="0.01">
-                        <span id="fiber-poisson-value" class="slider-value">0.20</span>
-                    </div>
+        <div class="compact-controls">
+            <h3>Constituent Properties & Controls</h3>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="fiber-modulus">Fibre Modulus \(E_f\) (GPa):</label>
+                    <input type="range" id="fiber-modulus" min="50" max="400" value="230" step="10">
+                    <span id="fiber-modulus-value" class="slider-value">230</span>
                 </div>
-
-                <div class="info-box info-box-golden">
-                    <h4>Matrix Properties</h4>
-                    <div class="slider-container">
-                        <label for="matrix-modulus">Matrix Modulus \(E_m\) (GPa):</label>
-                        <input type="range" id="matrix-modulus" min="1" max="10" value="3.5" step="0.5">
-                        <span id="matrix-modulus-value" class="slider-value">3.5</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="matrix-poisson">Matrix Poisson's Ratio \(\nu_m\):</label>
-                        <input type="range" id="matrix-poisson" min="0.25" max="0.45" value="0.35" step="0.01">
-                        <span id="matrix-poisson-value" class="slider-value">0.35</span>
-                    </div>
+                <div class="slider-container">
+                    <label for="fiber-poisson">Fibre Poisson's Ratio \(\nu_f\):</label>
+                    <input type="range" id="fiber-poisson" min="0.15" max="0.35" value="0.20" step="0.01">
+                    <span id="fiber-poisson-value" class="slider-value">0.20</span>
                 </div>
-
+            </div>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="matrix-modulus">Matrix Modulus \(E_m\) (GPa):</label>
+                    <input type="range" id="matrix-modulus" min="1" max="10" value="3.5" step="0.5">
+                    <span id="matrix-modulus-value" class="slider-value">3.5</span>
+                </div>
+                <div class="slider-container">
+                    <label for="matrix-poisson">Matrix Poisson's Ratio \(\nu_m\):</label>
+                    <input type="range" id="matrix-poisson" min="0.25" max="0.45" value="0.35" step="0.01">
+                    <span id="matrix-poisson-value" class="slider-value">0.35</span>
+                </div>
+            </div>
+            <div class="slider-row">
                 <div class="slider-container">
                     <label for="fiber-volume">Fibre Volume Fraction \(V_f\):</label>
                     <input type="range" id="fiber-volume" min="0.1" max="0.8" value="0.6" step="0.05">
                     <span id="fiber-volume-value" class="slider-value">0.60</span>
                 </div>
-
-                <div style="margin: 15px 0;">
-                    <h4>Material Presets:</h4>
-                    <select id="material-preset" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                <div class="slider-container">
+                    <label for="material-preset">Material Presets:</label>
+                    <select id="material-preset" style="width: 100%; padding: 8px; border-radius: 5px; border: 2px solid var(--primary-color);">
                         <option value="">-- Custom --</option>
                         <option value="carbon-epoxy">Carbon/Epoxy (AS4/3501-6)</option>
                         <option value="glass-epoxy">E-Glass/Epoxy</option>
@@ -176,18 +248,17 @@
                     </select>
                 </div>
             </div>
+        </div>
 
-            <div class="simulation-display">
-                <h3>Effective Lamina Properties</h3>
-                <div id="rom-results" class="info-box info-box-blue">
-                    <h4>Calculated Properties:</h4>
-                    <p><strong>Longitudinal Modulus:</strong> \(E_1 = \) <span id="e1-result">139.4</span> GPa</p>
-                    <p><strong>Transverse Modulus:</strong> \(E_2 = \) <span id="e2-result">10.2</span> GPa</p>
-                    <p><strong>Major Poisson's Ratio:</strong> \(\nu_{12} = \) <span id="nu12-result">0.26</span></p>
-                    <p><strong>In-plane Shear Modulus:</strong> \(G_{12} = \) <span id="g12-result">5.5</span> GPa</p>
-                </div>
-                <div id="rom-plot" class="plot-container"></div>
+        <div class="plot-wrapper">
+            <div id="rom-results" class="overlay-info overlay-top-right info-box-blue">
+                <h4>Calculated Properties:</h4>
+                <p><strong>\(E_1 = \)</strong> <span id="e1-result">139.4</span> GPa</p>
+                <p><strong>\(E_2 = \)</strong> <span id="e2-result">10.2</span> GPa</p>
+                <p><strong>\(\nu_{12} = \)</strong> <span id="nu12-result">0.26</span></p>
+                <p><strong>\(G_{12} = \)</strong> <span id="g12-result">5.5</span> GPa</p>
             </div>
+            <div id="rom-plot" class="plot-container"></div>
         </div>
     </div>
 
@@ -211,42 +282,37 @@
             <p>Where \([\bar{Q}] = [T]^{-1}[Q][T]^{-T}\) with transformation matrix involving \(\cos\theta\) and \(\sin\theta\).</p>
         </div>
 
-        <div class="simulation-container">
-            <div class="simulation-controls">
-                <h3 style="margin-top:0;">Loading Conditions</h3>
-
+        <div class="compact-controls">
+            <h3>Loading Conditions</h3>
+            <div class="slider-row">
                 <div class="slider-container">
                     <label for="fiber-angle">Fibre Orientation \(\theta\) (degrees):</label>
                     <input type="range" id="fiber-angle" min="0" max="90" value="0" step="5">
                     <span id="fiber-angle-value" class="slider-value">0</span>
                 </div>
-
                 <div class="slider-container">
                     <label for="applied-stress">Applied Stress \(\sigma_x\) (MPa):</label>
                     <input type="range" id="applied-stress" min="10" max="500" value="100" step="10">
                     <span id="applied-stress-value" class="slider-value">100</span>
                 </div>
-
-                <div class="info-box info-box-golden">
-                    <h4>Lamina Properties Used:</h4>
-                    <p>\(E_1 = 140\) GPa, \(E_2 = 10\) GPa</p>
-                    <p>\(G_{12} = 5.5\) GPa, \(\nu_{12} = 0.26\)</p>
-                </div>
             </div>
+        </div>
 
-            <div class="simulation-display">
-                <h3>Off-Axis Response</h3>
-                <div id="offaxis-viz" style="width: 100%; height: 300px;"></div>
-                <div id="offaxis-results" class="info-box info-box-blue">
-                    <h4>Stress and Strain in Material Axes:</h4>
-                    <p><strong>Longitudinal Stress:</strong> \(\sigma_1 = \) <span id="sigma1-result">100.0</span> MPa</p>
-                    <p><strong>Transverse Stress:</strong> \(\sigma_2 = \) <span id="sigma2-result">0.0</span> MPa</p>
-                    <p><strong>Shear Stress:</strong> \(\tau_{12} = \) <span id="tau12-result">0.0</span> MPa</p>
-                    <p><strong>Longitudinal Strain:</strong> \(\varepsilon_1 = \) <span id="epsilon1-result">714.3</span> με</p>
-                    <p><strong>Transverse Strain:</strong> \(\varepsilon_2 = \) <span id="epsilon2-result">-185.7</span> με</p>
-                </div>
-                <div id="angle-stiffness-plot" class="plot-container"></div>
+        <div class="plot-wrapper">
+            <div class="overlay-info overlay-top-left info-box-golden">
+                <h4>Lamina Properties:</h4>
+                <p>\(E_1 = 140\) GPa, \(E_2 = 10\) GPa</p>
+                <p>\(G_{12} = 5.5\) GPa, \(\nu_{12} = 0.26\)</p>
             </div>
+            <div class="overlay-info overlay-top-right info-box-blue">
+                <h4>Material Axes Stress/Strain:</h4>
+                <p><strong>\(\sigma_1 = \)</strong> <span id="sigma1-result">100.0</span> MPa</p>
+                <p><strong>\(\sigma_2 = \)</strong> <span id="sigma2-result">0.0</span> MPa</p>
+                <p><strong>\(\tau_{12} = \)</strong> <span id="tau12-result">0.0</span> MPa</p>
+                <p><strong>\(\varepsilon_1 = \)</strong> <span id="epsilon1-result">714.3</span> με</p>
+                <p><strong>\(\varepsilon_2 = \)</strong> <span id="epsilon2-result">-185.7</span> με</p>
+            </div>
+            <div id="angle-stiffness-plot" class="plot-container"></div>
         </div>
     </div>
 
@@ -275,23 +341,17 @@
             <p>\[D_{ij} = \frac{1}{3}\sum_{k=1}^{N} (\bar{Q}_{ij})_k (z_k^3 - z_{k-1}^3)\]</p>
         </div>
 
-        <div class="simulation-container">
-            <div class="simulation-controls">
-                <h3 style="margin-top:0;">Laminate Configuration</h3>
-
-                <div class="info-box info-box-blue">
-                    <h4>Layup Specification:</h4>
-                    <p>Enter layup angles separated by slashes (e.g., 0/45/-45/90)</p>
+        <div class="compact-controls">
+            <h3>Laminate Configuration</h3>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="layup-input">Layup (e.g., 0/45/-45/90):</label>
                     <input type="text" id="layup-input" value="0/45/-45/90/90/-45/45/0"
-                           style="width: 100%; padding: 8px; margin: 10px 0; border-radius: 5px; border: 2px solid var(--primary-color);">
-                    <button id="update-layup" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; cursor: pointer;">
-                        Update Laminate
-                    </button>
+                           style="width: 100%; padding: 8px; border-radius: 5px; border: 2px solid var(--primary-color);">
                 </div>
-
-                <div style="margin: 15px 0;">
-                    <h4>Common Layup Presets:</h4>
-                    <select id="layup-preset" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color);">
+                <div class="slider-container">
+                    <label for="layup-preset">Presets:</label>
+                    <select id="layup-preset" style="width: 100%; padding: 8px; border-radius: 5px; border: 2px solid var(--primary-color);">
                         <option value="">-- Select Preset --</option>
                         <option value="0/90">Cross-ply [0/90]s</option>
                         <option value="0/45/-45/90">Quasi-isotropic [0/±45/90]s</option>
@@ -300,27 +360,32 @@
                         <option value="30/-30/30/-30">Angle-ply [±30]2s</option>
                     </select>
                 </div>
-
+            </div>
+            <div class="slider-row">
                 <div class="slider-container">
                     <label for="ply-thickness">Ply Thickness (mm):</label>
                     <input type="range" id="ply-thickness" min="0.125" max="0.5" value="0.125" step="0.025">
                     <span id="ply-thickness-value" class="slider-value">0.125</span>
                 </div>
-            </div>
-
-            <div class="simulation-display">
-                <h3>Laminate Stacking Sequence</h3>
-                <div id="laminate-viz" style="width: 100%; height: 350px;"></div>
-                <div id="laminate-results" class="info-box info-box-golden">
-                    <h4>Laminate Properties:</h4>
-                    <p><strong>Total Thickness:</strong> <span id="total-thickness">1.00</span> mm</p>
-                    <p><strong>Number of Plies:</strong> <span id="num-plies">8</span></p>
-                    <p><strong>Symmetric:</strong> <span id="is-symmetric">Yes</span></p>
-                    <p><strong>Balanced:</strong> <span id="is-balanced">Yes</span></p>
-                    <p><strong>A11 (Extensional Stiffness):</strong> <span id="a11-value">0</span> MN/m</p>
-                    <p><strong>D11 (Bending Stiffness):</strong> <span id="d11-value">0</span> Nm</p>
+                <div class="slider-container" style="display: flex; align-items: flex-end;">
+                    <button id="update-layup" style="width: 100%; padding: 10px; border-radius: 5px; border: 2px solid var(--primary-color); background-color: white; cursor: pointer;">
+                        Update Laminate
+                    </button>
                 </div>
             </div>
+        </div>
+
+        <div class="plot-wrapper">
+            <div class="overlay-info overlay-top-right info-box-golden">
+                <h4>Laminate Properties:</h4>
+                <p><strong>Thickness:</strong> <span id="total-thickness">1.00</span> mm</p>
+                <p><strong>Plies:</strong> <span id="num-plies">8</span></p>
+                <p><strong>Symmetric:</strong> <span id="is-symmetric">Yes</span></p>
+                <p><strong>Balanced:</strong> <span id="is-balanced">Yes</span></p>
+                <p><strong>A11:</strong> <span id="a11-value">0</span> MN/m</p>
+                <p><strong>D11:</strong> <span id="d11-value">0</span> Nm</p>
+            </div>
+            <div id="laminate-viz" class="plot-container" style="height: 350px;"></div>
         </div>
     </div>
 
@@ -344,64 +409,55 @@
             <p>Where \(X_T, X_C\) are longitudinal tensile/compressive strengths, \(Y_T, Y_C\) are transverse strengths, and \(S\) is shear strength.</p>
         </div>
 
-        <div class="simulation-container">
-            <div class="simulation-controls">
-                <h3 style="margin-top:0;">Strength Properties</h3>
-
-                <div class="info-box info-box-blue" style="font-size: 0.9em;">
-                    <h4>Material Strengths (MPa):</h4>
-                    <div class="slider-container">
-                        <label for="xt-strength">Longitudinal Tensile \(X_T\):</label>
-                        <input type="range" id="xt-strength" min="500" max="3000" value="1500" step="100">
-                        <span id="xt-strength-value" class="slider-value">1500</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="xc-strength">Longitudinal Compressive \(X_C\):</label>
-                        <input type="range" id="xc-strength" min="500" max="2000" value="1200" step="100">
-                        <span id="xc-strength-value" class="slider-value">1200</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="yt-strength">Transverse Tensile \(Y_T\):</label>
-                        <input type="range" id="yt-strength" min="20" max="150" value="50" step="10">
-                        <span id="yt-strength-value" class="slider-value">50</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="yc-strength">Transverse Compressive \(Y_C\):</label>
-                        <input type="range" id="yc-strength" min="100" max="300" value="200" step="10">
-                        <span id="yc-strength-value" class="slider-value">200</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="s-strength">Shear Strength \(S\):</label>
-                        <input type="range" id="s-strength" min="30" max="150" value="70" step="10">
-                        <span id="s-strength-value" class="slider-value">70</span>
-                    </div>
+        <div class="compact-controls">
+            <h3>Material Strengths & Applied Stresses</h3>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="xt-strength">Long. Tensile \(X_T\) (MPa):</label>
+                    <input type="range" id="xt-strength" min="500" max="3000" value="1500" step="100">
+                    <span id="xt-strength-value" class="slider-value">1500</span>
                 </div>
-
-                <div class="info-box info-box-golden">
-                    <h4>Applied Stress State:</h4>
-                    <div class="slider-container">
-                        <label for="test-sigma1">Test \(\sigma_1\) (MPa):</label>
-                        <input type="range" id="test-sigma1" min="-500" max="1000" value="300" step="25">
-                        <span id="test-sigma1-value" class="slider-value">300</span>
-                    </div>
-                    <div class="slider-container">
-                        <label for="test-sigma2">Test \(\sigma_2\) (MPa):</label>
-                        <input type="range" id="test-sigma2" min="-200" max="100" value="20" step="10">
-                        <span id="test-sigma2-value" class="slider-value">20</span>
-                    </div>
+                <div class="slider-container">
+                    <label for="xc-strength">Long. Compressive \(X_C\) (MPa):</label>
+                    <input type="range" id="xc-strength" min="500" max="2000" value="1200" step="100">
+                    <span id="xc-strength-value" class="slider-value">1200</span>
                 </div>
             </div>
-
-            <div class="simulation-display">
-                <h3>Failure Envelope</h3>
-                <div id="failure-plot" class="plot-container"></div>
-                <div id="failure-results" class="info-box info-box-blue">
-                    <h4>Failure Assessment:</h4>
-                    <p><strong>Tsai-Hill Index:</strong> <span id="tsai-hill-index">0.0</span> (<span id="tsai-hill-status">Safe</span>)</p>
-                    <p><strong>Safety Factor:</strong> <span id="safety-factor">0.0</span></p>
-                    <p style="font-size: 0.85em; margin-top: 10px;">Note: Failure Index &lt; 1 indicates safe operation. Safety Factor = 1/√(Failure Index)</p>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="yt-strength">Trans. Tensile \(Y_T\) (MPa):</label>
+                    <input type="range" id="yt-strength" min="20" max="150" value="50" step="10">
+                    <span id="yt-strength-value" class="slider-value">50</span>
+                </div>
+                <div class="slider-container">
+                    <label for="yc-strength">Trans. Compressive \(Y_C\) (MPa):</label>
+                    <input type="range" id="yc-strength" min="100" max="300" value="200" step="10">
+                    <span id="yc-strength-value" class="slider-value">200</span>
                 </div>
             </div>
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="test-sigma1">Test \(\sigma_1\) (MPa):</label>
+                    <input type="range" id="test-sigma1" min="-500" max="1000" value="300" step="25">
+                    <span id="test-sigma1-value" class="slider-value">300</span>
+                </div>
+                <div class="slider-container">
+                    <label for="test-sigma2">Test \(\sigma_2\) (MPa):</label>
+                    <input type="range" id="test-sigma2" min="-200" max="100" value="20" step="10">
+                    <span id="test-sigma2-value" class="slider-value">20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="plot-wrapper">
+            <div class="overlay-info overlay-top-right info-box-blue">
+                <h4>Failure Assessment:</h4>
+                <p><strong>Tsai-Hill Index:</strong> <span id="tsai-hill-index">0.0</span></p>
+                <p><strong>Status:</strong> <span id="tsai-hill-status">Safe</span></p>
+                <p><strong>Safety Factor:</strong> <span id="safety-factor">0.0</span></p>
+                <p style="font-size: 0.85em; margin-top: 8px;">Index &lt; 1 = Safe<br>SF = 1/√(Index)</p>
+            </div>
+            <div id="failure-plot" class="plot-container"></div>
         </div>
     </div>
 
@@ -590,7 +646,7 @@
             const sliders = [
                 'fiber-modulus', 'fiber-poisson', 'matrix-modulus', 'matrix-poisson', 'fiber-volume',
                 'fiber-angle', 'applied-stress', 'ply-thickness',
-                'xt-strength', 'xc-strength', 'yt-strength', 'yc-strength', 's-strength',
+                'xt-strength', 'xc-strength', 'yt-strength', 'yc-strength',
                 'test-sigma1', 'test-sigma2'
             ];
 
@@ -711,7 +767,7 @@
                 hovermode: 'closest'
             };
 
-            Plotly.newPlot('rom-plot', [trace1, trace2, trace3, trace4], layout, {responsive: true});
+            Plotly.newPlot('rom-plot', [trace1, trace2, trace3, trace4], layout, {responsive: true, displayModeBar: false});
 
             return { E1, E2, nu12, G12 };
         }
@@ -791,7 +847,7 @@
                 yaxis: { title: 'Effective Modulus E<sub>x</sub> (GPa)' }
             };
 
-            Plotly.newPlot('angle-stiffness-plot', [trace, marker], layout, {responsive: true});
+            Plotly.newPlot('angle-stiffness-plot', [trace, marker], layout, {responsive: true, displayModeBar: false});
         }
 
         // Laminate visualization
@@ -871,7 +927,7 @@
                 showlegend: false
             };
 
-            Plotly.newPlot('laminate-viz', [trace], layout, {responsive: true});
+            Plotly.newPlot('laminate-viz', [trace], layout, {responsive: true, displayModeBar: false});
         }
 
         // Layup presets
@@ -898,50 +954,98 @@
             const XC = parseFloat(document.getElementById('xc-strength').value);
             const YT = parseFloat(document.getElementById('yt-strength').value);
             const YC = parseFloat(document.getElementById('yc-strength').value);
-            const S = parseFloat(document.getElementById('s-strength').value);
 
             const sigma1 = parseFloat(document.getElementById('test-sigma1').value);
             const sigma2 = parseFloat(document.getElementById('test-sigma2').value);
 
-            // Tsai-Hill criterion
-            const X = sigma1 >= 0 ? XT : XC;
-            const Y = sigma2 >= 0 ? YT : YC;
-            const tau12 = 0; // Simplified for 2D display
+            // Tsai-Hill criterion (properly accounting for tension/compression)
+            // Note: shear term omitted for 2D stress state visualization
 
-            const tsaiHill = Math.pow(sigma1/X, 2) - (sigma1*sigma2)/(X*X) + Math.pow(sigma2/Y, 2) + Math.pow(tau12/S, 2);
+            // Use appropriate strength values based on sign of stress
+            const X1 = sigma1 >= 0 ? XT : XC;
+            const X2 = sigma2 >= 0 ? YT : YC;
+
+            const tsaiHill = Math.pow(sigma1/X1, 2) - (sigma1*sigma2)/(X1*X1) + Math.pow(sigma2/X2, 2);
             const safetyFactor = tsaiHill > 0 ? 1/Math.sqrt(tsaiHill) : 999;
 
             document.getElementById('tsai-hill-index').textContent = tsaiHill.toFixed(3);
             document.getElementById('tsai-hill-status').textContent = tsaiHill >= 1 ? 'FAILURE' : 'Safe';
             document.getElementById('safety-factor').textContent = safetyFactor > 10 ? '> 10' : safetyFactor.toFixed(2);
 
-            // Plot failure envelope
+            // Plot failure envelope (4 quadrants with correct strength values)
             const sigma1Array = [];
-            const sigma2Pos = [];
-            const sigma2Neg = [];
+            const sigma2Envelope = [];
 
             for (let s1 = -XC; s1 <= XT; s1 += 10) {
                 sigma1Array.push(s1);
 
                 // Solve for sigma2 from Tsai-Hill = 1
-                // For positive sigma2
-                const A = 1/(YT*YT);
-                const B = -s1/(XT*XT);
-                const C = (s1*s1)/(XT*XT) - 1;
+                // Use appropriate X based on s1 sign
+                const X_s1 = s1 >= 0 ? XT : XC;
 
-                const disc = B*B - 4*A*C;
-                if (disc >= 0) {
-                    sigma2Pos.push((-B + Math.sqrt(disc))/(2*A));
-                    sigma2Neg.push((-B - Math.sqrt(disc))/(2*A));
-                } else {
-                    sigma2Pos.push(null);
-                    sigma2Neg.push(null);
+                // Try to find sigma2 that satisfies Tsai-Hill = 1
+                // (s1/X_s1)^2 - (s1*s2)/(X_s1^2) + (s2/Y)^2 = 1
+
+                let s2_solutions = [];
+
+                // Try both positive (using YT) and negative (using YC) sigma2
+                for (let tryPositive of [true, false]) {
+                    const Y_s2 = tryPositive ? YT : YC;
+
+                    // Quadratic: (s2/Y_s2)^2 - (s1/(X_s1^2))*s2 + (s1/X_s1)^2 - 1 = 0
+                    const a = 1/(Y_s2*Y_s2);
+                    const b = -s1/(X_s1*X_s1);
+                    const c = (s1*s1)/(X_s1*X_s1) - 1;
+
+                    const disc = b*b - 4*a*c;
+                    if (disc >= 0) {
+                        const s2_1 = (-b + Math.sqrt(disc))/(2*a);
+                        const s2_2 = (-b - Math.sqrt(disc))/(2*a);
+
+                        // Only keep solutions with correct sign
+                        if (tryPositive && s2_1 >= 0) s2_solutions.push(s2_1);
+                        if (tryPositive && s2_2 >= 0) s2_solutions.push(s2_2);
+                        if (!tryPositive && s2_1 <= 0) s2_solutions.push(s2_1);
+                        if (!tryPositive && s2_2 <= 0) s2_solutions.push(s2_2);
+                    }
                 }
+
+                // Pick the extreme values (both positive and negative)
+                sigma2Envelope.push(s2_solutions.length > 0 ? Math.max(...s2_solutions) : null);
+            }
+
+            // Also add the negative envelope
+            const sigma2EnvelopeNeg = [];
+            for (let s1 = -XC; s1 <= XT; s1 += 10) {
+                const X_s1 = s1 >= 0 ? XT : XC;
+
+                let s2_solutions = [];
+
+                for (let tryPositive of [true, false]) {
+                    const Y_s2 = tryPositive ? YT : YC;
+
+                    const a = 1/(Y_s2*Y_s2);
+                    const b = -s1/(X_s1*X_s1);
+                    const c = (s1*s1)/(X_s1*X_s1) - 1;
+
+                    const disc = b*b - 4*a*c;
+                    if (disc >= 0) {
+                        const s2_1 = (-b + Math.sqrt(disc))/(2*a);
+                        const s2_2 = (-b - Math.sqrt(disc))/(2*a);
+
+                        if (tryPositive && s2_1 >= 0) s2_solutions.push(s2_1);
+                        if (tryPositive && s2_2 >= 0) s2_solutions.push(s2_2);
+                        if (!tryPositive && s2_1 <= 0) s2_solutions.push(s2_1);
+                        if (!tryPositive && s2_2 <= 0) s2_solutions.push(s2_2);
+                    }
+                }
+
+                sigma2EnvelopeNeg.push(s2_solutions.length > 0 ? Math.min(...s2_solutions) : null);
             }
 
             const trace1 = {
                 x: sigma1Array,
-                y: sigma2Pos,
+                y: sigma2Envelope,
                 mode: 'lines',
                 name: 'Tsai-Hill Envelope',
                 line: { color: '#1890ff', width: 3 }
@@ -949,7 +1053,7 @@
 
             const trace2 = {
                 x: sigma1Array,
-                y: sigma2Neg,
+                y: sigma2EnvelopeNeg,
                 mode: 'lines',
                 showlegend: false,
                 line: { color: '#1890ff', width: 3 }
@@ -970,7 +1074,7 @@
                 hovermode: 'closest'
             };
 
-            Plotly.newPlot('failure-plot', [trace1, trace2, trace3], layout, {responsive: true});
+            Plotly.newPlot('failure-plot', [trace1, trace2, trace3], layout, {responsive: true, displayModeBar: false});
         }
 
         // Update all simulations

@@ -111,16 +111,6 @@
                 <label for="step-position">Step Position (%): <span id="step-position-value" class="value-display">50</span></label>
                 <input type="range" id="step-position" min="20" max="80" step="5" value="50" class="slider">
             </div>
-
-            <div class="slider-container">
-                <label for="modulus">Young's Modulus E (GPa): <span id="modulus-value" class="value-display">200</span></label>
-                <input type="range" id="modulus" min="50" max="400" step="10" value="200" class="slider">
-            </div>
-
-            <div class="slider-container">
-                <label for="load">Applied Load P (kN): <span id="load-value" class="value-display">10</span></label>
-                <input type="range" id="load" min="1" max="50" step="1" value="10" class="slider">
-            </div>
         </div>
 
         <div id="sketch-holder"></div>
@@ -199,18 +189,6 @@
                 document.getElementById('step-position').addEventListener('input', function() {
                     stepPos = parseFloat(this.value) / 100;
                     document.getElementById('step-position-value').textContent = this.value;
-                    solveProblem();
-                });
-
-                document.getElementById('modulus').addEventListener('input', function() {
-                    E = parseFloat(this.value);
-                    document.getElementById('modulus-value').textContent = E;
-                    solveProblem();
-                });
-
-                document.getElementById('load').addEventListener('input', function() {
-                    P = parseFloat(this.value);
-                    document.getElementById('load-value').textContent = P;
                     solveProblem();
                 });
             }

@@ -155,7 +155,8 @@
             let vortices = [];
             let numParticles = 600;
             let time = 0;
-            let dt = 0.1;
+            let dt = 0.016; // ~60 FPS in simulation time
+            let lastShedTime = 0;
 
             // Display variables
             let regime = '';
@@ -185,7 +186,8 @@
                     particles.push({
                         x: p.random(-50, p.width),
                         y: p.random(0, p.height),
-                        age: p.random(0, 100)
+                        age: p.random(0, 100),
+                        spawnOffset: p.random(0, 20) // Random spawn offset to prevent waves
                     });
                 }
             }
@@ -221,6 +223,7 @@
                     vortices = [];
                     time = 0;
                     shedPhase = 0;
+                    lastShedTime = 0;
                 });
             }
 
@@ -250,8 +253,11 @@
                 // Update vortex shedding parameters
                 if (Re > 50) {
                     // Strouhal number approximately 0.2 for cylinder
+                    // Frequency in Hz
                     shedFrequency = 0.2 * U / D;
-                    vortexStrength = p.constrain((Re - 50) / 200, 0, 2.0);
+                    // Vortex strength scales with Re and velocity
+                    // Circulation Γ ≈ U*D for cylinders, stronger with higher Re
+                    vortexStrength = U * D * p.constrain((Re - 50) / 30, 1.0, 8.0);
                 } else {
                     shedFrequency = 0;
                     vortexStrength = 0;
@@ -270,6 +276,19 @@
 
                 // Update and draw particles
                 updateParticles();
+
+                // Draw vortex cores for visualization
+                for (let vortex of vortices) {
+                    let alpha = p.map(Math.abs(vortex.strength), 0, vortexStrength * 1000, 30, 180);
+                    let coreSize = p.map(Math.abs(vortex.strength), 0, vortexStrength * 1000, 10, 25);
+                    if (vortex.strength > 0) {
+                        p.fill(255, 100, 100, alpha); // Red for positive (clockwise)
+                    } else {
+                        p.fill(100, 150, 255, alpha); // Blue for negative (counterclockwise)
+                    }
+                    p.noStroke();
+                    p.circle(vortex.x, vortex.y, coreSize);
+                }
 
                 // Draw cylinder
                 p.fill(60);
@@ -346,24 +365,66 @@
                 vortices = vortices.filter(v => v.x < p.width + 100);
 
                 // Add new vortices based on shedding frequency
-                if (vortexStrength > 0 && p.frameCount % Math.max(1, Math.floor(30 / shedFrequency)) === 0) {
-                    let side = Math.sin(shedPhase * 2 * Math.PI) > 0 ? 1 : -1;
-                    let offsetY = side * cylinderR * 0.8;
+                if (vortexStrength > 0 && shedFrequency > 0) {
+                    // Period of shedding in seconds
+                    let shedPeriod = 1.0 / shedFrequency;
 
-                    vortices.push({
-                        x: cylinderX + cylinderR,
-                        y: cylinderY + offsetY,
-                        strength: side * vortexStrength * 100,
-                        age: 0
-                    });
+                    // Check if enough time has passed to shed a vortex
+                    if (time - lastShedTime >= shedPeriod / 2) {
+                        // Alternate sides based on number of vortices
+                        let side = (vortices.length % 2 === 0) ? 1 : -1;
+
+                        // Offset from cylinder center - start behind cylinder
+                        let offsetY = side * cylinderR * 0.8;
+                        let offsetX = cylinderR * 1.3;
+
+                        vortices.push({
+                            x: cylinderX + offsetX,
+                            y: cylinderY + offsetY,
+                            strength: side * vortexStrength * 1000, // Much larger circulation
+                            age: 0,
+                            side: side
+                        });
+
+                        lastShedTime = time;
+                    }
                 }
 
-                // Move vortices downstream
+                // Move vortices downstream and let them interact
                 for (let v of vortices) {
-                    v.x += U * 30;
+                    // Convection by free stream
+                    v.x += U * 30 * dt;
+
+                    // Vortices induce velocity on each other (vortex dynamics)
+                    // This creates the characteristic oscillating wake pattern
+                    let inducedVelX = 0;
+                    let inducedVelY = 0;
+
+                    for (let other of vortices) {
+                        if (other !== v) {
+                            let dx = v.x - other.x;
+                            let dy = v.y - other.y;
+                            let dist = Math.sqrt(dx*dx + dy*dy);
+
+                            if (dist > 10) {
+                                // Biot-Savart law: velocity induced by vortex
+                                // For 2D point vortex at distance r with circulation Γ:
+                                // v_θ = Γ/(2πr), giving velocity components:
+                                // u = -Γ/(2π) * dy/r², v = Γ/(2π) * dx/r²
+                                let r2 = dist * dist;
+                                let factor = other.strength / (2 * Math.PI * r2);
+                                inducedVelX += -factor * dy * 0.08;
+                                inducedVelY += factor * dx * 0.08;
+                            }
+                        }
+                    }
+
+                    v.x += inducedVelX * dt;
+                    v.y += inducedVelY * dt;
+
                     v.age += dt;
-                    // Vortices decay over time
-                    v.strength *= 0.995;
+                    // Slow decay to maintain wake structure
+                    v.strength *= Math.pow(0.996, dt / 0.016);
                 }
             }
 
@@ -372,7 +433,7 @@
                     // Get velocity at particle position
                     let vel = getVelocity(particle.x, particle.y);
 
-                    // Update position
+                    // Update position using forward Euler integration
                     particle.x += vel.x * dt;
                     particle.y += vel.y * dt;
                     particle.age += dt;
@@ -385,25 +446,30 @@
                     // Reset particles that go out of bounds or hit cylinder
                     if (particle.x > p.width + 20 || particle.x < -20 ||
                         particle.y > p.height + 20 || particle.y < -20 ||
-                        dist < cylinderR || particle.age > 200) {
-                        particle.x = p.random(-20, 0);
+                        dist < cylinderR || particle.age > 50) {
+                        // Spread particles uniformly at inlet to prevent density waves
+                        particle.x = -particle.spawnOffset;
                         particle.y = p.random(0, p.height);
                         particle.age = 0;
+                        particle.spawnOffset = p.random(0, 20);
                     }
 
                     // Calculate vorticity for color
                     let vort = getVorticityAtPoint(particle.x, particle.y);
 
-                    // Color based on vorticity (red = clockwise, blue = counterclockwise)
-                    let vortMag = p.constrain(Math.abs(vort) * 50, 0, 255);
-                    if (vort > 0) {
-                        p.fill(200, 50, 50, 180); // Red for positive vorticity
+                    // Color based on vorticity (red = positive, blue = negative)
+                    let vortMag = Math.abs(vort);
+                    // Lower threshold for better visualization of vortex shedding
+                    if (vortMag > 0.02) {
+                        if (vort > 0) {
+                            let intensity = p.constrain(vortMag * 50, 100, 255);
+                            p.fill(255, 255 - intensity, 255 - intensity, 220); // Red for positive vorticity (clockwise)
+                        } else {
+                            let intensity = p.constrain(vortMag * 50, 100, 255);
+                            p.fill(255 - intensity, 255 - intensity, 255, 220); // Blue for negative vorticity (counterclockwise)
+                        }
                     } else {
-                        p.fill(50, 100, 200, 180); // Blue for negative vorticity
-                    }
-
-                    if (Math.abs(vort) < 0.1) {
-                        p.fill(100, 100, 100, 120); // Gray for low vorticity
+                        p.fill(120, 120, 120, 120); // Gray for low vorticity (more transparent)
                     }
 
                     p.noStroke();
@@ -421,32 +487,43 @@
                 let dy = y - cylinderY;
                 let r = Math.sqrt(dx*dx + dy*dy);
 
-                // Cylinder influence (simplified potential flow + boundary layer)
+                // Cylinder influence (simplified potential flow)
                 if (r > cylinderR) {
                     let R = cylinderR;
                     let R2 = R * R;
                     let r2 = r * r;
 
-                    // Potential flow around cylinder
+                    // Potential flow around cylinder (inviscid solution)
+                    // Stream function: ψ = U*r*sin(θ)*(1 - R²/r²)
+                    // Velocity components in polar: u_r = U*cos(θ)*(1 - R²/r²), u_θ = -U*sin(θ)*(1 + R²/r²)
                     let cos_theta = dx / r;
                     let sin_theta = dy / r;
 
                     let u_r = U * 50 * (1 - R2/r2) * cos_theta;
                     let u_theta = -U * 50 * (1 + R2/r2) * sin_theta;
 
+                    // Convert from polar to Cartesian coordinates
                     u = u_r * cos_theta - u_theta * sin_theta;
                     v = u_r * sin_theta + u_theta * cos_theta;
 
-                    // Add vortex influence
+                    // Add vortex influence using Biot-Savart law
+                    // For a 2D point vortex with circulation Γ:
+                    // Velocity magnitude: v_θ = Γ/(2πr)
+                    // Components: u = -Γ/(2πr²) * dy, v = Γ/(2πr²) * dx
                     for (let vortex of vortices) {
                         let vdx = x - vortex.x;
                         let vdy = y - vortex.y;
-                        let vr = Math.sqrt(vdx*vdx + vdy*vdy);
+                        let vr2 = vdx*vdx + vdy*vdy;
+                        let vr = Math.sqrt(vr2);
 
-                        if (vr > 5) {
+                        if (vr > 5) { // Avoid singularity at vortex center
                             let circulation = vortex.strength;
-                            let u_vortex = -circulation * vdy / (vr * vr);
-                            let v_vortex = circulation * vdx / (vr * vr);
+                            // Velocity induced by point vortex with viscous core
+                            // Modified to include core radius for numerical stability
+                            let coreRadius = 10;
+                            let factor = circulation / (2 * Math.PI * (vr2 + coreRadius * coreRadius));
+                            let u_vortex = -factor * vdy * 0.15;
+                            let v_vortex = factor * vdx * 0.15;
 
                             u += u_vortex;
                             v += v_vortex;
