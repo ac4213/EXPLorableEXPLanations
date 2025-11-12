@@ -102,13 +102,6 @@
                     </div>
                 </div>
                 <div class="slider-container">
-                    <label for="deflector-velocity">Deflector Velocity (m/s):</label>
-                    <div class="slider-row">
-                        <input type="range" id="deflector-velocity" min="0" max="20" value="0" step="1">
-                        <span id="deflector-velocity-value" class="value-display">0</span>
-                    </div>
-                </div>
-                <div class="slider-container">
                     <label for="jet-diameter">Jet Diameter (mm):</label>
                     <div class="slider-row">
                         <input type="range" id="jet-diameter" min="20" max="100" value="50" step="5">
@@ -127,13 +120,6 @@
             </div>
         </div>
 
-        <!-- Results Panel -->
-        <div class="results-panel">
-            <p><strong>Flow Rate:</strong> Q = <span id="flow-rate">0.039</span> m³/s</p>
-            <p><strong>Force on Deflector:</strong> F = <span id="force">785</span> N</p>
-            <p><strong>Power Delivered:</strong> P = <span id="power">0</span> W</p>
-            <p><strong>Efficiency:</strong> η = <span id="efficiency">0</span> %</p>
-        </div>
 
         <!-- Legend -->
         <div class="diagram-legend">
@@ -147,7 +133,11 @@
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background-color: #E74C3C;"></div>
-                <span>Force Vector</span>
+                <span>Horizontal Force</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #4CAF50;"></div>
+                <span>Vertical Force</span>
             </div>
         </div>
     </div>
@@ -389,13 +379,20 @@
         // Impact of Jets simulation using p5.js
         let sketch = new p5(function(p) {
             let jetVelocity = 20;
-            let deflectorVelocity = 0;
+            let deflectorVelocity = 0; // Fixed at 0
             let jetDiameter = 50; // mm
             let deflectorType = 'flat';
             let deflectorX = 500;
 
             const density = 1000; // kg/m³
             let particles = [];
+
+            // Results to display
+            let flowRate = 0;
+            let forceHorizontal = 0;
+            let forceVertical = 0;
+            let power = 0;
+            let efficiency = 0;
 
             p.setup = function() {
                 let canvasWidth = Math.min(800, p.windowWidth - 40);
@@ -408,12 +405,6 @@
             p.draw = function() {
                 p.background(240);
 
-                // Update deflector position if moving
-                if (deflectorVelocity > 0) {
-                    deflectorX += deflectorVelocity * 0.05;
-                    if (deflectorX > p.width - 100) deflectorX = 500;
-                }
-
                 // Draw nozzle
                 drawNozzle(p);
 
@@ -424,21 +415,25 @@
                 // Draw deflector
                 drawDeflector(p);
 
-                // Draw force vector
-                drawForceVector(p);
+                // Draw force vectors
+                drawForceVectors(p);
 
                 // Draw info labels
                 drawLabels(p);
+
+                // Draw infobox at top left
+                drawInfobox(p);
             };
 
             function initializeParticles() {
                 particles = [];
-                for (let i = 0; i < 40; i++) {
+                // Emit many more particles (200 instead of 40)
+                for (let i = 0; i < 200; i++) {
                     particles.push({
-                        x: 100 + i * 10,
+                        x: 100 + p.random(-5, 0),
                         y: 200 + p.random(-jetDiameter/4, jetDiameter/4),
-                        vx: jetVelocity,
-                        vy: 0,
+                        vx: jetVelocity * (0.95 + p.random(0.1)),
+                        vy: p.random(-0.5, 0.5),
                         deflected: false
                     });
                 }
@@ -502,23 +497,34 @@
                     if (!particle.deflected && particle.x >= deflectorX - 70 && particle.x <= deflectorX + 10) {
                         particle.deflected = true;
 
+                        // Preserve speed (elastic collision)
+                        let speed = p.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+
                         switch(deflectorType) {
                             case 'flat':
-                                particle.vx = -jetVelocity * 0.2; // Slight backward
-                                particle.vy = p.random(-2, 2);
+                                // Reflect horizontally, preserve vertical component
+                                particle.vx = -particle.vx * 0.9; // Some energy loss
+                                particle.vy = particle.vy + p.random(-1, 1); // Small spread
                                 break;
                             case 'curved':
-                                particle.vx = -jetVelocity * 0.9; // Near reversal
-                                particle.vy = p.random(-1, 1);
+                                // Reverse flow direction (180° deflection)
+                                particle.vx = -particle.vx * 0.95;
+                                particle.vy = -particle.vy * 0.95;
                                 break;
                             case 'hemispherical':
+                                // Deflect based on impact point (120° deflection)
                                 const angle = p.random(-p.PI/3, p.PI/3);
-                                particle.vx = jetVelocity * Math.cos(angle + p.PI);
-                                particle.vy = jetVelocity * Math.sin(angle + p.PI);
+                                particle.vx = speed * Math.cos(angle + p.PI) * 0.9;
+                                particle.vy = speed * Math.sin(angle + p.PI) * 0.9;
                                 break;
                             case 'inclined':
-                                particle.vx = jetVelocity * 0.5;
-                                particle.vy = p.random(0, 1) > 0.5 ? jetVelocity * 0.7 : -jetVelocity * 0.7;
+                                // 45° plate - reflect according to geometry
+                                // For a 45° inclined surface, vx and vy swap and change signs
+                                let tempVx = particle.vx;
+                                let tempVy = particle.vy;
+                                // Reflection formula for 45° surface
+                                particle.vx = tempVy * 0.9;
+                                particle.vy = tempVx * 0.9;
                                 break;
                         }
                     }
@@ -527,12 +533,15 @@
                     particle.x += particle.vx * 0.5;
                     particle.y += particle.vy * 0.5;
 
+                    // Add gravity effect
+                    particle.vy += 0.05;
+
                     // Reset if off screen
                     if (particle.x < 0 || particle.x > p.width || particle.y < 0 || particle.y > p.height) {
-                        particle.x = 100;
+                        particle.x = 100 + p.random(-5, 0);
                         particle.y = 200 + p.random(-jetDiameter/4, jetDiameter/4);
-                        particle.vx = jetVelocity;
-                        particle.vy = 0;
+                        particle.vx = jetVelocity * (0.95 + p.random(0.1));
+                        particle.vy = p.random(-0.5, 0.5);
                         particle.deflected = false;
                     }
                 }
@@ -550,46 +559,58 @@
                 }
             }
 
-            function drawForceVector(p) {
-                // Calculate force
-                const A = Math.PI * Math.pow(jetDiameter / 2000, 2); // m²
-                const relVel = jetVelocity - deflectorVelocity;
-                let force;
+            function drawForceVectors(p) {
+                // Draw both horizontal and vertical force vectors
+                const arrowLenH = Math.min(forceHorizontal / 5, 100);
+                const arrowLenV = Math.min(Math.abs(forceVertical) / 5, 80);
 
-                switch(deflectorType) {
-                    case 'flat':
-                        force = density * A * relVel * relVel;
-                        break;
-                    case 'curved':
-                        force = density * A * relVel * relVel * 2;
-                        break;
-                    case 'hemispherical':
-                        force = density * A * relVel * relVel * (1 - Math.cos(2 * Math.PI / 3));
-                        break;
-                    case 'inclined':
-                        force = density * A * relVel * relVel * (1 - Math.cos(Math.PI / 4));
-                        break;
-                }
-
-                // Draw force arrow
-                const arrowLen = Math.min(force / 5, 100);
+                // Horizontal force (always present)
                 p.stroke(231, 76, 60);
                 p.strokeWeight(4);
                 p.fill(231, 76, 60);
-                p.line(deflectorX, 200, deflectorX - arrowLen, 200);
+                p.line(deflectorX, 200, deflectorX - arrowLenH, 200);
 
-                // Arrow head
+                // Arrow head for horizontal force
                 p.triangle(
-                    deflectorX - arrowLen, 200,
-                    deflectorX - arrowLen + 10, 195,
-                    deflectorX - arrowLen + 10, 205
+                    deflectorX - arrowLenH, 200,
+                    deflectorX - arrowLenH + 10, 195,
+                    deflectorX - arrowLenH + 10, 205
                 );
 
-                // Label
+                // Label for horizontal force
                 p.noStroke();
                 p.textAlign(p.CENTER);
                 p.textSize(12);
-                p.text('F', deflectorX - arrowLen/2, 190);
+                p.text('Fₓ', deflectorX - arrowLenH/2, 190);
+
+                // Vertical force (if significant)
+                if (Math.abs(forceVertical) > 10) {
+                    p.stroke(76, 175, 80);
+                    p.strokeWeight(4);
+                    p.fill(76, 175, 80);
+
+                    if (forceVertical > 0) {
+                        // Downward force
+                        p.line(deflectorX, 200, deflectorX, 200 + arrowLenV);
+                        p.triangle(
+                            deflectorX, 200 + arrowLenV,
+                            deflectorX - 5, 200 + arrowLenV - 10,
+                            deflectorX + 5, 200 + arrowLenV - 10
+                        );
+                        p.noStroke();
+                        p.text('Fᵧ', deflectorX + 15, 200 + arrowLenV/2);
+                    } else {
+                        // Upward force
+                        p.line(deflectorX, 200, deflectorX, 200 - arrowLenV);
+                        p.triangle(
+                            deflectorX, 200 - arrowLenV,
+                            deflectorX - 5, 200 - arrowLenV + 10,
+                            deflectorX + 5, 200 - arrowLenV + 10
+                        );
+                        p.noStroke();
+                        p.text('Fᵧ', deflectorX + 15, 200 - arrowLenV/2);
+                    }
+                }
             }
 
             function drawLabels(p) {
@@ -602,23 +623,38 @@
                 if (deflectorType === 'hemispherical') typeLabel = 'Hemispherical Cup';
                 if (deflectorType === 'inclined') typeLabel = 'Inclined Plate (45°)';
 
-                p.text('Deflector: ' + typeLabel, 10, 20);
-                p.text('Jet Velocity: ' + jetVelocity + ' m/s', 10, 40);
-                if (deflectorVelocity > 0) {
-                    p.text('Deflector Velocity: ' + deflectorVelocity + ' m/s', 10, 60);
+                p.text('Deflector: ' + typeLabel, 10, 390);
+                p.text('Jet Velocity: ' + jetVelocity + ' m/s', 10, 375);
+            }
+
+            function drawInfobox(p) {
+                // Draw infobox at top left of canvas
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(10, 10, 220, 110, 5);
+
+                p.fill(0);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.LEFT);
+                p.text('Flow Rate: Q = ' + flowRate.toFixed(4) + ' m³/s', 20, 30);
+                p.text('Horizontal Force: Fₓ = ' + forceHorizontal.toFixed(1) + ' N', 20, 50);
+                if (Math.abs(forceVertical) > 0.1) {
+                    p.text('Vertical Force: Fᵧ = ' + forceVertical.toFixed(1) + ' N', 20, 70);
+                } else {
+                    p.text('Vertical Force: Fᵧ = 0 N', 20, 70);
                 }
+                let totalForce = p.sqrt(forceHorizontal * forceHorizontal + forceVertical * forceVertical);
+                p.text('Total Force: F = ' + totalForce.toFixed(1) + ' N', 20, 90);
+                p.text('Power: P = ' + power.toFixed(1) + ' W', 20, 110);
             }
 
             function setupControls() {
                 document.getElementById("jet-velocity").addEventListener("input", function() {
                     jetVelocity = parseFloat(this.value);
                     document.getElementById("jet-velocity-value").textContent = jetVelocity;
-                    calculateResults();
-                });
-
-                document.getElementById("deflector-velocity").addEventListener("input", function() {
-                    deflectorVelocity = parseFloat(this.value);
-                    document.getElementById("deflector-velocity-value").textContent = deflectorVelocity;
+                    initializeParticles(); // Reinitialize with new velocity
                     calculateResults();
                 });
 
@@ -638,36 +674,50 @@
             function calculateResults() {
                 const A = Math.PI * Math.pow(jetDiameter / 2000, 2); // Convert mm to m
                 const Q = A * jetVelocity;
-                const relVel = jetVelocity - deflectorVelocity;
+                const relVel = jetVelocity; // Deflector is stationary
 
-                let force, theta;
+                let Fx = 0, Fy = 0;
+                let theta;
+
                 switch(deflectorType) {
                     case 'flat':
+                        // Flat plate: all force is horizontal
                         theta = Math.PI / 2;
-                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fx = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fy = 0;
                         break;
                     case 'curved':
+                        // Curved vane (180°): all force is horizontal
                         theta = Math.PI;
-                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fx = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fy = 0;
                         break;
                     case 'hemispherical':
+                        // Hemispherical cup: mostly horizontal, some spread
                         theta = 2 * Math.PI / 3;
-                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fx = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        Fy = 0; // Symmetric, so no net vertical force
                         break;
                     case 'inclined':
-                        theta = Math.PI / 4;
-                        force = density * A * relVel * relVel * (1 - Math.cos(theta));
+                        // 45° inclined plate: both horizontal and vertical components
+                        // Incoming momentum is horizontal: m_dot * v
+                        // After deflection by 45°, momentum changes in both x and y
+                        const massFlowRate = density * Q;
+                        // For 45° deflection, velocity components change:
+                        // vx: from v to v*cos(45°) = 0.707v
+                        // vy: from 0 to v*sin(45°) = 0.707v
+                        Fx = massFlowRate * relVel * (1 - 0.707);
+                        Fy = massFlowRate * relVel * 0.707;
                         break;
                 }
 
-                const power = force * deflectorVelocity;
-                const jetKE = 0.5 * density * Q * jetVelocity * jetVelocity;
-                const efficiency = jetKE > 0 ? (power / jetKE) * 100 : 0;
+                flowRate = Q;
+                forceHorizontal = Fx;
+                forceVertical = Fy;
+                power = Fx * deflectorVelocity; // Power is zero since deflector is stationary
 
-                document.getElementById("flow-rate").textContent = Q.toFixed(4);
-                document.getElementById("force").textContent = force.toFixed(1);
-                document.getElementById("power").textContent = power.toFixed(1);
-                document.getElementById("efficiency").textContent = efficiency.toFixed(1);
+                const jetKE = 0.5 * density * Q * jetVelocity * jetVelocity;
+                efficiency = jetKE > 0 ? (power / jetKE) * 100 : 0;
             }
 
         }, 'sketch-holder');

@@ -181,6 +181,24 @@
             </div>
 
             <div class="controls-panel" style="margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px 0;">Show Reference Lines:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <div class="slider-container">
+                        <label><input type="checkbox" id="show-isothermals" checked> Isothermals (PV diagram)</label>
+                    </div>
+                    <div class="slider-container">
+                        <label><input type="checkbox" id="show-adiabatics" checked> Adiabatics (PV diagram)</label>
+                    </div>
+                    <div class="slider-container">
+                        <label><input type="checkbox" id="show-isobars"> Isobars (TS diagram)</label>
+                    </div>
+                    <div class="slider-container">
+                        <label><input type="checkbox" id="show-isochores"> Isochores (TS diagram)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel" style="margin-bottom: 15px;">
                 <div class="slider-container">
                     <label for="pressure-slider">Pressure (kPa): <span id="pressure-value">100.0</span></label>
                     <input type="range" id="pressure-slider" min="50" max="300" step="1" value="100">
@@ -604,9 +622,15 @@
             let showTrace = true;
             let tracePoints = [];
 
+            // Display options
+            let showIsothermals = true;
+            let showAdiabatics = true;
+            let showIsobars = false;
+            let showIsochores = false;
+
             // Particle system
             let particles = [];
-            const numParticles = 50;
+            let numParticles = 50; // Will be updated based on moles
 
             // Canvas dimensions
             let canvasWidth, canvasHeight;
@@ -675,6 +699,9 @@
 
             function initializeParticles() {
                 particles = [];
+                // Number of particles proportional to moles (50 particles per mole)
+                numParticles = Math.round(moles * 50);
+
                 let cylinderWidth = leftPanelWidth * 0.5;
                 let maxCylinderHeight = 320;
                 let minCylinderHeight = 80;
@@ -729,6 +756,7 @@
                     if (!animating) {
                         moles = parseFloat(this.value);
                         updateFromSlider('moles');
+                        initializeParticles(); // Update particle count based on moles
                     }
                 });
 
@@ -751,6 +779,23 @@
                     showTrace = !showTrace;
                     if (!showTrace) tracePoints = [];
                     this.textContent = showTrace ? 'Hide Trace' : 'Show Trace';
+                });
+
+                // Checkboxes for showing reference lines
+                document.getElementById('show-isothermals').addEventListener('change', function() {
+                    showIsothermals = this.checked;
+                });
+
+                document.getElementById('show-adiabatics').addEventListener('change', function() {
+                    showAdiabatics = this.checked;
+                });
+
+                document.getElementById('show-isobars').addEventListener('change', function() {
+                    showIsobars = this.checked;
+                });
+
+                document.getElementById('show-isochores').addEventListener('change', function() {
+                    showIsochores = this.checked;
                 });
             }
 
@@ -913,10 +958,35 @@
                         document.getElementById('animate-btn').textContent = 'Animate Process';
                     }
 
-                    // Interpolate state
-                    pressure = p.lerp(initialState.p, finalState.p, animProgress);
+                    // Interpolate following the correct thermodynamic path
                     volume = p.lerp(initialState.v, finalState.v, animProgress);
-                    temperature = p.lerp(initialState.t, finalState.t, animProgress);
+
+                    switch(processType) {
+                        case 'isothermal':
+                            // Follow PV = constant curve
+                            temperature = initialState.t;
+                            pressure = (moles * R * temperature) / (volume * 0.001) / 1000;
+                            break;
+
+                        case 'isobaric':
+                            // Follow P = constant line
+                            pressure = initialState.p;
+                            temperature = (pressure * 1000 * volume * 0.001) / (moles * R);
+                            break;
+
+                        case 'isochoric':
+                            // V constant, interpolate temperature
+                            volume = initialState.v;
+                            temperature = p.lerp(initialState.t, finalState.t, animProgress);
+                            pressure = (moles * R * temperature) / (volume * 0.001) / 1000;
+                            break;
+
+                        case 'adiabatic':
+                            // Follow PV^gamma = constant curve
+                            pressure = initialState.p * Math.pow(initialState.v / volume, GAMMA);
+                            temperature = initialState.t * Math.pow(initialState.v / volume, GAMMA - 1);
+                            break;
+                    }
 
                     updateState();
                 }
@@ -1129,59 +1199,217 @@
             }
 
             function drawProcessCurves(plotX, plotY, plotWidth, plotHeight, vMin, vMax, pMin, pMax) {
-                // Draw light reference curves for different processes
+                // Draw multiple reference curves for different processes
                 let refT = 300; // Reference temperature
                 let refN = 1;   // Reference moles
 
-                // Isothermal curve
-                p.stroke(0, 100, 200, 80);
-                p.strokeWeight(1.5);
-                p.noFill();
-                p.beginShape();
-                for (let v = vMin; v <= vMax; v += 0.5) {
-                    let pCalc = (refN * R * refT) / (v * 0.001) / 1000;
-                    if (pCalc >= pMin && pCalc <= pMax) {
-                        let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
-                        let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
-                        p.vertex(x, y);
-                    }
-                }
-                p.endShape();
+                // Draw multiple isothermal curves if enabled
+                if (showIsothermals) {
+                    const temps = [250, 300, 350, 400, 450];
+                    const colors = [[50, 80, 180], [70, 120, 200], [90, 160, 220], [110, 180, 230], [130, 200, 240]];
 
-                // Adiabatic curve
-                p.stroke(150, 0, 200, 80);
-                p.beginShape();
-                let v1 = 10;
-                let p1 = (refN * R * refT) / (v1 * 0.001) / 1000;
-                for (let v = vMin; v <= vMax; v += 0.5) {
-                    let pCalc = p1 * Math.pow(v1 / v, GAMMA);
-                    if (pCalc >= pMin && pCalc <= pMax) {
-                        let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
-                        let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
-                        p.vertex(x, y);
+                    for (let i = 0; i < temps.length; i++) {
+                        p.stroke(colors[i][0], colors[i][1], colors[i][2], 100);
+                        p.strokeWeight(1.5);
+                        p.noFill();
+                        p.beginShape();
+                        for (let v = vMin; v <= vMax; v += 0.5) {
+                            let pCalc = (refN * R * temps[i]) / (v * 0.001) / 1000;
+                            if (pCalc >= pMin && pCalc <= pMax) {
+                                let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                                let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
+                                p.vertex(x, y);
+                            }
+                        }
+                        p.endShape();
+
+                        // Label
+                        p.noStroke();
+                        p.fill(colors[i][0], colors[i][1], colors[i][2]);
+                        p.textSize(9);
+                        p.textAlign(p.RIGHT);
+                        let labelV = vMax - 2;
+                        let labelP = (refN * R * temps[i]) / (labelV * 0.001) / 1000;
+                        if (labelP >= pMin && labelP <= pMax) {
+                            let labelX = plotX + p.map(labelV, vMin, vMax, 0, plotWidth);
+                            let labelY = plotY + plotHeight - p.map(labelP, pMin, pMax, 0, plotHeight);
+                            p.text(temps[i] + 'K', labelX - 5, labelY);
+                        }
                     }
                 }
-                p.endShape();
+
+                // Draw multiple adiabatic curves if enabled
+                if (showAdiabatics) {
+                    const startVols = [6, 8, 10, 12, 14];
+                    const colors = [[120, 0, 180], [140, 20, 190], [160, 40, 200], [180, 60, 210], [200, 80, 220]];
+
+                    for (let i = 0; i < startVols.length; i++) {
+                        let v1 = startVols[i];
+                        let p1 = (refN * R * refT) / (v1 * 0.001) / 1000;
+
+                        p.stroke(colors[i][0], colors[i][1], colors[i][2], 100);
+                        p.strokeWeight(1.5);
+                        p.noFill();
+                        p.beginShape();
+                        for (let v = vMin; v <= vMax; v += 0.5) {
+                            let pCalc = p1 * Math.pow(v1 / v, GAMMA);
+                            if (pCalc >= pMin && pCalc <= pMax) {
+                                let x = plotX + p.map(v, vMin, vMax, 0, plotWidth);
+                                let y = plotY + plotHeight - p.map(pCalc, pMin, pMax, 0, plotHeight);
+                                p.vertex(x, y);
+                            }
+                        }
+                        p.endShape();
+                    }
+                }
 
                 // Add legend
-                p.textSize(10);
-                p.textAlign(p.LEFT);
-                let legendX = plotX + 10;
-                let legendY = plotY + 20;
+                if (showIsothermals || showAdiabatics) {
+                    p.textSize(10);
+                    p.textAlign(p.LEFT);
+                    let legendX = plotX + 10;
+                    let legendY = plotY + 20;
 
-                p.stroke(0, 100, 200, 150);
-                p.strokeWeight(2);
-                p.line(legendX, legendY, legendX + 20, legendY);
-                p.noStroke();
-                p.fill(0, 100, 200);
-                p.text('Isothermal', legendX + 25, legendY + 4);
+                    if (showIsothermals) {
+                        p.stroke(70, 120, 200, 150);
+                        p.strokeWeight(2);
+                        p.line(legendX, legendY, legendX + 20, legendY);
+                        p.noStroke();
+                        p.fill(70, 120, 200);
+                        p.text('Isothermals', legendX + 25, legendY + 4);
+                        legendY += 15;
+                    }
 
-                p.stroke(150, 0, 200, 150);
-                p.strokeWeight(2);
-                p.line(legendX, legendY + 15, legendX + 20, legendY + 15);
-                p.noStroke();
-                p.fill(150, 0, 200);
-                p.text('Adiabatic', legendX + 25, legendY + 19);
+                    if (showAdiabatics) {
+                        p.stroke(160, 40, 200, 150);
+                        p.strokeWeight(2);
+                        p.line(legendX, legendY, legendX + 20, legendY);
+                        p.noStroke();
+                        p.fill(160, 40, 200);
+                        p.text('Adiabatics', legendX + 25, legendY + 4);
+                    }
+                }
+            }
+
+            function drawTSReferenceCurves(plotX, plotY, plotWidth, plotHeight, tMin, tMax, sMin, sMax) {
+                // For an ideal gas on T-S diagram:
+                // Isochore (const V): dS = nCv dT/T  =>  S = nCv ln(T) + constant
+                // Isobar (const P):   dS = nCp dT/T  =>  S = nCp ln(T) + constant
+                //
+                // Since Cp = Cv + R, isobars have steeper slopes than isochores
+                // Using Cv ≈ 20.8 J/(mol·K) for diatomic, R = 8.314
+                // Cp ≈ 29.1 J/(mol·K)
+
+                const Cv = 20.8; // J/(mol·K) for diatomic gas
+                const Cp = Cv + R; // = 29.1 J/(mol·K)
+                const refN = 1; // 1 mole
+
+                // Reference temperature for calculations
+                const T_ref = 300;
+
+                // Draw isochores (constant volume lines) if enabled
+                if (showIsochores) {
+                    const sOffsets = [0.3, 0.8, 1.3, 1.8, 2.3]; // Different volume lines
+                    const colors = [[0, 150, 0], [20, 170, 20], [40, 190, 40], [60, 210, 60], [80, 230, 80]];
+
+                    for (let i = 0; i < sOffsets.length; i++) {
+                        p.stroke(colors[i][0], colors[i][1], colors[i][2], 120);
+                        p.strokeWeight(1.5);
+                        p.noFill();
+                        p.beginShape();
+
+                        for (let t = tMin; t <= tMax; t += 5) {
+                            // S = nCv ln(T/T_ref) + S_offset
+                            let sCalc = refN * Cv * Math.log(t / T_ref) / 100 + sOffsets[i];
+
+                            if (sCalc >= sMin && sCalc <= sMax) {
+                                let x = plotX + p.map(sCalc, sMin, sMax, 0, plotWidth);
+                                let y = plotY + plotHeight - p.map(t, tMin, tMax, 0, plotHeight);
+                                p.vertex(x, y);
+                            }
+                        }
+                        p.endShape();
+
+                        // Label
+                        p.noStroke();
+                        p.fill(colors[i][0], colors[i][1], colors[i][2]);
+                        p.textSize(9);
+                        p.textAlign(p.LEFT);
+                        let labelT = tMax - 30;
+                        let labelS = refN * Cv * Math.log(labelT / T_ref) / 100 + sOffsets[i];
+                        if (labelS >= sMin && labelS <= sMax) {
+                            let labelX = plotX + p.map(labelS, sMin, sMax, 0, plotWidth);
+                            let labelY = plotY + plotHeight - p.map(labelT, tMin, tMax, 0, plotHeight);
+                            p.text('V=' + (i+1), labelX + 3, labelY);
+                        }
+                    }
+                }
+
+                // Draw isobars (constant pressure lines) if enabled
+                if (showIsobars) {
+                    const sOffsets = [0.5, 1.0, 1.5, 2.0, 2.5]; // Different pressure lines
+                    const colors = [[180, 0, 0], [200, 30, 30], [220, 60, 60], [240, 90, 90], [255, 120, 120]];
+
+                    for (let i = 0; i < sOffsets.length; i++) {
+                        p.stroke(colors[i][0], colors[i][1], colors[i][2], 120);
+                        p.strokeWeight(1.5);
+                        p.noFill();
+                        p.beginShape();
+
+                        for (let t = tMin; t <= tMax; t += 5) {
+                            // S = nCp ln(T/T_ref) + S_offset
+                            // Cp > Cv, so isobars have steeper slope
+                            let sCalc = refN * Cp * Math.log(t / T_ref) / 100 + sOffsets[i];
+
+                            if (sCalc >= sMin && sCalc <= sMax) {
+                                let x = plotX + p.map(sCalc, sMin, sMax, 0, plotWidth);
+                                let y = plotY + plotHeight - p.map(t, tMin, tMax, 0, plotHeight);
+                                p.vertex(x, y);
+                            }
+                        }
+                        p.endShape();
+
+                        // Label
+                        p.noStroke();
+                        p.fill(colors[i][0], colors[i][1], colors[i][2]);
+                        p.textSize(9);
+                        p.textAlign(p.LEFT);
+                        let labelT = tMax - 30;
+                        let labelS = refN * Cp * Math.log(labelT / T_ref) / 100 + sOffsets[i];
+                        if (labelS >= sMin && labelS <= sMax) {
+                            let labelX = plotX + p.map(labelS, sMin, sMax, 0, plotWidth);
+                            let labelY = plotY + plotHeight - p.map(labelT, tMin, tMax, 0, plotHeight);
+                            p.text('P=' + (i+1), labelX + 3, labelY);
+                        }
+                    }
+                }
+
+                // Add legend
+                if (showIsobars || showIsochores) {
+                    p.textSize(10);
+                    p.textAlign(p.LEFT);
+                    let legendX = plotX + 10;
+                    let legendY = plotY + 20;
+
+                    if (showIsochores) {
+                        p.stroke(40, 190, 40, 150);
+                        p.strokeWeight(2);
+                        p.line(legendX, legendY, legendX + 20, legendY);
+                        p.noStroke();
+                        p.fill(40, 190, 40);
+                        p.text('Isochores', legendX + 25, legendY + 4);
+                        legendY += 15;
+                    }
+
+                    if (showIsobars) {
+                        p.stroke(220, 60, 60, 150);
+                        p.strokeWeight(2);
+                        p.line(legendX, legendY, legendX + 20, legendY);
+                        p.noStroke();
+                        p.fill(220, 60, 60);
+                        p.text('Isobars', legendX + 25, legendY + 4);
+                    }
+                }
             }
 
             function drawTSDiagram(offsetX) {
@@ -1256,8 +1484,39 @@
                     p.line(plotX, y, plotX + plotWidth, y);
                 }
 
-                // Simplified entropy calculation (for visualization)
-                let s = p.map(temperature, 200, 500, 0.5, 2.5);
+                // Draw reference lines for isobars and isochores
+                drawTSReferenceCurves(plotX, plotY, plotWidth, plotHeight, tMin, tMax, sMin, sMax);
+
+                // Proper entropy calculation for ideal gas
+                // S = nCv ln(T/T_ref) + nR ln(V/V_ref) + S_offset
+                // This ensures the point follows the correct thermodynamic curves
+                const Cv = 20.8; // J/(mol·K) for diatomic gas
+                const T_ref = 300; // Reference temperature (K)
+                const V_ref = 10;  // Reference volume (L)
+
+                // Helper function to calculate entropy from state
+                function calculateEntropy(t, v, n) {
+                    return n * Cv * Math.log(t / T_ref) / 100 +
+                           n * R * Math.log(v / V_ref) / 100 + 1.5;
+                }
+
+                // Calculate entropy based on current state
+                let s = calculateEntropy(temperature, volume, moles);
+
+                // Draw trace on T-S diagram
+                if (showTrace && tracePoints.length > 1) {
+                    p.stroke(255, 100, 0);
+                    p.strokeWeight(2);
+                    p.noFill();
+                    p.beginShape();
+                    for (let pt of tracePoints) {
+                        let ptEntropy = calculateEntropy(pt.t, pt.v, moles);
+                        let x = plotX + p.map(ptEntropy, sMin, sMax, 0, plotWidth);
+                        let y = plotY + plotHeight - p.map(pt.t, tMin, tMax, 0, plotHeight);
+                        p.vertex(x, y);
+                    }
+                    p.endShape();
+                }
 
                 // Draw current point
                 let currentX = plotX + p.map(s, sMin, sMax, 0, plotWidth);
@@ -1270,8 +1529,8 @@
                 // Note
                 p.fill(100);
                 p.textAlign(p.CENTER);
-                p.textSize(11);
-                p.text('(Simplified T-S representation)', plotX + plotWidth / 2, plotY + plotHeight - 20);
+                p.textSize(10);
+                p.text('S = nCv ln(T) + nR ln(V) + const', plotX + plotWidth / 2, plotY + plotHeight - 20);
             }
 
             p.windowResized = function() {

@@ -101,13 +101,24 @@
             </div>
 
             <div class="slider-container">
-                <label for="state-point-v">State Point v: <span id="state-point-v-value" class="value-display">0.01</span> m³/kg</label>
-                <input type="range" id="state-point-v" min="0.001" max="10" value="0.01" step="0.001" class="slider">
+                <label for="pressure">Pressure: <span id="pressure-value" class="value-display">100</span> kPa</label>
+                <input type="range" id="pressure" min="1" max="25000" value="100" step="1" class="slider">
+            </div>
+
+            <div class="slider-container">
+                <label for="volume">Specific Volume: <span id="volume-value" class="value-display">0.01</span> m³/kg</label>
+                <input type="range" id="volume" min="0.001" max="10" value="0.01" step="0.001" class="slider">
             </div>
 
             <div class="slider-container">
                 <label>
                     <input type="checkbox" id="show-isotherms" checked> Show Multiple Isotherms
+                </label>
+            </div>
+
+            <div class="slider-container">
+                <label>
+                    <input type="checkbox" id="show-saturation-dome" checked> Show Saturation Dome
                 </label>
             </div>
         </div>
@@ -445,8 +456,10 @@
         // p-V Diagram Simulation
         let sketch = new p5(function(p) {
             let temperature = 300; // K
+            let pressure = 100; // kPa
             let statePointV = 0.01; // m³/kg
             let showIsotherms = true;
+            let showSaturationDome = true;
 
             // Water properties (simplified)
             const T_triple = 273.16; // K
@@ -467,8 +480,10 @@
                 // Draw axes
                 drawAxes();
 
-                // Draw saturation dome
-                drawSaturationDome();
+                // Draw saturation dome if enabled
+                if (showSaturationDome) {
+                    drawSaturationDome();
+                }
 
                 // Draw isotherms
                 if (showIsotherms) {
@@ -477,6 +492,12 @@
 
                 // Draw current state point
                 drawStatePoint();
+
+                // Draw infobox at top-right
+                drawInfobox();
+
+                // Draw piston animation at bottom-right
+                drawPistonAnimation();
 
                 // Update state information
                 updateStateInfo();
@@ -488,13 +509,22 @@
                     document.getElementById('temperature-value').textContent = temperature;
                 });
 
-                document.getElementById('state-point-v').addEventListener('input', function() {
+                document.getElementById('pressure').addEventListener('input', function() {
+                    pressure = parseFloat(this.value);
+                    document.getElementById('pressure-value').textContent = pressure;
+                });
+
+                document.getElementById('volume').addEventListener('input', function() {
                     statePointV = parseFloat(this.value);
-                    document.getElementById('state-point-v-value').textContent = statePointV.toFixed(3);
+                    document.getElementById('volume-value').textContent = statePointV.toFixed(3);
                 });
 
                 document.getElementById('show-isotherms').addEventListener('change', function() {
                     showIsotherms = this.checked;
+                });
+
+                document.getElementById('show-saturation-dome').addEventListener('change', function() {
+                    showSaturationDome = this.checked;
                 });
             }
 
@@ -759,6 +789,157 @@
                     return (v - v_f) / (v_g - v_f);
                 }
                 return null; // Quality only defined in two-phase region
+            }
+
+            function drawInfobox() {
+                // Draw infobox at top-right of canvas
+                let boxWidth = 260;
+                let boxHeight = 140;
+                let boxX = p.width - boxWidth - 15;
+                let boxY = 15;
+
+                p.fill(255, 255, 255, 240);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Content
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(11);
+
+                let pVal = getPressureFromTV(temperature, statePointV);
+                let phase = determinePhase(temperature, statePointV);
+                let quality = calculateQuality(temperature, statePointV);
+
+                let yOffset = boxY + 12;
+                p.text('State Properties:', boxX + 10, yOffset);
+                yOffset += 18;
+                p.text('Temperature: ' + temperature + ' K (' + (temperature - 273.15).toFixed(1) + ' °C)', boxX + 10, yOffset);
+                yOffset += 16;
+                p.text('Pressure: ' + (pVal / 1e6).toFixed(3) + ' MPa', boxX + 10, yOffset);
+                yOffset += 16;
+                p.text('Specific Volume: ' + statePointV.toFixed(4) + ' m³/kg', boxX + 10, yOffset);
+                yOffset += 16;
+                p.textSize(10);
+                p.text('Phase: ' + phase, boxX + 10, yOffset);
+                yOffset += 16;
+
+                if (quality !== null) {
+                    p.fill(0, 100, 200);
+                    p.textSize(12);
+                    p.text('Quality (Dryness): x = ' + quality.toFixed(3), boxX + 10, yOffset);
+                    yOffset += 14;
+                    p.textSize(10);
+                    p.text('(' + (quality * 100).toFixed(1) + '% vapor, ' + ((1 - quality) * 100).toFixed(1) + '% liquid)', boxX + 10, yOffset);
+                }
+            }
+
+            function drawPistonAnimation() {
+                // Draw piston-cylinder animation at bottom-right
+                let pistonWidth = 120;
+                let pistonHeight = 150;
+                let pistonX = p.width - pistonWidth - 30;
+                let pistonY = p.height - pistonHeight - 30;
+
+                // Calculate quality for animation
+                let quality = calculateQuality(temperature, statePointV);
+                let phase = determinePhase(temperature, statePointV);
+
+                // Background box
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(pistonX - 10, pistonY - 10, pistonWidth + 20, pistonHeight + 20, 5);
+
+                // Cylinder walls
+                p.stroke(60);
+                p.strokeWeight(3);
+                p.noFill();
+                let cylX = pistonX + 20;
+                let cylY = pistonY + 20;
+                let cylW = 80;
+                let cylH = 120;
+                p.line(cylX, cylY + cylH, cylX, cylY); // Left wall
+                p.line(cylX + cylW, cylY + cylH, cylX + cylW, cylY); // Right wall
+                p.line(cylX, cylY + cylH, cylX + cylW, cylY + cylH); // Bottom
+
+                // Piston position based on volume (inverse relationship)
+                let pistonPos;
+                if (statePointV < 0.001) {
+                    pistonPos = cylH * 0.1; // Near bottom (high compression)
+                } else if (statePointV > 1) {
+                    pistonPos = cylH * 0.9; // Near top (high expansion)
+                } else {
+                    // Logarithmic scaling
+                    pistonPos = p.map(p.log(statePointV), p.log(0.001), p.log(1), cylH * 0.1, cylH * 0.9);
+                }
+                pistonPos = p.constrain(pistonPos, cylH * 0.1, cylH * 0.9);
+
+                // Determine color based on phase and quality
+                let liquidColor = [100, 150, 255];
+                let vaporColor = [255, 100, 100];
+
+                if (quality !== null) {
+                    // Two-phase: blend colors based on quality
+                    let r = p.lerp(liquidColor[0], vaporColor[0], quality);
+                    let g = p.lerp(liquidColor[1], vaporColor[1], quality);
+                    let b = p.lerp(liquidColor[2], vaporColor[2], quality);
+
+                    // Draw liquid portion
+                    p.fill(liquidColor[0], liquidColor[1], liquidColor[2], 200);
+                    let liquidHeight = pistonPos * (1 - quality);
+                    p.rect(cylX + 2, cylY + pistonPos - liquidHeight + 2, cylW - 4, liquidHeight, 0, 0, 3, 3);
+
+                    // Draw vapor portion with particles
+                    p.fill(vaporColor[0], vaporColor[1], vaporColor[2], 150);
+                    p.rect(cylX + 2, cylY + 2, cylW - 4, pistonPos - liquidHeight);
+
+                    // Draw particles in vapor region
+                    p.fill(vaporColor[0], vaporColor[1], vaporColor[2], 200);
+                    for (let i = 0; i < 15; i++) {
+                        let px = cylX + 10 + (i % 5) * 12 + p.sin(p.frameCount * 0.05 + i) * 3;
+                        let py = cylY + 10 + Math.floor(i / 5) * 15 + p.cos(p.frameCount * 0.05 + i) * 3;
+                        if (py < cylY + pistonPos - liquidHeight) {
+                            p.ellipse(px, py, 4, 4);
+                        }
+                    }
+                } else if (phase.includes('Liquid')) {
+                    // Pure liquid
+                    p.fill(liquidColor[0], liquidColor[1], liquidColor[2], 200);
+                    p.rect(cylX + 2, cylY + 2, cylW - 4, pistonPos, 0, 0, 3, 3);
+                } else {
+                    // Vapor or supercritical
+                    p.fill(vaporColor[0], vaporColor[1], vaporColor[2], 180);
+                    p.rect(cylX + 2, cylY + 2, cylW - 4, pistonPos);
+
+                    // Draw particles
+                    p.fill(vaporColor[0], vaporColor[1], vaporColor[2], 220);
+                    for (let i = 0; i < 20; i++) {
+                        let px = cylX + 10 + (i % 5) * 12 + p.sin(p.frameCount * 0.05 + i) * 3;
+                        let py = cylY + 10 + Math.floor(i / 5) * 15 + p.cos(p.frameCount * 0.05 + i) * 3;
+                        if (py < cylY + pistonPos) {
+                            p.ellipse(px, py, 4, 4);
+                        }
+                    }
+                }
+
+                // Draw piston head
+                p.fill(100);
+                p.stroke(40);
+                p.strokeWeight(2);
+                p.rect(cylX - 5, cylY + pistonPos, cylW + 10, 8, 2);
+
+                // Piston rod
+                p.line(cylX + cylW/2, cylY + pistonPos + 8, cylX + cylW/2, cylY + pistonPos + 20);
+
+                // Label
+                p.fill(0);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.CENTER);
+                p.text('Piston-Cylinder', pistonX + pistonWidth/2, pistonY - 15);
             }
 
         }, 'sketch-holder');

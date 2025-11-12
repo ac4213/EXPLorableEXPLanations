@@ -757,7 +757,7 @@
             }
 
             function updateFromVolume() {
-                // Update P and T based on process type
+                // Update P and T based on process type, following the correct curve
                 switch(processType) {
                     case 'isothermal':
                         // T constant, PV = constant
@@ -768,20 +768,21 @@
                     case 'isobaric':
                         // P constant, V/T = constant
                         pressure = P0;
-                        temperature = (pressure * 1000 * volume * 0.001) / (n * R);
+                        temperature = T0 * (volume / V0);
                         break;
 
                     case 'isochoric':
-                        // V should not change, reset to V0
+                        // V constant - don't allow volume changes
                         volume = V0;
-                        temperature = T0;
-                        pressure = P0;
+                        // Update based on temperature slider instead
+                        pressure = (n * R * temperature) / (volume * 0.001) / 1000;
                         break;
 
                     case 'adiabatic':
                         // PV^gamma = constant
                         pressure = P0 * Math.pow(V0/volume, gamma);
-                        temperature = (pressure * 1000 * volume * 0.001) / (n * R);
+                        // TV^(gamma-1) = constant
+                        temperature = T0 * Math.pow(V0/volume, gamma - 1);
                         break;
                 }
 

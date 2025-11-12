@@ -675,14 +675,27 @@
                 'profit1', 'profit2', 'labor1', 'labor2', 'labor-avail', 'material1', 'material2', 'material-avail'
             ];
 
+            // Determine which sliders should show integers vs decimals
+            const integerSliders = ['time-period', 'present-value', 'initial-cost', 'annual-revenue', 'annual-cost',
+                                   'salvage-value', 'project-life', 'marr', 'fixed-cost', 'variable-cost',
+                                   'unit-price', 'production-volume', 'alt-fixed', 'alt-variable',
+                                   'profit1', 'profit2', 'labor-avail', 'material-avail'];
+
             sliders.forEach(id => {
                 const slider = document.getElementById(id);
                 if (slider) {
                     const valueSpan = document.getElementById(id + '-value');
-                    slider.addEventListener('input', function() {
-                        valueSpan.textContent = parseFloat(this.value).toFixed(2);
-                        updateSimulations();
-                    });
+                    if (valueSpan) {
+                        slider.addEventListener('input', function() {
+                            // Format based on slider type
+                            if (integerSliders.includes(id)) {
+                                valueSpan.textContent = parseInt(this.value);
+                            } else {
+                                valueSpan.textContent = parseFloat(this.value).toFixed(2);
+                            }
+                            updateSimulations();
+                        });
+                    }
                 }
             });
         }
@@ -870,9 +883,11 @@
             const Q = parseFloat(document.getElementById('production-volume').value);
             const enableComp = document.getElementById('enable-comparison').checked;
 
-            const QBE = FC / (price - VC);
-            const currentProfit = (price - VC) * Q - FC;
-            const profitMargin = (currentProfit / (price * Q)) * 100;
+            // Prevent division by zero
+            const contribution = price - VC;
+            const QBE = contribution > 0 ? FC / contribution : 0;
+            const currentProfit = contribution * Q - FC;
+            const profitMargin = (price * Q) > 0 ? (currentProfit / (price * Q)) * 100 : 0;
 
             document.getElementById('be-volume').textContent = QBE.toFixed(0);
             document.getElementById('be-revenue').textContent = (QBE * price / 1000).toFixed(1);
@@ -968,13 +983,14 @@
             const b2 = parseFloat(document.getElementById('material2').value);
             const M = parseFloat(document.getElementById('material-avail').value);
 
-            // Find corner points
+            // Find corner points (with safeguards against division by zero)
             const corners = [
-                {x1: 0, x2: 0},
-                {x1: L/a1, x2: 0},
-                {x1: 0, x2: Math.min(L/a2, M/b2)},
-                {x1: M/b1, x2: 0}
+                {x1: 0, x2: 0}
             ];
+
+            if (a1 > 0) corners.push({x1: L/a1, x2: 0});
+            if (a2 > 0 && b2 > 0) corners.push({x1: 0, x2: Math.min(L/a2, M/b2)});
+            if (b1 > 0) corners.push({x1: M/b1, x2: 0});
 
             // Intersection of labor and material constraints
             const det = a1*b2 - a2*b1;
@@ -1012,10 +1028,10 @@
 
             document.getElementById('optimal-x1').textContent = optimalX1.toFixed(1);
             document.getElementById('optimal-x2').textContent = optimalX2.toFixed(1);
-            document.getElementById('max-profit').textContent = maxProfit.toFixed(0);
-            document.getElementById('labor-util').textContent = ((laborUsed/L)*100).toFixed(1);
+            document.getElementById('max-profit').textContent = maxProfit > -Infinity ? maxProfit.toFixed(0) : '0';
+            document.getElementById('labor-util').textContent = L > 0 ? ((laborUsed/L)*100).toFixed(1) : '0';
             document.getElementById('labor-slack').textContent = (L - laborUsed).toFixed(1);
-            document.getElementById('material-util').textContent = ((materialUsed/M)*100).toFixed(1);
+            document.getElementById('material-util').textContent = M > 0 ? ((materialUsed/M)*100).toFixed(1) : '0';
             document.getElementById('material-slack').textContent = (M - materialUsed).toFixed(1);
 
             // Plot feasible region
@@ -1023,10 +1039,17 @@
             const laborBound = [];
             const materialBound = [];
 
-            for (let x1 = 0; x1 <= Math.max(L/a1, M/b1); x1 += 1) {
+            // Calculate max x1 for plotting (with safeguards)
+            const maxX1 = Math.max(
+                a1 > 0 ? L/a1 : 100,
+                b1 > 0 ? M/b1 : 100,
+                100 // minimum default
+            );
+
+            for (let x1 = 0; x1 <= maxX1; x1 += Math.max(1, maxX1/100)) {
                 x1Array.push(x1);
-                laborBound.push((L - a1*x1) / a2);
-                materialBound.push((M - b1*x1) / b2);
+                laborBound.push(a2 > 0 ? (L - a1*x1) / a2 : L);
+                materialBound.push(b2 > 0 ? (M - b1*x1) / b2 : M);
             }
 
             const traces = [
@@ -1062,8 +1085,12 @@
 
             const layout = {
                 title: 'LP Feasible Region',
-                xaxis: { title: 'Product 1 (x₁)', range: [0, Math.max(L/a1, M/b1) * 1.1] },
-                yaxis: { title: 'Product 2 (x₂)', range: [0, Math.max(L/a2, M/b2) * 1.1] }
+                xaxis: { title: 'Product 1 (x₁)', range: [0, maxX1 * 1.1] },
+                yaxis: { title: 'Product 2 (x₂)', range: [0, Math.max(
+                    a2 > 0 ? L/a2 : 100,
+                    b2 > 0 ? M/b2 : 100,
+                    100
+                ) * 1.1] }
             };
 
             Plotly.newPlot('lp-plot', traces, layout, {responsive: true});
@@ -1071,10 +1098,29 @@
 
         // Update all simulations
         function updateSimulations() {
-            updateTVM();
-            updateEconomicAnalysis();
-            updateBreakEven();
-            updateLP();
+            try {
+                updateTVM();
+            } catch (e) {
+                console.error("Error in updateTVM:", e);
+            }
+
+            try {
+                updateEconomicAnalysis();
+            } catch (e) {
+                console.error("Error in updateEconomicAnalysis:", e);
+            }
+
+            try {
+                updateBreakEven();
+            } catch (e) {
+                console.error("Error in updateBreakEven:", e);
+            }
+
+            try {
+                updateLP();
+            } catch (e) {
+                console.error("Error in updateLP:", e);
+            }
         }
 
         // Initialize
