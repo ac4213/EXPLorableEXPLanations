@@ -113,29 +113,38 @@
 
     <!-- Section 2: Interactive Simulation -->
     <div class="simulation-container">
-        <h2>Interactive Hinged Plate Simulation</h2>
-        <p>Adjust the plate angle to see how hydrostatic pressure distribution and resultant force change. The simulation shows a side view of a hinged plate at the bottom of a tank.</p>
+        <h2>Interactive Hinged Gate Equilibrium Problem</h2>
+        <p>This simulation demonstrates the problem from the example: a hinged gate submerged in water with a horizontal force P applied. Adjust the parameters to see how the equilibrium changes and what minimum force P is required to prevent liquid leakage.</p>
 
         <!-- Control Panel -->
         <div class="controls-grid">
             <div class="slider-container">
-                <label for="depth">Fluid Depth: <span id="depth-value" class="value-display">4.0</span> m</label>
-                <input type="range" id="depth" min="2" max="8" value="4" step="0.5" class="slider">
+                <label for="h1">Water depth h₁: <span id="h1-value" class="value-display">7.0</span> m</label>
+                <input type="range" id="h1" min="3" max="10" value="7" step="0.5" class="slider">
             </div>
 
             <div class="slider-container">
-                <label for="plateAngle">Plate Angle: <span id="plateAngle-value" class="value-display">90</span>° from horizontal</label>
-                <input type="range" id="plateAngle" min="30" max="150" value="90" step="5" class="slider">
+                <label for="h2">Vertical wall height h₂: <span id="h2-value" class="value-display">5.0</span> m</label>
+                <input type="range" id="h2" min="1" max="7" value="5" step="0.5" class="slider">
             </div>
 
             <div class="slider-container">
-                <label for="plateLength">Plate Length: <span id="plateLength-value" class="value-display">2.0</span> m</label>
-                <input type="range" id="plateLength" min="1" max="4" value="2" step="0.5" class="slider">
+                <label for="l1">Horizontal plate length l₁: <span id="l1-value" class="value-display">2.5</span> m</label>
+                <input type="range" id="l1" min="0.5" max="4.5" value="2.5" step="0.1" class="slider">
             </div>
+        </div>
 
-            <div class="slider-container">
-                <label for="density">Fluid Density: <span id="density-value" class="value-display">1000</span> kg/m³</label>
-                <input type="range" id="density" min="800" max="1200" value="1000" step="50" class="slider">
+        <!-- Visualization Options -->
+        <div class="controls-grid" style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px;">
+            <div style="display: flex; gap: 20px; justify-content: center;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="showVerticalPressure" checked>
+                    <span>Show vertical wall pressure</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="showHorizontalPressure" checked>
+                    <span>Show horizontal plate pressure</span>
+                </label>
             </div>
         </div>
 
@@ -150,15 +159,15 @@
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background-color: rgba(139, 90, 43, 1);"></div>
-                <span>Hinged Plate</span>
+                <span>Gate Structure</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background-color: rgba(255, 0, 0, 0.5);"></div>
-                <span>Pressure Distribution</span>
+                <div class="legend-color" style="background-color: rgba(255, 0, 0, 0.7);"></div>
+                <span>Hydrostatic Forces (F₁, F₂)</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color" style="background-color: rgba(0, 200, 0, 1);"></div>
-                <span>Resultant Force</span>
+                <span>Applied Force (P)</span>
             </div>
         </div>
     </div>
@@ -381,364 +390,500 @@
 
     <!-- Page-specific JavaScript -->
     <script>
-        // Fluid statics simulation using p5.js
+        // Hinged L-Gate Hydrostatic Force Simulation
         let sketch = new p5(function(p) {
-            // Parameters
-            let depth = 4; // meters (water depth)
-            let plateAngle = 90; // degrees from horizontal
-            let plateLength = 2; // meters
-            let density = 1000; // kg/m³
-            let g = 9.81; // m/s²
-            let scale = 60; // pixels per meter
-            let plateWidth = 0.15; // meters (thickness for visualization)
+            // Parameters - using var so sliders can modify them
+            var h1 = 7.0; // total water depth (m)
+            var h2 = 5.0; // vertical wall height of gate (m)
+            var l1 = 2.5; // horizontal plate length (m)
 
-            // Tank dimensions
-            let tankWidth = 5; // meters
-            let tankX = 100; // pixels
-            let tankBottomY = 480; // pixels
+            // Fixed parameters
+            const b = 1.0; // width perpendicular to view (m) - fixed
+
+            // Visualization options
+            var showVerticalPressure = true;
+            var showHorizontalPressure = true;
+
+            // Constants
+            const rho = 1000; // water density (kg/m³)
+            const g = 9.81; // gravity (m/s²)
+            const scale = 45; // pixels per meter
+
+            // Visual constants
+            const gateThickness = 12;
+            const hingeX = 250;
+            const hingeY = 120;
 
             p.setup = function() {
                 let canvasWidth = Math.min(900, p.windowWidth - 40);
-                p.createCanvas(canvasWidth, 550);
+                p.createCanvas(canvasWidth, 600);
                 setupControls();
             };
 
             p.draw = function() {
-                p.background(245);
+                p.background(250);
 
-                // Draw tank walls (side view)
-                drawTank();
+                // Calculate all forces
+                let forces = calculateForces();
 
-                // Draw water
+                // Draw in order: walls, water, gate, pressure distributions, forces, labels
+                drawTankWalls();
                 drawWater();
+                drawGate();
 
-                // Draw hinged plate
-                drawHingedPlate();
+                // Draw pressure distributions if enabled
+                if (showVerticalPressure) {
+                    drawVerticalPressure();
+                }
+                if (showHorizontalPressure) {
+                    drawHorizontalPressure();
+                }
 
-                // Draw pressure distribution
-                drawPressureDistribution();
-
-                // Draw resultant force
-                drawResultantForce();
-
-                // Draw info box
-                drawInfoBox();
-
-                // Draw depth markers
-                drawDepthMarkers();
+                drawForces(forces);
+                drawDimensions();
+                drawInfoPanel(forces);
             };
 
-            function drawTank() {
-                // Tank walls (side view)
-                p.stroke(80);
-                p.strokeWeight(6);
+            function calculateForces() {
+                // F1: Hydrostatic force on vertical wall
+                // Hinge C is at water surface (depth = 0)
+                // Vertical wall extends h2 down from hinge
+                // Gauge pressure varies linearly from 0 at hinge to rho*g*h2 at bottom
+                let p_top = 0; // Gauge pressure at hinge (water surface)
+                let p_bottom = rho * g * h2; // Gauge pressure at bottom of vertical wall
+                let p_avg = (p_top + p_bottom) / 2;
+                let F1 = p_avg * h2 * b / 1000; // kN
+                let b1 = (2/3) * h2; // centroid of triangular distribution, 2/3 from hinge
+
+                // F2: Hydrostatic force on horizontal plate
+                // Horizontal plate is at depth h2 from water surface
+                // Uniform gauge pressure = rho*g*h2
+                let F2 = rho * g * h2 * l1 * b / 1000; // kN
+                let b2 = l1 / 2; // centroid at geometric center
+
+                // Calculate P for equilibrium: taking moments about hinge C
+                // Clockwise: F1*b1 + F2*b2
+                // Counter-clockwise: P*h2
+                let P = (F1 * b1 + F2 * b2) / h2;
+
+                return {
+                    F1: F1,
+                    F2: F2,
+                    b1: b1,
+                    b2: b2,
+                    P: P
+                };
+            }
+
+            function drawTankWalls() {
+                // Tank boundaries - fixed tank width of 5m
+                const tankWidth = 5.0; // meters
+                let waterSurface = hingeY;
+                let waterBottom = hingeY + h1 * scale;
+                let leftWall = hingeX - tankWidth * scale;
+
+                p.stroke(60);
+                p.strokeWeight(8);
                 p.noFill();
 
                 // Left wall
-                p.line(tankX, tankBottomY, tankX, tankBottomY - depth * scale);
-                // Bottom
-                p.line(tankX, tankBottomY, tankX + tankWidth * scale, tankBottomY);
+                p.line(leftWall, waterSurface, leftWall, waterBottom);
+                // Bottom wall
+                p.line(leftWall, waterBottom, hingeX + 80, waterBottom);
                 // Right wall
-                p.line(tankX + tankWidth * scale, tankBottomY, tankX + tankWidth * scale, tankBottomY - depth * scale);
-
-                // Ground
-                p.fill(150, 120, 90);
-                p.noStroke();
-                p.rect(0, tankBottomY, p.width, p.height - tankBottomY);
+                p.line(hingeX, waterSurface, hingeX, waterBottom);
             }
 
             function drawWater() {
-                // Water surface
-                let waterSurfaceY = tankBottomY - depth * scale;
+                const tankWidth = 5.0; // meters
+                let waterSurface = hingeY;
+                let waterBottom = hingeY + h1 * scale;
+                let leftWall = hingeX - tankWidth * scale;
+                let gateBottom = hingeY + h2 * scale;
 
-                // Water body
+                // Water region - enclosed by walls and gate
+                p.fill(100, 180, 255, 120);
                 p.noStroke();
-                p.fill(0, 100, 255, 100);
-                p.rect(tankX, waterSurfaceY, tankWidth * scale, depth * scale);
 
-                // Water surface line
-                p.stroke(0, 50, 200);
+                p.beginShape();
+                p.vertex(leftWall, waterSurface);           // Top left
+                p.vertex(hingeX - l1 * scale, waterSurface); // Free surface end
+                p.vertex(hingeX - l1 * scale, gateBottom);  // Down gate horizontal plate
+                p.vertex(hingeX, gateBottom);               // Across to vertical gate
+                p.vertex(hingeX, waterBottom);              // Down right wall
+                p.vertex(leftWall, waterBottom);            // Bottom left
+                p.endShape(p.CLOSE);
+
+                // Water surface waves
+                p.noFill();
+                p.stroke(20, 100, 200);
                 p.strokeWeight(2);
-                p.line(tankX, waterSurfaceY, tankX + tankWidth * scale, waterSurfaceY);
+                for (let x = leftWall; x < hingeX - l1 * scale; x += 8) {
+                    let wave = p.sin(p.frameCount * 0.04 + x * 0.08) * 2;
+                    p.line(x, waterSurface + wave, x + 8, waterSurface + wave);
+                }
 
                 // Label
                 p.fill(0);
                 p.noStroke();
+                p.textSize(14);
                 p.textAlign(p.CENTER);
-                p.textSize(12);
-                p.text("Water Surface", tankX + tankWidth * scale / 2, waterSurfaceY - 10);
+                p.text("Water", leftWall + 50, waterSurface + h1 * scale / 2);
             }
 
-            function drawHingedPlate() {
-                // Hinge position (at bottom left corner of tank)
-                let hingeX = tankX;
-                let hingeY = tankBottomY;
+            function drawGate() {
+                let gateBottom = hingeY + h2 * scale;
 
-                // Convert angle to radians (measured from horizontal)
-                let angleRad = p.radians(plateAngle);
-
-                // Plate end position
-                let plateEndX = hingeX + plateLength * scale * p.cos(angleRad);
-                let plateEndY = hingeY - plateLength * scale * p.sin(angleRad);
-
-                // Draw plate
-                p.stroke(80);
+                // Gate color
+                p.fill(120, 80, 40);
+                p.stroke(50);
                 p.strokeWeight(3);
-                p.fill(139, 90, 43);
 
-                // Plate as thick line (rectangle)
-                let perpAngle = angleRad + p.PI / 2;
-                let halfWidth = (plateWidth * scale) / 2;
+                // Vertical part (from hinge down)
+                p.rect(hingeX - gateThickness/2, hingeY, gateThickness, h2 * scale);
 
-                p.beginShape();
-                p.vertex(hingeX + halfWidth * p.cos(perpAngle), hingeY + halfWidth * p.sin(perpAngle));
-                p.vertex(plateEndX + halfWidth * p.cos(perpAngle), plateEndY + halfWidth * p.sin(perpAngle));
-                p.vertex(plateEndX - halfWidth * p.cos(perpAngle), plateEndY - halfWidth * p.sin(perpAngle));
-                p.vertex(hingeX - halfWidth * p.cos(perpAngle), hingeY - halfWidth * p.sin(perpAngle));
-                p.endShape(p.CLOSE);
+                // Horizontal part (from bottom, extending left)
+                p.rect(hingeX - l1 * scale, gateBottom - gateThickness/2, l1 * scale, gateThickness);
 
-                // Draw hinge
-                p.fill(60);
+                // Hinge at C
+                p.fill(40);
                 p.noStroke();
-                p.circle(hingeX, hingeY, 16);
-                p.stroke(40);
-                p.strokeWeight(1);
-                p.noFill();
-                p.circle(hingeX, hingeY, 16);
-                p.line(hingeX - 8, hingeY, hingeX + 8, hingeY);
-                p.line(hingeX, hingeY - 8, hingeX, hingeY + 8);
+                p.circle(hingeX, hingeY, 18);
 
-                // Label angle
-                p.noStroke();
+                // Hinge cross
+                p.stroke(255);
+                p.strokeWeight(2);
+                p.line(hingeX - 6, hingeY, hingeX + 6, hingeY);
+                p.line(hingeX, hingeY - 6, hingeX, hingeY + 6);
+
+                // Hinge label
                 p.fill(0);
+                p.noStroke();
+                p.textSize(16);
                 p.textAlign(p.LEFT);
-                p.textSize(11);
-                let arcRadius = 30;
-                let labelX = hingeX + arcRadius * 1.5 * p.cos(angleRad / 2);
-                let labelY = hingeY - arcRadius * 1.5 * p.sin(angleRad / 2);
-                p.text(plateAngle + "°", labelX, labelY);
-
-                // Draw arc showing angle
-                p.noFill();
-                p.stroke(0, 150);
-                p.strokeWeight(1);
-                p.arc(hingeX, hingeY, arcRadius * 2, arcRadius * 2, -angleRad, 0);
+                p.text("C", hingeX + 12, hingeY - 8);
             }
 
-            function drawPressureDistribution() {
-                let hingeX = tankX;
-                let hingeY = tankBottomY;
-                let angleRad = p.radians(plateAngle);
-                let waterSurfaceY = tankBottomY - depth * scale;
+            function drawVerticalPressure() {
+                // Draw linear pressure distribution on vertical wall (inside tank, left of gate)
+                // Gauge pressure: 0 at hinge (water surface) to rho*g*h2 at bottom of vertical wall
+                let p_top = 0; // Gauge pressure at hinge (water surface)
+                let p_bottom = rho * g * h2 / 1000; // kPa - gauge pressure at bottom of vertical wall
+                let gateBottom = hingeY + h2 * scale;
+                let pressureScale = 0.6; // visual scaling factor (increased for clarity)
 
-                // Calculate pressure distribution (triangular)
-                // Sample points along the plate
-                let numSamples = 15;
-
-                p.noFill();
-                p.stroke(255, 0, 0, 150);
+                // Draw the triangular pressure distribution
+                p.fill(211, 47, 47, 100);
+                p.stroke(211, 47, 47, 180);
                 p.strokeWeight(2);
 
                 p.beginShape();
-                for (let i = 0; i <= numSamples; i++) {
-                    let t = i / numSamples;
-                    let distAlongPlate = t * plateLength;
+                p.vertex(hingeX - gateThickness/2, hingeY); // Top of wall (inside tank)
 
-                    // Position along plate
-                    let plateX = hingeX + distAlongPlate * scale * p.cos(angleRad);
-                    let plateY = hingeY - distAlongPlate * scale * p.sin(angleRad);
-
-                    // Depth at this point (if submerged)
-                    let depthAtPoint = (waterSurfaceY - plateY) / scale;
-
-                    if (depthAtPoint > 0) {
-                        // Pressure at this depth
-                        let pressure = density * g * depthAtPoint;
-
-                        // Scale pressure for visualization
-                        let pressureArrowLength = p.map(pressure, 0, density * g * depth, 0, 80);
-
-                        // Draw pressure arrow perpendicular to plate (pointing toward plate)
-                        let perpAngle = angleRad + p.PI / 2;
-                        let arrowX = plateX - pressureArrowLength * p.cos(perpAngle);
-                        let arrowY = plateY - pressureArrowLength * p.sin(perpAngle);
-
-                        p.vertex(arrowX, arrowY);
-                    }
-                }
-                p.endShape();
-
-                // Fill the pressure distribution area
-                p.fill(255, 0, 0, 50);
-                p.stroke(255, 0, 0, 150);
-                p.beginShape();
-                p.vertex(hingeX, hingeY);
-
-                for (let i = 0; i <= numSamples; i++) {
-                    let t = i / numSamples;
-                    let distAlongPlate = t * plateLength;
-                    let plateX = hingeX + distAlongPlate * scale * p.cos(angleRad);
-                    let plateY = hingeY - distAlongPlate * scale * p.sin(angleRad);
-                    let depthAtPoint = (waterSurfaceY - plateY) / scale;
-
-                    if (depthAtPoint > 0) {
-                        let pressure = density * g * depthAtPoint;
-                        let pressureArrowLength = p.map(pressure, 0, density * g * depth, 0, 80);
-                        let perpAngle = angleRad + p.PI / 2;
-                        let arrowX = plateX - pressureArrowLength * p.cos(perpAngle);
-                        let arrowY = plateY - pressureArrowLength * p.sin(perpAngle);
-                        p.vertex(arrowX, arrowY);
-                    }
+                // Draw several points along the pressure distribution
+                let numPoints = 10;
+                for (let i = 0; i <= numPoints; i++) {
+                    let fraction = i / numPoints;
+                    let y = hingeY + fraction * h2 * scale;
+                    let pressure = p_top + fraction * (p_bottom - p_top);
+                    let x = hingeX - gateThickness/2 - pressure * pressureScale;
+                    p.vertex(x, y);
                 }
 
-                // Close to plate end
-                let plateEndX = hingeX + plateLength * scale * p.cos(angleRad);
-                let plateEndY = hingeY - plateLength * scale * p.sin(angleRad);
-                let endDepth = (waterSurfaceY - plateEndY) / scale;
-                if (endDepth > 0) {
-                    p.vertex(plateEndX, plateEndY);
-                }
-
+                p.vertex(hingeX - gateThickness/2, gateBottom); // Bottom of wall (inside tank)
                 p.endShape(p.CLOSE);
+
+                // Draw pressure arrows at several locations
+                let numArrows = 6;
+                for (let i = 0; i <= numArrows; i++) {
+                    let fraction = i / numArrows;
+                    let y = hingeY + fraction * h2 * scale;
+                    let pressure = p_top + fraction * (p_bottom - p_top);
+                    let arrowLen = pressure * pressureScale;
+
+                    p.stroke(211, 47, 47, 180);
+                    p.strokeWeight(1.5);
+                    p.line(hingeX - gateThickness/2 - arrowLen, y,
+                           hingeX - gateThickness/2, y);
+
+                    // Small arrowhead pointing right (toward gate)
+                    p.fill(211, 47, 47, 180);
+                    p.noStroke();
+                    let arrowSize = 4;
+                    p.triangle(hingeX - gateThickness/2, y,
+                              hingeX - gateThickness/2 - arrowSize, y - arrowSize*0.5,
+                              hingeX - gateThickness/2 - arrowSize, y + arrowSize*0.5);
+                }
+
+                // Label
+                p.fill(211, 47, 47);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.RIGHT);
+                p.text("Linear pressure", hingeX - gateThickness/2 - p_bottom * pressureScale - 5, hingeY + h2 * scale / 2);
+                p.text("distribution", hingeX - gateThickness/2 - p_bottom * pressureScale - 5, hingeY + h2 * scale / 2 + 13);
             }
 
-            function drawResultantForce() {
-                let hingeX = tankX;
-                let hingeY = tankBottomY;
-                let angleRad = p.radians(plateAngle);
-                let waterSurfaceY = tankBottomY - depth * scale;
+            function drawHorizontalPressure() {
+                // Draw constant pressure distribution on horizontal plate (above gate, inside tank)
+                // Uniform gauge pressure at depth h2 below water surface
+                let p_uniform = rho * g * h2 / 1000; // kPa - gauge pressure at the horizontal plate
+                let gateBottom = hingeY + h2 * scale;
+                let pressureScale = 0.6; // visual scaling factor (increased for clarity)
 
-                // Calculate centroid location (2/3 from hinge for triangular distribution)
-                // But need to account for partially submerged plate
-                let plateEndY = hingeY - plateLength * scale * p.sin(angleRad);
-                let submergedLength = plateLength;
+                // Draw the rectangular pressure distribution
+                p.fill(211, 47, 47, 100);
+                p.stroke(211, 47, 47, 180);
+                p.strokeWeight(2);
 
-                if (plateEndY < waterSurfaceY) {
-                    // Plate extends above water surface
-                    submergedLength = (hingeY - waterSurfaceY) / (scale * p.sin(angleRad));
+                let arrowLen = p_uniform * pressureScale;
+
+                p.beginShape();
+                p.vertex(hingeX - l1 * scale, gateBottom - gateThickness/2); // Left end (above gate)
+                p.vertex(hingeX, gateBottom - gateThickness/2); // Right end (at vertical wall)
+                p.vertex(hingeX, gateBottom - gateThickness/2 - arrowLen); // Right end extended upward
+                p.vertex(hingeX - l1 * scale, gateBottom - gateThickness/2 - arrowLen); // Left end extended upward
+                p.endShape(p.CLOSE);
+
+                // Draw pressure arrows at several locations
+                let numArrows = 6;
+                for (let i = 0; i <= numArrows; i++) {
+                    let fraction = i / numArrows;
+                    let x = hingeX - fraction * l1 * scale;
+
+                    p.stroke(211, 47, 47, 180);
+                    p.strokeWeight(1.5);
+                    p.line(x, gateBottom - gateThickness/2 - arrowLen,
+                           x, gateBottom - gateThickness/2);
+
+                    // Small arrowhead pointing down (toward gate)
+                    p.fill(211, 47, 47, 180);
+                    p.noStroke();
+                    let arrowSize = 4;
+                    p.triangle(x, gateBottom - gateThickness/2,
+                              x - arrowSize*0.5, gateBottom - gateThickness/2 - arrowSize,
+                              x + arrowSize*0.5, gateBottom - gateThickness/2 - arrowSize);
                 }
 
-                // Centroid is at 2/3 of submerged length from hinge
-                let centroidDist = (2.0 / 3.0) * submergedLength;
-
-                let centroidX = hingeX + centroidDist * scale * p.cos(angleRad);
-                let centroidY = hingeY - centroidDist * scale * p.sin(angleRad);
-
-                // Calculate total force (per unit width)
-                let avgDepth = centroidDist * p.sin(angleRad);
-                let totalForce = density * g * avgDepth * submergedLength; // N/m
-
-                // Draw resultant force arrow
-                let perpAngle = angleRad + p.PI / 2;
-                let forceArrowLength = p.map(totalForce, 0, density * g * depth * plateLength, 0, 100);
-
-                p.stroke(0, 200, 0);
-                p.strokeWeight(4);
-                let arrowEndX = centroidX - forceArrowLength * p.cos(perpAngle);
-                let arrowEndY = centroidY - forceArrowLength * p.sin(perpAngle);
-
-                p.line(centroidX, centroidY, arrowEndX, arrowEndY);
-
-                // Arrowhead
-                p.fill(0, 200, 0);
+                // Label
+                p.fill(211, 47, 47);
                 p.noStroke();
-                let arrowSize = 10;
+                p.textSize(11);
+                p.textAlign(p.CENTER);
+                p.text("Uniform pressure", hingeX - l1 * scale / 2, gateBottom - gateThickness/2 - arrowLen - 10);
+                p.text("distribution", hingeX - l1 * scale / 2, gateBottom - gateThickness/2 - arrowLen + 3);
+            }
+
+            function drawForces(forces) {
+                let gateBottom = hingeY + h2 * scale;
+                let forceScale = 0.15; // Increased from 0.025 for better visibility
+
+                // F1 - Hydrostatic force on vertical wall (horizontal arrow pointing right)
+                let F1_y = hingeY + forces.b1 * scale;
+                let F1_len = forces.F1 * forceScale;
+
+                drawArrow(hingeX + gateThickness/2 + 5, F1_y,
+                         hingeX + gateThickness/2 + 5 + F1_len, F1_y, '#D32F2F', 5);
+
+                p.fill(211, 47, 47);
+                p.noStroke();
+                p.textSize(15);
+                p.textAlign(p.CENTER);
+                p.text("F₁", hingeX + gateThickness/2 + 15 + F1_len/2, F1_y - 10);
+                p.textSize(12);
+                p.text(forces.F1.toFixed(0) + " kN", hingeX + gateThickness/2 + 15 + F1_len/2, F1_y + 20);
+
+                // F2 - Hydrostatic force on horizontal plate (vertical arrow pointing up)
+                let F2_x = hingeX - forces.b2 * scale;
+                let F2_len = forces.F2 * forceScale * 0.8;
+
+                drawArrow(F2_x, gateBottom + gateThickness/2 + 5,
+                         F2_x, gateBottom + gateThickness/2 + 5 + F2_len, '#D32F2F', 5);
+
+                p.fill(211, 47, 47);
+                p.textAlign(p.CENTER);
+                p.textSize(15);
+                p.text("F₂", F2_x - 30, gateBottom + gateThickness/2 + 25 + F2_len/2);
+                p.textSize(12);
+                p.text(forces.F2.toFixed(0) + " kN", F2_x - 30, gateBottom + gateThickness/2 + 40 + F2_len/2);
+
+                // P - Applied force (horizontal arrow pointing left to keep gate shut)
+                // Arrowhead should touch the external (right) surface of the gate
+                let P_len = forces.P * forceScale;
+
+                drawArrow(hingeX + gateThickness/2 + P_len, gateBottom,
+                         hingeX + gateThickness/2, gateBottom, '#2E7D32', 5);
+
+                p.fill(46, 125, 50);
+                p.textAlign(p.CENTER);
+                p.textSize(15);
+                p.text("P", hingeX + gateThickness/2 + P_len/2, gateBottom - 10);
+                p.textSize(12);
+                p.text(forces.P.toFixed(0) + " kN", hingeX + gateThickness/2 + P_len/2, gateBottom + 20);
+
+                // Moment arms (dashed lines)
+                p.stroke(100, 100, 180);
+                p.strokeWeight(1.5);
+                p.drawingContext.setLineDash([4, 4]);
+
+                // b1
+                p.line(hingeX, hingeY, hingeX, F1_y);
+                p.fill(100, 100, 180);
+                p.noStroke();
+                p.textSize(11);
+                p.text("b₁", hingeX - 20, (hingeY + F1_y)/2);
+
+                // b2
+                p.stroke(100, 100, 180);
+                p.drawingContext.setLineDash([4, 4]);
+                p.line(hingeX, gateBottom, F2_x, gateBottom);
+                p.fill(100, 100, 180);
+                p.noStroke();
+                p.text("b₂", (hingeX + F2_x)/2, gateBottom - 8);
+
+                p.drawingContext.setLineDash([]);
+            }
+
+            function drawDimensions() {
+                const tankWidth = 5.0; // meters
+                let leftWall = hingeX - tankWidth * scale;
+                let waterBottom = hingeY + h1 * scale;
+                let gateBottom = hingeY + h2 * scale;
+
+                p.stroke(80);
+                p.strokeWeight(1);
+                p.fill(60);
+                p.textSize(12);
+
+                // h1 (water depth)
+                let x1 = leftWall - 35;
+                drawDimLine(x1, hingeY, x1, waterBottom);
+                p.textAlign(p.CENTER);
                 p.push();
-                p.translate(arrowEndX, arrowEndY);
-                p.rotate(perpAngle - p.PI);
-                p.triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
+                p.translate(x1 - 15, (hingeY + waterBottom)/2);
+                p.rotate(-p.PI/2);
+                p.text("h₁ = " + h1.toFixed(1) + " m", 0, 0);
                 p.pop();
 
-                // Label
-                p.fill(0, 150, 0);
+                // h2 (gate height)
+                let x2 = hingeX + 55;
+                drawDimLine(x2, hingeY, x2, gateBottom);
+                p.push();
+                p.translate(x2 + 20, (hingeY + gateBottom)/2);
+                p.rotate(-p.PI/2);
+                p.text("h₂ = " + h2.toFixed(1) + " m", 0, 0);
+                p.pop();
+
+                // l1 (horizontal plate length)
+                let y1 = hingeY - 35;
+                drawDimLine(hingeX, y1, hingeX - l1 * scale, y1);
                 p.textAlign(p.CENTER);
-                p.textSize(12);
-                p.text("F_R", arrowEndX - 20 * p.cos(perpAngle), arrowEndY - 20 * p.sin(perpAngle));
-
-                // Mark centroid
-                p.fill(0, 200, 0);
-                p.noStroke();
-                p.circle(centroidX, centroidY, 8);
+                p.text("l₁ = " + l1.toFixed(1) + " m", hingeX - l1 * scale/2, y1 - 8);
             }
 
-            function drawDepthMarkers() {
-                let waterSurfaceY = tankBottomY - depth * scale;
-
-                p.stroke(100);
+            function drawDimLine(x1, y1, x2, y2) {
+                p.stroke(80);
                 p.strokeWeight(1);
-                p.fill(0);
-                p.textAlign(p.RIGHT);
-                p.textSize(11);
-
-                for (let d = 0; d <= depth; d += 0.5) {
-                    let y = tankBottomY - d * scale;
-                    p.line(tankX - 10, y, tankX - 3, y);
-                    if (d % 1 === 0) {
-                        p.text(d.toFixed(1) + " m", tankX - 15, y + 4);
-                    }
-                }
+                p.line(x1, y1, x2, y2);
+                p.line(x1 - 4, y1, x1 + 4, y1);
+                p.line(x2 - 4, y2, x2 + 4, y2);
             }
 
-            function drawInfoBox() {
-                let hingeX = tankX;
-                let hingeY = tankBottomY;
-                let angleRad = p.radians(plateAngle);
-                let waterSurfaceY = tankBottomY - depth * scale;
-
-                // Calculate values
-                let plateEndY = hingeY - plateLength * scale * p.sin(angleRad);
-                let submergedLength = plateLength;
-
-                if (plateEndY < waterSurfaceY) {
-                    submergedLength = (hingeY - waterSurfaceY) / (scale * p.sin(angleRad));
-                }
-
-                let centroidDist = (2.0 / 3.0) * submergedLength;
-                let centroidDepth = centroidDist * p.sin(angleRad);
-                let totalForce = density * g * centroidDepth * submergedLength; // N/m
-
-                // Info box
-                p.fill(255, 255, 255, 220);
+            function drawInfoPanel(forces) {
+                p.fill(255, 255, 255, 250);
                 p.stroke(100);
                 p.strokeWeight(2);
-                p.rect(p.width - 220, 20, 200, 140, 5);
+                p.rect(p.width - 310, 15, 295, 235, 8);
 
                 p.fill(0);
                 p.noStroke();
                 p.textAlign(p.LEFT);
-                p.textSize(13);
-                p.text("Hydrostatic Force Analysis", p.width - 210, 40);
+                p.textSize(15);
+                p.text("Equilibrium Analysis", p.width - 300, 40);
 
                 p.textSize(11);
-                p.text("Plate angle: " + plateAngle + "°", p.width - 210, 60);
-                p.text("Submerged length: " + submergedLength.toFixed(2) + " m", p.width - 210, 78);
-                p.text("Centroid depth: " + centroidDepth.toFixed(2) + " m", p.width - 210, 96);
-                p.text("Centroid distance: " + centroidDist.toFixed(2) + " m", p.width - 210, 114);
-                p.text("  (from hinge)", p.width - 210, 128);
-                p.text("Force (per m width):", p.width - 210, 146);
-                p.text("  F = " + (totalForce / 1000).toFixed(1) + " kN/m", p.width - 210, 160);
+                let y = 60;
+
+                p.text("Gate width (perpendicular): b = " + b.toFixed(1) + " m", p.width - 300, y);
+                y += 20;
+
+                p.text("Hydrostatic Forces:", p.width - 300, y);
+                y += 18;
+                p.text("  F₁ = " + forces.F1.toFixed(1) + " kN  (at b₁ = " + forces.b1.toFixed(2) + " m)", p.width - 300, y);
+                y += 16;
+                p.text("  F₂ = " + forces.F2.toFixed(1) + " kN  (at b₂ = " + forces.b2.toFixed(2) + " m)", p.width - 300, y);
+                y += 24;
+
+                p.text("Applied Force:", p.width - 300, y);
+                y += 18;
+                p.text("  P = " + forces.P.toFixed(1) + " kN", p.width - 300, y);
+                y += 24;
+
+                p.text("Moment Balance (about C):", p.width - 300, y);
+                y += 18;
+                p.text("  F₁·b₁ + F₂·b₂ = P·h₂", p.width - 300, y);
+                y += 16;
+                p.text("  " + (forces.F1 * forces.b1).toFixed(1) + " + " + (forces.F2 * forces.b2).toFixed(1) +
+                       " = " + (forces.P * h2).toFixed(1) + " kN·m", p.width - 300, y);
+                y += 24;
+
+                // Status
+                p.fill(46, 125, 50);
+                p.text("✓ Gate in Equilibrium", p.width - 300, y);
+            }
+
+            function drawArrow(x1, y1, x2, y2, color, weight) {
+                p.stroke(color);
+                p.strokeWeight(weight);
+                p.line(x1, y1, x2, y2);
+
+                // Arrowhead - larger for better visibility
+                p.fill(color);
+                p.noStroke();
+                let angle = p.atan2(y2 - y1, x2 - x1);
+                let size = 16; // Increased from 10
+
+                p.push();
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.triangle(0, 0, -size, -size*0.6, -size, size*0.6);
+                p.pop();
             }
 
             function setupControls() {
-                document.getElementById("depth").addEventListener("input", function() {
-                    depth = parseFloat(this.value);
-                    document.getElementById("depth-value").textContent = depth.toFixed(1);
+                document.getElementById("h1").addEventListener("input", function() {
+                    h1 = parseFloat(this.value);
+                    document.getElementById("h1-value").textContent = h1.toFixed(1);
+                    // Update h2 slider max to not exceed h1
+                    document.getElementById("h2").max = h1;
+                    if (h2 > h1) {
+                        h2 = h1;
+                        document.getElementById("h2").value = h2;
+                        document.getElementById("h2-value").textContent = h2.toFixed(1);
+                    }
                 });
 
-                document.getElementById("plateAngle").addEventListener("input", function() {
-                    plateAngle = parseFloat(this.value);
-                    document.getElementById("plateAngle-value").textContent = plateAngle;
+                document.getElementById("h2").addEventListener("input", function() {
+                    h2 = parseFloat(this.value);
+                    document.getElementById("h2-value").textContent = h2.toFixed(1);
                 });
 
-                document.getElementById("plateLength").addEventListener("input", function() {
-                    plateLength = parseFloat(this.value);
-                    document.getElementById("plateLength-value").textContent = plateLength.toFixed(1);
+                document.getElementById("l1").addEventListener("input", function() {
+                    l1 = parseFloat(this.value);
+                    document.getElementById("l1-value").textContent = l1.toFixed(1);
                 });
 
-                document.getElementById("density").addEventListener("input", function() {
-                    density = parseFloat(this.value);
-                    document.getElementById("density-value").textContent = density;
+                // Pressure distribution visualization checkboxes
+                document.getElementById("showVerticalPressure").addEventListener("change", function() {
+                    showVerticalPressure = this.checked;
                 });
+
+                document.getElementById("showHorizontalPressure").addEventListener("change", function() {
+                    showHorizontalPressure = this.checked;
+                });
+
+                // Set initial max for h2 based on h1
+                document.getElementById("h2").max = h1;
             }
 
         }, 'sketch-holder');

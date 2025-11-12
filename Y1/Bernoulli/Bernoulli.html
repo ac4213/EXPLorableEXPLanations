@@ -87,6 +87,7 @@
     <div class="simulation-section">
         <h2>Interactive Simulation: Venturi Tube</h2>
         <p>Explore how fluid velocity and pressure change through a converging-diverging tube (Venturi effect). Adjust the inlet velocity and tube geometry to see how Bernoulli's equation describes the flow behavior.</p>
+        <p><strong>Note:</strong> At high velocities or small throat diameters, you may observe <strong>cavitation</strong> - the formation of vapour bubbles when local pressure drops below the vapour pressure limit.</p>
 
         <div id="bernoulli-sketch"></div>
 
@@ -354,7 +355,7 @@
         let streamlines = [];
 
         // Constants
-        const P_atm = 101325; // Atmospheric pressure in Pa
+        const P_atm = 2000000; // Inlet pressure in Pa (20 bar = 2000 kPa)
         const g = 9.81;
         const NUM_STREAMLINES = 10;
         const PARTICLES_PER_STREAMLINE = 5;
@@ -458,18 +459,30 @@
 
                 // Bernoulli's equation (horizontal pipe, h1 = h2 = h3)
                 const P1 = P_atm;
-                const P2 = P1 + 0.5 * fluidDensity * (v1 * v1 - v2 * v2);
+                let P2 = P1 + 0.5 * fluidDensity * (v1 * v1 - v2 * v2);
+
+                // Check for cavitation (pressure cannot go below zero - vapour pressure limit)
+                const isCavitating = P2 < 0;
+                if (isCavitating) {
+                    P2 = 0; // Cap at zero pressure (cavitation occurs)
+                }
+
                 const P3 = P1; // Returns to inlet pressure
                 const deltaP = P1 - P2;
 
                 // Draw tube with gradient shading
                 drawVenturiTube(p, inletRadius, throatRadius);
 
+                // Draw cavitation effect if occurring and animation is running
+                if (isCavitating && animating) {
+                    drawCavitation(p, throatRadius);
+                }
+
                 // Draw streamlines
                 drawStreamlines(p, inletRadius, throatRadius);
 
                 // Draw pressure gauges
-                drawPressureGauges(p, P1, P2, P3, inletRadius, throatRadius);
+                drawPressureGauges(p, P1, P2, P3, inletRadius, throatRadius, isCavitating);
 
                 // Update and draw particles
                 if (animating) {
@@ -478,7 +491,7 @@
                 drawParticles(p, v1, v2);
 
                 // Draw info box
-                drawInfoBox(p, v1, v2, v3, P1, P2, P3, deltaP);
+                drawInfoBox(p, v1, v2, v3, P1, P2, P3, deltaP, isCavitating);
 
                 // Draw labels
                 drawLabels(p);
@@ -525,6 +538,34 @@
                 p.line(tubeEndX, centerY - r1, tubeEndX, centerY + r1);
             }
 
+            function drawCavitation(p, throatRadius) {
+                const centerY = canvasHeight / 2;
+                const throatX = (tubeStartX + tubeEndX) / 2;
+                const cavitationWidth = 80;
+
+                // Draw bubbles in the throat region
+                p.noStroke();
+                for (let i = 0; i < 20; i++) {
+                    const x = throatX + p.random(-cavitationWidth/2, cavitationWidth/2);
+                    const y = centerY + p.random(-throatRadius + 10, throatRadius - 10);
+                    const size = p.random(3, 8);
+
+                    // Translucent white bubbles
+                    p.fill(255, 255, 255, 180);
+                    p.ellipse(x, y, size, size);
+
+                    // Bubble highlights
+                    p.fill(255, 255, 255, 100);
+                    p.ellipse(x - size/4, y - size/4, size/3, size/3);
+                }
+
+                // Add warning glow around throat
+                p.noFill();
+                p.stroke(255, 100, 100, 100);
+                p.strokeWeight(8);
+                p.ellipse(throatX, centerY, throatRadius * 2 + 20, throatRadius * 2 + 20);
+            }
+
             function drawStreamlines(p, r1, r2) {
                 const centerY = canvasHeight / 2;
                 p.stroke(100, 120, 180, 120);
@@ -541,7 +582,7 @@
                 }
             }
 
-            function drawPressureGauges(p, P1, P2, P3, r1, r2) {
+            function drawPressureGauges(p, P1, P2, P3, r1, r2, isCavitating) {
                 const centerY = canvasHeight / 2;
                 const inletX = tubeStartX + 80;
                 const throatX = (tubeStartX + tubeEndX) / 2;
@@ -656,12 +697,12 @@
                 }
             }
 
-            function drawInfoBox(p, v1, v2, v3, P1, P2, P3, deltaP) {
-                // Draw info box in top-right corner
-                const boxX = canvasWidth - 200;
-                const boxY = 15;
-                const boxW = 185;
-                const boxH = 140;
+            function drawInfoBox(p, v1, v2, v3, P1, P2, P3, deltaP, isCavitating) {
+                // Draw info box centered at top
+                const boxW = 550;
+                const boxH = isCavitating ? 85 : 65;
+                const boxX = (canvasWidth - boxW) / 2;
+                const boxY = 10;
 
                 // Background
                 p.fill(255, 255, 255, 230);
@@ -669,31 +710,33 @@
                 p.strokeWeight(2);
                 p.rect(boxX, boxY, boxW, boxH, 5);
 
-                // Text
+                // Row 1: Title
                 p.noStroke();
                 p.fill(0);
-                p.textAlign(p.LEFT);
+                p.textAlign(p.CENTER);
                 p.textSize(12);
                 p.textStyle(p.BOLD);
-                p.text('Flow Conditions', boxX + 10, boxY + 20);
+                p.text('Flow Conditions', boxX + boxW/2, boxY + 18);
 
+                // Row 2: Inlet
+                p.textAlign(p.CENTER);
                 p.textStyle(p.NORMAL);
-                p.textSize(10);
-
-                p.fill(200, 50, 50);
-                p.text('Inlet:', boxX + 10, boxY + 40);
+                p.textSize(11);
                 p.fill(0);
-                p.text('v₁ = ' + v1.toFixed(2) + ' m/s', boxX + 15, boxY + 55);
-                p.text('P₁ = ' + (P1/1000).toFixed(1) + ' kPa', boxX + 15, boxY + 68);
+                const row2Y = boxY + 35;
+                p.text('Inlet: v₁ = ' + v1.toFixed(2) + ' m/s  ;  P₁ = ' + (P1/1000).toFixed(1) + ' kPa', boxX + boxW/2, row2Y);
 
-                p.fill(50, 50, 200);
-                p.text('Throat:', boxX + 10, boxY + 85);
-                p.fill(0);
-                p.text('v₂ = ' + v2.toFixed(2) + ' m/s', boxX + 15, boxY + 100);
-                p.text('P₂ = ' + (P2/1000).toFixed(1) + ' kPa', boxX + 15, boxY + 113);
+                // Row 3: Throat
+                const row3Y = boxY + 52;
+                p.text('Throat: v₂ = ' + v2.toFixed(2) + ' m/s  ;  P₂ = ' + (P2/1000).toFixed(1) + ' kPa', boxX + boxW/2, row3Y);
 
-                p.fill(100);
-                p.text('ΔP = ' + (deltaP/1000).toFixed(2) + ' kPa', boxX + 10, boxY + 132);
+                // Row 4: Cavitation warning (if applicable)
+                if (isCavitating) {
+                    const row4Y = boxY + 72;
+                    p.fill(255, 50, 50);
+                    p.textStyle(p.BOLD);
+                    p.text('⚠ CAVITATION! Pressure limited to 0 kPa', boxX + boxW/2, row4Y);
+                }
             }
 
             function drawLabels(p) {
