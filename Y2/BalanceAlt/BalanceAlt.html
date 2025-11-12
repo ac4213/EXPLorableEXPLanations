@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balancing of reciprocating Masses - Interactive Lecture</title>
+
+    <!-- External CSS (always in this order) -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <style>
+        .harmonic-chip {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .primary-harmonic {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+
+        .secondary-harmonic {
+            background-color: #bbdefb;
+            color: #1565c0;
+        }
+
+        .balance-table {
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .balance-table th,
+        .balance-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .balance-table th {
+            background-color: var(--primary-color);
+            color: #333;
+            font-weight: bold;
+        }
+
+        .balance-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .force-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .force-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .force-box {
+            background-color: #f5f5f5;
+            border-left: 4px solid #1e88e5;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .unbalanced-box {
+            border-left-color: #e53935;
+        }
+
+        .balanced-box {
+            border-left-color: #43a047;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Balancing of Reciprocating Masses</h1>
+        <p class="subtitle">Reciprocating Mechanisms and Vibration Reduction</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Reciprocating Mass Balancing</h2>
+        <p>
+            Reciprocating or alternative translation masses are found in piston engines, compressors, pumps, and other machinery
+            where components move back and forth in a linear path. Unlike rotating masses that produce centrifugal
+            forces, reciprocating masses generate reciprocating inertia forces that change direction periodically,
+            causing vibrations and potentially damaging the machine and its foundation.
+        </p>
+
+        <div class="key-point">
+            <p><strong>Core Challenge:</strong> Reciprocating masses produce primary and secondary unbalanced forces
+            that cannot be completely eliminated with simple counterweights. The goal is to minimize these forces
+            to acceptable levels, reducing vibration, noise, and mechanical wear.</p>
+        </div>
+
+        <h3>Slider-Crank Mechanism</h3>
+        <p>
+            The slider-crank mechanism converts rotary motion into reciprocating motion (or vice versa). It consists
+            of a crank rotating about a fixed pivot, connected via a connecting rod to a piston that slides in a
+            cylinder. This is the fundamental mechanism in internal combustion engines.
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Key Parameters:</strong></p>
+            <ul>
+                <li>\(r\) = Crank radius (half the stroke)</li>
+                <li>\(l\) = Connecting rod length</li>
+                <li>\(n = \frac{l}{r}\) = Ratio of connecting rod length to crank radius</li>
+                <li>\(\omega\) = Angular velocity of crank (rad/s)</li>
+                <li>\(\theta = \omega t\) = Crank angle from TDC (Top Dead Centre)</li>
+                <li>\(m_r\) = Reciprocating mass (piston + portion of connecting rod)</li>
+            </ul>
+        </div>
+
+        <h3>Piston Displacement and Acceleration</h3>
+        <p>
+            The position of the piston relative to the crankshaft centre is given by an exact expression, but for
+            practical analysis, we use an approximation that separates primary and secondary harmonics:
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Piston Displacement:</strong></p>
+            <p>\[x = r\left[(1-\cos\theta) + \frac{1}{2n}(1-\cos 2\theta)\right]\]</p>
+            <p>Where the first term is the primary motion and the second term is the secondary correction.</p>
+        </div>
+
+        <div class="equation-box">
+            <p><strong>Piston Acceleration:</strong></p>
+            <p>\[a = r\omega^2\left[\cos\theta + \frac{1}{n}\cos 2\theta\right]\]</p>
+            <p>This acceleration produces two components of inertia force.</p>
+        </div>
+
+        <h3>Primary and Secondary Unbalanced Forces</h3>
+        <p>
+            The inertia force of the reciprocating mass has two harmonic components:
+        </p>
+
+        <div class="force-comparison">
+            <div class="force-box">
+                <h4><span class="harmonic-chip primary-harmonic">Primary Force</span></h4>
+                <p><strong>Frequency:</strong> Same as crankshaft speed (\(\omega\))</p>
+                <p>\[F_p = m_r r \omega^2 \cos\theta\]</p>
+                <p>Acts along the line of piston motion</p>
+                <p><strong>Direction:</strong> Maximum toward crankshaft at TDC, away at BDC</p>
+            </div>
+
+            <div class="force-box">
+                <h4><span class="harmonic-chip secondary-harmonic">Secondary Force</span></h4>
+                <p><strong>Frequency:</strong> Twice the crankshaft speed (\(2\omega\))</p>
+                <p>\[F_s = m_r r \omega^2 \frac{1}{n}\cos 2\theta\]</p>
+                <p>Also acts along line of piston motion</p>
+                <p><strong>Magnitude:</strong> Smaller than primary, typically \(\frac{1}{4}\) to \(\frac{1}{5}\) of \(F_p\)</p>
+            </div>
+        </div>
+
+        <h3>Balancing Strategies</h3>
+
+        <h4>1. Primary Force Balancing</h4>
+        <p>
+            Primary forces can be partially balanced using rotating counterweights attached to the crankshaft.
+            However, a complete balance is impossible without creating an equal unbalanced force in the
+            perpendicular direction.
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Rotating Counterweight:</strong></p>
+            <p>A counterweight of mass \(m_c\) at radius \(r_c\) rotating with the crank produces a centrifugal force:</p>
+            <p>\[F_c = m_c r_c \omega^2\]</p>
+            <p>To balance primary force horizontally: \(m_c r_c = c \cdot m_r r\)</p>
+            <p>where \(c\) is the balance fraction (typically 0.5 to 0.67 for single-cylinder engines)</p>
+        </div>
+
+        <div class="key-point">
+            <p><strong>Trade-off:</strong> Partial balancing (c = 0.5 to 0.67) minimizes the vector sum of
+            horizontal and vertical unbalanced forces but doesn't eliminate either completely. This is an
+            optimization problem balancing horizontal vibration against vertical vibration.</p>
+        </div>
+
+        <h4>2. Secondary Force Balancing</h4>
+        <p>
+            Secondary forces cannot be balanced with simple rotating counterweights because they oscillate at
+            twice the crank frequency. Solutions include:
+        </p>
+
+        <ul>
+            <li><strong>Opposed-piston configuration:</strong> Two pistons moving in opposite directions</li>
+            <li><strong>Balance shafts:</strong> Two counter-rotating shafts at 2ω speed (e.g., Lanchester balancer)</li>
+            <li><strong>Multi-cylinder arrangements:</strong> Strategic cylinder phasing to cancel secondary forces</li>
+        </ul>
+
+        <h4>3. Multi-Cylinder Engines</h4>
+        <p>
+            In multi-cylinder engines, pistons are arranged with specific phase angles. The combined effect of
+            multiple reciprocating masses can achieve better balance:
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Primary Force Balance Condition:</strong></p>
+            <p>\[\sum_{i=1}^{N} m_{ri} r_i \cos\theta_i = 0\]</p>
+
+            <p><strong>Secondary Force Balance Condition:</strong></p>
+            <p>\[\sum_{i=1}^{N} m_{ri} r_i \frac{1}{n_i}\cos 2\theta_i = 0\]</p>
+        </div>
+
+        <table class="balance-table">
+            <thead>
+                <tr>
+                    <th>Engine Configuration</th>
+                    <th>Primary Balance</th>
+                    <th>Secondary Balance</th>
+                    <th>Typical Use</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Single Cylinder</td>
+                    <td>Partial (50-67%)</td>
+                    <td>Unbalanced</td>
+                    <td>Motorcycles, small engines</td>
+                </tr>
+                <tr>
+                    <td>Inline-2 (180°)</td>
+                    <td>Balanced</td>
+                    <td>Additive (worst)</td>
+                    <td>Rarely used</td>
+                </tr>
+                <tr>
+                    <td>Inline-4 (Even firing)</td>
+                    <td>Balanced</td>
+                    <td>Unbalanced</td>
+                    <td>Most common car engine</td>
+                </tr>
+                <tr>
+                    <td>Inline-6</td>
+                    <td>Balanced</td>
+                    <td>Balanced</td>
+                    <td>Premium cars, trucks</td>
+                </tr>
+                <tr>
+                    <td>V8 (90° cross-plane)</td>
+                    <td>Balanced</td>
+                    <td>Balanced</td>
+                    <td>Performance vehicles</td>
+                </tr>
+                <tr>
+                    <td>Flat-4 (Boxer)</td>
+                    <td>Balanced</td>
+                    <td>Unbalanced</td>
+                    <td>Porsche, Subaru</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Unbalanced Couples</h3>
+        <p>
+            Even when forces are balanced, unbalanced couples (moments) can cause pitching vibration. The couple
+            depends on the spacing between cylinders and requires consideration in engine design.
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Primary Couple:</strong></p>
+            <p>\[C_p = \sum_{i=1}^{N} m_{ri} r_i \omega^2 \cos\theta_i \cdot d_i\]</p>
+            <p>where \(d_i\) is the distance of cylinder \(i\) from a reference plane.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation: Slider-Crank Mechanism</h2>
+        <p>
+            Observe the slider-crank mechanism in action. Adjust the parameters to see how crank radius, connecting
+            rod length, and reciprocating mass affect the primary and secondary forces. The force vectors are shown
+            in real-time, and you can add a counterweight to see partial balancing in action.
+        </p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="crank-radius">Crank Radius r (mm):</label>
+                    <div class="slider-row">
+                        <input type="range" id="crank-radius" min="30" max="100" value="50" step="5">
+                        <span id="crank-radius-value" class="value-display">50</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="rod-length">Connecting Rod Length l (mm):</label>
+                    <div class="slider-row">
+                        <input type="range" id="rod-length" min="100" max="300" value="200" step="10">
+                        <span id="rod-length-value" class="value-display">200</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="recip-mass">Reciprocating Mass (kg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="recip-mass" min="0.5" max="3" value="1.5" step="0.1">
+                        <span id="recip-mass-value" class="value-display">1.5</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="rpm">Engine Speed (RPM):</label>
+                    <div class="slider-row">
+                        <input type="range" id="rpm" min="300" max="6000" value="2000" step="100">
+                        <span id="rpm-value" class="value-display">2000</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="balance-fraction">Balance Fraction c:</label>
+                    <div class="slider-row">
+                        <input type="range" id="balance-fraction" min="0" max="1" value="0" step="0.05">
+                        <span id="balance-fraction-value" class="value-display">0.00</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="force-scale">Force Vector Scale:</label>
+                    <div class="slider-row">
+                        <input type="range" id="force-scale" min="0.5" max="3" value="1" step="0.1">
+                        <span id="force-scale-value" class="value-display">1.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Simulation Controls -->
+        <div id="button-container">
+            <button id="play-pause-btn" class="control-button">Pause</button>
+            <button id="reset-btn" class="control-button">Reset</button>
+            <button id="show-graphs-btn" class="control-button">Toggle Force Graphs</button>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li>
+                <strong>Automotive Engines:</strong> Internal combustion engines require careful balancing to minimize
+                vibration and noise. Four-cylinder engines commonly use balance shafts (Mitsubishi's Silent Shaft,
+                Mercedes M264) to cancel secondary forces. Inline-six and V8 engines achieve natural balance through
+                cylinder arrangement.
+            </li>
+            <li>
+                <strong>Marine Diesel Engines:</strong> Large two-stroke marine diesels have significant reciprocating
+                masses (pistons can weigh over 1 ton). Balancing is critical to prevent hull vibration and fatigue
+                damage. Cross-head bearings and counterweights are precisely designed to minimize bearing loads.
+            </li>
+            <li>
+                <strong>Reciprocating Compressors:</strong> Industrial air compressors and gas compressors in pipelines
+                use opposed-piston configurations or multiple cylinders with phase offsets to balance primary forces.
+                Foundation design must account for any remaining unbalanced forces.
+            </li>
+            <li>
+                <strong>Pumps:</strong> Reciprocating pumps for high-pressure applications (oil refineries, chemical
+                plants) require balancing to prevent pipe vibration and extend seal life. Triplex pumps (three pistons
+                at 120°) provide smoother flow and better force balance than duplex designs.
+            </li>
+            <li>
+                <strong>Mechanical Presses:</strong> Stamping presses and forging hammers have large reciprocating
+                masses. Flywheel systems store energy and counterweights reduce foundation loads. Dynamic analysis
+                prevents resonance with building structures.
+            </li>
+            <li>
+                <strong>Agricultural Machinery:</strong> Hay balers and threshers with reciprocating cutting mechanisms
+                require balancing to minimize operator vibration exposure and prevent premature bearing failure, especially
+                given variable operating speeds.
+            </li>
+            <li>
+                <strong>Aircraft Engines:</strong> Opposed-piston (flat/boxer) engines in light aircraft (e.g., Lycoming,
+                Continental) achieve primary balance through symmetry. Lower vibration improves passenger comfort and
+                reduces instrument panel fatigue.
+            </li>
+            <li>
+                <strong>Textile Machinery:</strong> Weaving looms have reciprocating shuttles or rapiers moving at high
+                speeds. Balancing masses are incorporated to minimize frame vibration and maintain precise thread
+                positioning for product quality.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rod Ratio</td>
+                        <td>\(n = \frac{l}{r}\)</td>
+                        <td>Connecting rod length to crank radius</td>
+                    </tr>
+                    <tr>
+                        <td>Crank Angle</td>
+                        <td>\(\theta = \omega t\)</td>
+                        <td>Angular position from TDC</td>
+                    </tr>
+                    <tr>
+                        <td>Piston Displacement</td>
+                        <td>\(x = r\left[(1-\cos\theta) + \frac{1}{2n}(1-\cos 2\theta)\right]\)</td>
+                        <td>Position relative to crankshaft</td>
+                    </tr>
+                    <tr>
+                        <td>Piston Acceleration</td>
+                        <td>\(a = r\omega^2\left[\cos\theta + \frac{1}{n}\cos 2\theta\right]\)</td>
+                        <td>Linear acceleration of piston</td>
+                    </tr>
+                    <tr>
+                        <td>Primary Inertia Force</td>
+                        <td>\(F_p = m_r r \omega^2 \cos\theta\)</td>
+                        <td>Force at crankshaft frequency</td>
+                    </tr>
+                    <tr>
+                        <td>Secondary Inertia Force</td>
+                        <td>\(F_s = m_r r \omega^2 \frac{1}{n}\cos 2\theta\)</td>
+                        <td>Force at twice crankshaft frequency</td>
+                    </tr>
+                    <tr>
+                        <td>Total Inertia Force</td>
+                        <td>\(F = F_p + F_s\)</td>
+                        <td>Combined reciprocating force</td>
+                    </tr>
+                    <tr>
+                        <td>Counterweight Force</td>
+                        <td>\(F_c = m_c r_c \omega^2\)</td>
+                        <td>Centrifugal force of balance weight</td>
+                    </tr>
+                    <tr>
+                        <td>Balance Condition</td>
+                        <td>\(m_c r_c = c \cdot m_r r\)</td>
+                        <td>Partial balance with fraction c</td>
+                    </tr>
+                    <tr>
+                        <td>Horizontal Unbalance</td>
+                        <td>\(F_h = m_r r \omega^2(\cos\theta - c)\)</td>
+                        <td>Remaining horizontal force</td>
+                    </tr>
+                    <tr>
+                        <td>Vertical Unbalance</td>
+                        <td>\(F_v = c \cdot m_r r \omega^2 \sin\theta\)</td>
+                        <td>Introduced vertical force</td>
+                    </tr>
+                    <tr>
+                        <td>Optimal Balance</td>
+                        <td>\(c_{\text{opt}} = \frac{1}{\sqrt{2}} \approx 0.707\)</td>
+                        <td>Minimizes maximum total force</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Primary Inertia Force</h3>
+            <p>
+                A single-cylinder engine has a reciprocating mass of 2 kg, crank radius of 60 mm, and operates
+                at 3000 RPM. Calculate the maximum primary inertia force.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Reciprocating mass: \(m_r = 2\) kg</li>
+                    <li>Crank radius: \(r = 60\) mm = 0.06 m</li>
+                    <li>Speed: \(N = 3000\) RPM</li>
+                </ul>
+
+                <p><strong>Step 1: Convert RPM to rad/s</strong></p>
+                <p>\[\omega = \frac{2\pi N}{60} = \frac{2\pi \times 3000}{60} = 314.16 \text{ rad/s}\]</p>
+
+                <p><strong>Step 2: Calculate maximum primary force</strong></p>
+                <p>The primary force is: \(F_p = m_r r \omega^2 \cos\theta\)</p>
+                <p>Maximum occurs when \(\cos\theta = 1\):</p>
+                <p>\[F_{p,\text{max}} = m_r r \omega^2\]</p>
+                <p>\[F_{p,\text{max}} = 2 \times 0.06 \times (314.16)^2\]</p>
+                <p>\[F_{p,\text{max}} = 2 \times 0.06 \times 98736.4\]</p>
+                <p>\[F_{p,\text{max}} = 11848 \text{ N} = 11.85 \text{ kN}\]</p>
+
+                <p><strong>Answer:</strong> The maximum primary inertia force is 11.85 kN</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Secondary Force Calculation</h3>
+            <p>
+                For the same engine in Problem 1, if the connecting rod length is 240 mm, calculate the maximum
+                secondary inertia force and compare it to the primary force.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>From Problem 1: \(m_r = 2\) kg, \(r = 0.06\) m, \(\omega = 314.16\) rad/s</li>
+                    <li>Connecting rod length: \(l = 240\) mm = 0.24 m</li>
+                </ul>
+
+                <p><strong>Step 1: Calculate rod ratio</strong></p>
+                <p>\[n = \frac{l}{r} = \frac{0.24}{0.06} = 4\]</p>
+
+                <p><strong>Step 2: Calculate maximum secondary force</strong></p>
+                <p>The secondary force is: \(F_s = m_r r \omega^2 \frac{1}{n}\cos 2\theta\)</p>
+                <p>Maximum occurs when \(\cos 2\theta = 1\):</p>
+                <p>\[F_{s,\text{max}} = \frac{m_r r \omega^2}{n}\]</p>
+                <p>\[F_{s,\text{max}} = \frac{11848}{4} = 2962 \text{ N} = 2.96 \text{ kN}\]</p>
+
+                <p><strong>Step 3: Compare to primary force</strong></p>
+                <p>\[\frac{F_{s,\text{max}}}{F_{p,\text{max}}} = \frac{1}{n} = \frac{1}{4} = 0.25 = 25\%\]</p>
+
+                <p><strong>Answer:</strong> The maximum secondary force is 2.96 kN, which is 25% of the primary force.
+                With a typical rod ratio of 4, the secondary force is significant but smaller than the primary force.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Counterweight Design</h3>
+            <p>
+                Design a counterweight to achieve 60% balance of the primary force for the engine in Problem 1.
+                If the counterweight is placed at a radius of 80 mm from the crankshaft axis, what mass is required?
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>From Problem 1: \(m_r = 2\) kg, \(r = 0.06\) m</li>
+                    <li>Balance fraction: \(c = 0.60\)</li>
+                    <li>Counterweight radius: \(r_c = 80\) mm = 0.08 m</li>
+                </ul>
+
+                <p><strong>Balance Condition:</strong></p>
+                <p>\[m_c r_c = c \cdot m_r r\]</p>
+
+                <p><strong>Solve for counterweight mass:</strong></p>
+                <p>\[m_c = \frac{c \cdot m_r r}{r_c}\]</p>
+                <p>\[m_c = \frac{0.60 \times 2 \times 0.06}{0.08}\]</p>
+                <p>\[m_c = \frac{0.072}{0.08} = 0.9 \text{ kg}\]</p>
+
+                <p><strong>Verification:</strong></p>
+                <p>Counterweight moment: \(m_c r_c = 0.9 \times 0.08 = 0.072\) kg·m</p>
+                <p>Required moment: \(c \cdot m_r r = 0.60 \times 2 \times 0.06 = 0.072\) kg·m ✓</p>
+
+                <p><strong>Answer:</strong> A counterweight of 0.9 kg placed at 80 mm radius will provide 60%
+                balance of the primary force.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Multi-Cylinder Balance</h3>
+            <p>
+                A two-cylinder inline engine has pistons 180° out of phase (when one is at TDC, the other is at BDC).
+                If each cylinder has identical reciprocating mass of 1.5 kg and crank radius of 50 mm, determine
+                if the primary forces are balanced.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Two cylinders with 180° phase difference</li>
+                    <li>Each cylinder: \(m_r = 1.5\) kg, \(r = 0.05\) m</li>
+                    <li>Cylinder 1 angle: \(\theta_1 = \theta\)</li>
+                    <li>Cylinder 2 angle: \(\theta_2 = \theta + 180°\)</li>
+                </ul>
+
+                <p><strong>Primary Force Balance Condition:</strong></p>
+                <p>\[\sum F_p = m_{r1} r_1 \omega^2 \cos\theta_1 + m_{r2} r_2 \omega^2 \cos\theta_2\]</p>
+
+                <p><strong>Substituting values:</strong></p>
+                <p>\[\sum F_p = 1.5 \times 0.05 \times \omega^2 \cos\theta + 1.5 \times 0.05 \times \omega^2 \cos(\theta + 180°)\]</p>
+
+                <p><strong>Using trigonometric identity:</strong> \(\cos(\theta + 180°) = -\cos\theta\)</p>
+                <p>\[\sum F_p = 1.5 \times 0.05 \times \omega^2 \cos\theta + 1.5 \times 0.05 \times \omega^2 \times (-\cos\theta)\]</p>
+                <p>\[\sum F_p = 1.5 \times 0.05 \times \omega^2 \cos\theta - 1.5 \times 0.05 \times \omega^2 \cos\theta = 0\]</p>
+
+                <p><strong>Primary forces are BALANCED! ✓</strong></p>
+
+                <p><strong>Secondary Force Analysis:</strong></p>
+                <p>\[\sum F_s = \frac{m_r r \omega^2}{n}\cos 2\theta + \frac{m_r r \omega^2}{n}\cos 2(\theta + 180°)\]</p>
+                <p>Since \(\cos 2(\theta + 180°) = \cos(2\theta + 360°) = \cos 2\theta\):</p>
+                <p>\[\sum F_s = \frac{m_r r \omega^2}{n}\cos 2\theta + \frac{m_r r \omega^2}{n}\cos 2\theta = \frac{2m_r r \omega^2}{n}\cos 2\theta\]</p>
+
+                <p><strong>Secondary forces are ADDITIVE (worst case)! ✗</strong></p>
+
+                <p><strong>Answer:</strong> The 180° two-cylinder configuration achieves perfect primary force balance
+                but has the worst secondary force balance, with both cylinders' secondary forces adding together.
+                This configuration is rarely used in practice due to severe secondary vibration.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is the primary difference between rotating and reciprocating mass balancing?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Rotating masses are heavier</label>
+                    <label><input type="radio" name="q1" value="b"> b) reciprocating masses move linearly and produce forces that change direction</label>
+                    <label><input type="radio" name="q1" value="c"> c) Rotating masses cannot be balanced</label>
+                    <label><input type="radio" name="q1" value="d"> d) reciprocating masses rotate faster</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: At what frequency does the secondary inertia force oscillate?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) Same as crankshaft speed (ω)</label>
+                    <label><input type="radio" name="q2" value="b"> b) Half the crankshaft speed (ω/2)</label>
+                    <label><input type="radio" name="q2" value="c"> c) Twice the crankshaft speed (2ω)</label>
+                    <label><input type="radio" name="q2" value="d"> d) Four times the crankshaft speed (4ω)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: If the connecting rod ratio n = l/r = 4, what percentage of the primary force is the secondary force?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 10%</label>
+                    <label><input type="radio" name="q3" value="b"> b) 25%</label>
+                    <label><input type="radio" name="q3" value="c"> c) 50%</label>
+                    <label><input type="radio" name="q3" value="d"> d) 75%</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: Why can't the primary force be completely balanced with a simple rotating counterweight?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Counterweights are too expensive</label>
+                    <label><input type="radio" name="q4" value="b"> b) It would create an unbalanced force in the perpendicular direction</label>
+                    <label><input type="radio" name="q4" value="c"> c) The math is too complicated</label>
+                    <label><input type="radio" name="q4" value="d"> d) Primary forces cannot be reduced at all</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: What is the typical balance fraction (c) for single-cylinder engines?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) 0 (no balancing)</label>
+                    <label><input type="radio" name="q5" value="b"> b) 0.5 to 0.67</label>
+                    <label><input type="radio" name="q5" value="c"> c) 1.0 (complete balance)</label>
+                    <label><input type="radio" name="q5" value="d"> d) 2.0</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: Which engine configuration achieves both primary and secondary balance naturally?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) Single cylinder</label>
+                    <label><input type="radio" name="q6" value="b"> b) Inline-4</label>
+                    <label><input type="radio" name="q6" value="c"> c) Inline-6</label>
+                    <label><input type="radio" name="q6" value="d"> d) Inline-2</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 7: What are Lanchester balance shafts designed to eliminate?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> a) Primary forces</label>
+                    <label><input type="radio" name="q7" value="b"> b) Secondary forces</label>
+                    <label><input type="radio" name="q7" value="c"> c) Both primary and secondary forces</label>
+                    <label><input type="radio" name="q7" value="d"> d) Rotating unbalance only</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 8: How does inertia force scale with engine speed?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> a) Linearly with ω</label>
+                    <label><input type="radio" name="q8" value="b"> b) Quadratically with ω²</label>
+                    <label><input type="radio" name="q8" value="c"> c) Cubically with ω³</label>
+                    <label><input type="radio" name="q8" value="d"> d) Independent of speed</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer (auto-generated) -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // ========================================
+        // SLIDER-CRANK SIMULATION
+        // ========================================
+        let sketch = new p5(function(p) {
+            // Mechanism parameters
+            let r = 50;           // Crank radius (mm -> pixels)
+            let l = 200;          // Connecting rod length
+            let mr = 1.5;         // Reciprocating mass (kg)
+            let rpm = 2000;       // Engine speed
+            let balanceFraction = 0;
+            let forceScale = 1.0;
+
+            // Animation
+            let theta = 0;        // Crank angle
+            let running = true;
+            let showGraphs = false;
+
+            // Force history for graphs
+            let forceHistory = [];
+            let maxHistoryLength = 200;
+
+            // Canvas parameters
+            let originX, originY;
+            let scale = 1.2;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 600);
+                originX = 200;
+                originY = 300;
+
+                setupControls();
+            };
+
+            p.draw = function() {
+                p.background(245);
+
+                // Update angle
+                if (running) {
+                    let omega = (rpm * 2 * Math.PI) / 60; // rad/s
+                    theta += omega * 0.016 * 0.5; // Slow down for visualization
+                    if (theta > 2 * Math.PI) theta -= 2 * Math.PI;
+                }
+
+                // Calculate mechanism positions
+                let n = l / r; // Rod ratio
+
+                // Crank position
+                let crankX = r * Math.cos(theta);
+                let crankY = r * Math.sin(theta);
+
+                // Piston position (approximate)
+                let pistonX = r * (Math.cos(theta) + (1 / n) * Math.cos(2 * theta) / 2) + r + l;
+
+                // Actual connecting rod geometry
+                let rodLength = l;
+                let crankEndX = originX + crankX * scale;
+                let crankEndY = originY - crankY * scale;
+                let pistonPosX = originX + pistonX * scale;
+                let rodAngle = Math.asin((crankY) / l);
+                let pistonRealX = originX + (crankX + l * Math.cos(rodAngle)) * scale;
+
+                // Draw cylinder
+                p.stroke(100);
+                p.strokeWeight(3);
+                p.noFill();
+                let cylinderX = originX + (r + l) * scale;
+                p.rect(cylinderX - 20, originY - 60, 40, 120);
+
+                // Draw ground
+                p.stroke(80);
+                p.strokeWeight(2);
+                p.line(cylinderX - 30, originY + 70, cylinderX + 30, originY + 70);
+                // Hatch marks
+                for (let i = -30; i <= 30; i += 10) {
+                    p.line(cylinderX + i, originY + 70, cylinderX + i - 5, originY + 80);
+                }
+
+                // Draw crank
+                p.stroke(200, 100, 0);
+                p.strokeWeight(6);
+                p.line(originX, originY, crankEndX, crankEndY);
+
+                // Draw connecting rod
+                p.stroke(100, 100, 200);
+                p.strokeWeight(6);
+                p.line(crankEndX, crankEndY, pistonRealX, originY);
+
+                // Draw piston
+                p.fill(150);
+                p.stroke(100);
+                p.strokeWeight(2);
+                p.rect(pistonRealX - 15, originY - 40, 30, 80);
+
+                // Draw crank center
+                p.fill(255, 200, 0);
+                p.stroke(200, 150, 0);
+                p.strokeWeight(2);
+                p.circle(originX, originY, 20);
+
+                // Draw crank pin
+                p.fill(150, 150, 150);
+                p.stroke(100);
+                p.circle(crankEndX, crankEndY, 15);
+
+                // Calculate forces
+                let omega = (rpm * 2 * Math.PI) / 60; // rad/s
+                let Fp = mr * (r / 1000) * omega * omega * Math.cos(theta); // Primary force (N)
+                let Fs = mr * (r / 1000) * omega * omega * (1 / n) * Math.cos(2 * theta); // Secondary (N)
+                let F_total = Fp + Fs;
+
+                // Counterweight force
+                let Fc_horiz = 0;
+                let Fc_vert = 0;
+                if (balanceFraction > 0) {
+                    let mc_rc = balanceFraction * mr * (r / 1000);
+                    Fc_horiz = mc_rc * omega * omega * Math.cos(theta);
+                    Fc_vert = mc_rc * omega * omega * Math.sin(theta);
+
+                    // Draw counterweight
+                    let cwX = originX - crankX * scale * 0.5;
+                    let cwY = originY + crankY * scale * 0.5;
+                    p.fill(100, 200, 100);
+                    p.stroke(50, 150, 50);
+                    p.strokeWeight(2);
+                    p.circle(cwX, cwY, 25);
+                }
+
+                // Net forces after balancing
+                let F_horiz_net = F_total - Fc_horiz;
+                let F_vert_net = -Fc_vert; // Negative because counterweight creates downward force
+
+                // Store force history
+                if (running) {
+                    forceHistory.push({
+                        theta: theta,
+                        Fp: Fp,
+                        Fs: Fs,
+                        Ftotal: F_total,
+                        Fhoriz: F_horiz_net,
+                        Fvert: F_vert_net
+                    });
+                    if (forceHistory.length > maxHistoryLength) {
+                        forceHistory.shift();
+                    }
+                }
+
+                // Draw force vectors on piston
+                let forceDrawScale = 0.02 * forceScale;
+
+                // Primary force (red)
+                p.stroke(255, 0, 0);
+                p.strokeWeight(3);
+                drawArrow(pistonRealX, originY, pistonRealX + Fp * forceDrawScale, originY, p);
+
+                // Secondary force (blue)
+                p.stroke(0, 100, 255);
+                drawArrow(pistonRealX, originY - 20, pistonRealX + Fs * forceDrawScale, originY - 20, p);
+
+                // Total force (black)
+                p.stroke(0);
+                p.strokeWeight(4);
+                drawArrow(pistonRealX, originY + 20, pistonRealX + F_total * forceDrawScale, originY + 20, p);
+
+                // Net force after balancing (green)
+                if (balanceFraction > 0) {
+                    p.stroke(0, 200, 0);
+                    p.strokeWeight(4);
+                    drawArrow(pistonRealX, originY + 40, pistonRealX + F_horiz_net * forceDrawScale, originY + 40, p);
+                }
+
+                // Draw info overlay
+                drawInfoOverlay(Fp, Fs, F_total, F_horiz_net, F_vert_net, n);
+
+                // Draw force graphs if enabled
+                if (showGraphs && forceHistory.length > 10) {
+                    drawForceGraphs();
+                }
+
+                // Draw legend
+                drawLegend();
+            };
+
+            function drawArrow(x1, y1, x2, y2, p) {
+                p.line(x1, y1, x2, y2);
+                let angle = Math.atan2(y2 - y1, x2 - x1);
+                let arrowSize = 10;
+                p.push();
+                p.translate(x2, y2);
+                p.rotate(angle);
+                p.fill(p.drawingContext.strokeStyle);
+                p.noStroke();
+                p.triangle(0, 0, -arrowSize, -arrowSize / 2, -arrowSize, arrowSize / 2);
+                p.pop();
+            }
+
+            function drawInfoOverlay(Fp, Fs, Ftotal, Fhoriz, Fvert, n) {
+                // Semi-transparent background
+                p.fill(255, 255, 255, 240);
+                p.stroke(50);
+                p.strokeWeight(1);
+                p.rect(p.width - 280, 10, 270, 180, 5);
+
+                // Text
+                p.fill(0);
+                p.noStroke();
+                p.textSize(13);
+                p.textAlign(p.LEFT);
+
+                let x = p.width - 270;
+                let y = 30;
+                let lineHeight = 20;
+
+                p.textStyle(p.BOLD);
+                p.text('Mechanism Parameters:', x, y);
+                p.textStyle(p.NORMAL);
+
+                y += lineHeight;
+                p.text('Rod Ratio n = l/r: ' + n.toFixed(2), x, y);
+
+                y += lineHeight;
+                p.text('Crank Angle: ' + (theta * 180 / Math.PI).toFixed(1) + '°', x, y);
+
+                y += lineHeight;
+                p.textStyle(p.BOLD);
+                p.text('Inertia Forces:', x, y);
+                p.textStyle(p.NORMAL);
+
+                y += lineHeight;
+                p.fill(255, 0, 0);
+                p.text('Primary: ' + Fp.toFixed(0) + ' N', x, y);
+
+                y += lineHeight;
+                p.fill(0, 100, 255);
+                p.text('Secondary: ' + Fs.toFixed(0) + ' N', x, y);
+
+                y += lineHeight;
+                p.fill(0);
+                p.text('Total: ' + Ftotal.toFixed(0) + ' N', x, y);
+
+                if (balanceFraction > 0) {
+                    y += lineHeight;
+                    p.textStyle(p.BOLD);
+                    p.text('After Balancing:', x, y);
+                    p.textStyle(p.NORMAL);
+
+                    y += lineHeight;
+                    p.fill(0, 150, 0);
+                    p.text('Horiz: ' + Fhoriz.toFixed(0) + ' N', x, y);
+                    p.text('Vert: ' + Fvert.toFixed(0) + ' N', x + 120, y);
+                }
+            }
+
+            function drawLegend() {
+                let x = 10;
+                let y = p.height - 110;
+
+                p.fill(255, 255, 255, 240);
+                p.stroke(50);
+                p.strokeWeight(1);
+                p.rect(x, y, 180, 100, 5);
+
+                p.textSize(12);
+                p.textAlign(p.LEFT);
+                p.noStroke();
+
+                y += 20;
+                p.fill(255, 0, 0);
+                p.text('━━ Primary Force (Fp)', x + 10, y);
+
+                y += 20;
+                p.fill(0, 100, 255);
+                p.text('━━ Secondary Force (Fs)', x + 10, y);
+
+                y += 20;
+                p.fill(0);
+                p.text('━━ Total Force (F)', x + 10, y);
+
+                if (balanceFraction > 0) {
+                    y += 20;
+                    p.fill(0, 150, 0);
+                    p.text('━━ Net Balanced (Fnet)', x + 10, y);
+                }
+            }
+
+            function drawForceGraphs() {
+                let graphX = 450;
+                let graphY = 380;
+                let graphW = 330;
+                let graphH = 200;
+
+                // Background
+                p.fill(255, 255, 255, 240);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(graphX, graphY, graphW, graphH);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.CENTER);
+                p.text('Force vs Crank Angle', graphX + graphW / 2, graphY + 15);
+
+                // Find max force for scaling
+                let maxForce = 0;
+                for (let data of forceHistory) {
+                    maxForce = Math.max(maxForce, Math.abs(data.Ftotal), Math.abs(data.Fp), Math.abs(data.Fs));
+                }
+
+                if (maxForce === 0) maxForce = 1;
+
+                // Draw grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                for (let i = 0; i <= 4; i++) {
+                    let yPos = graphY + 30 + (graphH - 40) * i / 4;
+                    p.line(graphX + 10, yPos, graphX + graphW - 10, yPos);
+                }
+
+                // Draw zero line
+                p.stroke(150);
+                p.strokeWeight(1);
+                let zeroY = graphY + 30 + (graphH - 40) / 2;
+                p.line(graphX + 10, zeroY, graphX + graphW - 10, zeroY);
+
+                // Draw force curves
+                let plotW = graphW - 20;
+                let plotH = (graphH - 40) / 2;
+
+                // Primary force (red)
+                p.stroke(255, 0, 0, 150);
+                p.strokeWeight(2);
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < forceHistory.length; i++) {
+                    let x = graphX + 10 + (plotW * i) / maxHistoryLength;
+                    let y = zeroY - (forceHistory[i].Fp / maxForce) * plotH;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Secondary force (blue)
+                p.stroke(0, 100, 255, 150);
+                p.strokeWeight(2);
+                p.beginShape();
+                for (let i = 0; i < forceHistory.length; i++) {
+                    let x = graphX + 10 + (plotW * i) / maxHistoryLength;
+                    let y = zeroY - (forceHistory[i].Fs / maxForce) * plotH;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Total force (black)
+                p.stroke(0, 200);
+                p.strokeWeight(3);
+                p.beginShape();
+                for (let i = 0; i < forceHistory.length; i++) {
+                    let x = graphX + 10 + (plotW * i) / maxHistoryLength;
+                    let y = zeroY - (forceHistory[i].Ftotal / maxForce) * plotH;
+                    p.vertex(x, y);
+                }
+                p.endShape();
+
+                // Axis labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(10);
+                p.textAlign(p.RIGHT);
+                p.text('+' + maxForce.toFixed(0), graphX + 8, graphY + 32);
+                p.text('0', graphX + 8, zeroY + 4);
+                p.text('-' + maxForce.toFixed(0), graphY + graphH - 12);
+            }
+
+            function setupControls() {
+                // Crank radius
+                document.getElementById("crank-radius").addEventListener("input", function() {
+                    r = parseFloat(this.value);
+                    document.getElementById("crank-radius-value").textContent = r.toFixed(0);
+                });
+
+                // Rod length
+                document.getElementById("rod-length").addEventListener("input", function() {
+                    l = parseFloat(this.value);
+                    document.getElementById("rod-length-value").textContent = l.toFixed(0);
+                });
+
+                // Reciprocating mass
+                document.getElementById("recip-mass").addEventListener("input", function() {
+                    mr = parseFloat(this.value);
+                    document.getElementById("recip-mass-value").textContent = mr.toFixed(1);
+                });
+
+                // RPM
+                document.getElementById("rpm").addEventListener("input", function() {
+                    rpm = parseFloat(this.value);
+                    document.getElementById("rpm-value").textContent = rpm.toFixed(0);
+                });
+
+                // Balance fraction
+                document.getElementById("balance-fraction").addEventListener("input", function() {
+                    balanceFraction = parseFloat(this.value);
+                    document.getElementById("balance-fraction-value").textContent = balanceFraction.toFixed(2);
+                });
+
+                // Force scale
+                document.getElementById("force-scale").addEventListener("input", function() {
+                    forceScale = parseFloat(this.value);
+                    document.getElementById("force-scale-value").textContent = forceScale.toFixed(1);
+                });
+
+                // Play/Pause button
+                document.getElementById("play-pause-btn").addEventListener("click", function() {
+                    running = !running;
+                    this.textContent = running ? "Pause" : "Play";
+                    if (running) {
+                        this.classList.remove('paused');
+                    } else {
+                        this.classList.add('paused');
+                    }
+                });
+
+                // Reset button
+                document.getElementById("reset-btn").addEventListener("click", function() {
+                    theta = 0;
+                    forceHistory = [];
+                    running = false;
+                    document.getElementById("play-pause-btn").textContent = "Play";
+                    document.getElementById("play-pause-btn").classList.add('paused');
+                });
+
+                // Show graphs button
+                document.getElementById("show-graphs-btn").addEventListener("click", function() {
+                    showGraphs = !showGraphs;
+                    this.textContent = showGraphs ? "Hide Force Graphs" : "Show Force Graphs";
+                    if (showGraphs) {
+                        this.classList.add('active');
+                    } else {
+                        this.classList.remove('active');
+                    }
+                });
+            }
+
+        }, 'sketch-holder');
+
+        // ========================================
+        // QUIZ HANDLING
+        // ========================================
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // reciprocating masses move linearly and change direction
+                q2: 'c',  // Twice the crankshaft speed (2ω)
+                q3: 'b',  // 25% (1/n = 1/4)
+                q4: 'b',  // Creates unbalanced force perpendicular
+                q5: 'b',  // 0.5 to 0.67
+                q6: 'c',  // Inline-6
+                q7: 'b',  // Secondary forces
+                q8: 'b'   // Quadratically with ω²
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let feedback = "";
+
+            if (percentage >= 90) {
+                feedback = "Excellent! You have mastered the concepts of reciprocating mass balancing.";
+            } else if (percentage >= 70) {
+                feedback = "Good work! Review the practice problems for deeper understanding.";
+            } else if (percentage >= 50) {
+                feedback = "Fair performance. Review the primary and secondary force equations carefully.";
+            } else {
+                feedback = "Keep studying! Focus on understanding the slider-crank mechanism and force components.";
+            }
+
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>
+                          <p style="font-style: italic; margin-bottom: 15px;">${feedback}</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

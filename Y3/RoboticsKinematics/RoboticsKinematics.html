@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robotics Kinematics - Interactive Lecture</title>
+
+    <!-- External CSS (always in this order) -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <!-- Numeric.js for matrix operations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+
+    <style>
+        .dh-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .dh-table th,
+        .dh-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .dh-table th {
+            background-color: var(--primary-color);
+            color: #333;
+            font-weight: bold;
+        }
+
+        .dh-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .controls-grid-4col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid-4col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .workspace-info {
+            background-color: #e8f4f8;
+            border-left: 4px solid #1e88e5;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .solution-type {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .solution-elbow-up {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .solution-elbow-down {
+            background-color: #bbdefb;
+            color: #1565c0;
+        }
+
+        .canvas-overlay-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .canvas-infobox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #1e88e5;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 10;
+        }
+
+        .canvas-infobox h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: #1e88e5;
+            border-bottom: 1px solid #1e88e5;
+            padding-bottom: 5px;
+        }
+
+        .canvas-infobox p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .canvas-infobox span {
+            font-weight: bold;
+            color: #1565c0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Robotics Kinematics</h1>
+        <p class="subtitle">Forward and Inverse Kinematics for Manipulators</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Robotics Kinematics</h2>
+        <p>
+            Robotics kinematics is the study of motion in robotic systems without considering the forces that cause
+            the motion. It forms the mathematical foundation for robot control, trajectory planning, and manipulation.
+            Kinematics allows us to answer two fundamental questions:
+        </p>
+
+        <div class="key-point">
+            <p><strong>Core Concepts:</strong> Forward kinematics determines where the robot's end-effector is located
+            given the joint angles, while inverse kinematics solves for the joint angles needed to reach a desired
+            end-effector position and orientation.</p>
+        </div>
+
+        <h3>Denavit-Hartenberg (DH) Parameters</h3>
+        <p>
+            The Denavit-Hartenberg convention provides a systematic method to describe the geometry of serial manipulators.
+            Each link is described by four parameters that define the transformation from one joint frame to the next:
+        </p>
+
+        <div class="equation-box">
+            <p><strong>DH Parameters:</strong></p>
+            <ul>
+                <li>\(\theta_i\) = Joint angle (rotation about \(z_{i-1}\) axis)</li>
+                <li>\(d_i\) = Link offset (translation along \(z_{i-1}\) axis)</li>
+                <li>\(a_i\) = Link length (translation along \(x_i\) axis)</li>
+                <li>\(\alpha_i\) = Link twist (rotation about \(x_i\) axis)</li>
+            </ul>
+        </div>
+
+        <h3>Homogeneous Transformation Matrix</h3>
+        <p>
+            The transformation from frame \(i-1\) to frame \(i\) is represented by a 4×4 homogeneous transformation
+            matrix that combines rotation and translation:
+        </p>
+
+        <div class="equation-box">
+            <p>\[{}^{i-1}T_i = \begin{bmatrix}
+                \cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+                \sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
+                0 & \sin\alpha_i & \cos\alpha_i & d_i \\
+                0 & 0 & 0 & 1
+            \end{bmatrix}\]</p>
+        </div>
+
+        <h3>Forward Kinematics</h3>
+        <p>
+            Forward kinematics (FK) computes the position and orientation of the end-effector given the joint variables.
+            For a serial manipulator with \(n\) joints, the transformation from the base frame to the end-effector is:
+        </p>
+
+        <div class="equation-box">
+            <p>\[{}^0T_n = {}^0T_1 \cdot {}^1T_2 \cdot \ldots \cdot {}^{n-1}T_n\]</p>
+            <p>For a planar 2R manipulator:</p>
+            <p>\[x = L_1\cos\theta_1 + L_2\cos(\theta_1 + \theta_2)\]</p>
+            <p>\[y = L_1\sin\theta_1 + L_2\sin(\theta_1 + \theta_2)\]</p>
+        </div>
+
+        <h3>Inverse Kinematics</h3>
+        <p>
+            Inverse kinematics (IK) is the reverse problem: given a desired end-effector pose, find the joint angles.
+            This is generally more challenging as it may have:
+        </p>
+        <ul>
+            <li><strong>No solution:</strong> Target is outside the workspace</li>
+            <li><strong>Unique solution:</strong> Rare, typically at workspace boundaries</li>
+            <li><strong>Multiple solutions:</strong> Common, such as "elbow-up" and "elbow-down" configurations</li>
+            <li><strong>Infinite solutions:</strong> Occurs in redundant manipulators</li>
+        </ul>
+
+        <div class="equation-box">
+            <p><strong>Geometric Solution for Planar 2R Manipulator:</strong></p>
+            <p>\[\theta_2 = \pm \cos^{-1}\left(\frac{x^2 + y^2 - L_1^2 - L_2^2}{2L_1L_2}\right)\]</p>
+            <p>\[\theta_1 = \tan^{-1}\left(\frac{y}{x}\right) - \tan^{-1}\left(\frac{L_2\sin\theta_2}{L_1 + L_2\cos\theta_2}\right)\]</p>
+            <p>The ± sign gives two solutions: elbow-up (+) and elbow-down (-).</p>
+        </div>
+
+        <div class="workspace-info">
+            <p><strong>Workspace:</strong> The workspace of a manipulator is the set of all positions the end-effector
+            can reach. For a planar 2R manipulator, the workspace is an annulus (ring) with inner radius
+            \(|L_1 - L_2|\) and outer radius \(L_1 + L_2\).</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Interactive Simulation - Forward Kinematics -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation 1: Forward Kinematics</h2>
+        <p>
+            Adjust the joint angles and link lengths to see how the robot manipulator moves. The forward kinematics
+            equations calculate the end-effector position (shown as a red circle). Observe how the coordinate frames
+            move with each link.
+        </p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="theta1-fk">Joint 1 Angle θ₁ (deg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="theta1-fk" min="-180" max="180" value="30" step="1">
+                        <span id="theta1-fk-value" class="value-display">30°</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="theta2-fk">Joint 2 Angle θ₂ (deg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="theta2-fk" min="-180" max="180" value="45" step="1">
+                        <span id="theta2-fk-value" class="value-display">45°</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="theta3-fk">Joint 3 Angle θ₃ (deg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="theta3-fk" min="-180" max="180" value="60" step="1">
+                        <span id="theta3-fk-value" class="value-display">60°</span>
+                    </div>
+                </div>
+            </div>
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="L1-fk">Link 1 Length L₁:</label>
+                    <div class="slider-row">
+                        <input type="range" id="L1-fk" min="50" max="200" value="120" step="5">
+                        <span id="L1-fk-value" class="value-display">120</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="L2-fk">Link 2 Length L₂:</label>
+                    <div class="slider-row">
+                        <input type="range" id="L2-fk" min="50" max="200" value="100" step="5">
+                        <span id="L2-fk-value" class="value-display">100</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="L3-fk">Link 3 Length L₃:</label>
+                    <div class="slider-row">
+                        <input type="range" id="L3-fk" min="30" max="150" value="80" step="5">
+                        <span id="L3-fk-value" class="value-display">80</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div class="canvas-overlay-container">
+            <div id="fk-sketch-holder"></div>
+            <div class="canvas-infobox">
+                <h4>End-Effector Position</h4>
+                <p>X = <span id="fk-x-display">0.00</span> units</p>
+                <p>Y = <span id="fk-y-display">0.00</span> units</p>
+                <p>Total Reach = <span id="fk-reach-display">0.00</span> units</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Interactive Simulation - Inverse Kinematics -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation 2: Inverse Kinematics</h2>
+        <p>
+            Click anywhere in the workspace to set a target position (green circle). The inverse kinematics solver
+            will calculate the required joint angles. For a 2R manipulator, there are typically two solutions:
+            <span class="solution-type solution-elbow-up">Elbow-Up</span> and
+            <span class="solution-type solution-elbow-down">Elbow-Down</span>.
+            Use the toggle button to switch between solutions.
+        </p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label for="L1-ik">Link 1 Length L₁:</label>
+                    <div class="slider-row">
+                        <input type="range" id="L1-ik" min="50" max="200" value="120" step="5">
+                        <span id="L1-ik-value" class="value-display">120</span>
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <label for="L2-ik">Link 2 Length L₂:</label>
+                    <div class="slider-row">
+                        <input type="range" id="L2-ik" min="50" max="200" value="100" step="5">
+                        <span id="L2-ik-value" class="value-display">100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div class="canvas-overlay-container">
+            <div id="ik-sketch-holder"></div>
+            <div class="canvas-infobox">
+                <h4>IK Solution</h4>
+                <p>Target: X = <span id="ik-target-x">150</span>, Y = <span id="ik-target-y">150</span></p>
+                <p>θ₁ = <span id="ik-theta1-display">0.0°</span></p>
+                <p>θ₂ = <span id="ik-theta2-display">0.0°</span></p>
+                <p>Status: <span id="ik-status-display" class="status-success">Solution Found</span></p>
+            </div>
+        </div>
+
+        <!-- Simulation Controls -->
+        <div id="button-container">
+            <button id="toggle-solution-btn" class="control-button">Toggle Solution (Elbow-Up)</button>
+            <button id="reset-ik-btn" class="control-button">Reset</button>
+        </div>
+    </div>
+
+    <!-- Section 4: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li>
+                <strong>Industrial Robotics:</strong> Manufacturing robots use forward kinematics for trajectory
+                planning and inverse kinematics for pick-and-place operations, welding, painting, and assembly tasks.
+                Six-axis industrial robots like the ABB IRB 6700 rely on IK solvers to position tools precisely.
+            </li>
+            <li>
+                <strong>Surgical Robotics:</strong> The da Vinci Surgical System uses inverse kinematics to translate
+                surgeon hand movements into precise instrument positions inside the patient's body, enabling minimally
+                invasive procedures with enhanced dexterity.
+            </li>
+            <li>
+                <strong>Space Robotics:</strong> Robotic arms on the International Space Station (Canadarm2) and Mars
+                rovers use kinematics for satellite capture, module positioning, and scientific sampling in extreme
+                environments.
+            </li>
+            <li>
+                <strong>Humanoid Robotics:</strong> Walking robots like Boston Dynamics' Atlas use IK to determine
+                leg joint angles for foot placement during dynamic locomotion, maintaining balance while navigating
+                complex terrain.
+            </li>
+            <li>
+                <strong>Computer Animation:</strong> Character animation in films and video games uses inverse
+                kinematics to create realistic limb movements. Animators specify hand positions, and IK solvers
+                automatically compute natural arm and shoulder angles.
+            </li>
+            <li>
+                <strong>Collaborative Robots (Cobots):</strong> Robots like Universal Robots' UR series work alongside
+                humans in factories, using real-time kinematics for safe, adaptive motion in shared workspaces.
+            </li>
+            <li>
+                <strong>Agricultural Robotics:</strong> Harvesting robots use computer vision and IK to reach and pick
+                fruits at various positions, adapting to irregular plant geometries in orchards and fields.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Section 5: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DH Transformation</td>
+                        <td>\({}^{i-1}T_i = Rot_{z,\theta_i} Trans_{z,d_i} Trans_{x,a_i} Rot_{x,\alpha_i}\)</td>
+                        <td>Transformation from frame i-1 to i</td>
+                    </tr>
+                    <tr>
+                        <td>Forward Kinematics</td>
+                        <td>\({}^0T_n = \prod_{i=1}^{n} {}^{i-1}T_i\)</td>
+                        <td>Base to end-effector transformation</td>
+                    </tr>
+                    <tr>
+                        <td>2R FK: X Position</td>
+                        <td>\(x = L_1\cos\theta_1 + L_2\cos(\theta_1 + \theta_2)\)</td>
+                        <td>End-effector x-coordinate</td>
+                    </tr>
+                    <tr>
+                        <td>2R FK: Y Position</td>
+                        <td>\(y = L_1\sin\theta_1 + L_2\sin(\theta_1 + \theta_2)\)</td>
+                        <td>End-effector y-coordinate</td>
+                    </tr>
+                    <tr>
+                        <td>2R IK: θ₂</td>
+                        <td>\(\theta_2 = \pm\cos^{-1}\left(\frac{x^2+y^2-L_1^2-L_2^2}{2L_1L_2}\right)\)</td>
+                        <td>Second joint angle (± for two solutions)</td>
+                    </tr>
+                    <tr>
+                        <td>2R IK: θ₁</td>
+                        <td>\(\theta_1 = \text{atan2}(y,x) - \text{atan2}(L_2\sin\theta_2, L_1+L_2\cos\theta_2)\)</td>
+                        <td>First joint angle</td>
+                    </tr>
+                    <tr>
+                        <td>Workspace Radius</td>
+                        <td>\(R_{\text{min}} = |L_1 - L_2|, \quad R_{\text{max}} = L_1 + L_2\)</td>
+                        <td>Reachable workspace boundaries</td>
+                    </tr>
+                    <tr>
+                        <td>Reachability Condition</td>
+                        <td>\(|L_1 - L_2| \leq \sqrt{x^2 + y^2} \leq L_1 + L_2\)</td>
+                        <td>Target must be within workspace</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Denavit-Hartenberg Table Example (3R Planar Manipulator)</h3>
+        <table class="dh-table">
+            <thead>
+                <tr>
+                    <th>Joint \(i\)</th>
+                    <th>\(\theta_i\)</th>
+                    <th>\(d_i\)</th>
+                    <th>\(a_i\)</th>
+                    <th>\(\alpha_i\)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>\(\theta_1\)*</td>
+                    <td>0</td>
+                    <td>\(L_1\)</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>\(\theta_2\)*</td>
+                    <td>0</td>
+                    <td>\(L_2\)</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>\(\theta_3\)*</td>
+                    <td>0</td>
+                    <td>\(L_3\)</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="text-align: center; font-size: 0.9em; margin-top: 5px;">
+            <em>* indicates joint variable (revolute joint)</em>
+        </p>
+    </div>
+
+    <!-- Section 6: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Forward Kinematics of 2R Manipulator</h3>
+            <p>
+                A planar 2R robot manipulator has link lengths \(L_1 = 150\) mm and \(L_2 = 100\) mm.
+                The joint angles are \(\theta_1 = 30°\) and \(\theta_2 = 45°\). Calculate the position
+                of the end-effector.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(L_1 = 150\) mm</li>
+                    <li>\(L_2 = 100\) mm</li>
+                    <li>\(\theta_1 = 30°\)</li>
+                    <li>\(\theta_2 = 45°\)</li>
+                </ul>
+
+                <p><strong>Formulas:</strong></p>
+                <p>\[x = L_1\cos\theta_1 + L_2\cos(\theta_1 + \theta_2)\]</p>
+                <p>\[y = L_1\sin\theta_1 + L_2\sin(\theta_1 + \theta_2)\]</p>
+
+                <p><strong>Calculation:</strong></p>
+                <p>First, calculate \(\theta_1 + \theta_2 = 30° + 45° = 75°\)</p>
+
+                <p>X-coordinate:</p>
+                <p>\[x = 150\cos(30°) + 100\cos(75°)\]</p>
+                <p>\[x = 150(0.866) + 100(0.259)\]</p>
+                <p>\[x = 129.9 + 25.9 = 155.8 \text{ mm}\]</p>
+
+                <p>Y-coordinate:</p>
+                <p>\[y = 150\sin(30°) + 100\sin(75°)\]</p>
+                <p>\[y = 150(0.5) + 100(0.966)\]</p>
+                <p>\[y = 75.0 + 96.6 = 171.6 \text{ mm}\]</p>
+
+                <p><strong>Answer:</strong> The end-effector position is (155.8 mm, 171.6 mm)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Workspace of 2R Manipulator</h3>
+            <p>
+                For the same manipulator in Problem 1 with \(L_1 = 150\) mm and \(L_2 = 100\) mm,
+                determine the workspace. What is the minimum and maximum reach?
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(L_1 = 150\) mm</li>
+                    <li>\(L_2 = 100\) mm</li>
+                </ul>
+
+                <p><strong>Formulas:</strong></p>
+                <p>\[R_{\text{min}} = |L_1 - L_2|\]</p>
+                <p>\[R_{\text{max}} = L_1 + L_2\]</p>
+
+                <p><strong>Calculation:</strong></p>
+                <p>Minimum reach (fully folded):</p>
+                <p>\[R_{\text{min}} = |150 - 100| = 50 \text{ mm}\]</p>
+
+                <p>Maximum reach (fully extended):</p>
+                <p>\[R_{\text{max}} = 150 + 100 = 250 \text{ mm}\]</p>
+
+                <p><strong>Answer:</strong> The workspace is an annulus with inner radius 50 mm and outer radius 250 mm.
+                Any target position with distance from the origin between 50 mm and 250 mm can be reached.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Inverse Kinematics - Elbow-Up Configuration</h3>
+            <p>
+                A 2R manipulator with \(L_1 = 100\) mm and \(L_2 = 100\) mm needs to reach a target at
+                position (120, 80) mm. Calculate the joint angles for the elbow-up configuration.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(L_1 = 100\) mm, \(L_2 = 100\) mm</li>
+                    <li>Target: \(x = 120\) mm, \(y = 80\) mm</li>
+                </ul>
+
+                <p><strong>Step 1: Check if target is reachable</strong></p>
+                <p>\[r = \sqrt{x^2 + y^2} = \sqrt{120^2 + 80^2} = \sqrt{14400 + 6400} = 144.2 \text{ mm}\]</p>
+                <p>\[R_{\text{min}} = |100 - 100| = 0 \text{ mm}\]</p>
+                <p>\[R_{\text{max}} = 100 + 100 = 200 \text{ mm}\]</p>
+                <p>Since \(0 \leq 144.2 \leq 200\), target is reachable. ✓</p>
+
+                <p><strong>Step 2: Calculate θ₂ (elbow-up: positive solution)</strong></p>
+                <p>\[\cos\theta_2 = \frac{x^2 + y^2 - L_1^2 - L_2^2}{2L_1L_2}\]</p>
+                <p>\[\cos\theta_2 = \frac{14400 + 6400 - 10000 - 10000}{2(100)(100)} = \frac{800}{20000} = 0.04\]</p>
+                <p>\[\theta_2 = +\cos^{-1}(0.04) = +87.7°\]</p>
+
+                <p><strong>Step 3: Calculate θ₁</strong></p>
+                <p>\[\theta_1 = \text{atan2}(y, x) - \text{atan2}(L_2\sin\theta_2, L_1 + L_2\cos\theta_2)\]</p>
+                <p>\[\theta_1 = \text{atan2}(80, 120) - \text{atan2}(100\sin(87.7°), 100 + 100\cos(87.7°))\]</p>
+                <p>\[\theta_1 = 33.7° - \text{atan2}(99.92, 104.0)\]</p>
+                <p>\[\theta_1 = 33.7° - 43.9° = -10.2°\]</p>
+
+                <p><strong>Answer:</strong> For elbow-up configuration: \(\theta_1 = -10.2°\), \(\theta_2 = 87.7°\)</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Unreachable Target</h3>
+            <p>
+                Can a 2R manipulator with \(L_1 = 80\) mm and \(L_2 = 60\) mm reach a target at (200, 50) mm?
+                If not, explain why and suggest the closest reachable point.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>\(L_1 = 80\) mm, \(L_2 = 60\) mm</li>
+                    <li>Target: \(x = 200\) mm, \(y = 50\) mm</li>
+                </ul>
+
+                <p><strong>Step 1: Calculate distance to target</strong></p>
+                <p>\[r = \sqrt{x^2 + y^2} = \sqrt{200^2 + 50^2} = \sqrt{40000 + 2500} = 206.2 \text{ mm}\]</p>
+
+                <p><strong>Step 2: Calculate workspace limits</strong></p>
+                <p>\[R_{\text{min}} = |80 - 60| = 20 \text{ mm}\]</p>
+                <p>\[R_{\text{max}} = 80 + 60 = 140 \text{ mm}\]</p>
+
+                <p><strong>Step 3: Check reachability</strong></p>
+                <p>Since \(r = 206.2\) mm \(> R_{\text{max}} = 140\) mm, the target is <strong>UNREACHABLE</strong>.</p>
+
+                <p><strong>Step 4: Find closest reachable point</strong></p>
+                <p>The closest point is on the maximum reach circle in the direction of the target:</p>
+                <p>\[\text{Direction angle: } \phi = \text{atan2}(50, 200) = 14.0°\]</p>
+                <p>Closest reachable point:</p>
+                <p>\[x_{\text{closest}} = R_{\text{max}}\cos\phi = 140\cos(14.0°) = 135.8 \text{ mm}\]</p>
+                <p>\[y_{\text{closest}} = R_{\text{max}}\sin\phi = 140\sin(14.0°) = 33.9 \text{ mm}\]</p>
+
+                <p><strong>Answer:</strong> The target is unreachable because it's 206.2 mm from the origin,
+                which exceeds the maximum reach of 140 mm. The closest reachable point is approximately (135.8, 33.9) mm.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 7: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What does forward kinematics compute?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Joint angles from end-effector position</label>
+                    <label><input type="radio" name="q1" value="b"> b) End-effector position from joint angles</label>
+                    <label><input type="radio" name="q1" value="c"> c) Forces required to move the robot</label>
+                    <label><input type="radio" name="q1" value="d"> d) Torques at each joint</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: How many DH parameters are needed to describe each link?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) 2</label>
+                    <label><input type="radio" name="q2" value="b"> b) 3</label>
+                    <label><input type="radio" name="q2" value="c"> c) 4</label>
+                    <label><input type="radio" name="q2" value="d"> d) 6</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: For a planar 2R manipulator with L₁ = 150 mm and L₂ = 100 mm, what is the maximum reach?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) 50 mm</label>
+                    <label><input type="radio" name="q3" value="b"> b) 150 mm</label>
+                    <label><input type="radio" name="q3" value="c"> c) 200 mm</label>
+                    <label><input type="radio" name="q3" value="d"> d) 250 mm</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: How many solutions typically exist for the inverse kinematics of a 2R planar manipulator?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) Always exactly 1</label>
+                    <label><input type="radio" name="q4" value="b"> b) Usually 2 (elbow-up and elbow-down)</label>
+                    <label><input type="radio" name="q4" value="c"> c) Infinite solutions</label>
+                    <label><input type="radio" name="q4" value="d"> d) 4 solutions</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: What shape is the workspace of a planar 2R manipulator?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) Circle</label>
+                    <label><input type="radio" name="q5" value="b"> b) Annulus (ring)</label>
+                    <label><input type="radio" name="q5" value="c"> c) Rectangle</label>
+                    <label><input type="radio" name="q5" value="d"> d) Ellipse</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: Which of the following is NOT a DH parameter?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) Joint angle θᵢ</label>
+                    <label><input type="radio" name="q6" value="b"> b) Link length aᵢ</label>
+                    <label><input type="radio" name="q6" value="c"> c) Link mass mᵢ</label>
+                    <label><input type="radio" name="q6" value="d"> d) Link twist αᵢ</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 7: When is a target position unreachable for a 2R manipulator?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> a) When the target is at the origin</label>
+                    <label><input type="radio" name="q7" value="b"> b) When distance to target is less than |L₁ - L₂|</label>
+                    <label><input type="radio" name="q7" value="c"> c) When distance to target is greater than L₁ + L₂</label>
+                    <label><input type="radio" name="q7" value="d"> d) Both b and c</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 8: In the homogeneous transformation matrix, what does the 4×4 size allow us to represent?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> a) Only rotations</label>
+                    <label><input type="radio" name="q8" value="b"> b) Only translations</label>
+                    <label><input type="radio" name="q8" value="c"> c) Both rotations and translations in one matrix</label>
+                    <label><input type="radio" name="q8" value="d"> d) Only scaling operations</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer (auto-generated) -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // ========================================
+        // FORWARD KINEMATICS SIMULATION
+        // ========================================
+        let fkSketch = new p5(function(p) {
+            // Robot parameters
+            let theta1 = 30;
+            let theta2 = 45;
+            let theta3 = 60;
+            let L1 = 120;
+            let L2 = 100;
+            let L3 = 80;
+
+            // Canvas parameters
+            let originX, originY;
+            let scale = 1;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 600);
+                originX = p.width / 2;
+                originY = p.height - 100;
+
+                // Setup sliders
+                setupFKSliders();
+
+                // Initial calculation
+                updateFK();
+            };
+
+            p.draw = function() {
+                p.background(245);
+
+                // Draw workspace circle
+                p.stroke(200);
+                p.strokeWeight(1);
+                p.noFill();
+                let maxReach = L1 + L2 + L3;
+                p.circle(originX, originY, maxReach * 2);
+
+                // Draw grid
+                drawGrid();
+
+                // Calculate joint positions
+                let x1 = L1 * Math.cos(theta1 * Math.PI / 180);
+                let y1 = L1 * Math.sin(theta1 * Math.PI / 180);
+
+                let x2 = x1 + L2 * Math.cos((theta1 + theta2) * Math.PI / 180);
+                let y2 = y1 + L2 * Math.sin((theta1 + theta2) * Math.PI / 180);
+
+                let x3 = x2 + L3 * Math.cos((theta1 + theta2 + theta3) * Math.PI / 180);
+                let y3 = y2 + L3 * Math.sin((theta1 + theta2 + theta3) * Math.PI / 180);
+
+                // Transform to canvas coordinates
+                let p0 = {x: originX, y: originY};
+                let p1 = {x: originX + x1, y: originY - y1};
+                let p2 = {x: originX + x2, y: originY - y2};
+                let p3 = {x: originX + x3, y: originY - y3};
+
+                // Draw links
+                p.strokeWeight(8);
+                p.stroke(100);
+                p.line(p0.x, p0.y, p1.x, p1.y);
+                p.stroke(120);
+                p.line(p1.x, p1.y, p2.x, p2.y);
+                p.stroke(140);
+                p.line(p2.x, p2.y, p3.x, p3.y);
+
+                // Draw joints
+                p.fill(255, 200, 0);
+                p.stroke(200, 150, 0);
+                p.strokeWeight(2);
+                p.circle(p0.x, p0.y, 20);
+                p.circle(p1.x, p1.y, 16);
+                p.circle(p2.x, p2.y, 16);
+
+                // Draw end-effector
+                p.fill(255, 50, 50);
+                p.stroke(200, 0, 0);
+                p.strokeWeight(2);
+                p.circle(p3.x, p3.y, 20);
+
+                // Draw coordinate frames
+                drawFrame(p0.x, p0.y, 0, 40);
+                drawFrame(p1.x, p1.y, theta1, 35);
+                drawFrame(p2.x, p2.y, theta1 + theta2, 30);
+                drawFrame(p3.x, p3.y, theta1 + theta2 + theta3, 25);
+
+                // Draw position lines
+                p.stroke(100, 100, 255, 100);
+                p.strokeWeight(1);
+                p.drawingContext.setLineDash([5, 5]);
+                p.line(originX, originY, p3.x, p3.y);
+                p.line(p3.x, originY, p3.x, p3.y);
+                p.line(originX, originY, p3.x, originY);
+                p.drawingContext.setLineDash([]);
+
+                // Labels
+                p.fill(0);
+                p.noStroke();
+                p.textSize(12);
+                p.textAlign(p.CENTER);
+                p.text("Base", p0.x, p0.y + 30);
+                p.text("End-Effector", p3.x, p3.y - 20);
+
+                // Update display values
+                document.getElementById('fk-x-display').textContent = x3.toFixed(2);
+                document.getElementById('fk-y-display').textContent = y3.toFixed(2);
+                document.getElementById('fk-reach-display').textContent = Math.sqrt(x3*x3 + y3*y3).toFixed(2);
+            };
+
+            function drawGrid() {
+                p.stroke(230);
+                p.strokeWeight(1);
+
+                // Vertical lines
+                for (let x = 0; x < p.width; x += 50) {
+                    p.line(x, 0, x, p.height);
+                }
+
+                // Horizontal lines
+                for (let y = 0; y < p.height; y += 50) {
+                    p.line(0, y, p.width, y);
+                }
+
+                // Origin axes
+                p.stroke(150);
+                p.strokeWeight(2);
+                p.line(originX, 0, originX, p.height);
+                p.line(0, originY, p.width, originY);
+            }
+
+            function drawFrame(x, y, angle, size) {
+                p.push();
+                p.translate(x, y);
+                p.rotate(-angle * Math.PI / 180);
+
+                // X-axis (red)
+                p.stroke(255, 0, 0);
+                p.strokeWeight(2);
+                p.line(0, 0, size, 0);
+                p.fill(255, 0, 0);
+                p.noStroke();
+                p.triangle(size, 0, size - 6, -3, size - 6, 3);
+
+                // Y-axis (green)
+                p.stroke(0, 200, 0);
+                p.strokeWeight(2);
+                p.line(0, 0, 0, -size);
+                p.fill(0, 200, 0);
+                p.noStroke();
+                p.triangle(0, -size, -3, -size + 6, 3, -size + 6);
+
+                p.pop();
+            }
+
+            function updateFK() {
+                // Values updated in real-time by draw function
+            }
+
+            function setupFKSliders() {
+                document.getElementById("theta1-fk").addEventListener("input", function() {
+                    theta1 = parseFloat(this.value);
+                    document.getElementById("theta1-fk-value").textContent = theta1.toFixed(0) + "°";
+                });
+
+                document.getElementById("theta2-fk").addEventListener("input", function() {
+                    theta2 = parseFloat(this.value);
+                    document.getElementById("theta2-fk-value").textContent = theta2.toFixed(0) + "°";
+                });
+
+                document.getElementById("theta3-fk").addEventListener("input", function() {
+                    theta3 = parseFloat(this.value);
+                    document.getElementById("theta3-fk-value").textContent = theta3.toFixed(0) + "°";
+                });
+
+                document.getElementById("L1-fk").addEventListener("input", function() {
+                    L1 = parseFloat(this.value);
+                    document.getElementById("L1-fk-value").textContent = L1.toFixed(0);
+                });
+
+                document.getElementById("L2-fk").addEventListener("input", function() {
+                    L2 = parseFloat(this.value);
+                    document.getElementById("L2-fk-value").textContent = L2.toFixed(0);
+                });
+
+                document.getElementById("L3-fk").addEventListener("input", function() {
+                    L3 = parseFloat(this.value);
+                    document.getElementById("L3-fk-value").textContent = L3.toFixed(0);
+                });
+            }
+
+        }, 'fk-sketch-holder');
+
+        // ========================================
+        // INVERSE KINEMATICS SIMULATION
+        // ========================================
+        let ikSketch = new p5(function(p) {
+            // Robot parameters
+            let L1 = 120;
+            let L2 = 100;
+
+            // Target position
+            let targetX = 150;
+            let targetY = 100;
+
+            // Solution
+            let theta1 = 0;
+            let theta2 = 0;
+            let solutionExists = true;
+            let elbowUp = true;
+
+            // Animation variables
+            let isAnimating = false;
+            let animationStartTime = 0;
+            let animationDuration = 700; // ms
+            let startX, startY; // Starting end-effector position
+            let endX, endY; // Target end-effector position
+            let animTheta1, animTheta2; // Current animated angles
+
+            // Ghost arm variables
+            let showGhost = false;
+            let ghostTheta1, ghostTheta2;
+            let ghostAlpha = 255;
+            let ghostFadeStart = 0;
+            let ghostFadeDuration = 400; // ms
+
+            // Canvas parameters
+            let originX, originY;
+            let dragging = false;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(800, 600);
+                originX = p.width / 2;
+                originY = p.height - 100;
+
+                // Setup controls
+                setupIKControls();
+
+                // Initial IK calculation
+                solveIK();
+            };
+
+            p.draw = function() {
+                p.background(245);
+
+                // Update animation and ghost
+                updateAnimation();
+                updateGhost();
+
+                // Draw workspace
+                p.stroke(200);
+                p.strokeWeight(1);
+                p.noFill();
+
+                // Max reach circle
+                let maxReach = L1 + L2;
+                p.circle(originX, originY, maxReach * 2);
+
+                // Min reach circle
+                let minReach = Math.abs(L1 - L2);
+                if (minReach > 0) {
+                    p.stroke(220);
+                    p.circle(originX, originY, minReach * 2);
+                }
+
+                // Draw grid
+                drawIKGrid();
+
+                // Draw workspace annotation
+                p.fill(100);
+                p.noStroke();
+                p.textSize(11);
+                p.textAlign(p.LEFT);
+                p.text("Reachable Workspace", originX + maxReach - 80, originY - 10);
+
+                // Use animated angles if animating, otherwise use solution angles
+                let displayTheta1 = isAnimating ? animTheta1 : theta1;
+                let displayTheta2 = isAnimating ? animTheta2 : theta2;
+
+                // Draw ghost arm if visible
+                if (showGhost && ghostAlpha > 0) {
+                    drawRobotArm(ghostTheta1, ghostTheta2, ghostAlpha);
+                }
+
+                // Calculate joint positions using current angles
+                let x1 = L1 * Math.cos(displayTheta1);
+                let y1 = L1 * Math.sin(displayTheta1);
+
+                let x2 = x1 + L2 * Math.cos(displayTheta1 + displayTheta2);
+                let y2 = y1 + L2 * Math.sin(displayTheta1 + displayTheta2);
+
+                // Transform to canvas coordinates
+                let p0 = {x: originX, y: originY};
+                let p1 = {x: originX + x1, y: originY - y1};
+                let p2 = {x: originX + x2, y: originY - y2};
+
+                // Draw target position
+                let targetCanvasX = originX + targetX;
+                let targetCanvasY = originY - targetY;
+
+                // Target circle
+                if (solutionExists) {
+                    p.fill(100, 255, 100, 100);
+                    p.stroke(50, 200, 50);
+                } else {
+                    p.fill(255, 100, 100, 100);
+                    p.stroke(200, 50, 50);
+                }
+                p.strokeWeight(2);
+                p.circle(targetCanvasX, targetCanvasY, 30);
+
+                // Crosshair
+                p.line(targetCanvasX - 15, targetCanvasY, targetCanvasX + 15, targetCanvasY);
+                p.line(targetCanvasX, targetCanvasY - 15, targetCanvasX, targetCanvasY + 15);
+
+                // Draw main robot if solution exists
+                if (solutionExists) {
+                    drawRobotArm(displayTheta1, displayTheta2, 255);
+
+                    // Configuration label
+                    p.fill(0);
+                    p.noStroke();
+                    p.textSize(12);
+                    p.textAlign(p.CENTER);
+                    let configText = elbowUp ? "Elbow-Up" : "Elbow-Down";
+                    p.text(configText, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2 - 20);
+                }
+
+                // Instructions
+                p.fill(0);
+                p.noStroke();
+                p.textSize(14);
+                p.textAlign(p.CENTER);
+                p.text("Click anywhere to set target position", p.width / 2, 30);
+            };
+
+            function drawRobotArm(angle1, angle2, alpha) {
+                // Calculate joint positions
+                let x1 = L1 * Math.cos(angle1);
+                let y1 = L1 * Math.sin(angle1);
+
+                let x2 = x1 + L2 * Math.cos(angle1 + angle2);
+                let y2 = y1 + L2 * Math.sin(angle1 + angle2);
+
+                // Transform to canvas coordinates
+                let p0 = {x: originX, y: originY};
+                let p1 = {x: originX + x1, y: originY - y1};
+                let p2 = {x: originX + x2, y: originY - y2};
+
+                // Draw links
+                p.strokeWeight(8);
+                p.stroke(100, 100, 100, alpha * 0.6);
+                p.line(p0.x, p0.y, p1.x, p1.y);
+                p.stroke(120, 120, 120, alpha * 0.6);
+                p.line(p1.x, p1.y, p2.x, p2.y);
+
+                // Draw joints
+                p.fill(255, 200, 0, alpha);
+                p.stroke(200, 150, 0, alpha);
+                p.strokeWeight(2);
+                p.circle(p0.x, p0.y, 20);
+                p.circle(p1.x, p1.y, 16);
+
+                // Draw end-effector
+                p.fill(255, 50, 50, alpha);
+                p.stroke(200, 0, 0, alpha);
+                p.strokeWeight(2);
+                p.circle(p2.x, p2.y, 20);
+            }
+
+            function updateAnimation() {
+                if (!isAnimating) return;
+
+                let elapsed = p.millis() - animationStartTime;
+                let t = Math.min(elapsed / animationDuration, 1.0);
+
+                // Ease-in-out cubic easing
+                t = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+                // Interpolate end-effector position in Cartesian space
+                let currentX = startX + (endX - startX) * t;
+                let currentY = startY + (endY - startY) * t;
+
+                // Solve IK for current interpolated position
+                let r = Math.sqrt(currentX * currentX + currentY * currentY);
+                let maxReach = L1 + L2;
+                let minReach = Math.abs(L1 - L2);
+
+                if (r <= maxReach && r >= minReach) {
+                    // Calculate theta2
+                    let cosTheta2 = (currentX * currentX + currentY * currentY - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+                    cosTheta2 = Math.max(-1, Math.min(1, cosTheta2));
+
+                    if (elbowUp) {
+                        animTheta2 = Math.acos(cosTheta2);
+                    } else {
+                        animTheta2 = -Math.acos(cosTheta2);
+                    }
+
+                    // Calculate theta1
+                    let k1 = L1 + L2 * Math.cos(animTheta2);
+                    let k2 = L2 * Math.sin(animTheta2);
+                    animTheta1 = Math.atan2(currentY, currentX) - Math.atan2(k2, k1);
+                }
+
+                // Check if animation is complete
+                if (t >= 1.0) {
+                    isAnimating = false;
+                    theta1 = animTheta1;
+                    theta2 = animTheta2;
+                }
+            }
+
+            function updateGhost() {
+                if (!showGhost) return;
+
+                let elapsed = p.millis() - ghostFadeStart;
+                ghostAlpha = Math.max(0, 255 * (1 - elapsed / ghostFadeDuration));
+
+                if (ghostAlpha <= 0) {
+                    showGhost = false;
+                }
+            }
+
+            function drawIKGrid() {
+                p.stroke(230);
+                p.strokeWeight(1);
+
+                // Vertical lines
+                for (let x = 0; x < p.width; x += 50) {
+                    p.line(x, 0, x, p.height);
+                }
+
+                // Horizontal lines
+                for (let y = 0; y < p.height; y += 50) {
+                    p.line(0, y, p.width, y);
+                }
+
+                // Origin axes
+                p.stroke(150);
+                p.strokeWeight(2);
+                p.line(originX, 0, originX, p.height);
+                p.line(0, originY, p.width, originY);
+            }
+
+            p.mousePressed = function() {
+                if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+                    // Store current end-effector position as start
+                    let currentTheta1 = isAnimating ? animTheta1 : theta1;
+                    let currentTheta2 = isAnimating ? animTheta2 : theta2;
+
+                    startX = L1 * Math.cos(currentTheta1) + L2 * Math.cos(currentTheta1 + currentTheta2);
+                    startY = L1 * Math.sin(currentTheta1) + L2 * Math.sin(currentTheta1 + currentTheta2);
+
+                    // Set new target
+                    targetX = p.mouseX - originX;
+                    targetY = originY - p.mouseY;
+                    endX = targetX;
+                    endY = targetY;
+
+                    // Calculate final solution
+                    solveIK();
+
+                    // Start animation if solution exists
+                    if (solutionExists) {
+                        // Store ghost position
+                        ghostTheta1 = currentTheta1;
+                        ghostTheta2 = currentTheta2;
+                        showGhost = true;
+                        ghostAlpha = 255;
+                        ghostFadeStart = p.millis();
+
+                        // Start animation
+                        isAnimating = true;
+                        animationStartTime = p.millis();
+                        animTheta1 = currentTheta1;
+                        animTheta2 = currentTheta2;
+                    }
+
+                    return false;
+                }
+            };
+
+            function solveIK() {
+                // Calculate distance to target
+                let r = Math.sqrt(targetX * targetX + targetY * targetY);
+
+                // Check if target is reachable
+                let maxReach = L1 + L2;
+                let minReach = Math.abs(L1 - L2);
+
+                if (r > maxReach || r < minReach) {
+                    solutionExists = false;
+                    document.getElementById('ik-status-display').textContent = "Target Unreachable";
+                    document.getElementById('ik-status-display').className = "status-error";
+                    document.getElementById('ik-target-x').textContent = targetX.toFixed(1);
+                    document.getElementById('ik-target-y').textContent = targetY.toFixed(1);
+                    document.getElementById('ik-theta1-display').textContent = "N/A";
+                    document.getElementById('ik-theta2-display').textContent = "N/A";
+                    return;
+                }
+
+                solutionExists = true;
+
+                // Calculate theta2 using law of cosines
+                let cosTheta2 = (targetX * targetX + targetY * targetY - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+
+                // Clamp to avoid numerical errors
+                cosTheta2 = Math.max(-1, Math.min(1, cosTheta2));
+
+                // Two solutions: elbow-up (+) and elbow-down (-)
+                if (elbowUp) {
+                    theta2 = Math.acos(cosTheta2);
+                } else {
+                    theta2 = -Math.acos(cosTheta2);
+                }
+
+                // Calculate theta1
+                let k1 = L1 + L2 * Math.cos(theta2);
+                let k2 = L2 * Math.sin(theta2);
+                theta1 = Math.atan2(targetY, targetX) - Math.atan2(k2, k1);
+
+                // Update display
+                document.getElementById('ik-target-x').textContent = targetX.toFixed(1);
+                document.getElementById('ik-target-y').textContent = targetY.toFixed(1);
+                document.getElementById('ik-theta1-display').textContent = (theta1 * 180 / Math.PI).toFixed(1) + "°";
+                document.getElementById('ik-theta2-display').textContent = (theta2 * 180 / Math.PI).toFixed(1) + "°";
+                document.getElementById('ik-status-display').textContent = "Solution Found";
+                document.getElementById('ik-status-display').className = "status-success";
+            }
+
+            function setupIKControls() {
+                document.getElementById("L1-ik").addEventListener("input", function() {
+                    L1 = parseFloat(this.value);
+                    document.getElementById("L1-ik-value").textContent = L1.toFixed(0);
+                    solveIK();
+                });
+
+                document.getElementById("L2-ik").addEventListener("input", function() {
+                    L2 = parseFloat(this.value);
+                    document.getElementById("L2-ik-value").textContent = L2.toFixed(0);
+                    solveIK();
+                });
+
+                document.getElementById("toggle-solution-btn").addEventListener("click", function() {
+                    // Store current position as ghost
+                    let currentTheta1 = isAnimating ? animTheta1 : theta1;
+                    let currentTheta2 = isAnimating ? animTheta2 : theta2;
+
+                    ghostTheta1 = currentTheta1;
+                    ghostTheta2 = currentTheta2;
+                    showGhost = true;
+                    ghostAlpha = 255;
+                    ghostFadeStart = p.millis();
+
+                    // Calculate current end-effector position
+                    startX = L1 * Math.cos(currentTheta1) + L2 * Math.cos(currentTheta1 + currentTheta2);
+                    startY = L1 * Math.sin(currentTheta1) + L2 * Math.sin(currentTheta1 + currentTheta2);
+
+                    // Toggle solution
+                    elbowUp = !elbowUp;
+                    this.textContent = elbowUp ? "Toggle Solution (Elbow-Up)" : "Toggle Solution (Elbow-Down)";
+
+                    // Target stays the same
+                    endX = targetX;
+                    endY = targetY;
+
+                    // Recalculate IK with new configuration
+                    solveIK();
+
+                    // Start animation
+                    if (solutionExists) {
+                        isAnimating = true;
+                        animationStartTime = p.millis();
+                        animTheta1 = currentTheta1;
+                        animTheta2 = currentTheta2;
+                    }
+                });
+
+                document.getElementById("reset-ik-btn").addEventListener("click", function() {
+                    // Store current position as ghost
+                    let currentTheta1 = isAnimating ? animTheta1 : theta1;
+                    let currentTheta2 = isAnimating ? animTheta2 : theta2;
+
+                    ghostTheta1 = currentTheta1;
+                    ghostTheta2 = currentTheta2;
+                    showGhost = true;
+                    ghostAlpha = 255;
+                    ghostFadeStart = p.millis();
+
+                    // Calculate current end-effector position
+                    startX = L1 * Math.cos(currentTheta1) + L2 * Math.cos(currentTheta1 + currentTheta2);
+                    startY = L1 * Math.sin(currentTheta1) + L2 * Math.sin(currentTheta1 + currentTheta2);
+
+                    // Reset to default
+                    targetX = 150;
+                    targetY = 100;
+                    endX = targetX;
+                    endY = targetY;
+                    elbowUp = true;
+                    document.getElementById("toggle-solution-btn").textContent = "Toggle Solution (Elbow-Up)";
+
+                    solveIK();
+
+                    // Start animation
+                    if (solutionExists) {
+                        isAnimating = true;
+                        animationStartTime = p.millis();
+                        animTheta1 = currentTheta1;
+                        animTheta2 = currentTheta2;
+                    }
+                });
+            }
+
+        }, 'ik-sketch-holder');
+
+        // ========================================
+        // QUIZ HANDLING
+        // ========================================
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Forward kinematics: end-effector position from joint angles
+                q2: 'c',  // 4 DH parameters
+                q3: 'd',  // Maximum reach = 150 + 100 = 250 mm
+                q4: 'b',  // Usually 2 solutions
+                q5: 'b',  // Annulus (ring)
+                q6: 'c',  // Link mass is not a DH parameter
+                q7: 'd',  // Both b and c
+                q8: 'c'   // Both rotations and translations
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let feedback = "";
+
+            if (percentage >= 90) {
+                feedback = "Excellent! You have a strong understanding of robotics kinematics.";
+            } else if (percentage >= 70) {
+                feedback = "Good job! Review the concepts where you had difficulty.";
+            } else if (percentage >= 50) {
+                feedback = "Fair performance. Consider reviewing the material and practicing more problems.";
+            } else {
+                feedback = "Keep studying! Review the lecture content and work through the practice problems.";
+            }
+
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>
+                          <p style="font-style: italic; margin-bottom: 15px;">${feedback}</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>

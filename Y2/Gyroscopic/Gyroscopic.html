@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gyroscopic Effects - Interactive Lecture</title>
+
+    <!-- External CSS (always in this order) -->
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/problems.css">
+    <link rel="stylesheet" href="/assets/css/quizzes.css">
+    <link rel="stylesheet" href="/assets/css/simulations.css">
+    <link rel="stylesheet" href="/assets/css/uicontrols.css">
+
+    <!-- MathJax for LaTeX equations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.0/es5/tex-mml-chtml.js"></script>
+
+    <!-- p5.js for interactive simulations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+    <style>
+        .vector-legend {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .vector-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vector-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .gyro-table {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .gyro-table th,
+        .gyro-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .gyro-table th {
+            background-color: var(--primary-color);
+            color: #333;
+            font-weight: bold;
+        }
+
+        .gyro-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .direction-box {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .vector-legend {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Gyroscopic Effects</h1>
+        <p class="subtitle">Angular Momentum, Precession, and Engineering Applications</p>
+    </header>
+
+    <!-- Section 1: Teaching Content -->
+    <div class="content-section">
+        <h2>Understanding Gyroscopic Effects</h2>
+        <p>
+            A gyroscope is a spinning wheel or disc mounted so that it can rotate freely about one or more axes.
+            The remarkable property of a gyroscope is its tendency to maintain its orientation in space, resisting
+            changes to its axis of rotation. When a torque is applied to a spinning gyroscope, instead of rotating
+            about the axis of the applied torque, it responds by rotating about a third axis perpendicular to both
+            the spin axis and the torque axis. This phenomenon is called <strong>precession</strong>.
+        </p>
+
+        <div class="key-point">
+            <p><strong>Core Principle:</strong> A spinning rotor possesses angular momentum that resists changes
+            to its orientation. When subjected to an external torque, the gyroscope precesses—rotating about an
+            axis perpendicular to both the spin axis and the applied torque. The rate of precession is directly
+            proportional to the applied torque and inversely proportional to the angular momentum.</p>
+        </div>
+
+        <h3>Angular Momentum</h3>
+        <p>
+            The angular momentum of a rotating body is a vector quantity that represents the product of the
+            moment of inertia and angular velocity. For a spinning disc or wheel:
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Angular Momentum:</strong></p>
+            <p>\[\vec{L} = I \vec{\omega}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\vec{L}\) = Angular momentum vector (kg·m²/s)</li>
+                <li>\(I\) = Moment of inertia about the spin axis (kg·m²)</li>
+                <li>\(\vec{\omega}\) = Angular velocity vector (rad/s)</li>
+            </ul>
+            <p>For a thin disc of mass \(m\) and radius \(r\):</p>
+            <p>\[I = \frac{1}{2}mr^2\]</p>
+        </div>
+
+        <div class="direction-box">
+            <p><strong>Right-Hand Rule:</strong> The direction of the angular momentum vector is determined by
+            the right-hand rule. If you curl the fingers of your right hand in the direction of rotation, your
+            thumb points in the direction of the angular momentum vector.</p>
+        </div>
+
+        <h3>Gyroscopic Couple</h3>
+        <p>
+            When an external torque is applied to change the direction of the angular momentum vector, the
+            gyroscope experiences a gyroscopic couple (or gyroscopic moment). According to Newton's second law
+            for rotation:
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Fundamental Gyroscopic Equation:</strong></p>
+            <p>\[\vec{\tau} = \frac{d\vec{L}}{dt}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\vec{\tau}\) = Applied torque vector (N·m)</li>
+                <li>\(\frac{d\vec{L}}{dt}\) = Rate of change of angular momentum (N·m)</li>
+            </ul>
+        </div>
+
+        <h3>Gyroscopic Precession</h3>
+        <p>
+            When a constant torque \(\tau\) is applied perpendicular to the spin axis, the angular momentum
+            vector rotates about the torque axis at a constant angular velocity called the
+            <strong>precession rate</strong> (\(\Omega_p\)):
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Precession Rate:</strong></p>
+            <p>\[\Omega_p = \frac{\tau}{L} = \frac{\tau}{I\omega}\]</p>
+            <p>Where:</p>
+            <ul>
+                <li>\(\Omega_p\) = Precession angular velocity (rad/s)</li>
+                <li>\(\tau\) = Applied torque magnitude (N·m)</li>
+                <li>\(L = I\omega\) = Angular momentum magnitude (kg·m²/s)</li>
+            </ul>
+            <p><strong>Key Insight:</strong> Higher spin speeds (\(\omega\)) result in slower precession for
+            the same applied torque. This is why fast-spinning gyroscopes are very stable.</p>
+        </div>
+
+        <h3>Direction of Precession</h3>
+        <p>
+            The direction of precession can be determined using the vector cross product:
+        </p>
+
+        <div class="equation-box">
+            <p>\[\vec{\Omega}_p \times \vec{L} = \vec{\tau}\]</p>
+            <p>Equivalently: \(\vec{\Omega}_p = \frac{\vec{\tau} \times \vec{L}}{L^2}\)</p>
+            <p>The precession axis is perpendicular to both the angular momentum vector and the applied torque vector.</p>
+        </div>
+
+        <div class="direction-box">
+            <p><strong>Right-Hand Rule for Precession:</strong> Point the fingers of your right hand along the
+            angular momentum vector \(\vec{L}\), then curl them toward the applied torque vector \(\vec{\tau}\).
+            Your thumb points in the direction of the precession angular velocity \(\vec{\Omega}_p\).</p>
+        </div>
+
+        <h3>Gyroscopic Effects in Vehicles</h3>
+
+        <h4>Aircraft Turns</h4>
+        <p>
+            In an aircraft with a spinning engine and propeller, gyroscopic effects occur during maneuvers.
+            When the aircraft pitches (nose up/down), the gyroscopic couple creates a yawing moment. When it
+            yaws (nose left/right), a pitching moment is created. Pilots must account for these cross-coupled
+            moments.
+        </p>
+
+        <div class="equation-box">
+            <p><strong>Gyroscopic Couple in Aircraft:</strong></p>
+            <p>\[C_g = I\omega\Omega_p\]</p>
+            <p>Where \(\Omega_p\) is the angular velocity of the aircraft's turning motion (pitch, yaw, or roll).</p>
+        </div>
+
+        <h4>Marine Vessels</h4>
+        <p>
+            Ships with large rotating turbines or engines experience gyroscopic effects during pitching (bow
+            up/down) and rolling (side-to-side) motions in rough seas. This affects stability and steering.
+        </p>
+
+        <h4>Motorcycles and Bicycles</h4>
+        <p>
+            The spinning wheels of a motorcycle or bicycle act as gyroscopes. When the rider leans into a turn,
+            the wheels resist this change in orientation, but the gyroscopic couple helps stabilize the vehicle
+            during the turn. Counter-steering works partly due to gyroscopic effects.
+        </p>
+
+        <h4>Automobiles</h4>
+        <p>
+            During high-speed cornering, the rotating wheels and drivetrain components create gyroscopic couples
+            that affect vehicle handling. This is particularly noticeable in racing cars during rapid direction
+            changes.
+        </p>
+
+        <h3>Gyroscopic Stabilization</h3>
+        <p>
+            The resistance of a gyroscope to changes in orientation makes it useful for stabilization:
+        </p>
+        <ul>
+            <li><strong>Ship Stabilizers:</strong> Large gyroscopes mounted in ships reduce rolling motion</li>
+            <li><strong>Camera Gimbals:</strong> Keep cameras steady despite platform movement</li>
+            <li><strong>Satellites:</strong> Control Moment Gyroscopes (CMGs) for attitude control</li>
+            <li><strong>Segway:</strong> Uses gyroscopes and accelerometers for balance control</li>
+        </ul>
+
+        <table class="gyro-table">
+            <thead>
+                <tr>
+                    <th>Application</th>
+                    <th>Spin Axis</th>
+                    <th>Disturbing Motion</th>
+                    <th>Gyroscopic Effect</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Aircraft (propeller)</td>
+                    <td>Longitudinal (forward)</td>
+                    <td>Pitch up/down</td>
+                    <td>Yawing moment (left/right)</td>
+                </tr>
+                <tr>
+                    <td>Ship turbine</td>
+                    <td>Transverse (side-to-side)</td>
+                    <td>Pitching in waves</td>
+                    <td>Steering torque</td>
+                </tr>
+                <tr>
+                    <td>Motorcycle wheel</td>
+                    <td>Lateral (wheel axis)</td>
+                    <td>Lean in turn</td>
+                    <td>Stabilizing couple</td>
+                </tr>
+                <tr>
+                    <td>Helicopter rotor</td>
+                    <td>Vertical</td>
+                    <td>Forward tilt</td>
+                    <td>Sideways moment</td>
+                </tr>
+                <tr>
+                    <td>Satellite CMG</td>
+                    <td>Variable</td>
+                    <td>Attitude change</td>
+                    <td>Controlled torque for rotation</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Section 2: Interactive Simulation -->
+    <div class="simulation-container">
+        <h2>Interactive Simulation: Gyroscopic Precession</h2>
+        <p>
+            This simulation shows a spinning disc (gyroscope) experiencing precession due to gravitational torque.
+            The disc spins about its axis (blue arrow shows angular momentum \(\vec{L}\)), gravity creates a torque
+            (red arrow shows \(\vec{\tau}\)), and the disc precesses about the vertical axis (green arrow shows
+            precession \(\vec{\Omega}_p\)). Adjust the spin speed, disc mass, and radius to observe how they affect
+            the precession rate.
+        </p>
+
+        <!-- Control Panel -->
+        <div class="controls-panel">
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="spin-speed">Spin Speed ω (rad/s):</label>
+                    <div class="slider-row">
+                        <input type="range" id="spin-speed" min="5" max="100" value="40" step="1">
+                        <span id="spin-speed-value" class="value-display">40</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="disc-mass">Disc Mass m (kg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="disc-mass" min="0.5" max="5" value="2" step="0.1">
+                        <span id="disc-mass-value" class="value-display">2.0</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="disc-radius">Disc Radius r (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="disc-radius" min="0.1" max="0.5" value="0.2" step="0.01">
+                        <span id="disc-radius-value" class="value-display">0.20</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-grid">
+                <div class="slider-container">
+                    <label for="arm-length">Support Arm Length L (m):</label>
+                    <div class="slider-row">
+                        <input type="range" id="arm-length" min="0.2" max="0.8" value="0.5" step="0.05">
+                        <span id="arm-length-value" class="value-display">0.50</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="view-angle">View Angle (deg):</label>
+                    <div class="slider-row">
+                        <input type="range" id="view-angle" min="0" max="360" value="45" step="5">
+                        <span id="view-angle-value" class="value-display">45</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <label for="time-scale">Animation Speed:</label>
+                    <div class="slider-row">
+                        <input type="range" id="time-scale" min="0.1" max="1" value="0.1" step="0.1">
+                        <span id="time-scale-value" class="value-display">0.1×</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Canvas Holder -->
+        <div id="sketch-holder"></div>
+
+        <!-- Simulation Controls -->
+        <div id="button-container">
+            <button id="play-pause-btn" class="control-button">Pause</button>
+            <button id="reset-btn" class="control-button">Reset</button>
+            <button id="toggle-vectors-btn" class="control-button active">Show Vectors</button>
+        </div>
+
+        <!-- Vector Legend -->
+        <div class="vector-legend">
+            <div class="vector-item">
+                <div class="vector-color" style="background-color: #2196F3; height: 6px;"></div>
+                <span><strong>L</strong> - Angular Momentum (blue)</span>
+            </div>
+            <div class="vector-item">
+                <div class="vector-color" style="background-color: #F44336; height: 6px;"></div>
+                <span><strong>τ</strong> - Gravitational Torque (red)</span>
+            </div>
+            <div class="vector-item">
+                <div class="vector-color" style="background-color: #4CAF50; height: 6px;"></div>
+                <span><strong>Ωₚ</strong> - Precession Rate (green)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: Engineering Applications -->
+    <div class="content-section">
+        <h2>Engineering Applications</h2>
+        <ul>
+            <li>
+                <strong>Aviation - Gyroscopic Instruments:</strong> Aircraft use gyroscopic instruments including
+                the attitude indicator (artificial horizon), heading indicator, and turn coordinator. These
+                instruments maintain orientation references essential for instrument flight in clouds or at night.
+                Modern MEMS gyroscopes in autopilot systems use the same principles.
+            </li>
+            <li>
+                <strong>Naval Architecture - Ship Stabilization:</strong> Large passenger ships like cruise liners
+                use active gyroscopic stabilizers (e.g., Seakeeper systems) to reduce rolling motion by up to 95%.
+                A spinning flywheel mounted in a gimbal generates controlled torques to counteract wave-induced roll.
+            </li>
+            <li>
+                <strong>Space Systems - Attitude Control:</strong> Satellites and space stations use Control Moment
+                Gyroscopes (CMGs) for precise attitude control without expending propellant. The International Space
+                Station has four large CMGs that maintain orientation for solar panel tracking and communications.
+            </li>
+            <li>
+                <strong>Automotive - Electronic Stability Control (ESC):</strong> Modern vehicles use MEMS gyroscopes
+                to detect yaw rate and roll rate. The ESC system compares intended steering input with actual vehicle
+                motion and applies individual brakes to prevent skidding and rollovers. Mandatory in new cars since 2012.
+            </li>
+            <li>
+                <strong>Robotics - Balance and Locomotion:</strong> Self-balancing robots like Segways and delivery
+                robots use gyroscopes combined with accelerometers (IMU - Inertial Measurement Unit) to maintain
+                upright posture. Bipedal robots use gyroscopic feedback for dynamic walking stability.
+            </li>
+            <li>
+                <strong>Consumer Electronics - Image Stabilization:</strong> Smartphones, cameras, and drones use
+                miniature MEMS gyroscopes for optical image stabilization (OIS) and electronic image stabilization
+                (EIS), compensating for hand shake and platform motion to produce steady video and sharp photos.
+            </li>
+            <li>
+                <strong>Industrial - Precision Machining:</strong> High-speed CNC milling machines experience
+                gyroscopic effects from rotating spindles during rapid tool path changes. Modern controllers
+                compensate for these effects to maintain accuracy at speeds over 40,000 RPM.
+            </li>
+            <li>
+                <strong>Transportation - Maglev Trains:</strong> High-speed maglev trains use gyroscopic sensors
+                to detect and correct lateral motion and banking angles during high-speed turns, ensuring passenger
+                comfort and safety at speeds exceeding 600 km/h.
+            </li>
+            <li>
+                <strong>Weapons Systems - Gyroscope-Stabilized Platforms:</strong> Tank guns, naval artillery, and
+                aircraft gun turrets use gyro-stabilized platforms to maintain aim despite vehicle motion. This allows
+                accurate firing while the platform is moving across rough terrain or in rough seas.
+            </li>
+        </ul>
+    </div>
+
+    <!-- Section 4: Summary of Key Equations -->
+    <div class="content-section">
+        <h2>Summary of Key Equations</h2>
+        <div class="equation-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>Equation</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Angular Momentum</td>
+                        <td>\(\vec{L} = I\vec{\omega}\)</td>
+                        <td>Product of moment of inertia and angular velocity</td>
+                    </tr>
+                    <tr>
+                        <td>Moment of Inertia (Disc)</td>
+                        <td>\(I = \frac{1}{2}mr^2\)</td>
+                        <td>For a thin disc about central axis</td>
+                    </tr>
+                    <tr>
+                        <td>Moment of Inertia (Ring)</td>
+                        <td>\(I = mr^2\)</td>
+                        <td>For a thin ring about central axis</td>
+                    </tr>
+                    <tr>
+                        <td>Fundamental Equation</td>
+                        <td>\(\vec{\tau} = \frac{d\vec{L}}{dt}\)</td>
+                        <td>Torque equals rate of change of angular momentum</td>
+                    </tr>
+                    <tr>
+                        <td>Precession Rate</td>
+                        <td>\(\Omega_p = \frac{\tau}{I\omega}\)</td>
+                        <td>Angular velocity of precession</td>
+                    </tr>
+                    <tr>
+                        <td>Gyroscopic Couple</td>
+                        <td>\(C_g = I\omega\Omega_p\)</td>
+                        <td>Couple due to precession motion</td>
+                    </tr>
+                    <tr>
+                        <td>Gravitational Torque</td>
+                        <td>\(\tau = mgL\)</td>
+                        <td>Torque due to weight at distance L</td>
+                    </tr>
+                    <tr>
+                        <td>Precession Period</td>
+                        <td>\(T_p = \frac{2\pi}{\Omega_p} = \frac{2\pi I\omega}{\tau}\)</td>
+                        <td>Time for one complete precession</td>
+                    </tr>
+                    <tr>
+                        <td>Vector Cross Product</td>
+                        <td>\(\vec{\tau} = \vec{\Omega}_p \times \vec{L}\)</td>
+                        <td>Direction relationship for precession</td>
+                    </tr>
+                    <tr>
+                        <td>Active Gyroscopic Couple</td>
+                        <td>\(C = I\omega\Omega\sin\alpha\)</td>
+                        <td>Couple at angle α between axes</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice Problems -->
+    <div class="content-section">
+        <h2>Practice Problems</h2>
+
+        <div class="practice-problems">
+            <h3>Problem 1: Gyroscopic Precession Rate</h3>
+            <p>
+                A gyroscope consists of a disc of mass 2 kg and radius 0.15 m, spinning at 3000 RPM. The disc
+                is mounted at the end of a horizontal arm of length 0.4 m from the pivot point. Calculate the
+                rate of precession due to gravity.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
+            <div id="solution1" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Mass: \(m = 2\) kg</li>
+                    <li>Radius: \(r = 0.15\) m</li>
+                    <li>Spin speed: \(N = 3000\) RPM</li>
+                    <li>Arm length: \(L = 0.4\) m</li>
+                    <li>Gravity: \(g = 9.81\) m/s²</li>
+                </ul>
+
+                <p><strong>Step 1: Convert RPM to rad/s</strong></p>
+                <p>\[\omega = \frac{2\pi N}{60} = \frac{2\pi \times 3000}{60} = 314.16 \text{ rad/s}\]</p>
+
+                <p><strong>Step 2: Calculate moment of inertia</strong></p>
+                <p>For a thin disc: \(I = \frac{1}{2}mr^2\)</p>
+                <p>\[I = \frac{1}{2} \times 2 \times (0.15)^2 = \frac{1}{2} \times 2 \times 0.0225 = 0.0225 \text{ kg·m}^2\]</p>
+
+                <p><strong>Step 3: Calculate angular momentum</strong></p>
+                <p>\[L = I\omega = 0.0225 \times 314.16 = 7.069 \text{ kg·m}^2\text{/s}\]</p>
+
+                <p><strong>Step 4: Calculate gravitational torque</strong></p>
+                <p>\[\tau = mgL = 2 \times 9.81 \times 0.4 = 7.848 \text{ N·m}\]</p>
+
+                <p><strong>Step 5: Calculate precession rate</strong></p>
+                <p>\[\Omega_p = \frac{\tau}{L} = \frac{7.848}{7.069} = 1.110 \text{ rad/s}\]</p>
+
+                <p>Convert to RPM:</p>
+                <p>\[N_p = \frac{\Omega_p \times 60}{2\pi} = \frac{1.110 \times 60}{2\pi} = 10.6 \text{ RPM}\]</p>
+
+                <p><strong>Answer:</strong> The precession rate is 1.11 rad/s or 10.6 RPM (one complete precession
+                every 5.7 seconds).</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 2: Effect of Spin Speed on Precession</h3>
+            <p>
+                For the gyroscope in Problem 1, calculate the precession rate if the spin speed is doubled to
+                6000 RPM while all other parameters remain the same. What can you conclude about the relationship
+                between spin speed and precession rate?
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
+            <div id="solution2" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Same gyroscope as Problem 1</li>
+                    <li>New spin speed: \(N = 6000\) RPM</li>
+                    <li>Torque remains the same: \(\tau = 7.848\) N·m</li>
+                </ul>
+
+                <p><strong>Step 1: Convert new RPM to rad/s</strong></p>
+                <p>\[\omega = \frac{2\pi \times 6000}{60} = 628.32 \text{ rad/s}\]</p>
+
+                <p><strong>Step 2: Calculate new angular momentum</strong></p>
+                <p>\[L = I\omega = 0.0225 \times 628.32 = 14.137 \text{ kg·m}^2\text{/s}\]</p>
+                <p>Note: Angular momentum doubled because \(\omega\) doubled.</p>
+
+                <p><strong>Step 3: Calculate new precession rate</strong></p>
+                <p>\[\Omega_p = \frac{\tau}{L} = \frac{7.848}{14.137} = 0.555 \text{ rad/s}\]</p>
+
+                <p>Convert to RPM:</p>
+                <p>\[N_p = \frac{0.555 \times 60}{2\pi} = 5.3 \text{ RPM}\]</p>
+
+                <p><strong>Comparison:</strong></p>
+                <ul>
+                    <li>Original: 3000 RPM spin → 10.6 RPM precession</li>
+                    <li>Doubled: 6000 RPM spin → 5.3 RPM precession</li>
+                </ul>
+
+                <p><strong>Answer:</strong> When spin speed doubles, precession rate halves. The relationship is
+                \(\Omega_p \propto \frac{1}{\omega}\). Faster spinning gyroscopes precess more slowly, making
+                them more stable and better at maintaining orientation.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 3: Aircraft Gyroscopic Effect</h3>
+            <p>
+                An aircraft has a propeller with moment of inertia 15 kg·m² rotating at 2400 RPM. During a
+                maneuver, the aircraft pitches upward at a rate of 0.5 rad/s. Calculate the magnitude of the
+                gyroscopic couple experienced by the aircraft.
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution3')">Show Solution</p>
+            <div id="solution3" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Moment of inertia: \(I = 15\) kg·m²</li>
+                    <li>Propeller speed: \(N = 2400\) RPM</li>
+                    <li>Pitch rate: \(\Omega_p = 0.5\) rad/s</li>
+                </ul>
+
+                <p><strong>Step 1: Convert propeller RPM to rad/s</strong></p>
+                <p>\[\omega = \frac{2\pi \times 2400}{60} = 251.33 \text{ rad/s}\]</p>
+
+                <p><strong>Step 2: Calculate angular momentum</strong></p>
+                <p>\[L = I\omega = 15 \times 251.33 = 3770 \text{ kg·m}^2\text{/s}\]</p>
+
+                <p><strong>Step 3: Calculate gyroscopic couple</strong></p>
+                <p>The gyroscopic couple is given by:</p>
+                <p>\[C_g = I\omega\Omega_p\]</p>
+                <p>\[C_g = 15 \times 251.33 \times 0.5 = 1885 \text{ N·m}\]</p>
+
+                <p>Alternatively: \(C_g = L \times \Omega_p = 3770 \times 0.5 = 1885\) N·m</p>
+
+                <p><strong>Direction:</strong> When the propeller rotates clockwise (viewed from behind) and the
+                aircraft pitches up, the gyroscopic couple causes a yawing moment to the right. The pilot must
+                apply left rudder to compensate.</p>
+
+                <p><strong>Answer:</strong> The gyroscopic couple is 1885 N·m, creating a yawing moment perpendicular
+                to both the propeller spin axis and the pitching motion.</p>
+            </div>
+        </div>
+
+        <div class="practice-problems">
+            <h3>Problem 4: Ship Stabilizer Design</h3>
+            <p>
+                A ship stabilizer system uses a gyroscope with a disc of mass 500 kg and radius 1.2 m, spinning
+                at 1500 RPM. If the ship rolls at 0.1 rad/s due to waves, what gyroscopic couple is generated
+                to oppose the rolling motion?
+            </p>
+
+            <p class="toggle-section" onclick="toggleSolution('solution4')">Show Solution</p>
+            <div id="solution4" class="hidden">
+                <p><strong>Solution:</strong></p>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Disc mass: \(m = 500\) kg</li>
+                    <li>Disc radius: \(r = 1.2\) m</li>
+                    <li>Spin speed: \(N = 1500\) RPM</li>
+                    <li>Roll rate: \(\Omega_{\text{roll}} = 0.1\) rad/s</li>
+                </ul>
+
+                <p><strong>Step 1: Calculate moment of inertia</strong></p>
+                <p>\[I = \frac{1}{2}mr^2 = \frac{1}{2} \times 500 \times (1.2)^2 = 360 \text{ kg·m}^2\]</p>
+
+                <p><strong>Step 2: Convert RPM to rad/s</strong></p>
+                <p>\[\omega = \frac{2\pi \times 1500}{60} = 157.08 \text{ rad/s}\]</p>
+
+                <p><strong>Step 3: Calculate angular momentum</strong></p>
+                <p>\[L = I\omega = 360 \times 157.08 = 56549 \text{ kg·m}^2\text{/s}\]</p>
+
+                <p><strong>Step 4: Calculate gyroscopic couple</strong></p>
+                <p>\[C_g = I\omega\Omega_{\text{roll}} = 360 \times 157.08 \times 0.1 = 5655 \text{ N·m}\]</p>
+
+                <p>Or equivalently: \(C_g = L \times \Omega_{\text{roll}} = 56549 \times 0.1 = 5655\) N·m</p>
+
+                <p><strong>Answer:</strong> The gyroscope generates a stabilizing couple of 5655 N·m (approximately
+                5.66 kN·m) that opposes the ship's rolling motion. In practice, the gyroscope is mounted in a
+                gimbal system that applies this couple to the ship's hull through bearings, reducing roll amplitude
+                and improving passenger comfort.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 6: Knowledge Check Quiz -->
+    <div class="content-section">
+        <h2>Knowledge Check Quiz</h2>
+        <div class="quiz-container">
+            <div class="quiz-question">
+                <h3>Question 1: What is angular momentum?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q1" value="a"> a) Mass times velocity</label>
+                    <label><input type="radio" name="q1" value="b"> b) Moment of inertia times angular velocity</label>
+                    <label><input type="radio" name="q1" value="c"> c) Force times distance</label>
+                    <label><input type="radio" name="q1" value="d"> d) Torque times time</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 2: What is gyroscopic precession?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q2" value="a"> a) The spinning motion of the gyroscope</label>
+                    <label><input type="radio" name="q2" value="b"> b) Rotation about an axis perpendicular to both the spin axis and applied torque</label>
+                    <label><input type="radio" name="q2" value="c"> c) The resistance to any rotation</label>
+                    <label><input type="radio" name="q2" value="d"> d) The slowing down of the spin</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 3: How does increasing the spin speed affect the precession rate for a given torque?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q3" value="a"> a) Precession rate increases</label>
+                    <label><input type="radio" name="q3" value="b"> b) Precession rate decreases</label>
+                    <label><input type="radio" name="q3" value="c"> c) Precession rate stays the same</label>
+                    <label><input type="radio" name="q3" value="d"> d) Precession rate becomes zero</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 4: What is the moment of inertia of a thin disc about its central axis?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q4" value="a"> a) \(I = mr^2\)</label>
+                    <label><input type="radio" name="q4" value="b"> b) \(I = \frac{1}{2}mr^2\)</label>
+                    <label><input type="radio" name="q4" value="c"> c) \(I = \frac{2}{5}mr^2\)</label>
+                    <label><input type="radio" name="q4" value="d"> d) \(I = \frac{1}{3}mr^2\)</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 5: In which direction does a gyroscope precess?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q5" value="a"> a) In the direction of the applied torque</label>
+                    <label><input type="radio" name="q5" value="b"> b) Opposite to the applied torque</label>
+                    <label><input type="radio" name="q5" value="c"> c) Perpendicular to both spin axis and torque direction</label>
+                    <label><input type="radio" name="q5" value="d"> d) In the direction of angular momentum</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 6: Which device uses gyroscopic principles for attitude reference in aircraft?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q6" value="a"> a) Altimeter</label>
+                    <label><input type="radio" name="q6" value="b"> b) Attitude indicator (artificial horizon)</label>
+                    <label><input type="radio" name="q6" value="c"> c) Airspeed indicator</label>
+                    <label><input type="radio" name="q6" value="d"> d) Fuel gauge</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 7: What happens when an aircraft with a spinning propeller pitches upward?</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q7" value="a"> a) No gyroscopic effect occurs</label>
+                    <label><input type="radio" name="q7" value="b"> b) A rolling moment is created</label>
+                    <label><input type="radio" name="q7" value="c"> c) A yawing moment is created</label>
+                    <label><input type="radio" name="q7" value="d"> d) The propeller stops spinning</label>
+                </div>
+            </div>
+
+            <div class="quiz-question">
+                <h3>Question 8: The fundamental gyroscopic equation is:</h3>
+                <div class="quiz-options">
+                    <label><input type="radio" name="q8" value="a"> a) \(\vec{F} = m\vec{a}\)</label>
+                    <label><input type="radio" name="q8" value="b"> b) \(\vec{\tau} = \frac{d\vec{L}}{dt}\)</label>
+                    <label><input type="radio" name="q8" value="c"> c) \(E = mc^2\)</label>
+                    <label><input type="radio" name="q8" value="d"> d) \(\vec{L} = \vec{r} \times \vec{p}\)</label>
+                </div>
+            </div>
+
+            <button id="submit-quiz">Submit Quiz</button>
+            <div id="quiz-results"></div>
+        </div>
+    </div>
+
+    <!-- Footer (auto-generated) -->
+    <footer>
+        <script src="/assets/common/footer.js"></script>
+    </footer>
+
+    <!-- Common JavaScript Functions -->
+    <script src="/assets/common/problems.js"></script>
+    <script src="/assets/common/quizzes.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        // ========================================
+        // GYROSCOPIC PRECESSION SIMULATION (3D WEBGL)
+        // ========================================
+        let sketch = new p5(function(p) {
+            // Gyroscope parameters
+            let omega = 40;        // Spin speed (rad/s)
+            let mass = 2;          // Disc mass (kg)
+            let radius = 0.2;      // Disc radius (m)
+            let armLength = 0.5;   // Support arm length (m)
+            let viewAngle = 45;    // Viewing angle (degrees)
+            let timeScale = 0.1;   // Animation speed multiplier
+
+            // Calculated values
+            let I, L, tau, omegaP;
+
+            // Animation
+            let precessionAngle = 0;
+            let spinAngle = 0;
+            let running = true;
+            let showVectors = true;
+
+            // Display scale
+            let displayScale = 200; // pixels per meter
+
+            // Constants
+            const g = 9.81; // m/s²
+
+            // 2D graphics buffer for overlays
+            let overlayBuffer;
+
+            p.setup = function() {
+                let canvas = p.createCanvas(900, 700, p.WEBGL);
+                canvas.parent('sketch-holder');
+
+                // Create 2D graphics buffer for text/UI overlays
+                overlayBuffer = p.createGraphics(900, 700);
+
+                p.frameRate(60);
+                setupControls();
+                calculate();
+            };
+
+            p.draw = function() {
+                // Clear background
+                p.background(245);
+
+                // Update angles
+                if (running) {
+                    let dt = 1/60 * timeScale;
+                    precessionAngle += omegaP * dt;
+                    spinAngle += omega * dt;
+
+                    // Keep angles in range
+                    if (precessionAngle > 2 * Math.PI) precessionAngle -= 2 * Math.PI;
+                    if (spinAngle > 2 * Math.PI) spinAngle -= 2 * Math.PI;
+                }
+
+                // Set up camera based on view angle
+                let camDistance = 400;
+                let camHeight = 200;
+                let camX = camDistance * Math.cos(viewAngle * Math.PI / 180);
+                let camZ = camDistance * Math.sin(viewAngle * Math.PI / 180);
+                p.camera(camX, -camHeight, camZ, 0, 0, 0, 0, 1, 0);
+
+                // Set up lighting
+                p.ambientLight(100);
+                p.directionalLight(255, 255, 255, 0.3, 0.5, -1);
+
+                // Draw ground plane
+                drawGroundPlane();
+
+                // Rotate entire scene by precession angle
+                p.rotateY(precessionAngle);
+
+                // Draw gyroscope in 3D
+                drawGyroscope3D();
+
+                // Draw vectors if enabled
+                if (showVectors) {
+                    drawVectors3D();
+                }
+
+                // Draw 2D overlays (infobox) - must be last
+                draw2DOverlays();
+            };
+
+            function calculate() {
+                // Moment of inertia for disc
+                I = 0.5 * mass * radius * radius;
+
+                // Angular momentum
+                L = I * omega;
+
+                // Gravitational torque
+                tau = mass * g * armLength;
+
+                // Precession rate
+                omegaP = tau / L;
+            }
+
+            function drawGroundPlane() {
+                p.push();
+
+                // Draw ground grid
+                p.stroke(220);
+                p.strokeWeight(1);
+                p.noFill();
+
+                let gridSize = 400;
+                let gridStep = 50;
+
+                for (let i = -gridSize; i <= gridSize; i += gridStep) {
+                    p.line(i, 0, -gridSize, i, 0, gridSize);
+                    p.line(-gridSize, 0, i, gridSize, 0, i);
+                }
+
+                // Draw vertical axis (precession axis)
+                p.stroke(150, 150, 150, 150);
+                p.strokeWeight(3);
+                p.line(0, -250, 0, 0, 50, 0);
+
+                // Central pivot support
+                p.fill(80);
+                p.noStroke();
+                p.translate(0, 0, 0);
+                p.box(20, 10, 20);
+
+                p.pop();
+            }
+
+            function drawGyroscope3D() {
+                let armX = armLength * displayScale;
+                let discR = radius * displayScale;
+
+                p.push();
+
+                // Draw support arm
+                p.push();
+                p.translate(armX / 2, 0, 0);
+                p.fill(120);
+                p.noStroke();
+                p.rotateZ(p.PI / 2);
+                p.cylinder(6, armX, 16, 1);
+                p.pop();
+
+                // Move to disc position
+                p.translate(armX, 0, 0);
+
+                // Orient cylinder along X axis (rotate 90° around Z)
+                p.rotateZ(p.PI / 2);
+
+                // Apply spin rotation around the disc's center axis (local Y = global X)
+                p.rotateY(spinAngle);
+
+                // Draw spinning disc as thin cylinder
+                p.push();
+                p.fill(200, 200, 255);
+                p.noStroke();
+                p.cylinder(discR, 8, 24, 1);
+
+                // Draw reference line on disc surface (to show spin)
+                p.push();
+                p.translate(0, 0, 0);
+                p.fill(255, 0, 0);
+                p.box(2, 2, discR * 2.5);
+                p.pop();
+
+                p.pop();
+
+                // Draw disc center hub
+                p.push();
+                p.fill(150, 150, 220);
+                p.noStroke();
+                p.sphere(12, 12, 12);
+                p.pop();
+
+                p.pop();
+            }
+
+            function drawVectors3D() {
+                let armX = armLength * displayScale;
+
+                // Angular momentum vector L (blue) - along X axis (disc spin axis)
+                p.push();
+                p.translate(armX, 0, 0);
+                drawArrow3D_X(0, 0, 0, L*30, 8, 33, 150, 243);
+                p.pop();
+
+                // Torque vector τ (red) - along Z axis (into/out of page due to gravity)
+                p.push();
+                p.translate(armX, 0, 0);
+                let torqueLength = tau * 10;
+                drawArrow3D_Z(0, 0, 0, -torqueLength, 8, 244, 67, 54);
+                p.pop();
+
+                // Precession vector Ωp (green) - along Y axis (vertical)
+                p.push();
+                p.translate(0, 0, 0);
+                let precessionLength = omegaP*10;
+                drawArrow3D_Y(0, 0, 0, -precessionLength, 8, 76, 175, 80);
+                p.pop();
+            }
+
+            function drawArrow3D_X(x, y, z, length, arrowSize, r, g, b) {
+                // Draw line along X axis
+                p.stroke(r, g, b);
+                p.strokeWeight(5);
+                p.line(x, y, z, x + length, y, z);
+
+                // Draw cone at end
+                p.push();
+                p.translate(x + length, y, z);
+                p.rotateZ(-p.PI / 2);
+                p.noStroke();
+                p.fill(r, g, b);
+                p.cone(arrowSize, arrowSize * 2);
+                p.pop();
+            }
+
+            function drawArrow3D_Y(x, y, z, length, arrowSize, r, g, b) {
+                // Draw line along Y axis
+                p.stroke(r, g, b);
+                p.strokeWeight(5);
+                p.line(x, y, z, x, y + length, z);
+
+                // Draw cone at end
+                p.push();
+                p.translate(x, y + length, z);
+                if (length < 0) {
+                    p.rotateX(p.PI);
+                }
+                p.noStroke();
+                p.fill(r, g, b);
+                p.cone(arrowSize, arrowSize * 2);
+                p.pop();
+            }
+
+            function drawArrow3D_Z(x, y, z, length, arrowSize, r, g, b) {
+                // Draw line along Z axis
+                p.stroke(r, g, b);
+                p.strokeWeight(5);
+                p.line(x, y, z, x, y, z + length);
+
+                // Draw cone at end
+                p.push();
+                p.translate(x, y, z + length);
+                p.rotateX(p.PI / 2);
+                if (length > 0) {
+                    p.rotateY(p.PI);
+                }
+                p.noStroke();
+                p.fill(r, g, b);
+                p.cone(-arrowSize, -arrowSize * 2);
+                p.pop();
+            }
+
+            function draw2DOverlays() {
+                // Clear the overlay buffer
+                overlayBuffer.clear();
+
+                // Draw infobox on 2D buffer
+                let x = 20;
+                let y = 30;
+                let lineHeight = 22;
+
+                // Background
+                overlayBuffer.fill(255, 255, 255, 240);
+                overlayBuffer.stroke(50);
+                overlayBuffer.strokeWeight(1);
+                overlayBuffer.rect(10, 10, 280, 220, 5);
+
+                // Text
+                overlayBuffer.fill(0);
+                overlayBuffer.noStroke();
+                overlayBuffer.textSize(13);
+                overlayBuffer.textAlign(overlayBuffer.LEFT);
+
+                overlayBuffer.textStyle(overlayBuffer.BOLD);
+                overlayBuffer.text('Gyroscope Parameters:', x, y);
+                overlayBuffer.textStyle(overlayBuffer.NORMAL);
+
+                y += lineHeight;
+                overlayBuffer.text('Mass m: ' + mass.toFixed(2) + ' kg', x, y);
+
+                y += lineHeight;
+                overlayBuffer.text('Radius r: ' + radius.toFixed(2) + ' m', x, y);
+
+                y += lineHeight;
+                overlayBuffer.text('Spin ω: ' + omega.toFixed(1) + ' rad/s', x, y);
+
+                y += lineHeight;
+                overlayBuffer.text('Arm length L: ' + armLength.toFixed(2) + ' m', x, y);
+
+                y += lineHeight;
+                overlayBuffer.textStyle(overlayBuffer.BOLD);
+                overlayBuffer.text('Calculated Values:', x, y);
+                overlayBuffer.textStyle(overlayBuffer.NORMAL);
+
+                y += lineHeight;
+                overlayBuffer.text('Moment of Inertia I:', x, y);
+                y += lineHeight;
+                overlayBuffer.text('  ' + I.toFixed(4) + ' kg·m²', x, y);
+
+                y += lineHeight;
+                overlayBuffer.text('Angular Momentum L:', x, y);
+                y += lineHeight;
+                overlayBuffer.text('  ' + L.toFixed(2) + ' kg·m²/s', x, y);
+
+                y += lineHeight;
+                overlayBuffer.text('Torque τ: ' + tau.toFixed(2) + ' N·m', x, y);
+
+                y += lineHeight;
+                overlayBuffer.fill(76, 175, 80);
+                overlayBuffer.textStyle(overlayBuffer.BOLD);
+                overlayBuffer.text('Precession Rate Ωₚ:', x, y);
+                y += lineHeight;
+                overlayBuffer.text('  ' + omegaP.toFixed(3) + ' rad/s', x, y);
+
+                // Render overlay buffer as textured plane in front of camera
+                p.push();
+
+                // Switch to orthographic projection looking straight at the plane
+                p.camera(0, 0, (p.height/2.0) / Math.tan(p.PI*30.0 / 180.0), 0, 0, 0, 0, 1, 0);
+                p.ortho(-p.width/2, p.width/2, -p.height/2, p.height/2, 0, Math.max(p.width, p.height));
+
+                // Disable lighting for the overlay
+                p.noLights();
+
+                // Position plane at z=0
+                p.translate(0, 0, 0);
+
+                // Apply texture and draw plane
+                p.texture(overlayBuffer);
+                p.noStroke();
+                p.plane(p.width, p.height);
+
+                p.pop();
+            }
+
+            function setupControls() {
+                // Spin speed
+                document.getElementById("spin-speed").addEventListener("input", function() {
+                    omega = parseFloat(this.value);
+                    document.getElementById("spin-speed-value").textContent = omega.toFixed(0);
+                    calculate();
+                });
+
+                // Disc mass
+                document.getElementById("disc-mass").addEventListener("input", function() {
+                    mass = parseFloat(this.value);
+                    document.getElementById("disc-mass-value").textContent = mass.toFixed(1);
+                    calculate();
+                });
+
+                // Disc radius
+                document.getElementById("disc-radius").addEventListener("input", function() {
+                    radius = parseFloat(this.value);
+                    document.getElementById("disc-radius-value").textContent = radius.toFixed(2);
+                    calculate();
+                });
+
+                // Arm length
+                document.getElementById("arm-length").addEventListener("input", function() {
+                    armLength = parseFloat(this.value);
+                    document.getElementById("arm-length-value").textContent = armLength.toFixed(2);
+                    calculate();
+                });
+
+                // View angle
+                document.getElementById("view-angle").addEventListener("input", function() {
+                    viewAngle = parseFloat(this.value);
+                    document.getElementById("view-angle-value").textContent = viewAngle.toFixed(0);
+                });
+
+                // Time scale
+                document.getElementById("time-scale").addEventListener("input", function() {
+                    timeScale = parseFloat(this.value);
+                    document.getElementById("time-scale-value").textContent = timeScale.toFixed(1) + "×";
+                });
+
+                // Play/Pause button
+                document.getElementById("play-pause-btn").addEventListener("click", function() {
+                    running = !running;
+                    this.textContent = running ? "Pause" : "Play";
+                    if (running) {
+                        this.classList.remove('paused');
+                    } else {
+                        this.classList.add('paused');
+                    }
+                });
+
+                // Reset button
+                document.getElementById("reset-btn").addEventListener("click", function() {
+                    precessionAngle = 0;
+                    spinAngle = 0;
+                    running = false;
+                    document.getElementById("play-pause-btn").textContent = "Play";
+                    document.getElementById("play-pause-btn").classList.add('paused');
+                });
+
+                // Toggle vectors button
+                document.getElementById("toggle-vectors-btn").addEventListener("click", function() {
+                    showVectors = !showVectors;
+                    this.textContent = showVectors ? "Hide Vectors" : "Show Vectors";
+                    if (showVectors) {
+                        this.classList.add('active');
+                    } else {
+                        this.classList.remove('active');
+                    }
+                });
+            }
+
+        }, 'sketch-holder');
+
+        // ========================================
+        // QUIZ HANDLING
+        // ========================================
+        document.getElementById('submit-quiz').addEventListener('click', function() {
+            const answers = {
+                q1: 'b',  // Moment of inertia times angular velocity
+                q2: 'b',  // Rotation perpendicular to spin and torque
+                q3: 'b',  // Precession rate decreases
+                q4: 'b',  // I = (1/2)mr²
+                q5: 'c',  // Perpendicular to both
+                q6: 'b',  // Attitude indicator
+                q7: 'c',  // Yawing moment created
+                q8: 'b'   // τ = dL/dt
+            };
+
+            let score = 0;
+            let totalQuestions = Object.keys(answers).length;
+            let resultsHTML = '<h3>Quiz Results:</h3>';
+
+            for (let question in answers) {
+                const selectedOption = document.querySelector(`input[name="${question}"]:checked`);
+                const correctAnswer = answers[question];
+
+                if (selectedOption) {
+                    if (selectedOption.value === correctAnswer) {
+                        score++;
+                        resultsHTML += `<p style="color: #28a745; font-weight: bold;">${question.toUpperCase()}: Correct! ✓</p>`;
+                    } else {
+                        resultsHTML += `<p style="color: #dc3545; font-weight: bold;">${question.toUpperCase()}: Incorrect ✗</p>`;
+                    }
+                } else {
+                    resultsHTML += `<p style="color: #666;">${question.toUpperCase()}: Not answered</p>`;
+                }
+            }
+
+            const percentage = ((score / totalQuestions) * 100).toFixed(0);
+            let feedback = "";
+
+            if (percentage >= 90) {
+                feedback = "Excellent! You have a strong grasp of gyroscopic principles.";
+            } else if (percentage >= 70) {
+                feedback = "Good work! Review the relationship between precession and angular momentum.";
+            } else if (percentage >= 50) {
+                feedback = "Fair performance. Study the fundamental gyroscopic equation and practice problems.";
+            } else {
+                feedback = "Keep studying! Focus on understanding angular momentum and the right-hand rule.";
+            }
+
+            resultsHTML = `<p style="font-size: 1.2em; font-weight: bold;">You scored ${score} out of ${totalQuestions} (${percentage}%)</p>
+                          <p style="font-style: italic; margin-bottom: 15px;">${feedback}</p>` + resultsHTML;
+
+            document.getElementById('quiz-results').innerHTML = resultsHTML;
+        });
+    </script>
+</body>
+</html>
