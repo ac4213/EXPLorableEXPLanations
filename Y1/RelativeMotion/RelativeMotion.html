@@ -26,7 +26,7 @@
             gap: 10px;
             margin: 15px 0;
         }
-        
+
         .pov-button {
             padding: 10px 20px;
             background-color: var(--secondary-color);
@@ -45,31 +45,102 @@
         .pov-button:hover {
             background-color: var(--primary-color);
         }
-        
-        .velocity-info {
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .controls-grid-2col {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            min-width: 0;
+            max-width: 900px;
+        }
+
+        .object-controls {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .velocity-card {
-            background-color: white;
-            padding: 10px;
+            min-width: 0;
+            padding: 15px;
+            background-color: #f9f9f9;
             border-radius: 5px;
-            border-left: 4px solid var(--primary-color);
         }
-        
+
+        .object-controls h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .button-group button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .button-group button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        #sketch-holder {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .velocity-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.75);
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 250px;
+            font-size: 0.9em;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+
+        .velocity-card {
+            margin: 0;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+        }
+
+        .velocity-card.hidden {
+            display: none;
+        }
+
         .velocity-card h4 {
-            margin: 0 0 8px 0;
-            color: #b38600;
-        }
-        
-        .velocity-card p {
-            margin: 5px 0;
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
             font-size: 0.95em;
         }
-        
+
+        .velocity-card p {
+            margin: 2px 0;
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+
     </style>
 </head>
 <body>
@@ -163,61 +234,55 @@
         
         <div id="sketch-holder">
             <!-- p5.js sketch will go here -->
+            <div class="velocity-info">
+                <div class="velocity-card" id="card-absolute">
+                    <h4>Absolute Velocities</h4>
+                    <p><strong>A:</strong> <span id="vel-a">2.0 m/s @ 45°</span></p>
+                    <p><strong>B:</strong> <span id="vel-b">3.0 m/s @ 135°</span></p>
+                </div>
+                <div class="velocity-card" id="card-relative-ba" class="hidden">
+                    <h4>B relative to A</h4>
+                    <p><span id="vel-rel-ba">3.61 m/s @ angle</span></p>
+                </div>
+                <div class="velocity-card" id="card-relative-ab" class="hidden">
+                    <h4>A relative to B</h4>
+                    <p><span id="vel-rel-ab">3.61 m/s @ angle</span></p>
+                </div>
+            </div>
         </div>
         
         <div class="control-panel">
-            <h3>Velocity Controls</h3>
-            
-            <div class="control-row">
-                <label>Object A Speed:</label>
-                <input type="range" id="speed1" min="0" max="5" step="0.1" value="2">
-                <span id="speed1-value">2.0 m/s</span>
+            <div class="controls-grid-2col">
+                <div class="object-controls">
+                    <h3>Object A</h3>
+                    <div class="slider-container">
+                        <label>Speed: <span id="speed1-value" class="value-display">2.0 m/s</span></label>
+                        <input type="range" id="speed1" min="0" max="5" step="0.1" value="2">
+                    </div>
+                    <div class="slider-container">
+                        <label>Direction: <span id="angle1-value" class="value-display">45°</span></label>
+                        <input type="range" id="angle1" min="0" max="360" step="1" value="45">
+                    </div>
+                </div>
+
+                <div class="object-controls">
+                    <h3>Object B</h3>
+                    <div class="slider-container">
+                        <label>Speed: <span id="speed2-value" class="value-display">3.0 m/s</span></label>
+                        <input type="range" id="speed2" min="0" max="5" step="0.1" value="3">
+                    </div>
+                    <div class="slider-container">
+                        <label>Direction: <span id="angle2-value" class="value-display">135°</span></label>
+                        <input type="range" id="angle2" min="0" max="360" step="1" value="135">
+                    </div>
+                </div>
             </div>
-            
-            <div class="control-row">
-                <label>Object A Direction:</label>
-                <input type="range" id="angle1" min="0" max="360" step="1" value="45">
-                <span id="angle1-value">45°</span>
-            </div>
-            
-            <div class="control-row">
-                <label>Object B Speed:</label>
-                <input type="range" id="speed2" min="0" max="5" step="0.1" value="3">
-                <span id="speed2-value">3.0 m/s</span>
-            </div>
-            
-            <div class="control-row">
-                <label>Object B Direction:</label>
-                <input type="range" id="angle2" min="0" max="360" step="1" value="135">
-                <span id="angle2-value">135°</span>
-            </div>
-            
-            <button id="reset-button" style="margin-top: 10px;">Reset Positions</button>
-            <button id="pause-button" style="margin-top: 10px;">Pause/Play</button>
-            <button id="toggle-grid" style="margin-top: 10px;">Toggle Grid</button>
-            <button id="toggle-trails" style="margin-top: 10px;">Toggle Trails</button>
-        </div>
-        
-        <div class="velocity-info">
-            <div class="velocity-card">
-                <h4>Object A</h4>
-                <p>Velocity: <span id="vel-a">2.0 m/s @ 45°</span></p>
-                <p>Components: <span id="vel-a-comp">(1.41, 1.41) m/s</span></p>
-            </div>
-            <div class="velocity-card">
-                <h4>Object B</h4>
-                <p>Velocity: <span id="vel-b">3.0 m/s @ 135°</span></p>
-                <p>Components: <span id="vel-b-comp">(-2.12, 2.12) m/s</span></p>
-            </div>
-            <div class="velocity-card">
-                <h4>B relative to A</h4>
-                <p>Relative Velocity: <span id="vel-rel-ba">3.61 m/s</span></p>
-                <p>Components: <span id="vel-rel-ba-comp">(-3.54, 0.71) m/s</span></p>
-            </div>
-            <div class="velocity-card">
-                <h4>A relative to B</h4>
-                <p>Relative Velocity: <span id="vel-rel-ab">3.61 m/s</span></p>
-                <p>Components: <span id="vel-rel-ab-comp">(3.54, -0.71) m/s</span></p>
+
+            <div class="button-group">
+                <button id="reset-button">Reset Positions</button>
+                <button id="pause-button">Pause/Play</button>
+                <button id="toggle-grid">Toggle Grid</button>
+                <button id="toggle-trails">Toggle Trails</button>
             </div>
         </div>
     </div>
@@ -778,13 +843,33 @@
             document.querySelectorAll('.pov-button').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
+            // Update button active states
             if (povMode === 'ground') {
                 document.getElementById('pov-ground').classList.add('active');
             } else if (povMode === 'objectA') {
                 document.getElementById('pov-object1').classList.add('active');
             } else {
                 document.getElementById('pov-object2').classList.add('active');
+            }
+
+            // Update velocity info card visibility
+            const cardAbsolute = document.getElementById('card-absolute');
+            const cardRelativeBA = document.getElementById('card-relative-ba');
+            const cardRelativeAB = document.getElementById('card-relative-ab');
+
+            if (povMode === 'ground') {
+                cardAbsolute.classList.remove('hidden');
+                cardRelativeBA.classList.add('hidden');
+                cardRelativeAB.classList.add('hidden');
+            } else if (povMode === 'objectA') {
+                cardAbsolute.classList.remove('hidden');
+                cardRelativeBA.classList.remove('hidden');
+                cardRelativeAB.classList.add('hidden');
+            } else if (povMode === 'objectB') {
+                cardAbsolute.classList.remove('hidden');
+                cardRelativeAB.classList.remove('hidden');
+                cardRelativeBA.classList.add('hidden');
             }
         }
         
@@ -821,27 +906,27 @@
             let vAx = speed1 * cos(radians(angle1));
             let vAy = speed1 * sin(radians(angle1));
             document.getElementById('vel-a').textContent = `${speed1.toFixed(1)} m/s @ ${angle1}°`;
-            document.getElementById('vel-a-comp').textContent = `(${vAx.toFixed(2)}, ${vAy.toFixed(2)}) m/s`;
-            
+
             // Object B
             let vBx = speed2 * cos(radians(angle2));
             let vBy = speed2 * sin(radians(angle2));
             document.getElementById('vel-b').textContent = `${speed2.toFixed(1)} m/s @ ${angle2}°`;
-            document.getElementById('vel-b-comp').textContent = `(${vBx.toFixed(2)}, ${vBy.toFixed(2)}) m/s`;
-            
+
             // B relative to A
             let vBAx = vBx - vAx;
             let vBAy = vBy - vAy;
             let vBAMag = sqrt(vBAx * vBAx + vBAy * vBAy);
-            document.getElementById('vel-rel-ba').textContent = `${vBAMag.toFixed(2)} m/s`;
-            document.getElementById('vel-rel-ba-comp').textContent = `(${vBAx.toFixed(2)}, ${vBAy.toFixed(2)}) m/s`;
-            
+            let vBAAngle = degrees(atan2(vBAy, vBAx));
+            if (vBAAngle < 0) vBAAngle += 360;
+            document.getElementById('vel-rel-ba').textContent = `${vBAMag.toFixed(2)} m/s @ ${Math.round(vBAAngle)}°`;
+
             // A relative to B
             let vABx = vAx - vBx;
             let vABy = vAy - vBy;
             let vABMag = sqrt(vABx * vABx + vABy * vABy);
-            document.getElementById('vel-rel-ab').textContent = `${vABMag.toFixed(2)} m/s`;
-            document.getElementById('vel-rel-ab-comp').textContent = `(${vABx.toFixed(2)}, ${vABy.toFixed(2)}) m/s`;
+            let vABAngle = degrees(atan2(vABy, vABx));
+            if (vABAngle < 0) vABAngle += 360;
+            document.getElementById('vel-rel-ab').textContent = `${vABMag.toFixed(2)} m/s @ ${Math.round(vABAngle)}°`;
         }
 
         // Quiz functionality

@@ -87,7 +87,7 @@
         // Layout variables
         let boxSize = 40;
         let boxSpacing = 150; // Increased spacing between boxes
-        let yPosition = 120;  // Reduced vertical position of first row
+        let yPosition = 100;  // Optimized vertical position for better fit
         let rowSpacing = 200; // Increased spacing between rows
         let plotWidth = 300;
         let plotHeight = 150;
@@ -169,10 +169,12 @@
         function setup() {
             setupSystem();
 
-            let canvas = createCanvas(900, 750); // Increased canvas width and height
+            let canvas = createCanvas(900, 640); // Optimized canvas size for better viewport fit
             canvas.parent('sketch-holder');
             canvas.style('display', 'block');
             canvas.style('margin', '0 auto');
+            canvas.style('max-width', '100%');
+            canvas.style('height', 'auto');
             
             // Setup animate button
             let animateBtn = document.getElementById('animateBtn');

@@ -135,44 +135,31 @@
 
         <div id="cycle-sketch"></div>
 
-        <div class="controls-panel">
-            <div class="control-row" id="compression-control">
-                <label>Compression Ratio (r):</label>
-                <input type="range" id="compression-slider" min="4" max="12" step="0.5" value="8">
-                <span id="compression-value">8.0</span>
+        <div class="controls-grid">
+            <div class="slider-container" id="compression-control">
+                <label>Compression Ratio (r): <span id="compression-value">8.0</span></label>
+                <input type="range" id="compression-slider" min="4" max="12" step="0.5" value="8" class="slider">
             </div>
 
-            <div class="control-row" id="cutoff-control" style="display:none;">
-                <label>Cutoff Ratio (rₑ):</label>
-                <input type="range" id="cutoff-slider" min="1.5" max="3.0" step="0.1" value="2.0">
-                <span id="cutoff-value">2.0</span>
+            <div class="slider-container" id="cutoff-control" style="display:none;">
+                <label>Cutoff Ratio (rₑ): <span id="cutoff-value">2.0</span></label>
+                <input type="range" id="cutoff-slider" min="1.5" max="3.0" step="0.1" value="2.0" class="slider">
             </div>
 
-            <div class="control-row" id="temp-high-control" style="display:none;">
-                <label>High Temperature (K):</label>
-                <input type="range" id="temp-high-slider" min="400" max="1000" step="10" value="600">
-                <span id="temp-high-value">600 K</span>
+            <div class="slider-container" id="temp-high-control" style="display:none;">
+                <label>High Temperature: <span id="temp-high-value">600 K</span></label>
+                <input type="range" id="temp-high-slider" min="400" max="1000" step="10" value="600" class="slider">
             </div>
 
-            <div class="control-row" id="temp-low-control" style="display:none;">
-                <label>Low Temperature (K):</label>
-                <input type="range" id="temp-low-slider" min="250" max="400" step="10" value="300">
-                <span id="temp-low-value">300 K</span>
+            <div class="slider-container" id="temp-low-control" style="display:none;">
+                <label>Low Temperature: <span id="temp-low-value">300 K</span></label>
+                <input type="range" id="temp-low-slider" min="250" max="400" step="10" value="300" class="slider">
             </div>
 
-            <div class="control-row">
-                <label>Specific Heat Ratio (γ):</label>
-                <input type="range" id="gamma-slider" min="1.2" max="1.67" step="0.01" value="1.4">
-                <span id="gamma-value">1.40</span>
+            <div class="slider-container">
+                <label>Specific Heat Ratio (γ): <span id="gamma-value">1.40</span></label>
+                <input type="range" id="gamma-slider" min="1.2" max="1.67" step="0.01" value="1.4" class="slider">
             </div>
-        </div>
-
-        <div class="results-panel">
-            <h3>Cycle Performance:</h3>
-            <p><strong>Thermal Efficiency:</strong> η = <span id="efficiency-display">56.5</span>%</p>
-            <p><strong>Work Output:</strong> W = <span id="work-display">120</span> kJ/kg</p>
-            <p><strong>Heat Input:</strong> Q<sub>in</sub> = <span id="heat-in-display">212</span> kJ/kg</p>
-            <p><strong>Heat Rejected:</strong> Q<sub>out</sub> = <span id="heat-out-display">92</span> kJ/kg</p>
         </div>
     </div>
 
@@ -452,6 +439,12 @@
             const plotWidth = canvasWidth - 2 * margin;
             const plotHeight = canvasHeight - 2 * margin;
 
+            // Info box data
+            let cycleEfficiency = 0;
+            let cycleWork = 0;
+            let cycleHeatIn = 0;
+            let cycleHeatOut = 0;
+
             p.setup = function() {
                 let canvas = p.createCanvas(canvasWidth, canvasHeight);
                 canvas.parent('cycle-sketch');
@@ -500,6 +493,9 @@
 
                 // Draw labels
                 drawLabels(p);
+
+                // Draw info box
+                drawInfobox();
             };
 
             function drawAxes(p) {
@@ -871,10 +867,46 @@
         }
 
         function updateResults(efficiency, work, heatIn, heatOut) {
-            document.getElementById('efficiency-display').textContent = efficiency.toFixed(1);
-            document.getElementById('work-display').textContent = work.toFixed(0);
-            document.getElementById('heat-in-display').textContent = heatIn.toFixed(0);
-            document.getElementById('heat-out-display').textContent = heatOut.toFixed(0);
+            cycleEfficiency = efficiency;
+            cycleWork = work;
+            cycleHeatIn = heatIn;
+            cycleHeatOut = heatOut;
+        }
+
+        function drawInfobox() {
+            // Draw semi-transparent info box in top-right corner
+            let boxWidth = 260;
+            let boxHeight = 130;
+            let boxX = p.width - boxWidth - 15;
+            let boxY = 15;
+
+            // Background
+            p.fill(255, 255, 255, 230);
+            p.stroke(100);
+            p.strokeWeight(1);
+            p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+            // Title
+            p.fill(0);
+            p.noStroke();
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(13);
+            p.textStyle(p.BOLD);
+            p.text('Cycle Performance:', boxX + 10, boxY + 10);
+
+            // Info text
+            p.textStyle(p.NORMAL);
+            p.textSize(11);
+            let yPos = boxY + 32;
+            let lineHeight = 20;
+
+            p.text('Thermal Efficiency: η = ' + cycleEfficiency.toFixed(1) + '%', boxX + 10, yPos);
+            yPos += lineHeight;
+            p.text('Work Output: W = ' + cycleWork.toFixed(0) + ' kJ/kg', boxX + 10, yPos);
+            yPos += lineHeight;
+            p.text('Heat Input: Q_in = ' + cycleHeatIn.toFixed(0) + ' kJ/kg', boxX + 10, yPos);
+            yPos += lineHeight;
+            p.text('Heat Rejected: Q_out = ' + cycleHeatOut.toFixed(0) + ' kJ/kg', boxX + 10, yPos);
         }
 
         // Quiz handler

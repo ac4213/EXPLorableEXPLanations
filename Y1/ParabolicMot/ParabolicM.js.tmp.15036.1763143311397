@@ -47,7 +47,7 @@ let flightData = {
 let showVelocities = false;
 let showAccelerations = false;
 let slowMoMultiplier = 1.0; // 1.0 = normal speed, 0.25 = 4x slower
-let velocityScale = 20; // Scale factor for velocity vector display (smaller arrows)
+let velocityScale = 50; // Scale factor for velocity vector display
 let accelerationScale = 30; // Scale factor for acceleration vector display
 
 function setup() {
@@ -60,35 +60,16 @@ function setup() {
   initialPosition = createVector(0, height);
   reset();
 
-  // GUI - Create checkboxes in first row
-  let velocityCheckbox = createCheckbox('Show Velocities', false);
-  velocityCheckbox.parent('checkboxes-row');
-  velocityCheckbox.changed(() => {
-    showVelocities = velocityCheckbox.checked();
-  });
-
-  let accelerationCheckbox = createCheckbox('Show Accelerations', false);
-  accelerationCheckbox.parent('checkboxes-row');
-  accelerationCheckbox.changed(() => {
-    showAccelerations = accelerationCheckbox.checked();
-  });
-
-  // Create buttons in second row
+  // GUI
   button = createButton('RESET');
-  button.parent('buttons-row');
+  button.parent('button-container')
   button.mousePressed(reset);
-
+  
+  // Add toggle button for trajectory prediction
   let predictButton = createButton('TOGGLE PREDICTION');
-  predictButton.parent('buttons-row');
+  predictButton.parent('button-container');
   predictButton.mousePressed(() => {
     showPrediction = !showPrediction;
-  });
-
-  let slowMoButton = createButton('SLOW-MO');
-  slowMoButton.parent('buttons-row');
-  slowMoButton.mousePressed(() => {
-    slowMoMultiplier = slowMoMultiplier === 1.0 ? 0.25 : 1.0;
-    slowMoButton.html(slowMoMultiplier === 0.25 ? 'NORMAL SPEED' : 'SLOW-MO');
   });
 
   ballColor = color(255, 204, 84);
@@ -200,37 +181,24 @@ function draw() {
   if (!isFired) {
     velocity = p5.Vector.fromAngle(angle); // unitvect direction
     velocity.mult(initialSpeed); // magnitude
-
+    
     // Calculate and draw predicted trajectory
     if (showPrediction) {
       calculateTrajectory(initialPosition.copy(), velocity.copy());
       drawTrajectoryPrediction();
     }
   } else { // Otherwise, evolve the trajectory
-    // Apply gravity to the velocity (scaled by slow-mo multiplier)
-    let gravityThisFrame = p5.Vector.mult(gravity, slowMoMultiplier);
-    velocity.add(gravityThisFrame);
-
-    // Apply velocity to the position (scaled by slow-mo multiplier)
-    let displacementThisFrame = p5.Vector.mult(velocity, slowMoMultiplier);
-    position.add(displacementThisFrame);
-
+    // Apply gravity to the velocity
+    velocity.add(gravity);
+    // Apply velocity to the position
+    position.add(velocity);
+    
     // Update flight data
-    flightData.currentTime += (1/60) * slowMoMultiplier; // Apply slow-mo multiplier
+    flightData.currentTime += 1/60; // Assuming 60fps
   }
 
   // Draw the ball
   drawBall(position.x, position.y, ballColor);
-
-  // Draw velocity vectors if enabled
-  if (isFired && showVelocities) {
-    drawVelocityVector(position, velocity);
-  }
-
-  // Draw acceleration vectors if enabled
-  if (isFired && showAccelerations) {
-    drawAccelerationVector(position, gravity);
-  }
 
   // FLIGHT DATA DISPLAY
   drawFlightData();
@@ -441,90 +409,4 @@ function mouseClicked() {
       isFired = true;
     }
   }
-}
-
-// Draw velocity vector
-function drawVelocityVector(pos, vel) {
-  push();
-
-  // Calculate component vectors for visualization
-  let vx = vel.x;
-  let vy = vel.y;
-
-  // Draw total velocity vector (red)
-  stroke(255, 0, 0);
-  strokeWeight(2.5);
-  let scaledVel = p5.Vector.mult(vel, velocityScale);
-  line(pos.x, pos.y, pos.x + scaledVel.x, pos.y + scaledVel.y);
-
-  // Draw arrowhead for total velocity
-  let angle = atan2(scaledVel.y, scaledVel.x);
-  let arrowSize = 8;
-  push();
-  translate(pos.x + scaledVel.x, pos.y + scaledVel.y);
-  rotate(angle);
-  fill(255, 0, 0);
-  noStroke();
-  beginShape();
-  vertex(0, 0);
-  vertex(-arrowSize, -arrowSize / 2);
-  vertex(-arrowSize, arrowSize / 2);
-  endShape(CLOSE);
-  pop();
-
-  // Draw horizontal velocity component (blue)
-  stroke(0, 0, 255);
-  strokeWeight(1.5);
-  let scaledVx = vx * velocityScale;
-  line(pos.x, pos.y, pos.x + scaledVx, pos.y);
-
-  // Draw vertical velocity component (green)
-  stroke(0, 255, 0);
-  strokeWeight(1.5);
-  let scaledVy = vy * velocityScale;
-  line(pos.x, pos.y, pos.x, pos.y + scaledVy);
-
-  // Draw component labels
-  fill(0);
-  textSize(10);
-  textAlign(LEFT);
-  text(`vₓ=${vx.toFixed(2)}`, pos.x + scaledVx + 5, pos.y - 5);
-  text(`vᵧ=${vy.toFixed(2)}`, pos.x + 5, pos.y + scaledVy + 12);
-
-  pop();
-}
-
-// Draw acceleration vector
-function drawAccelerationVector(pos, accel) {
-  push();
-
-  // Draw acceleration vector (purple) - always pointing down
-  stroke(128, 0, 255);
-  strokeWeight(3);
-  let scaledAccel = p5.Vector.mult(accel, accelerationScale);
-  line(pos.x, pos.y, pos.x + scaledAccel.x, pos.y + scaledAccel.y);
-
-  // Draw arrowhead for acceleration
-  let angle = atan2(scaledAccel.y, scaledAccel.x);
-  let arrowSize = 8;
-  push();
-  translate(pos.x + scaledAccel.x, pos.y + scaledAccel.y);
-  rotate(angle);
-  fill(128, 0, 255);
-  noStroke();
-  beginShape();
-  vertex(0, 0);
-  vertex(-arrowSize, -arrowSize / 2);
-  vertex(-arrowSize, arrowSize / 2);
-  endShape(CLOSE);
-  pop();
-
-  // Draw acceleration label
-  fill(0);
-  textSize(10);
-  textAlign(LEFT);
-  let magnitude = accel.mag();
-  text(`a=${magnitude.toFixed(2)} m/s²`, pos.x + 5, pos.y + scaledAccel.y + 20);
-
-  pop();
 }

@@ -88,13 +88,15 @@
         </div>
         
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="axialForce">Axial Force (kN): <span id="axialForceVal">50</span></label>
-                <input type="range" id="axialForce" min="-200" max="200" step="10" value="50">
-            </div>
-            <div class="control-group">
-                <label for="crossArea">Cross-sectional Area (mm²): <span id="crossAreaVal">1000</span></label>
-                <input type="range" id="crossArea" min="100" max="2500" step="100" value="1000">
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label for="axialForce">Axial Force (kN): <span id="axialForceVal">50</span></label>
+                    <input type="range" id="axialForce" min="-200" max="200" step="10" value="50">
+                </div>
+                <div class="control-item">
+                    <label for="crossArea">Cross-sectional Area (mm²): <span id="crossAreaVal">1000</span></label>
+                    <input type="range" id="crossArea" min="100" max="2500" step="100" value="1000">
+                </div>
             </div>
         </div>
 
@@ -127,23 +129,25 @@
         </div>
         
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="shearForce">Shear Force (kN): <span id="shearForceVal">130</span></label>
-                <input id="shearForce" type="range" min="10" max="300" step="5" value="130">
-            </div>
-            
-            <div class="control-group">
-                <label for="cutSlider">Cut Position: <span id="cutReadout">Cut @ y = 0.0 mm</span></label>
-                <input id="cutSlider" type="range" min="0" max="100" step="1" value="50" title="Cut position (0% top → 100% bottom)">
-            </div>
-            
-            <div class="control-group">
-                <label for="shearSection">Section Type:</label>
-                <select id="shearSection">
-                    <option value="rectangular" selected>Rectangular</option>
-                    <option value="t-section">T-section</option>
-                    <option value="i-section">I-section</option>
-                </select>
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label for="shearForce">Shear Force (kN): <span id="shearForceVal">130</span></label>
+                    <input id="shearForce" type="range" min="10" max="300" step="5" value="130">
+                </div>
+
+                <div class="control-item">
+                    <label for="cutSlider">Cut Position: <span id="cutReadout">Cut @ y = 0.0 mm</span></label>
+                    <input id="cutSlider" type="range" min="0" max="100" step="1" value="50" title="Cut position (0% top → 100% bottom)">
+                </div>
+
+                <div class="control-item">
+                    <label for="shearSection">Section Type:</label>
+                    <select id="shearSection">
+                        <option value="rectangular" selected>Rectangular</option>
+                        <option value="t-section">T-section</option>
+                        <option value="i-section">I-section</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -195,17 +199,19 @@
         </div>
         
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="bendingForce">Tip Force F (kN): <span id="bendingForceVal">10</span></label>
-                <input type="range" id="bendingForce" min="-50" max="150" step="1" value="10">
-            </div>
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label for="bendingForce">Tip Force F (kN): <span id="bendingForceVal">10</span></label>
+                    <input type="range" id="bendingForce" min="-50" max="150" step="1" value="10">
+                </div>
 
-            <div class="control-group">
-                <label for="bendingSection">Section Type:</label>
-                <select id="bendingSection">
-                    <option value="rectangular" selected>Rectangular</option>
-                    <option value="t-section">T-section</option>
-                </select>
+                <div class="control-item">
+                    <label for="bendingSection">Section Type:</label>
+                    <select id="bendingSection">
+                        <option value="rectangular" selected>Rectangular</option>
+                        <option value="t-section">T-section</option>
+                    </select>
+                </div>
             </div>
         </div>
 
@@ -222,14 +228,16 @@
         </div>
 
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="bendX">Element x-position along beam (m): <span id="bendXVal">0.30</span></label>
-                <input type="range" id="bendX" min="0" max="2.00" step="0.01" value="0.30">
-            </div>
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label for="bendX">Element x-position along beam (m): <span id="bendXVal">0.30</span></label>
+                    <input type="range" id="bendX" min="0" max="2.00" step="0.01" value="0.30">
+                </div>
 
-            <div class="control-group">
-                <label for="bendY">Element y across depth (−top … +bottom): <span id="bendYVal">-1.00</span></label>
-                <input type="range" id="bendY" min="-1" max="1" step="0.01" value="-1">
+                <div class="control-item">
+                    <label for="bendY">Element y across depth (−top … +bottom): <span id="bendYVal">-1.00</span></label>
+                    <input type="range" id="bendY" min="-1" max="1" step="0.01" value="-1">
+                </div>
             </div>
         </div>
 
@@ -263,31 +271,33 @@
         </div>
         
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="torTorque">Torque T (kN·m): <span id="torTorqueVal">5.0</span></label>
-                <input type="range" id="torTorque" min="-20" max="20" step="1" value="5">
-            </div>
+            <div class="controls-grid-3col">
+                <div class="control-item">
+                    <label for="torTorque">Torque T (kN·m): <span id="torTorqueVal">5.0</span></label>
+                    <input type="range" id="torTorque" min="-20" max="20" step="1" value="5">
+                </div>
 
-            <div class="control-group">
-                <label for="torSection">Section Type:</label>
-                <select id="torSection">
-                    <option value="solid" selected>Solid circular</option>
-                    <option value="hollow">Hollow circular</option>
-                </select>
-            </div>
+                <div class="control-item">
+                    <label for="torSection">Section Type:</label>
+                    <select id="torSection">
+                        <option value="solid" selected>Solid circular</option>
+                        <option value="hollow">Hollow circular</option>
+                    </select>
+                </div>
 
-            <div class="control-group">
-                <label for="torElementPos">Infinitesimal Position: <span id="torElementPosVal">1.0</span></label>
-                <input type="range" id="torElementPos" min="-1" max="1" step="0.05" value="1">
-            </div>
+                <div class="control-item">
+                    <label for="torElementPos">Infinitesimal Position: <span id="torElementPosVal">1.0</span></label>
+                    <input type="range" id="torElementPos" min="-1" max="1" step="0.05" value="1">
+                </div>
 
-            <div class="control-group" id="torSolidDims" style="display:flex; gap:12px; align-items:center;">
-                <label> Diameter D (mm): <input type="number" id="torD" min="50" max="250" step="1" value="200"></label>
-            </div>
+                <div class="control-item" id="torSolidDims" style="display:flex; gap:12px; align-items:center;">
+                    <label> Diameter D (mm): <input type="number" id="torD" min="50" max="250" step="1" value="200"></label>
+                </div>
 
-            <div class="control-group" id="torHollowDims" style="display:none; gap:12px; align-items:center;">
-                <label> Diameter D (mm): <input type="number" id="torDo" min="50" max="250" step="1" value="200"></label>
-                <label> Thickness t (mm): <input type="number" id="torThk" min="5" max="200" step="1" value="20"></label>
+                <div class="control-item" id="torHollowDims" style="display:none; gap:12px; align-items:center;">
+                    <label> Diameter D (mm): <input type="number" id="torDo" min="50" max="250" step="1" value="200"></label>
+                    <label> Thickness t (mm): <input type="number" id="torThk" min="5" max="200" step="1" value="20"></label>
+                </div>
             </div>
         </div>
 

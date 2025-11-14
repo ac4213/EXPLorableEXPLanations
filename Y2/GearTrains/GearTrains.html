@@ -150,32 +150,34 @@
         <div id="involute-simulation"></div>
         
         <div class="gear-controls">
-            <div class="control-row">
-                <label>ISO Module (mm):</label>
-                <select id="iso-module">
-                    <option value="4" selected>4.0</option>
-                    <option value="5">5.0</option>
-                    <option value="6">6.0</option>
-                    <option value="8">8.0</option>
-                    <option value="10">10.0</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <label>Number of Teeth:</label>
-                <input type="range" id="num-teeth-involute" min="8" max="30" value="24">
-                <span id="num-teeth-involute-value">24</span>
-            </div>
-            <div class="control-row">
-                <label>Pressure Angle:</label>
-                <select id="pressure-angle">
-                    <option value="14.5">14.5° (Old standard)</option>
-                    <option value="20" selected>20° (ISO standard)</option>
-                    <option value="25">25° (ISO heavy duty)</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <button id="reset-involute">Reset Animation</button>
-                <button id="pause-involute">Pause</button>
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label>ISO Module (mm):</label>
+                    <select id="iso-module">
+                        <option value="4" selected>4.0</option>
+                        <option value="5">5.0</option>
+                        <option value="6">6.0</option>
+                        <option value="8">8.0</option>
+                        <option value="10">10.0</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>Number of Teeth:</label>
+                    <input type="range" id="num-teeth-involute" min="8" max="30" value="24">
+                    <span id="num-teeth-involute-value">24</span>
+                </div>
+                <div class="control-item">
+                    <label>Pressure Angle:</label>
+                    <select id="pressure-angle">
+                        <option value="14.5">14.5° (Old standard)</option>
+                        <option value="20" selected>20° (ISO standard)</option>
+                        <option value="25">25° (ISO heavy duty)</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <button id="reset-involute">Reset Animation</button>
+                    <button id="pause-involute">Pause</button>
+                </div>
             </div>
         </div>
 
@@ -191,27 +193,29 @@
         <div id="simple-gear-simulation"></div>
         
         <div class="gear-controls">
-            <div class="control-row">
-                <label>Driver Teeth:</label>
-                <input type="range" id="driver-teeth" min="8" max="40" value="10" step="2">
-                <span id="driver-teeth-value">10</span>
-            </div>
-            <div class="control-row">
-                <label>Driven Teeth:</label>
-                <input type="range" id="driven-teeth" min="8" max="40" value="20" step="2">
-                <span id="driven-teeth-value">20</span>
-            </div>
-            <div class="control-row">
-                <label>Include Idler:</label>
-                <input type="checkbox" id="include-idler">
-                <label style="min-width: auto;">Idler Teeth:</label>
-                <input type="range" id="idler-teeth" min="10" max="20" value="15" step="2" disabled>
-                <span id="idler-teeth-value">15</span>
-            </div>
-            <div class="control-row">
-                <label>Input Speed (RPM):</label>
-                <input type="range" id="input-speed-simple" min="10" max="50" value="10">
-                <span id="input-speed-simple-value">50</span>
+            <div class="controls-grid-2col">
+                <div class="control-item">
+                    <label>Driver Teeth:</label>
+                    <input type="range" id="driver-teeth" min="8" max="40" value="10" step="2">
+                    <span id="driver-teeth-value">10</span>
+                </div>
+                <div class="control-item">
+                    <label>Driven Teeth:</label>
+                    <input type="range" id="driven-teeth" min="8" max="40" value="20" step="2">
+                    <span id="driven-teeth-value">20</span>
+                </div>
+                <div class="control-item">
+                    <label>Include Idler:</label>
+                    <input type="checkbox" id="include-idler">
+                    <label style="min-width: auto;">Idler Teeth:</label>
+                    <input type="range" id="idler-teeth" min="10" max="20" value="15" step="2" disabled>
+                    <span id="idler-teeth-value">15</span>
+                </div>
+                <div class="control-item">
+                    <label>Input Speed (RPM):</label>
+                    <input type="range" id="input-speed-simple" min="10" max="50" value="10">
+                    <span id="input-speed-simple-value">50</span>
+                </div>
             </div>
         </div>
     </div>
@@ -223,30 +227,32 @@
         <div id="compound-gear-simulation"></div>
         
         <div class="gear-controls">
-            <div class="control-row">
-                <label>Stage 1 Driver Teeth:</label>
-                <input type="range" id="stage1-driver" min="10" max="30" value="10" step="2">
-                <span id="stage1-driver-value">10</span>
-            </div>
-            <div class="control-row">
-                <label>Stage 1 Driven Teeth:</label>
-                <input type="range" id="stage1-driven" min="10" max="40" value="20" step="2">
-                <span id="stage1-driven-value">20</span>
-            </div>
-            <div class="control-row">
-                <label>Stage 2 Driver Teeth:</label>
-                <input type="range" id="stage2-driver" min="10" max="40" value="10" step="2">
-                <span id="stage2-driver-value">10</span>
-            </div>
-            <div class="control-row">
-                <label>Stage 2 Driven Teeth:</label>
-                <input type="range" id="stage2-driven" min="10" max="60" value="30" step="2">
-                <span id="stage2-driven-value">30</span>
-            </div>
-            <div class="control-row">
-                <label>Input Speed (RPM):</label>
-                <input type="range" id="input-speed-compound" min="10" max="100" value="50">
-                <span id="input-speed-compound-value">50</span>
+            <div class="controls-grid-3col">
+                <div class="control-item">
+                    <label>Stage 1 Driver Teeth:</label>
+                    <input type="range" id="stage1-driver" min="10" max="30" value="10" step="2">
+                    <span id="stage1-driver-value">10</span>
+                </div>
+                <div class="control-item">
+                    <label>Stage 1 Driven Teeth:</label>
+                    <input type="range" id="stage1-driven" min="10" max="40" value="20" step="2">
+                    <span id="stage1-driven-value">20</span>
+                </div>
+                <div class="control-item">
+                    <label>Stage 2 Driver Teeth:</label>
+                    <input type="range" id="stage2-driver" min="10" max="40" value="10" step="2">
+                    <span id="stage2-driver-value">10</span>
+                </div>
+                <div class="control-item">
+                    <label>Stage 2 Driven Teeth:</label>
+                    <input type="range" id="stage2-driven" min="10" max="60" value="30" step="2">
+                    <span id="stage2-driven-value">30</span>
+                </div>
+                <div class="control-item">
+                    <label>Input Speed (RPM):</label>
+                    <input type="range" id="input-speed-compound" min="10" max="100" value="50">
+                    <span id="input-speed-compound-value">50</span>
+                </div>
             </div>
         </div>
 
@@ -263,33 +269,35 @@
         <div id="epicyclic-gear-simulation"></div>
         
         <div class="gear-controls">
-            <div class="control-row">
-                <label>Fixed Component:</label>
-                <select id="fixed-component">
-                    <option value="ring">Ring Gear</option>
-                    <option value="carrier">Carrier</option>
-                    <option value="sun">Sun Gear</option>
-                </select>
-            </div>
-            <div class="control-row">
-                <label>Sun Teeth:</label>
-                <input type="range" id="sun-teeth" min="12" max="30" value="20" step="2">
-                <span id="sun-teeth-value">20</span>
-            </div>
-            <div class="control-row">
-                <label>Planet Teeth:</label>
-                <input type="range" id="planet-teeth" min="8" max="20" value="10" step="2">
-                <span id="planet-teeth-value">10</span>
-            </div>
-            <div class="control-row">
-                <label>Number of Planets:</label>
-                <input type="range" id="num-planets" min="2" max="4" value="3" >
-                <span id="num-planets-value">3</span>
-            </div>
-            <div class="control-row">
-                <label>Input Speed (RPM):</label>
-                <input type="range" id="input-speed-epicyclic" min="10" max="100" value="30">
-                <span id="input-speed-epicyclic-value">30</span>
+            <div class="controls-grid-3col">
+                <div class="control-item">
+                    <label>Fixed Component:</label>
+                    <select id="fixed-component">
+                        <option value="ring">Ring Gear</option>
+                        <option value="carrier">Carrier</option>
+                        <option value="sun">Sun Gear</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>Sun Teeth:</label>
+                    <input type="range" id="sun-teeth" min="12" max="30" value="20" step="2">
+                    <span id="sun-teeth-value">20</span>
+                </div>
+                <div class="control-item">
+                    <label>Planet Teeth:</label>
+                    <input type="range" id="planet-teeth" min="8" max="20" value="10" step="2">
+                    <span id="planet-teeth-value">10</span>
+                </div>
+                <div class="control-item">
+                    <label>Number of Planets:</label>
+                    <input type="range" id="num-planets" min="2" max="4" value="3" >
+                    <span id="num-planets-value">3</span>
+                </div>
+                <div class="control-item">
+                    <label>Input Speed (RPM):</label>
+                    <input type="range" id="input-speed-epicyclic" min="10" max="100" value="30">
+                    <span id="input-speed-epicyclic-value">30</span>
+                </div>
             </div>
         </div>
 

@@ -49,6 +49,9 @@ let sketch = new p5(function(p) {
         // Update and draw flow particles
         updateParticles();
         drawParticles();
+
+        // Draw info box
+        drawInfobox();
     };
 
     function initializeParticles() {
@@ -422,15 +425,47 @@ let sketch = new p5(function(p) {
         // Discharge height: h = (P_pump - losses) / (ρ * g)
         let remainingPressure = pumpPressure * 1000 - totalLoss * density * g; // Pa
         dischargeHeight = Math.max(0, remainingPressure / (density * g));
+    }
 
-        // Update display
-        document.getElementById("reynolds").textContent = reynolds.toFixed(0);
-        document.getElementById("flow-regime").textContent = reynolds < 2300 ? 'Laminar' : 'Turbulent';
-        document.getElementById("friction-factor").textContent = frictionFactor.toFixed(4);
-        document.getElementById("major-loss").textContent = majorLoss.toFixed(2);
-        document.getElementById("minor-loss").textContent = minorLoss.toFixed(2);
-        document.getElementById("total-loss").textContent = totalLoss.toFixed(2);
-        document.getElementById("discharge-height").textContent = dischargeHeight.toFixed(2);
+    function drawInfobox() {
+        // Draw semi-transparent info box in top-right corner
+        let boxWidth = 280;
+        let boxHeight = 160;
+        let boxX = p.width - boxWidth - 15;
+        let boxY = 15;
+
+        // Background
+        p.fill(255, 255, 255, 230);
+        p.stroke(100);
+        p.strokeWeight(1);
+        p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+        // Title
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.LEFT, p.TOP);
+        p.textSize(13);
+        p.textStyle(p.BOLD);
+        p.text('System Performance:', boxX + 10, boxY + 10);
+
+        // Info text
+        p.textStyle(p.NORMAL);
+        p.textSize(11);
+        let yPos = boxY + 30;
+        let lineHeight = 20;
+
+        let flowRegime = reynolds < 2300 ? 'Laminar' : 'Turbulent';
+        p.text('Reynolds Number: Re = ' + reynolds.toFixed(0) + ' (' + flowRegime + ')', boxX + 10, yPos);
+        yPos += lineHeight;
+        p.text('Friction Factor: f = ' + frictionFactor.toFixed(4), boxX + 10, yPos);
+        yPos += lineHeight;
+        p.text('Major Loss (friction): h_f = ' + majorLoss.toFixed(2) + ' m', boxX + 10, yPos);
+        yPos += lineHeight;
+        p.text('Minor Loss (fittings): h_L = ' + minorLoss.toFixed(2) + ' m', boxX + 10, yPos);
+        yPos += lineHeight;
+        p.text('Total Head Loss: h_total = ' + totalLoss.toFixed(2) + ' m', boxX + 10, yPos);
+        yPos += lineHeight;
+        p.text('Discharge Height: h = ' + dischargeHeight.toFixed(2) + ' m', boxX + 10, yPos);
     }
 
 }, 'sketch-holder');

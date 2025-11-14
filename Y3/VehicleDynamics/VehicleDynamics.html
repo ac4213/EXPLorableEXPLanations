@@ -11,6 +11,25 @@
     <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
+    <style>
+        /* Vehicle Dynamics specific: buttons side-by-side on large screens */
+        @media (min-width: 1025px) {
+            .simulation-section .controls-grid-2col .control-group:has(button) {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 10px !important;
+                align-items: center !important;
+                justify-content: center !important;
+                grid-column: 1 / -1 !important;
+                flex-wrap: nowrap !important;
+            }
+
+            .simulation-section .controls-grid-2col .control-group:has(button) button {
+                flex: 0 1 auto !important;
+                min-width: 120px !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -122,7 +141,7 @@
         <h2>Interactive Vehicle Dynamics Simulation</h2>
         <p>This simulation shows a top-down view of a vehicle performing various maneuvers. Adjust parameters to see how vehicle characteristics affect handling behavior.</p>
 
-        <div class="controls-container">
+        <div class="controls-grid-2col">
             <div class="control-group">
                 <label for="maneuver-type">Maneuver:</label>
                 <select id="maneuver-type">

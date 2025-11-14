@@ -14,6 +14,86 @@
     <link rel="stylesheet" href="/assets/css/quizzes.css">
     <link rel="stylesheet" href="/assets/css/simulations.css">
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
+    <!-- Page-specific styles -->
+    <style>
+        /* Billiards simulation controls layout */
+        .billiards-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .billiards-controls .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .billiards-controls .slider-row {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .billiards-controls .slider-container {
+            flex: 0 1 auto;
+            min-width: 280px;
+            margin: 0;
+        }
+
+        .billiards-controls .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .billiards-controls .slider-container input[type="range"] {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        /* Responsive design for billiards controls */
+        @media (max-width: 768px) {
+            .billiards-controls .slider-row {
+                gap: 15px;
+            }
+
+            .billiards-controls .slider-container {
+                min-width: 250px;
+                flex: 1 1 calc(50% - 8px);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .billiards-controls .slider-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .billiards-controls .slider-container {
+                min-width: 100%;
+                flex: 1 1 100%;
+            }
+
+            .billiards-controls .button-row {
+                gap: 10px;
+            }
+
+            .billiards-controls .button-row button {
+                flex: 1 1 auto;
+                min-width: 100px;
+            }
+        }
+    </style>
     <!-- Simulation Scripts -->
     <script src="billiards-simulation.js"></script>
     <script src="angular-momentum-simulation.js"></script>
@@ -219,50 +299,47 @@
             </div>
         </div>
         
-        <div class="controls">
-            <button id="reset-billiards">Reset</button>
-            <button id="run-collision">Run Collision</button>
-            <button id="toggle-vectors">Toggle Vectors</button>
-
-            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="mass-ratio">Mass Ratio (White/Blue):</label>
-                    <input type="range" id="mass-ratio" min="0.5" max="3" step="0.1" value="1">
-                    <span id="mass-ratio-value">1.0</span>
-                </div>
-
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="y-pos-white">Impact Offset (White Ball):</label>
-                    <input type="range" id="y-pos-white" min="50" max="350" step="5" value="200">
-                    <span id="y-pos-white-value">200</span>
-                </div>
+        <div class="controls billiards-controls">
+            <!-- Row 1: Buttons centered -->
+            <div class="button-group button-row">
+                <button id="reset-billiards">Reset</button>
+                <button id="run-collision">Run Collision</button>
+                <button id="toggle-vectors">Toggle Vectors</button>
             </div>
 
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="speed-white">White Ball Speed (m/s):</label>
+            <!-- Row 2: White ball speed, Blue ball speed -->
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="speed-white">White Ball Speed (m/s): <span id="speed-white-value" class="value-display">1.0 m/s</span></label>
                     <input type="range" id="speed-white" min="0" max="10" step="0.5" value="1">
-                    <span id="speed-white-value">1.0</span>
                 </div>
-
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="speed-blue">Blue Ball Speed (m/s):</label>
+                <div class="slider-container">
+                    <label for="speed-blue">Blue Ball Speed (m/s): <span id="speed-blue-value" class="value-display">1.0 m/s</span></label>
                     <input type="range" id="speed-blue" min="0" max="10" step="0.5" value="1">
-                    <span id="speed-blue-value">1.0</span>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="restitution">Coefficient of Restitution:</label>
-                    <input type="range" id="restitution" min="0" max="1" step="0.1" value="1">
-                    <span id="restitution-value">1.0</span>
+            <!-- Row 3: Mass ratio, Coefficient of restitution -->
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="mass-ratio">Mass Ratio (White/Blue): <span id="mass-ratio-value" class="value-display">1.0</span></label>
+                    <input type="range" id="mass-ratio" min="0.5" max="3" step="0.1" value="1">
                 </div>
+                <div class="slider-container">
+                    <label for="restitution">Coefficient of Restitution: <span id="restitution-value" class="value-display">1.0</span></label>
+                    <input type="range" id="restitution" min="0" max="1" step="0.1" value="1">
+                </div>
+            </div>
 
-                <div class="control-group" style="flex: 1; min-width: 250px;">
-                    <label for="time-scale">Animation Speed:</label>
+            <!-- Row 4: Impact offset, Animation speed -->
+            <div class="slider-row">
+                <div class="slider-container">
+                    <label for="y-pos-white">Impact Offset (White Ball): <span id="y-pos-white-value" class="value-display">200</span></label>
+                    <input type="range" id="y-pos-white" min="50" max="350" step="5" value="200">
+                </div>
+                <div class="slider-container">
+                    <label for="time-scale">Animation Speed: <span id="time-scale-value" class="value-display">1%</span></label>
                     <input type="range" id="time-scale" min="0.01" max="0.1" step="0.01" value="0.01">
-                    <span id="time-scale-value">1%</span>
                 </div>
             </div>
         </div>

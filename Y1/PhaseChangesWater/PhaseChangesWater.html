@@ -143,11 +143,6 @@
         </div>
 
         <div id="sketch-holder"></div>
-
-        <div class="results-panel" id="state-info">
-            <strong>State Point Information:</strong>
-            <div id="state-details">Select temperature and volume to see state properties...</div>
-        </div>
     </div>
 
     <!-- Section 3: Engineering Applications -->
@@ -498,9 +493,6 @@
 
                 // Draw piston animation at bottom-right
                 drawPistonAnimation();
-
-                // Update state information
-                updateStateInfo();
             };
 
             function setupControls() {
@@ -698,22 +690,6 @@
                     p.line(x, 60, x, p.height - 60);
                     p.line(60, y, p.width - 60, y);
                 }
-            }
-
-            function updateStateInfo() {
-                let pVal = getPressureFromTV(temperature, statePointV);
-                let phase = determinePhase(temperature, statePointV);
-                let quality = calculateQuality(temperature, statePointV);
-
-                let info = `<strong>Temperature:</strong> ${temperature} K (${(temperature - 273.15).toFixed(2)} °C)<br>`;
-                info += `<strong>Specific Volume:</strong> ${statePointV.toFixed(4)} m³/kg<br>`;
-                info += `<strong>Pressure:</strong> ${(pVal / 1e6).toFixed(3)} MPa<br>`;
-                info += `<strong>Phase:</strong> ${phase}<br>`;
-                if (quality !== null) {
-                    info += `<strong>Quality:</strong> ${quality.toFixed(3)} (${(quality * 100).toFixed(1)}% vapor)`;
-                }
-
-                document.getElementById('state-details').innerHTML = info;
             }
 
             function getSaturationPressure(T) {

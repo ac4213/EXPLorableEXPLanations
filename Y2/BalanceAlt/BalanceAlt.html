@@ -297,55 +297,41 @@
 
         <!-- Control Panel -->
         <div class="controls-panel">
-            <div class="controls-grid">
-                <div class="slider-container">
+            <div class="controls-grid-3col">
+                <div class="control-item">
                     <label for="crank-radius">Crank Radius r (mm):</label>
-                    <div class="slider-row">
-                        <input type="range" id="crank-radius" min="30" max="100" value="50" step="5">
-                        <span id="crank-radius-value" class="value-display">50</span>
-                    </div>
+                    <input type="range" id="crank-radius" min="30" max="100" value="50" step="5">
+                    <span id="crank-radius-value" class="value-display">50</span>
                 </div>
 
-                <div class="slider-container">
+                <div class="control-item">
                     <label for="rod-length">Connecting Rod Length l (mm):</label>
-                    <div class="slider-row">
-                        <input type="range" id="rod-length" min="100" max="300" value="200" step="10">
-                        <span id="rod-length-value" class="value-display">200</span>
-                    </div>
+                    <input type="range" id="rod-length" min="100" max="300" value="200" step="10">
+                    <span id="rod-length-value" class="value-display">200</span>
                 </div>
 
-                <div class="slider-container">
+                <div class="control-item">
                     <label for="recip-mass">Reciprocating Mass (kg):</label>
-                    <div class="slider-row">
-                        <input type="range" id="recip-mass" min="0.5" max="3" value="1.5" step="0.1">
-                        <span id="recip-mass-value" class="value-display">1.5</span>
-                    </div>
+                    <input type="range" id="recip-mass" min="0.5" max="3" value="1.5" step="0.1">
+                    <span id="recip-mass-value" class="value-display">1.5</span>
                 </div>
-            </div>
 
-            <div class="controls-grid">
-                <div class="slider-container">
+                <div class="control-item">
                     <label for="rpm">Engine Speed (RPM):</label>
-                    <div class="slider-row">
-                        <input type="range" id="rpm" min="300" max="6000" value="2000" step="100">
-                        <span id="rpm-value" class="value-display">2000</span>
-                    </div>
+                    <input type="range" id="rpm" min="300" max="6000" value="2000" step="100">
+                    <span id="rpm-value" class="value-display">2000</span>
                 </div>
 
-                <div class="slider-container">
+                <div class="control-item">
                     <label for="balance-fraction">Balance Fraction c:</label>
-                    <div class="slider-row">
-                        <input type="range" id="balance-fraction" min="0" max="1" value="0" step="0.05">
-                        <span id="balance-fraction-value" class="value-display">0.00</span>
-                    </div>
+                    <input type="range" id="balance-fraction" min="0" max="1" value="0" step="0.05">
+                    <span id="balance-fraction-value" class="value-display">0.00</span>
                 </div>
 
-                <div class="slider-container">
+                <div class="control-item">
                     <label for="force-scale">Force Vector Scale:</label>
-                    <div class="slider-row">
-                        <input type="range" id="force-scale" min="0.5" max="3" value="1" step="0.1">
-                        <span id="force-scale-value" class="value-display">1.0</span>
-                    </div>
+                    <input type="range" id="force-scale" min="0.5" max="3" value="1" step="0.1">
+                    <span id="force-scale-value" class="value-display">1.0</span>
                 </div>
             </div>
         </div>

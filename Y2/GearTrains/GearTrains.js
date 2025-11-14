@@ -1039,7 +1039,9 @@ const epicyclicGearSimulation = function(p) {
 
         p.text("Gear Ratio (Output/Input):", p.width - 270, yPos);
         yPos += 18;
-        p.text("  " + Math.abs(ratio).toFixed(2) + " (1:" + Math.abs(ratio).toFixed(2) + ")", p.width - 270, yPos);
+        let ratioDisplay = ratio.toFixed(2);
+        let directionLabel = ratio < 0 ? " (Reverse)" : " (Same direction)";
+        p.text("  " + ratioDisplay + directionLabel, p.width - 270, yPos);
         p.pop();
     };
 };

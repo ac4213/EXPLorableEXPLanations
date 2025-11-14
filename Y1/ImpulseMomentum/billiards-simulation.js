@@ -337,50 +337,60 @@ function initializeBilliardsSimulation() {
             p.textAlign(p.LEFT, p.TOP);
             p.textSize(11);
 
-            // Background for text - made smaller and more transparent
+            // Top-left: Initial Conditions (made shorter)
             p.fill(0, 0, 0, 100);
             p.noStroke();
-            p.rect(5, 5, 290, 165, 5);
-            
+            p.rect(5, 5, 290, 135, 5);
+
             p.fill(255);
             p.text('Initial Conditions:', 10, 10);
-            p.text(`  White: v₀ = ${whiteSpeed.toFixed(1)} m/s, θ = 0°`, 10, 30);
-            p.text(`  Blue:  v₀ = ${blueSpeed.toFixed(1)} m/s, θ = 180° (centred)`, 10, 50);
-            p.text(`  Mass Ratio (W/B): ${massRatio.toFixed(1)}`, 10, 70);
-            p.text(`  Coefficient of Restitution: ${restitution.toFixed(1)}`, 10, 90);
-            p.text(`  White Ball Y Offset: ${(whiteYPos - tableHeight/2).toFixed(0)} px`, 10, 110);
-            
-            if (hasCollided) {
-                p.fill(255, 255, 0);
-                p.text(`Impact Parameter b: ${collisionData.impactParameter.toFixed(2)}`, 10, 135);
-                p.text(`  (0 = head-on, 1 = grazing)`, 10, 155);
-                p.fill(255);
-                p.text('Final Velocities:', 10, 175);
-                p.text(`  White: v = ${collisionData.whiteFinal.v.toFixed(2)} m/s, θ = ${collisionData.whiteFinal.angle.toFixed(1)}°`, 10, 195);
-                p.text(`  Blue:  v = ${collisionData.blueFinal.v.toFixed(2)} m/s, θ = ${collisionData.blueFinal.angle.toFixed(1)}°`, 10, 215);
-            }
-            
-            // Display momentum and energy
+            p.text(`  White: v₀ = ${whiteSpeed.toFixed(1)} m/s, θ = 0°`, 10, 28);
+            p.text(`  Blue:  v₀ = ${blueSpeed.toFixed(1)} m/s, θ = 180°`, 10, 46);
+            p.text(`  Mass Ratio (W/B): ${massRatio.toFixed(1)}`, 10, 64);
+            p.text(`  Coeff. of Restitution: ${restitution.toFixed(1)}`, 10, 82);
+            p.text(`  Y Offset: ${(whiteYPos - tableHeight/2).toFixed(0)} px`, 10, 100);
+
+            // Top-right: Momentum and Energy (made taller)
             let totalMomentumX = whiteBall.mass * whiteBall.vel.x + blueBall.mass * blueBall.vel.x;
             let totalMomentumY = whiteBall.mass * whiteBall.vel.y + blueBall.mass * blueBall.vel.y;
             let totalMomentum = p.sqrt(totalMomentumX * totalMomentumX + totalMomentumY * totalMomentumY);
-            
+
             // Calculate kinetic energy
-            let kineticEnergy = 0.5 * whiteBall.mass * whiteBall.vel.magSq() + 
+            let kineticEnergy = 0.5 * whiteBall.mass * whiteBall.vel.magSq() +
                                0.5 * blueBall.mass * blueBall.vel.magSq();
             kineticEnergy = kineticEnergy / (pixelsPerMeter * pixelsPerMeter);
-            
+
             p.fill(0, 0, 0, 100);
             p.noStroke();
-            p.rect(tableWidth - 220, 5, 215, 90, 5);
-            
+            p.rect(tableWidth - 220, 5, 215, 145, 5);
+
             p.fill(255);
             p.textAlign(p.RIGHT, p.TOP);
-            p.text(`Total Momentum: ${(totalMomentum/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 10);
-            p.text(`Px: ${(totalMomentumX/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 30);
-            p.text(`Py: ${(totalMomentumY/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 50);
-            p.text(`Kinetic Energy: ${kineticEnergy.toFixed(2)} J`, tableWidth - 10, 70);
-            p.text(`Animation Speed: ${(timeScale * 100).toFixed(0)}%`, tableWidth - 10, 90);
+            p.text(`Total Momentum:`, tableWidth - 10, 10);
+            p.text(`${(totalMomentum/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 26);
+            p.text(`Px: ${(totalMomentumX/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 46);
+            p.text(`Py: ${(totalMomentumY/pixelsPerMeter).toFixed(2)} kg·m/s`, tableWidth - 10, 62);
+            p.text(`Kinetic Energy:`, tableWidth - 10, 82);
+            p.text(`${kineticEnergy.toFixed(2)} J`, tableWidth - 10, 98);
+            p.text(`Animation Speed: ${(timeScale * 100).toFixed(0)}%`, tableWidth - 10, 125);
+
+            // Bottom-right: Final Results (new infobox)
+            if (hasCollided) {
+                p.fill(0, 0, 0, 100);
+                p.noStroke();
+                p.rect(tableWidth - 220, tableHeight - 120, 215, 115, 5);
+
+                p.fill(255, 255, 0);
+                p.textAlign(p.RIGHT, p.TOP);
+                p.text(`Impact Parameter:`, tableWidth - 10, tableHeight - 115);
+                p.text(`b = ${collisionData.impactParameter.toFixed(2)}`, tableWidth - 10, tableHeight - 99);
+                p.text(`(0=head-on, 1=grazing)`, tableWidth - 10, tableHeight - 83);
+
+                p.fill(255);
+                p.text(`Final Velocities:`, tableWidth - 10, tableHeight - 60);
+                p.text(`White: ${collisionData.whiteFinal.v.toFixed(2)} m/s @ ${collisionData.whiteFinal.angle.toFixed(1)}°`, tableWidth - 10, tableHeight - 44);
+                p.text(`Blue: ${collisionData.blueFinal.v.toFixed(2)} m/s @ ${collisionData.blueFinal.angle.toFixed(1)}°`, tableWidth - 10, tableHeight - 28);
+            }
         }
 
         // External controls

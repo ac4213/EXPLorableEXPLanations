@@ -85,8 +85,8 @@
   <div class="simulation-container">
     <div class="simulation-title">Simulation 1: Plasticity Progression in Cross-Sections</div>
 
-    <div class="controls-panel">
-      <div class="control-row">
+    <div class="controls-grid-2col">
+      <div class="control-group">
         <label>Section Type:</label>
         <select id="sectionType1">
           <option value="rectangular">Rectangular</option>
@@ -94,18 +94,20 @@
           <option value="i-section">I-Section</option>
         </select>
       </div>
-      <div class="slider-row">
+      <div class="control-group">
         <label>Yield Stress (MPa):</label>
         <input type="range" id="yieldStress1" min="200" max="500" value="250" step="10"/>
         <span class="value-display" id="yieldValue1">250</span>
       </div>
-      <div class="slider-row">
+      <div class="control-group">
         <label>Bending Moment (kN·m):</label>
         <input type="range" id="momentSlider1" min="0" max="300" value="0" step="1"/>
         <span class="value-display" id="momentValue1">0</span>
       </div>
-      <button id="resetBtn1">Reset</button>
-      <div class="legend">
+      <div class="control-group">
+        <button id="resetBtn1">Reset</button>
+      </div>
+      <div class="legend" style="grid-column: 1 / -1;">
         <span class="chip-blue">Elastic</span>
         <span class="chip-red">Plastic</span>
         <span class="chip-grey">Yield ±σ<sub>y</sub></span>
@@ -151,23 +153,23 @@
   <div class="simulation-container">
     <div class="simulation-title">Simulation 2: Residual Stress Formation</div>
 
-    <div class="controls-panel">
-      <div class="slider-row">
+    <div class="controls-grid-2col">
+      <div class="control-group">
         <label>Fibre Position (y/h):</label>
         <input type="range" id="fibrePosition" min="-1" max="1" value="0.5" step="0.05"/>
         <span class="value-display" id="fibreValue">0.50</span>
       </div>
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button id="loadBtn">Load</button>
-        <button id="unloadBtn" disabled>Unload to 0</button>
-        <button id="resetBtn2">Reset</button>
-      </div>
-      <div class="slider-row">
+      <div class="control-group">
         <label>Applied Moment (kN·m):</label>
         <input type="range" id="momentSlider2" min="0" max="300" value="0" step="1" disabled/>
         <span class="value-display" id="momentValue2">0</span>
       </div>
-      <div class="legend">
+      <div class="control-group">
+        <button id="loadBtn">Load</button>
+        <button id="unloadBtn" disabled>Unload to 0</button>
+        <button id="resetBtn2">Reset</button>
+      </div>
+      <div class="legend" style="grid-column: 1 / -1;">
         <span class="chip-blue">Current stress (loading)</span>
         <span class="chip-red">Residual (after unload)</span>
       </div>

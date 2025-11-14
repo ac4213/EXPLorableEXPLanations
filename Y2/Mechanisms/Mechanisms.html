@@ -64,6 +64,15 @@
         .pause-button.paused {
             background-color: #f44336;
         }
+
+        .diagram-infobox {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+        }
     </style>
 </head>
 <body>
@@ -224,29 +233,31 @@
         
         <div class="simulation-container">
             <div id="fourbar-sketch"></div>
-            <div class="controls">
-                <div class="control-group">
+            <div class="controls-grid-2col">
+                <div class="control-item">
                     <label for="fourbar-omega">Angular Velocity (ω)</label>
                     <input type="range" id="fourbar-omega" min="-5" max="5" step="0.1" value="2">
                     <span class="value-display" id="fourbar-omega-display">2.0 rad/s</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label for="fourbar-alpha">Angular Acceleration (α)</label>
                     <input type="range" id="fourbar-alpha" min="-5" max="5" step="0.1" value="0">
                     <span class="value-display" id="fourbar-alpha-display">0.0 rad/s²</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="fourbar-show-velocity"> Show Velocity
                     </label>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="fourbar-show-acceleration"> Show Acceleration
                     </label>
                 </div>
-                <button id="fourbar-pause" class="pause-button">Pause</button>
-                <button id="fourbar-reset">Reset</button>
+                <div class="control-item">
+                    <button id="fourbar-pause" class="pause-button">Pause</button>
+                    <button id="fourbar-reset">Reset</button>
+                </div>
             </div>
             <div class="diagram-legend">
                 <div class="legend-item">
@@ -269,29 +280,31 @@
         
         <div class="simulation-container">
             <div id="slidercrank-sketch"></div>
-            <div class="controls">
-                <div class="control-group">
+            <div class="controls-grid-2col">
+                <div class="control-item">
                     <label for="slidercrank-omega">Angular Velocity (ω)</label>
                     <input type="range" id="slidercrank-omega" min="-5" max="5" step="0.1" value="3">
                     <span class="value-display" id="slidercrank-omega-display">3.0 rad/s</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label for="slidercrank-alpha">Angular Acceleration (α)</label>
                     <input type="range" id="slidercrank-alpha" min="-5" max="5" step="0.1" value="0">
                     <span class="value-display" id="slidercrank-alpha-display">0.0 rad/s²</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="slidercrank-show-velocity"> Show Velocity
                     </label>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="slidercrank-show-acceleration"> Show Acceleration
                     </label>
                 </div>
-                <button id="slidercrank-pause" class="pause-button">Pause</button>
-                <button id="slidercrank-reset">Reset</button>
+                <div class="control-item">
+                    <button id="slidercrank-pause" class="pause-button">Pause</button>
+                    <button id="slidercrank-reset">Reset</button>
+                </div>
             </div>
             <div class="diagram-legend">
                 <div class="legend-item">
@@ -314,29 +327,31 @@
         
         <div class="simulation-container">
             <div id="quickreturn-sketch"></div>
-            <div class="controls">
-                <div class="control-group">
+            <div class="controls-grid-2col">
+                <div class="control-item">
                     <label for="quickreturn-omega">Angular Velocity (ω)</label>
                     <input type="range" id="quickreturn-omega" min="-5" max="5" step="0.1" value="1">
                     <span class="value-display" id="quickreturn-omega-display">1.0 rad/s</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label for="quickreturn-alpha">Angular Acceleration (α)</label>
                     <input type="range" id="quickreturn-alpha" min="-5" max="5" step="0.1" value="0">
                     <span class="value-display" id="quickreturn-alpha-display">0.0 rad/s²</span>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="quickreturn-show-velocity"> Show Velocity
                     </label>
                 </div>
-                <div class="control-group">
+                <div class="control-item">
                     <label>
                         <input type="checkbox" id="quickreturn-show-acceleration"> Show Acceleration
                     </label>
                 </div>
-                <button id="quickreturn-pause" class="pause-button">Pause</button>
-                <button id="quickreturn-reset">Reset</button>
+                <div class="control-item">
+                    <button id="quickreturn-pause" class="pause-button">Pause</button>
+                    <button id="quickreturn-reset">Reset</button>
+                </div>
             </div>
             <div class="diagram-legend">
                 <div class="legend-item">
@@ -735,33 +750,43 @@
                 p.ellipse(A.x, A.y, 10, 10);
                 p.ellipse(B.x, B.y, 10, 10);
 
+                // Draw point labels
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.CENTER, p.BOTTOM);
+                p.textSize(12);
+                p.text('O₁', O1.x, O1.y - 10);
+                p.text('D', O4.x, O4.y - 10);
+                p.text('A', A.x, A.y - 8);
+                p.text('B,C', B.x, B.y - 8);
+
+                // Calculate velocities and angular velocities for diagrams
+                let vAx = -omega * A.y;
+                let vAy = omega * A.x;
+                let vBx = 0, vBy = 0;
+                let omega3 = 0, omega4 = 0;
+                let rAB = p.createVector(B.x - A.x, B.y - A.y);
+                let rB = p.createVector(B.x - O4.x, B.y - O4.y);
+
+                let M = [
+                    [-rAB.y, rB.y],
+                    [rAB.x, -rB.x]
+                ];
+                let rhs = [-vAx, -vAy];
+                let det = M[0][0]*M[1][1] - M[0][1]*M[1][0];
+
+                if (Math.abs(det) > 0.001) {
+                    omega3 = (rhs[0]*M[1][1] - rhs[1]*M[0][1]) / det;
+                    omega4 = (M[0][0]*rhs[1] - M[1][0]*rhs[0]) / det;
+                    vBx = -omega4 * rB.y;
+                    vBy = omega4 * rB.x;
+                }
+
                 // Velocity Analysis
                 if (showVelocity) {
                     p.strokeWeight(2);
-                    let vAx = -omega * A.y;
-                    let vAy = omega * A.x;
-
                     drawArrow(p, A.x, A.y, A.x + vAx * 0.5 * SCALE, A.y + vAy * 0.5 * SCALE, [0,170,0]);
-
-                    // Calculate velocity of B
-                    let rAB = p.createVector(B.x - A.x, B.y - A.y);
-                    let rB = p.createVector(B.x - O4.x, B.y - O4.y);
-
-                    let M = [
-                        [-rAB.y, rB.y],
-                        [rAB.x, -rB.x]
-                    ];
-                    let rhs = [-vAx, -vAy];
-                    let det = M[0][0]*M[1][1] - M[0][1]*M[1][0];
-
-                    if (Math.abs(det) > 0.001) {
-                        let omega3 = (rhs[0]*M[1][1] - rhs[1]*M[0][1]) / det;
-                        let omega4 = (M[0][0]*rhs[1] - M[1][0]*rhs[0]) / det;
-
-                        let vBx = -omega4 * rB.y;
-                        let vBy = omega4 * rB.x;
-                        drawArrow(p, B.x, B.y, B.x + vBx * 0.5 * SCALE, B.y + vBy * 0.5 * SCALE, [0,170,0]);
-                    }
+                    drawArrow(p, B.x, B.y, B.x + vBx * 0.5 * SCALE, B.y + vBy * 0.5 * SCALE, [0,170,0]);
                 }
 
                 // Acceleration Analysis
@@ -819,10 +844,73 @@
                 p.text(`θ₂ = ${(theta % (2*p.PI)).toFixed(2)} rad`, -canvasWidth * 0.2, textY);
                 p.text(`ω₂ = ${omega.toFixed(2)} rad/s`, -canvasWidth * 0.2, textY + 20);
                 p.text(`α₂ = ${alpha.toFixed(2)} rad/s²`, -canvasWidth * 0.2, textY + 40);
-                
+
                 if (isPaused) {
                     p.fill(255, 0, 0);
                     p.text("PAUSED", -canvasWidth * 0.2, textY + 60);
+                }
+
+                // Velocity Diagram Info Box (top right)
+                if (showVelocity) {
+                    let vA_mag = p.sqrt(vAx * vAx + vAy * vAy);
+                    let vB_mag = p.sqrt(vBx * vBx + vBy * vBy);
+                    let vCB_mag = p.sqrt((vBx - vAx) * (vBx - vAx) + (vBy - vAy) * (vBy - vAy));
+
+                    p.fill(255);
+                    p.stroke(0);
+                    p.strokeWeight(2);
+                    p.rect(canvasWidth * 0.25, -canvasHeight * 0.45, canvasWidth * 0.3, canvasHeight * 0.35);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(11);
+                    let boxX = canvasWidth * 0.27;
+                    let boxY = -canvasHeight * 0.42;
+                    p.text('Velocity Diagram', boxX, boxY);
+                    p.textSize(10);
+                    p.text(`V_A = ${vA_mag.toFixed(2)}`, boxX, boxY + 18);
+                    p.text(`V_B = ${vB_mag.toFixed(2)}`, boxX, boxY + 32);
+                    p.text(`V_{CB} = ${vCB_mag.toFixed(2)}`, boxX, boxY + 46);
+                    p.text(`ω₃ = ${omega3.toFixed(2)} rad/s`, boxX, boxY + 62);
+                    p.text(`ω₄ = ${omega4.toFixed(2)} rad/s`, boxX, boxY + 76);
+                }
+
+                // Acceleration Diagram Info Box (bottom right)
+                if (showAcceleration) {
+                    // Calculate accelerations
+                    let aAtx = -alpha * A.y;
+                    let aAty = alpha * A.x;
+                    let aAcx = -omega * omega * A.x;
+                    let aAcy = -omega * omega * A.y;
+                    let aAx_total = aAtx + aAcx;
+                    let aAy_total = aAty + aAcy;
+
+                    // Point B acceleration (from rocker link rotation)
+                    let aBcx = -omega4 * omega4 * rB.x;
+                    let aBcy = -omega4 * omega4 * rB.y;
+
+                    let aA_mag = p.sqrt(aAx_total * aAx_total + aAy_total * aAy_total);
+                    let aB_mag = p.sqrt(aBcx * aBcx + aBcy * aBcy);
+                    let aCB_c = omega4 * omega4 * rAB.mag();
+
+                    p.fill(255);
+                    p.stroke(0);
+                    p.strokeWeight(2);
+                    p.rect(canvasWidth * 0.25, canvasHeight * 0.1, canvasWidth * 0.3, canvasHeight * 0.35);
+
+                    p.fill(0);
+                    p.noStroke();
+                    p.textAlign(p.LEFT, p.TOP);
+                    p.textSize(11);
+                    let boxX = canvasWidth * 0.27;
+                    let boxY = canvasHeight * 0.13;
+                    p.text('Acceleration Diagram', boxX, boxY);
+                    p.textSize(10);
+                    p.text(`a_A = ${aA_mag.toFixed(2)}`, boxX, boxY + 18);
+                    p.text(`a_B = ${aB_mag.toFixed(2)}`, boxX, boxY + 32);
+                    p.text(`a^c_{CB} = ${aCB_c.toFixed(2)}`, boxX, boxY + 46);
+                    p.text(`(a^t_{CB} ≈ 0)`, boxX, boxY + 60);
                 }
             };
 
@@ -979,35 +1067,45 @@ let slidercrankSketch = function(p) {
         p.ellipse(0, 0, 10 * SCALE, 10 * SCALE);
         p.ellipse(Ax, Ay, 10 * SCALE, 10 * SCALE);
         p.ellipse(s, 0, 10 * SCALE, 10 * SCALE);
-        
+
+        // Draw point labels
+        p.fill(0);
+        p.noStroke();
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.textSize(12);
+        p.text('A (fixed)', 0, -8);
+        p.text('B', Ax, Ay - 8);
+        p.text('C', s, -8);
+
+        // Calculate velocities
+        let vAx = -omega * radius * p.sin(theta);
+        let vAy = omega * radius * p.cos(theta);
+        let vs = -radius * omega * (p.sin(theta) + radius * p.sin(2*theta)/(2*length*p.cos(beta)));
+
         // Velocity vectors
         if (showVelocity) {
             p.stroke(0, 170, 0);
             p.strokeWeight(2);
-            
-            let vAx = -omega * radius * p.sin(theta);
-            let vAy = omega * radius * p.cos(theta);
             drawArrow(p, Ax, Ay, Ax + vAx * SCALE, Ay + vAy * SCALE);
-            
-            let vs = -radius * omega * (p.sin(theta) + radius * p.sin(2*theta)/(2*length*p.cos(beta)));
             drawArrow(p, s, 0, s + vs * SCALE, 0);
         }
         
         // Acceleration vectors
+        let aAtx = 0, aAty = 0, aAcx = 0, aAcy = 0, as = 0;
         if (showAcceleration) {
             p.stroke(255, 0, 0);
             p.strokeWeight(2);
-            
-            let aAtx = -alpha * radius * p.sin(theta);
-            let aAty = alpha * radius * p.cos(theta);
-            let aAcx = -omega * omega * radius * p.cos(theta);
-            let aAcy = -omega * omega * radius * p.sin(theta);
+
+            aAtx = -alpha * radius * p.sin(theta);
+            aAty = alpha * radius * p.cos(theta);
+            aAcx = -omega * omega * radius * p.cos(theta);
+            aAcy = -omega * omega * radius * p.sin(theta);
             drawArrow(p, Ax, Ay, Ax + (aAtx + aAcx) * SCALE * 0.5, Ay + (aAty + aAcy) * SCALE * 0.5);
-            
-            let as = -radius * (alpha * p.sin(theta) + omega * omega * p.cos(theta));
+
+            as = -radius * (alpha * p.sin(theta) + omega * omega * p.cos(theta));
             drawArrow(p, s, 0, s + as * SCALE * 0.5, 0);
         }
-        
+
         // Display values
         p.fill(0);
         p.noStroke();
@@ -1018,10 +1116,64 @@ let slidercrankSketch = function(p) {
         p.text(`ω = ${omega.toFixed(1)} rad/s`, textX, textY + 20);
         p.text(`α = ${alpha.toFixed(1)} rad/s²`, textX, textY + 40);
         p.text(`Piston = ${(s/SCALE).toFixed(1)} mm`, textX, textY + 60);
-        
+
         if (isPaused) {
             p.fill(255, 0, 0);
             p.text("PAUSED", textX, textY + 80);
+        }
+
+        // Velocity Diagram Info Box (top right)
+        if (showVelocity) {
+            let vA_mag = p.sqrt(vAx * vAx + vAy * vAy);
+            let vC_mag = p.abs(vs);
+            let vBC_mag = p.sqrt((vs - vAx) * (vs - vAx) + (0 - vAy) * (0 - vAy));
+
+            p.fill(255);
+            p.stroke(0);
+            p.strokeWeight(2);
+            p.rect(canvasWidth * 0.2, -canvasHeight * 0.45, canvasWidth * 0.28, canvasHeight * 0.3);
+
+            p.fill(0);
+            p.noStroke();
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(11);
+            let boxX = canvasWidth * 0.22;
+            let boxY = -canvasHeight * 0.42;
+            p.text('Velocity Diagram', boxX, boxY);
+            p.textSize(10);
+            p.text(`V_B = ${vA_mag.toFixed(2)}`, boxX, boxY + 18);
+            p.text(`V_C = ${vC_mag.toFixed(2)}`, boxX, boxY + 32);
+            p.text(`V_{BC} = ${vBC_mag.toFixed(2)}`, boxX, boxY + 46);
+        }
+
+        // Acceleration Diagram Info Box (bottom right)
+        if (showAcceleration) {
+            let aA_mag = p.sqrt((aAtx + aAcx) * (aAtx + aAcx) + (aAty + aAcy) * (aAty + aAcy));
+            let aC_mag = p.abs(as);
+            let aA_tang = p.sqrt(aAtx * aAtx + aAty * aAty);
+            let aA_cent = p.sqrt(aAcx * aAcx + aAcy * aAcy);
+            let aC_tang = p.abs(alpha * radius);
+            let aC_cent = omega * omega * radius;
+
+            p.fill(255);
+            p.stroke(0);
+            p.strokeWeight(2);
+            p.rect(canvasWidth * 0.2, canvasHeight * 0.1, canvasWidth * 0.28, canvasHeight * 0.35);
+
+            p.fill(0);
+            p.noStroke();
+            p.textAlign(p.LEFT, p.TOP);
+            p.textSize(11);
+            let boxX = canvasWidth * 0.22;
+            let boxY = canvasHeight * 0.13;
+            p.text('Acceleration Diagram', boxX, boxY);
+            p.textSize(10);
+            p.text(`a_B = ${aA_mag.toFixed(2)}`, boxX, boxY + 18);
+            p.text(`a^t_B = ${aA_tang.toFixed(2)}`, boxX, boxY + 32);
+            p.text(`a^c_B = ${aA_cent.toFixed(2)}`, boxX, boxY + 46);
+            p.text(`a_C = ${aC_mag.toFixed(2)}`, boxX, boxY + 62);
+            p.text(`a^t_C = ${aC_tang.toFixed(2)}`, boxX, boxY + 76);
+            p.text(`a^c_C = ${aC_cent.toFixed(2)}`, boxX, boxY + 90);
         }
     };
     

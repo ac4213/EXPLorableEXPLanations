@@ -145,49 +145,51 @@
         <div id="heat-sketch"></div>
 
         <div class="controls-panel">
-            <div class="control-row">
-                <label>Hot Side Temperature (°C):</label>
-                <input type="range" id="temp-hot-slider" min="20" max="100" step="1" value="80">
-                <span id="temp-hot-value">80 °C</span>
-            </div>
+            <div class="controls-grid controls-grid-3col">
+                <div class="control-group">
+                    <label>Hot Side Temperature (°C):</label>
+                    <input type="range" id="temp-hot-slider" min="20" max="100" step="1" value="80">
+                    <span id="temp-hot-value">80 °C</span>
+                </div>
 
-            <div class="control-row">
-                <label>Cold Side Temperature (°C):</label>
-                <input type="range" id="temp-cold-slider" min="-20" max="30" step="1" value="20">
-                <span id="temp-cold-value">20 °C</span>
-            </div>
+                <div class="control-group">
+                    <label>Cold Side Temperature (°C):</label>
+                    <input type="range" id="temp-cold-slider" min="-20" max="30" step="1" value="20">
+                    <span id="temp-cold-value">20 °C</span>
+                </div>
 
-            <div class="control-row">
-                <label>Wall Thickness (cm):</label>
-                <input type="range" id="thickness-slider" min="5" max="50" step="1" value="20">
-                <span id="thickness-value">20 cm</span>
-            </div>
+                <div class="control-group">
+                    <label>Wall Thickness (cm):</label>
+                    <input type="range" id="thickness-slider" min="5" max="50" step="1" value="20">
+                    <span id="thickness-value">20 cm</span>
+                </div>
 
-            <div class="control-row">
-                <label>Thermal Conductivity (W/m·K):</label>
-                <input type="range" id="conductivity-slider" min="0.02" max="2.0" step="0.02" value="0.5">
-                <span id="conductivity-value">0.50 W/m·K</span>
-            </div>
+                <div class="control-group">
+                    <label>Thermal Conductivity (W/m·K):</label>
+                    <input type="range" id="conductivity-slider" min="0.02" max="2.0" step="0.02" value="0.5">
+                    <span id="conductivity-value">0.50 W/m·K</span>
+                </div>
 
-            <div class="control-row" id="conv-h-control" style="display:none;">
-                <label>Convection Coefficient (W/m²·K):</label>
-                <input type="range" id="conv-h-slider" min="5" max="50" step="1" value="10">
-                <span id="conv-h-value">10 W/m²·K</span>
-            </div>
+                <div class="control-group" id="conv-h-control" style="display:none;">
+                    <label>Convection Coefficient (W/m²·K):</label>
+                    <input type="range" id="conv-h-slider" min="5" max="50" step="1" value="10">
+                    <span id="conv-h-value">10 W/m²·K</span>
+                </div>
 
-            <div class="control-row" id="emissivity-control" style="display:none;">
-                <label>Emissivity (ε):</label>
-                <input type="range" id="emissivity-slider" min="0.05" max="1.0" step="0.05" value="0.9">
-                <span id="emissivity-value">0.90</span>
+                <div class="control-group" id="emissivity-control" style="display:none;">
+                    <label>Emissivity (ε):</label>
+                    <input type="range" id="emissivity-slider" min="0.05" max="1.0" step="0.05" value="0.9">
+                    <span id="emissivity-value">0.90</span>
+                </div>
             </div>
         </div>
 
-        <div class="results-panel">
-            <h3>Heat Transfer Analysis:</h3>
-            <p><strong>Heat Flux:</strong> q = <span id="heat-flux-display">150</span> W/m²</p>
-            <p><strong>Total Heat Transfer (1 m² area):</strong> Q = <span id="heat-total-display">150</span> W</p>
-            <p><strong>Thermal Resistance:</strong> R<sub>total</sub> = <span id="resistance-display">0.40</span> m²·K/W</p>
-            <p><strong>Temperature Drop Across Wall:</strong> ΔT = <span id="temp-drop-display">60</span> °C</p>
+        <!-- Hidden elements to store calculated values -->
+        <div style="display:none;">
+            <span id="heat-flux-display">150</span>
+            <span id="heat-total-display">150</span>
+            <span id="resistance-display">0.40</span>
+            <span id="temp-drop-display">60</span>
         </div>
     </div>
 
@@ -544,6 +546,9 @@
 
                 // Draw labels and legend
                 drawLabelsAndLegend(p);
+
+                // Draw info box
+                drawInfobox(p);
             };
 
             function drawWall(p) {
@@ -667,6 +672,37 @@
                 if (transferMode === 'radiation') {
                     p.text(`ε = ${emissivity.toFixed(2)}`, 50, 115);
                 }
+            }
+
+            function drawInfobox(p) {
+                const boxX = 490;
+                const boxY = 50;
+                const boxWidth = 200;
+                const boxHeight = 120;
+
+                // Semi-transparent white background
+                p.fill(255, 255, 255, 230);
+                p.stroke(0);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Text content
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT);
+                p.textSize(13);
+                p.text('Heat Transfer Analysis', boxX + 10, boxY + 20);
+
+                p.textSize(11);
+                const heatFlux = parseFloat(document.getElementById('heat-flux-display').textContent);
+                const heatTotal = parseFloat(document.getElementById('heat-total-display').textContent);
+                const resistance = parseFloat(document.getElementById('resistance-display').textContent);
+                const tempDrop = parseFloat(document.getElementById('temp-drop-display').textContent);
+
+                p.text(`q = ${heatFlux.toFixed(1)} W/m²`, boxX + 10, boxY + 40);
+                p.text(`Q = ${heatTotal.toFixed(1)} W (1 m²)`, boxX + 10, boxY + 58);
+                p.text(`R = ${resistance.toFixed(3)} m²·K/W`, boxX + 10, boxY + 76);
+                p.text(`ΔT = ${tempDrop.toFixed(1)} °C`, boxX + 10, boxY + 94);
             }
 
             function calculateHeatTransfer() {

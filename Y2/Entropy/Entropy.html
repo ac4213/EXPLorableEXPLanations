@@ -104,36 +104,19 @@
         <p>Explore the ideal reversible heat engine operating between two thermal reservoirs. The Carnot cycle represents the maximum possible efficiency for any heat engine and demonstrates fundamental principles of entropy.</p>
 
         <!-- Control Panel -->
-        <div class="controls-panel">
-            <div class="controls-grid-2col">
-                <div class="slider-container">
-                    <label for="thot">Hot Reservoir Temperature (K):</label>
-                    <div class="slider-row">
-                        <input type="range" id="thot" min="400" max="1000" value="600">
-                        <span id="thot-value" class="value-display">600</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label for="tcold">Cold Reservoir Temperature (K):</label>
-                    <div class="slider-row">
-                        <input type="range" id="tcold" min="200" max="400" value="300">
-                        <span id="tcold-value" class="value-display">300</span>
-                    </div>
-                </div>
+        <div class="controls-grid">
+            <div class="slider-container">
+                <label for="thot">Hot Reservoir Temperature: <span id="thot-value" class="value-display">600</span> K</label>
+                <input type="range" id="thot" min="400" max="1000" value="600" class="slider">
+            </div>
+            <div class="slider-container">
+                <label for="tcold">Cold Reservoir Temperature: <span id="tcold-value" class="value-display">300</span> K</label>
+                <input type="range" id="tcold" min="200" max="400" value="300" class="slider">
             </div>
         </div>
 
         <!-- Canvas Holder -->
         <div id="carnot-sketch"></div>
-
-        <!-- Results Panel -->
-        <div class="results-panel">
-            <p><strong>Carnot Efficiency:</strong> <span id="carnot-efficiency">50.0</span>%</p>
-            <p><strong>Heat Input (Q<sub>H</sub>):</strong> <span id="qh-display">1000</span> J</p>
-            <p><strong>Heat Rejected (Q<sub>C</sub>):</strong> <span id="qc-display">500</span> J</p>
-            <p><strong>Work Output (W):</strong> <span id="w-display">500</span> J</p>
-            <p><strong>Entropy Change (Cycle):</strong> <span id="ds-cycle">0</span> J/K (for complete cycle)</p>
-        </div>
 
         <div class="key-point">
             <p><strong>Key Observation:</strong> The Carnot efficiency depends only on the temperatures of the hot and cold reservoirs: \(\eta_{Carnot} = 1 - \frac{T_C}{T_H}\). No real heat engine can exceed this efficiency!</p>
@@ -146,43 +129,23 @@
         <p>Compare reversible and irreversible heat transfer processes. Move the slider to see how temperature gradients lead to entropy generation.</p>
 
         <!-- Control Panel -->
-        <div class="controls-panel">
-            <div class="controls-grid-2col">
-                <div class="slider-container">
-                    <label for="t1">Initial Temperature (K):</label>
-                    <div class="slider-row">
-                        <input type="range" id="t1" min="300" max="800" value="600">
-                        <span id="t1-value" class="value-display">600</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label for="t2">Final Temperature (K):</label>
-                    <div class="slider-row">
-                        <input type="range" id="t2" min="300" max="800" value="400">
-                        <span id="t2-value" class="value-display">400</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label for="heat-transfer">Heat Transfer (J):</label>
-                    <div class="slider-row">
-                        <input type="range" id="heat-transfer" min="100" max="5000" step="100" value="1000">
-                        <span id="heat-value" class="value-display">1000</span>
-                    </div>
-                </div>
+        <div class="controls-grid">
+            <div class="slider-container">
+                <label for="t1">Initial Temperature: <span id="t1-value" class="value-display">600</span> K</label>
+                <input type="range" id="t1" min="300" max="800" value="600" class="slider">
+            </div>
+            <div class="slider-container">
+                <label for="t2">Final Temperature: <span id="t2-value" class="value-display">400</span> K</label>
+                <input type="range" id="t2" min="300" max="800" value="400" class="slider">
+            </div>
+            <div class="slider-container">
+                <label for="heat-transfer">Heat Transfer: <span id="heat-value" class="value-display">1000</span> J</label>
+                <input type="range" id="heat-transfer" min="100" max="5000" step="100" value="1000" class="slider">
             </div>
         </div>
 
         <!-- Canvas Holder -->
         <div id="entropy-sketch"></div>
-
-        <!-- Results Panel -->
-        <div class="results-panel-blue">
-            <p><strong>Reversible Process (through intermediate reservoirs):</strong></p>
-            <p>Entropy Change: <span id="ds-rev">0.00</span> J/K</p>
-            <p><strong>Irreversible Process (direct heat transfer):</strong></p>
-            <p>Entropy Generated: <span id="ds-irrev">0.00</span> J/K</p>
-            <p class="status-error" id="irrev-status"><strong>Irreversibility always generates entropy!</strong></p>
-        </div>
     </div>
 
     <!-- Section 4: Interactive Simulation 3 - Gas Expansion -->
@@ -191,38 +154,25 @@
         <p>Observe how a gas spontaneously expands into a vacuum, increasing entropy even though no heat is transferred.</p>
 
         <!-- Control Panel -->
-        <div class="controls-panel">
-            <div class="controls-grid-2col">
-                <div class="slider-container">
-                    <label for="v-ratio">Volume Ratio (V<sub>final</sub>/V<sub>initial</sub>):</label>
-                    <div class="slider-row">
-                        <input type="range" id="v-ratio" min="1" max="10" step="0.5" value="2">
-                        <span id="v-ratio-value" class="value-display">2.0</span>
-                    </div>
-                </div>
-                <div class="slider-container">
-                    <label for="num-particles">Number of Particles:</label>
-                    <div class="slider-row">
-                        <input type="range" id="num-particles" min="10" max="100" step="10" value="50">
-                        <span id="particles-value" class="value-display">50</span>
-                    </div>
-                </div>
+        <div class="controls-grid">
+            <div class="slider-container">
+                <label for="v-ratio">Volume Ratio (V<sub>final</sub>/V<sub>initial</sub>): <span id="v-ratio-value" class="value-display">2.0</span></label>
+                <input type="range" id="v-ratio" min="1" max="10" step="0.5" value="2" class="slider">
             </div>
-            <div id="button-container">
-                <button id="expand-btn" class="control-button">Remove Partition</button>
-                <button id="reset-expansion-btn" class="control-button">Reset</button>
+            <div class="slider-container">
+                <label for="num-particles">Number of Particles: <span id="particles-value" class="value-display">50</span></label>
+                <input type="range" id="num-particles" min="10" max="100" step="10" value="50" class="slider">
+            </div>
+            <div class="slider-container" style="grid-column: 1 / -1;">
+                <div id="button-container" style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="expand-btn" class="control-button">Remove Partition</button>
+                    <button id="reset-expansion-btn" class="control-button">Reset</button>
+                </div>
             </div>
         </div>
 
         <!-- Canvas Holder -->
         <div id="expansion-sketch"></div>
-
-        <!-- Results Panel -->
-        <div class="results-panel-green">
-            <p><strong>Entropy Change per Mole:</strong></p>
-            <p>\(\Delta S = nR\ln(V_2/V_1) = \) <span id="entropy-expansion">0.00</span> J/(mol·K)</p>
-            <p><strong>This process is spontaneous and irreversible!</strong></p>
-        </div>
     </div>
 
     <!-- Section 5: Engineering Applications -->
@@ -587,6 +537,12 @@
             let animationPhase = 0;
             let animating = false;
 
+            // Info box data
+            let efficiency = 0;
+            let QH = 0;
+            let QC = 0;
+            let W = 0;
+
             p.setup = function() {
                 let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 500);
                 canvas.parent('carnot-sketch');
@@ -648,6 +604,9 @@
 
                 // Draw PV diagram
                 drawPVDiagram(p);
+
+                // Draw info box
+                drawInfobox();
             };
 
             function drawArrow(p, x1, y1, x2, y2, col, label) {
@@ -762,16 +721,48 @@
             }
 
             function updateCarnotResults() {
-                let efficiency = (1 - Tcold / Thot) * 100;
-                let QH = 1000;
-                let W = efficiency / 100 * QH;
-                let QC = QH - W;
+                efficiency = (1 - Tcold / Thot) * 100;
+                QH = 1000;
+                W = efficiency / 100 * QH;
+                QC = QH - W;
+            }
 
-                document.getElementById('carnot-efficiency').textContent = efficiency.toFixed(1);
-                document.getElementById('qh-display').textContent = QH.toFixed(0);
-                document.getElementById('qc-display').textContent = QC.toFixed(0);
-                document.getElementById('w-display').textContent = W.toFixed(0);
-                document.getElementById('ds-cycle').textContent = '0.00';
+            function drawInfobox() {
+                // Draw semi-transparent info box in top-left corner
+                let boxWidth = 280;
+                let boxHeight = 140;
+                let boxX = 15;
+                let boxY = 15;
+
+                // Background
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(12);
+                p.textStyle(p.BOLD);
+                p.text('Carnot Cycle Performance:', boxX + 10, boxY + 10);
+
+                // Info text
+                p.textStyle(p.NORMAL);
+                p.textSize(11);
+                let yPos = boxY + 30;
+                let lineHeight = 20;
+
+                p.text('Carnot Efficiency: ' + efficiency.toFixed(1) + '%', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Heat Input (Q_H): ' + QH.toFixed(0) + ' J', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Heat Rejected (Q_C): ' + QC.toFixed(0) + ' J', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Work Output (W): ' + W.toFixed(0) + ' J', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Entropy Change (Cycle): 0.00 J/K', boxX + 10, yPos);
             }
         }, 'carnot-sketch');
 
@@ -782,6 +773,10 @@
             let T1 = 600;
             let T2 = 400;
             let Q = 1000;
+
+            // Info box data
+            let dS_rev = 0;
+            let dS_irrev = 0;
 
             p.setup = function() {
                 let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 400);
@@ -856,6 +851,9 @@
                     p.noStroke();
                     p.text('Thermal Equilibrium - No heat transfer', 400, centerY + 100);
                 }
+
+                // Draw info box
+                drawInfobox();
             };
 
             function drawHeatArrow(p, x1, y1, x2, y2) {
@@ -886,16 +884,48 @@
 
             function updateEntropyResults() {
                 // Reversible process (isothermal at average temperature)
-                let Tavg = (T1 + T2) / 2;
-                let dS_rev = 0; // For complete cycle
+                dS_rev = 0; // For complete cycle
 
                 // Irreversible process (direct heat transfer)
                 let dS1 = -Q / T1; // Body 1 loses heat
                 let dS2 = Q / T2;  // Body 2 gains heat
-                let dS_irrev = dS1 + dS2;
+                dS_irrev = dS1 + dS2;
+            }
 
-                document.getElementById('ds-rev').textContent = dS_rev.toFixed(2);
-                document.getElementById('ds-irrev').textContent = dS_irrev.toFixed(2);
+            function drawInfobox() {
+                // Draw semi-transparent info box in top-right corner
+                let boxWidth = 310;
+                let boxHeight = 120;
+                let boxX = p.width - boxWidth - 15;
+                let boxY = 15;
+
+                // Background
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(12);
+                p.textStyle(p.BOLD);
+                p.text('Entropy Generation:', boxX + 10, boxY + 10);
+
+                // Info text
+                p.textStyle(p.NORMAL);
+                p.textSize(11);
+                let yPos = boxY + 30;
+                let lineHeight = 20;
+
+                p.text('Reversible Process (intermediate reservoirs):', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('  Entropy Change: ' + dS_rev.toFixed(2) + ' J/K', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Irreversible Process (direct transfer):', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('  Entropy Generated: ' + dS_irrev.toFixed(2) + ' J/K', boxX + 10, yPos);
             }
         }, 'entropy-sketch');
 
@@ -908,6 +938,9 @@
             let volumeRatio = 2.0;
             let partitionRemoved = false;
             let partitionX;
+
+            // Info box data
+            let deltaS = 0;
 
             p.setup = function() {
                 let canvas = p.createCanvas(Math.min(800, p.windowWidth - 40), 400);
@@ -980,6 +1013,9 @@
                 p.textAlign(p.LEFT);
                 p.text('Initial Volume: V₁', 15, 30);
                 p.text('Final Volume: V₂ = ' + volumeRatio.toFixed(1) + ' × V₁', 15, 50);
+
+                // Draw info box
+                drawInfobox();
             };
 
             function initializeParticles() {
@@ -997,8 +1033,40 @@
 
             function updateExpansionResults() {
                 let R = 8.314; // J/(mol·K)
-                let deltaS = R * p.log(volumeRatio);
-                document.getElementById('entropy-expansion').textContent = deltaS.toFixed(2);
+                deltaS = R * p.log(volumeRatio);
+            }
+
+            function drawInfobox() {
+                // Draw semi-transparent info box in bottom-right corner
+                let boxWidth = 300;
+                let boxHeight = 80;
+                let boxX = p.width - boxWidth - 15;
+                let boxY = p.height - boxHeight - 15;
+
+                // Background
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(12);
+                p.textStyle(p.BOLD);
+                p.text('Entropy Change:', boxX + 10, boxY + 10);
+
+                // Info text
+                p.textStyle(p.NORMAL);
+                p.textSize(11);
+                let yPos = boxY + 30;
+                let lineHeight = 18;
+
+                p.text('ΔS = nR ln(V₂/V₁) = ' + deltaS.toFixed(2) + ' J/(mol·K)', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.textStyle(p.BOLD);
+                p.text('This process is spontaneous and irreversible!', boxX + 10, yPos);
             }
 
             class Particle {

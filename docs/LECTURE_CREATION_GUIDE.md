@@ -1312,7 +1312,52 @@ document.getElementById('submit-quiz').addEventListener('click', function() {
 - ❌ Mix unit systems
 - ❌ Skip intermediate steps in solutions
 
-### 5. Simulations
+### 5. Layout Principles for Interactive Simulations
+
+**CRITICAL DESIGN PRINCIPLE:** The simulation canvas and its controls should be visible simultaneously without scrolling. This ensures students can immediately see the feedback of changing parameters.
+
+#### Horizontal Control Layout
+
+**DO:**
+- ✅ **Arrange controls horizontally** (side-by-side or in grids) to keep them above or below the simulation canvas
+- ✅ Use `controls-grid`, `controls-grid-2col`, or `controls-grid-3col` classes for responsive horizontal layouts
+- ✅ Keep controls compact and on the same viewport as the canvas
+- ✅ Test that controls + canvas fit on standard laptop screens (1366x768 minimum)
+- ✅ Ensure controls remain visible while interacting with simulation (no scrolling required)
+- ✅ Maintain horizontal layouts for desktops, laptops, tablets, and landscape phones
+
+**DON'T:**
+- ❌ Stack controls vertically in a long column that pushes the canvas below the fold
+- ❌ Create control panels that require scrolling to access while viewing the simulation
+- ❌ Place critical controls far from the simulation canvas
+- ❌ Force users to scroll up and down between controls and canvas
+
+**Screen Size Exceptions:**
+- Small phones (portrait mode, < 576px width): Constraints may be relaxed; vertical stacking is acceptable
+- All other devices: Maintain horizontal fitting principle
+
+#### Canvas Infoboxes vs HTML Results Panels
+
+**DO:**
+- ✅ **Always prefer canvas-overlaid infoboxes** for real-time simulation data and parameters
+- ✅ Position infoboxes in a corner of the canvas (typically top-right or bottom-left)
+- ✅ Use semi-transparent backgrounds for infoboxes (e.g., `rgba(255, 255, 255, 230)`)
+- ✅ Update infobox content within the draw loop for real-time feedback
+- ✅ Keep infoboxes concise (5-8 lines typically)
+- ✅ Use infoboxes for: current values, calculated results, flow parameters, system status
+
+**DON'T:**
+- ❌ Place real-time simulation results in HTML panels below the canvas
+- ❌ Require users to scroll down to see simulation outputs
+- ❌ Create separate results panels that are not always visible
+- ❌ Update HTML DOM elements for rapidly changing values (use canvas text instead)
+
+**When to use HTML panels:**
+- Static explanatory text that doesn't change during simulation
+- Detailed instructions or theory (not real-time data)
+- Supplementary information that doesn't need to be constantly visible
+
+### 6. Simulations
 
 **DO:**
 - ✅ Provide clear instructions for using the simulation
@@ -1392,7 +1437,7 @@ p.draw = function() {
 - **Canvas Infobox:** Real-time simulation data, current parameters, dynamic values, critical feedback
 - **HTML Panel:** Static explanatory text, detailed instructions, supplementary information that doesn't change during simulation
 
-### 6. Accessibility
+### 7. Accessibility
 
 **DO:**
 - ✅ Use descriptive button labels
@@ -1747,6 +1792,9 @@ The framework uses these standard breakpoints:
 
 ### Simulation
 - [ ] Control panel with sliders
+- [ ] Controls arranged horizontally (grid layout)
+- [ ] Controls + canvas fit on screen without scrolling
+- [ ] Canvas-overlaid infobox used for real-time data (not HTML panels)
 - [ ] Canvas holder div present
 - [ ] Start/reset buttons
 - [ ] Current values displayed

@@ -110,15 +110,24 @@
         <p>Adjust the parameters to see how they affect the critical buckling load and column behaviour.</p>
         
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="lengthSlider">Length (m): <span id="lengthValue">2.0</span></label>
-                <input type="range" id="lengthSlider" min="1" max="5" step="0.1" value="2.0">
+            <div class="controls-grid-2col" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px;">
+                <div class="control-item">
+                    <label for="lengthSlider">Length (m): <span id="lengthValue">2.0</span></label>
+                    <input type="range" id="lengthSlider" min="1" max="5" step="0.1" value="2.0">
+                </div>
+                <div class="control-item">
+                    <label for="loadSlider">Applied Load (kN): <span id="loadValue">10</span></label>
+                    <input type="range" id="loadSlider" min="0" max="150" step="1" value="10">
+                </div>
             </div>
-            <div class="control-group">
-                <label for="loadSlider">Applied Load (kN): <span id="loadValue">10</span></label>
-                <input type="range" id="loadSlider" min="0" max="150" step="1" value="10">
-            </div>
-            <div class="control-group">
+        </div>
+
+        <div id="sketch-holder">
+            <!-- Our simulation will go here! -->
+        </div>
+
+        <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+            <div class="control-item">
                 <label for="endCondition">End Conditions:</label>
                 <select id="endCondition">
                     <option value="pinned">Pinned-Pinned (K=1.0)</option>
@@ -128,30 +137,6 @@
                 </select>
             </div>
         </div>
-
-        <div id="sketch-holder">
-            <!-- Our simulation will go here! -->
-        </div>
-        <div id="button-container">
-            <!-- Our GUI goes here-->
-        </div>
-
-        <div id="buckling-data" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
-            <h4>Analysis Results:</h4>
-            <p>Critical Load: <span id="criticalLoad">--</span> kN</p>
-            <p>Safety Factor: <span id="safetyFactor">--</span></p>
-            <p>Slenderness Ratio: <span id="slenderness">--</span></p>
-            <p>Status: <span id="bucklingStatus">Stable</span></p>
-        </div>
-
-        <h3>Simulation Instructions</h3>
-        <ul>
-            <li>Use the sliders to adjust column length and applied load</li>
-            <li>Select different end conditions from the dropdown menu</li>
-            <li>Watch the column deform when the applied load exceeds the critical buckling load</li>
-            <li>Observe how the critical load changes with different parameters</li>
-            <li>The column colour changes from blue (stable) to red (buckled)</li>
-        </ul>
     </div>
 
     <div class="content-section">
@@ -482,19 +467,22 @@
         
         function draw() {
             background(240, 240, 240);
-            
+
             // Draw grid
             drawGrid();
-            
+
             // Draw column first to get coordinates
             let columnCoords = drawColumn();
-            
+
             // Draw support conditions using column coordinates
             drawSupports(columnCoords);
-            
+
             // Draw load using column coordinates
             drawAppliedLoad(columnCoords);
-            
+
+            // Draw info box
+            drawInfoBox(columnCoords);
+
             // Update display
             updateDisplay();
         }
@@ -555,23 +543,23 @@
             let availableHeight = height - 2 * margin;
             let columnScale = availableHeight / (length * 100); // Dynamic scaling
             if (columnScale > 1) columnScale = 1; // Don't scale up, only down
-            
+
             let columnHeight = length * 100 * columnScale;
             let baseY = height - margin;
             let topY = baseY - columnHeight;
             let centerX = width / 2;
-            
+
             // Calculate if buckled
             let Pcr = calculateCriticalLoad();
             let isBuckled = appliedLoad * 1000 > Pcr; // Convert kN to N
-            
+
             push();
             strokeWeight(8);
-            
+
             if (isBuckled) {
                 // Draw buckled shape
                 stroke(255, 50, 50); // Red for buckled
-                
+
                 // Generate buckled shape with mathematically correct mode shapes
                 let amplitude = Math.min(50, (appliedLoad * 1000 / Pcr - 1) * 30);
                 let points = [];
@@ -601,7 +589,7 @@
 
                     points.push({x: centerX + deflection, y: y});
                 }
-                
+
                 // Draw the buckled column
                 noFill();
                 beginShape();
@@ -609,43 +597,111 @@
                     vertex(point.x, point.y);
                 }
                 endShape();
-                
+
             } else {
                 // Draw straight column
                 stroke(50, 50, 255); // Blue for stable
                 line(centerX, baseY, centerX, topY);
             }
-            
+
             pop();
-            
+
+            // Draw dimension line for length to the left
+            push();
+            stroke(0);
+            strokeWeight(1);
+            fill(0);
+            textAlign(RIGHT, CENTER);
+            textSize(12);
+
+            // Dimension line
+            let leftMargin = centerX - 50;
+            line(leftMargin, baseY, leftMargin, topY);
+            line(leftMargin - 5, baseY, leftMargin + 5, baseY);
+            line(leftMargin - 5, topY, leftMargin + 5, topY);
+
+            // Dimension text
+            text(length.toFixed(1) + ' m', leftMargin - 15, (baseY + topY) / 2);
+
+            pop();
+
             // Return coordinates for other functions
             return {baseY, topY, centerX, columnScale};
         }
         
         function drawAppliedLoad(coords) {
             let {topY, centerX} = coords;
-            
+
             // Draw load arrow
             push();
             stroke(255, 100, 0);
             strokeWeight(3);
             fill(255, 100, 0);
-            
+
             // Arrow shaft
             let arrowLength = map(appliedLoad, 0, maxLoad, 10, 60);
             line(centerX, topY - 20, centerX, topY - 20 - arrowLength);
-            
+
             // Arrow head
-            triangle(centerX - 8, topY - 20 - 10, 
-                    centerX + 8, topY - 20 - 10, 
+            triangle(centerX - 8, topY - 20 - 10,
+                    centerX + 8, topY - 20 - 10,
                     centerX, topY - 20);
-            
+
             // Load label
             fill(0);
             textAlign(CENTER);
             textSize(14);
             text(appliedLoad + ' kN', centerX, topY - 30 - arrowLength);
-            
+
+            pop();
+        }
+
+        function drawInfoBox(coords) {
+            let Pcr = calculateCriticalLoad();
+            let PcrKN = Pcr / 1000; // Convert to kN
+            let safetyFactor = appliedLoad > 0 ? (PcrKN / appliedLoad) : Infinity;
+            let r = Math.sqrt(I / A);
+            let K = getKValue();
+            let slenderness = (K * length) / r;
+            let isBuckled = appliedLoad * 1000 > Pcr;
+
+            // Info box position (fixed to top right corner of canvas)
+            let boxX = width - 200;
+            let boxY = 20;
+            let boxWidth = 180;
+            let boxHeight = 140;
+
+            push();
+
+            // Draw background box
+            fill(255);
+            stroke(100, 100, 200);
+            strokeWeight(2);
+            rect(boxX, boxY, boxWidth, boxHeight);
+
+            // Draw text with no stroke
+            noStroke();
+            fill(0);
+            textAlign(LEFT);
+            textSize(11);
+            let lineHeight = 16;
+            let textX = boxX + 10;
+            let textY = boxY + 15;
+
+            textStyle(NORMAL);
+            text('Critical Load: ' + PcrKN.toFixed(1) + ' kN', textX, textY);
+            text('Applied Load: ' + appliedLoad + ' kN', textX, textY + lineHeight);
+            text('Safety Factor: ' + safetyFactor.toFixed(2), textX, textY + 2 * lineHeight);
+            text('Slenderness: ' + slenderness.toFixed(0), textX, textY + 3 * lineHeight);
+            text('Cross-section: ' + (A * 1e6).toFixed(1) + ' cm²', textX, textY + 4 * lineHeight);
+            text('Second moment: ' + (I * 1e12).toFixed(2) + ' mm⁴', textX, textY + 5 * lineHeight);
+
+            // Status
+            fill(isBuckled ? 255 : 50, isBuckled ? 50 : 200, 50);
+            textSize(12);
+            textStyle(BOLD);
+            text('Status: ' + (isBuckled ? 'BUCKLED' : 'STABLE'), textX, textY + 6.8 * lineHeight);
+
             pop();
         }
         
@@ -664,20 +720,8 @@
         }
         
         function updateDisplay() {
-            let Pcr = calculateCriticalLoad();
-            let PcrKN = Pcr / 1000; // Convert to kN
-            let safetyFactor = appliedLoad > 0 ? (PcrKN / appliedLoad) : Infinity;
-            let r = Math.sqrt(I / A);
-            let K = getKValue();
-            let slenderness = (K * length) / r;
-            let isBuckled = appliedLoad * 1000 > Pcr;
-            
-            document.getElementById('criticalLoad').textContent = PcrKN.toFixed(1);
-            document.getElementById('safetyFactor').textContent = safetyFactor.toFixed(2);
-            document.getElementById('slenderness').textContent = slenderness.toFixed(0);
-            document.getElementById('bucklingStatus').textContent = isBuckled ? 'BUCKLED' : 'Stable';
-            document.getElementById('bucklingStatus').style.color = isBuckled ? 'red' : 'green';
-            document.getElementById('bucklingStatus').style.fontWeight = 'bold';
+            // Display is now handled by drawInfoBox() on the canvas
+            // This function is kept for compatibility but no longer updates HTML elements
         }
         
         function getKValue() {

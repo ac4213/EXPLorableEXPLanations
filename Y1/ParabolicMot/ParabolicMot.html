@@ -22,6 +22,30 @@
     <link rel="stylesheet" href="/assets/css/uicontrols.css">
     <!-- Your script goes here -->
     <script src="ParabolicM.js"></script>
+    <style>
+        #button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .controls-row.checkboxes {
+            align-items: center;
+        }
+
+        .controls-row.buttons {
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -94,7 +118,8 @@
                 <!-- Our sketch will go here! -->
             </div>
             <div id="button-container">
-                <!-- Our GUI goes here-->
+                <div class="controls-row checkboxes" id="checkboxes-row"></div>
+                <div class="controls-row buttons" id="buttons-row"></div>
             </div>
 
             <h3>Simulation Instructions</h3>

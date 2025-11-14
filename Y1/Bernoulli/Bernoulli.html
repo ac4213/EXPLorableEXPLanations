@@ -92,19 +92,19 @@
         <div id="bernoulli-sketch"></div>
 
         <div class="controls-panel">
-            <div class="control-row">
-                <label>Inlet Velocity (v₁):</label>
-                <input type="range" id="velocity-slider" min="1" max="20" step="0.5" value="5">
-                <span id="velocity-value">5.0 m/s</span>
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label>Inlet Velocity (v₁): <span id="velocity-value" class="value-display">5.0 m/s</span></label>
+                    <input type="range" id="velocity-slider" min="1" max="20" step="0.5" value="5">
+                </div>
+
+                <div class="slider-container">
+                    <label>Throat Diameter Ratio: <span id="diameter-value" class="value-display">0.50</span></label>
+                    <input type="range" id="diameter-slider" min="0.3" max="0.8" step="0.05" value="0.5">
+                </div>
             </div>
 
-            <div class="control-row">
-                <label>Throat Diameter Ratio:</label>
-                <input type="range" id="diameter-slider" min="0.3" max="0.8" step="0.05" value="0.5">
-                <span id="diameter-value">0.50</span>
-            </div>
-
-            <div class="control-row">
+            <div class="button-group">
                 <button id="animate-button">Start Animation</button>
                 <button id="reset-button">Reset</button>
             </div>
@@ -590,11 +590,15 @@
 
                 // Normalize pressures for display (relative to atmospheric)
                 const maxPressureHeight = 60;
-                const pressureRange = 15000; // Expected pressure range in Pa
+                const minPressureHeight = 5;
+                const pressureRange = 50000; // Pressure range in Pa (±50 kPa from atmospheric)
 
-                const h1 = maxPressureHeight;
-                const h2 = ((P2 - P_atm) / pressureRange) * maxPressureHeight + maxPressureHeight;
-                const h3 = maxPressureHeight;
+                // Calculate gauge heights as deviations from atmospheric pressure
+                // h = centerHeight + (pressure deviation / pressureRange) * maxHeight
+                const centerHeight = maxPressureHeight * 0.5;
+                const h1 = centerHeight + ((P1 - P_atm) / pressureRange) * maxPressureHeight;
+                const h2 = centerHeight + ((P2 - P_atm) / pressureRange) * maxPressureHeight;
+                const h3 = centerHeight + ((P3 - P_atm) / pressureRange) * maxPressureHeight;
 
                 // Helper function to draw a gauge at bottom of pipe
                 function drawGauge(x, pipeBottomY, h, label, pressure, color) {

@@ -114,11 +114,6 @@
         </div>
 
         <div id="sketch-holder"></div>
-
-        <div class="results-panel">
-            <strong>Solution Comparison:</strong>
-            <div id="solution-info">Adjust parameters to see displacement and stress distributions...</div>
-        </div>
     </div>
 
     <script>
@@ -143,6 +138,11 @@
             let exactStresses = [];
             let exactPositions = [];
 
+            // Info box data
+            let maxDispExact = 0;
+            let maxDispFEM = 0;
+            let percentError = 0;
+
             p.setup = function() {
                 let canvas = p.createCanvas(900, 900);
                 canvas.parent('sketch-holder');
@@ -165,6 +165,9 @@
                 drawComparisonPlot(50, 520, 800, 150, "Stress (MPa)",
                     exactPositions, exactStresses,
                     femPositions, femStresses);
+
+                // Draw info box
+                drawInfobox();
             };
 
             function setupSliders() {
@@ -342,21 +345,11 @@
 
             function updateSolutionInfo() {
                 // Get max displacements
-                let maxDispExact = Math.max(...exactDisplacements) * 1000; // mm
-                let maxDispFEM = Math.max(...femDisplacements) * 1000; // mm
+                maxDispExact = Math.max(...exactDisplacements) * 1000; // mm
+                maxDispFEM = Math.max(...femDisplacements) * 1000; // mm
 
                 // Calculate error
-                let error = Math.abs((maxDispFEM - maxDispExact) / maxDispExact * 100);
-
-                let info = `
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div><strong>Max Displacement (Exact):</strong> ${maxDispExact.toFixed(4)} mm</div>
-                        <div><strong>Max Displacement (FEM):</strong> ${maxDispFEM.toFixed(4)} mm</div>
-                        <div><strong>Percentage Error:</strong> ${error.toFixed(3)}%</div>
-                        <div><strong>Number of Elements:</strong> ${numElements}</div>
-                    </div>
-                `;
-                document.getElementById('solution-info').innerHTML = info;
+                percentError = Math.abs((maxDispFEM - maxDispExact) / maxDispExact * 100);
             }
 
             function drawSteppedShaft() {
@@ -560,6 +553,42 @@
                 p.text("● FEM", w - 120, 35);
 
                 p.pop();
+            }
+
+            function drawInfobox() {
+                // Draw semi-transparent info box in top-right corner
+                let boxWidth = 320;
+                let boxHeight = 130;
+                let boxX = p.width - boxWidth - 15;
+                let boxY = 15;
+
+                // Background
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(14);
+                p.textStyle(p.BOLD);
+                p.text('Solution Comparison:', boxX + 10, boxY + 10);
+
+                // Info text
+                p.textStyle(p.NORMAL);
+                p.textSize(12);
+                let yPos = boxY + 35;
+                let lineHeight = 22;
+
+                p.text('Max Displacement (Exact): ' + maxDispExact.toFixed(4) + ' mm', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Max Displacement (FEM): ' + maxDispFEM.toFixed(4) + ' mm', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Percentage Error: ' + percentError.toFixed(3) + '%', boxX + 10, yPos);
+                yPos += lineHeight;
+                p.text('Number of Elements: ' + numElements, boxX + 10, yPos);
             }
         }, 'sketch-holder');
     </script>

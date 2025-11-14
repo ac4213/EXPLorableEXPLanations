@@ -23,9 +23,10 @@
         /* Car Controls - Specific to drag race */
         .car-controls {
             border: 2px solid #ddd;
-            padding: 10px;
+            padding: 15px;
             border-radius: 5px;
-            margin: 5px 0;
+            flex: 1;
+            min-width: 250px;
         }
 
         .car1-controls {
@@ -36,6 +37,22 @@
         .car2-controls {
             border-color: #4dabf7;
             background-color: #f0f8ff;
+        }
+
+        /* Grid layout for two car controls side-by-side */
+        .controls-grid-2col {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 20px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            order: 0 !important;
+        }
+
+        .controls-grid-2col .car-controls {
+            display: block !important;
+            flex: none !important;
+            min-width: auto !important;
         }
 
         /* Race Stats Display */
@@ -64,7 +81,66 @@
             height: 400px;
         }
 
+        /* Ensure sliders in car controls don't overflow */
+        .car-controls .slider-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .car-controls .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .car-controls .slider-container input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        /* Override simulation-controls to use block flow for drag race */
+        .simulation-section .simulation-controls {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 15px !important;
+            justify-content: flex-start !important;
+            flex-wrap: nowrap !important;
+        }
+
+        /* Race distance slider - full width above car controls */
+        .simulation-controls > .slider-container {
+            width: 100%;
+            order: -1;
+            flex-shrink: 0;
+        }
+
+        .simulation-controls > .button-group {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 0;
+            order: 2;
+            flex-shrink: 0;
+        }
+
         /* Responsive adjustments for drag race */
+        @media (max-width: 900px) {
+            .controls-grid-2col {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .car-controls {
+                min-width: auto;
+            }
+        }
+
         @media (max-width: 768px) {
             #sketch-holder-drag-race, #sketch-holder-acc-demo {
                 height: 300px;
@@ -78,11 +154,19 @@
                 gap: 8px;
                 padding: 8px;
             }
+
+            .car-controls {
+                padding: 12px;
+            }
         }
 
         @media (max-width: 576px) {
             #sketch-holder-drag-race, #sketch-holder-acc-demo {
                 height: 250px;
+            }
+
+            .car-controls {
+                padding: 10px;
             }
         }
 
@@ -180,13 +264,13 @@
 
         <div class="simulation-controls">
             <div class="slider-container">
-                <label>Applied Acceleration: <span id="acc-demo-value" class="slider-value">5.0</span> m/s²</label>
+                <label>Applied Acceleration: <span id="acc-demo-value" class="value-display">5.0 m/s²</span></label>
                 <input type="range" id="acc-demo-slider" min="-10" max="10" step="0.5" value="5">
             </div>
-            <div style="text-align: center;">
+            <div class="button-group">
                 <button id="reset-acc-demo">RESET</button>
-                <p><em>Click and hold on the track to apply acceleration. Release to coast at constant velocity.</em></p>
             </div>
+            <p style="text-align: center;"><em>Click and hold on the track to apply acceleration. Release to coast at constant velocity.</em></p>
         </div>
     </div>
 
@@ -228,38 +312,38 @@
         </div>
         
         <div class="simulation-controls">
-            <div class="control-row">
-                <div class="control-column car-controls car1-controls">
+            <div class="controls-grid-2col">
+                <div class="car-controls car1-controls">
                     <h4 style="color: #ff6b6b;">Red Car</h4>
                     <div class="slider-container">
-                        <label>Initial Velocity: <span id="car1-v0-value" class="slider-value">10.0</span> m/s</label>
+                        <label>Initial Velocity: <span id="car1-v0-value" class="value-display">10.0 m/s</span></label>
                         <input type="range" id="car1-v0" min="0" max="30" step="0.5" value="10">
                     </div>
                     <div class="slider-container">
-                        <label>Acceleration: <span id="car1-acc-value" class="slider-value">2.0</span> m/s²</label>
+                        <label>Acceleration: <span id="car1-acc-value" class="value-display">2.0 m/s²</span></label>
                         <input type="range" id="car1-acc" min="-5" max="10" step="0.1" value="2">
                     </div>
                 </div>
-                
-                <div class="control-column car-controls car2-controls">
+
+                <div class="car-controls car2-controls">
                     <h4 style="color: #4dabf7;">Blue Car</h4>
                     <div class="slider-container">
-                        <label>Initial Velocity: <span id="car2-v0-value" class="slider-value">5.0</span> m/s</label>
+                        <label>Initial Velocity: <span id="car2-v0-value" class="value-display">5.0 m/s</span></label>
                         <input type="range" id="car2-v0" min="0" max="30" step="0.5" value="5">
                     </div>
                     <div class="slider-container">
-                        <label>Acceleration: <span id="car2-acc-value" class="slider-value">3.0</span> m/s²</label>
+                        <label>Acceleration: <span id="car2-acc-value" class="value-display">3.0 m/s²</span></label>
                         <input type="range" id="car2-acc" min="-5" max="10" step="0.1" value="3">
                     </div>
                 </div>
             </div>
-            
+
             <div class="slider-container">
-                <label>Race Distance: <span id="race-distance-value" class="slider-value">200</span> m</label>
+                <label>Race Distance: <span id="race-distance-value" class="value-display">200 m</span></label>
                 <input type="range" id="race-distance" min="50" max="500" step="10" value="200">
             </div>
-            
-            <div style="text-align: center; margin: 10px 0;">
+
+            <div class="button-group">
                 <button id="start-race">START RACE</button>
                 <button id="reset-race">RESET</button>
             </div>

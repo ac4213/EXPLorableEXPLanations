@@ -398,7 +398,7 @@ const failureCriteriaSketch = (p) => {
       // Ensure yield stress ≤ ultimate tensile stress / √3
       // This guarantees Von Mises envelope stays within Rankine everywhere
       if (sy > maxYieldStress) {
-        yieldStressEl.value = Math.round(maxYieldStress);
+        yieldStressEl.value = parseFloat(maxYieldStress.toFixed(2));
       }
     };
 

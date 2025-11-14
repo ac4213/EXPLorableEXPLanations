@@ -26,22 +26,105 @@
             background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
             margin: 20px 0;
         }
-        
+
         .feedback {
             margin-top: 10px;
             padding: 10px;
             border-radius: 5px;
             font-weight: bold;
         }
-        
+
         .feedback.correct {
             background-color: #d4edda;
             color: #155724;
         }
-        
+
         .feedback.incorrect {
             background-color: #f8d7da;
             color: #721c24;
+        }
+
+        /* Infobox styles */
+        .infobox {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            font-family: monospace;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            max-width: 250px;
+        }
+
+        .infobox-top-left {
+            top: 10px;
+            left: 10px;
+        }
+
+        .infobox-top-right {
+            top: 10px;
+            right: 10px;
+        }
+
+        .infobox-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .infobox-item {
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        .infobox-item span {
+            color: #0066ff;
+            font-weight: bold;
+        }
+
+        /* Horizontal slider layout */
+        .controls-grid-3col {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .slider-container {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+
+        .slider-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+        }
+
+        /* Checkbox group underneath */
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
         }
     </style>
 </head>
@@ -146,47 +229,63 @@
 
     <div class="simulation-section">
         <h2>Interactive Simulation: Bead on a String</h2>
-        <div id="sketch-holder"></div>
-        
+        <div id="sketch-holder">
+            <!-- Tension info box (top left) -->
+            <div id="tensionInfobox" class="infobox infobox-top-left">
+                <div class="infobox-title">System Properties</div>
+                <div class="infobox-item">ω = <span id="omegaInfoValue">2.00</span> rad/s</div>
+                <div class="infobox-item">α = <span id="alphaInfoValue">0.00</span> rad/s²</div>
+                <div class="infobox-item">v = <span id="linearSpeedValue">3.00</span> m/s</div>
+                <div class="infobox-item">a<sub>c</sub> = <span id="centripAccValue">6.00</span> m/s²</div>
+                <div class="infobox-item">a<sub>t</sub> = <span id="tangAccValue">0.00</span> m/s²</div>
+                <div class="infobox-item">a<sub>total</sub> = <span id="totalAccValue">0.00</span> m/s²</div>
+                <div class="infobox-item" style="border-top: 1px solid #ddd; margin-top: 6px; padding-top: 6px;">
+                    <strong>Tension:</strong><br>
+                    T = <span id="tensionValue">6.00</span> N
+                </div>
+            </div>
+
+            <!-- Legend info box (top right) -->
+            <div id="legendInfobox" class="infobox infobox-top-right">
+                <div class="infobox-title">Simulation Legend</div>
+                <div class="infobox-item"><span style="color: #0066ff;">●</span> String Tension</div>
+                <div class="infobox-item"><span style="color: #00cc00;">●</span> Velocity Vector</div>
+                <div class="infobox-item"><span style="color: #ff0066;">●</span> Centripetal Acc</div>
+                <div class="infobox-item"><span style="color: #ff9900;">●</span> Tangential Acc</div>
+                <div class="infobox-item"><span style="color: #9900ff;">●</span> Total Acc</div>
+            </div>
+        </div>
+
         <div class="interactive-controls">
-            <div class="control-group">
-                <label for="angularVelocity">Initial Angular Velocity (\(\omega_0\)): <span id="angVelValue">2.0</span> rad/s</label>
-                <input type="range" id="angularVelocity" min="-3" max="3" step="0.1" value="2.0">
+            <div class="controls-grid-3col">
+                <div class="slider-container">
+                    <label for="angularVelocity">Initial Angular Velocity (\(\omega_0\)): <span id="angVelValue" class="value-display">2.0 rad/s</span></label>
+                    <input type="range" id="angularVelocity" min="-3" max="3" step="0.1" value="2.0">
+                </div>
+
+                <div class="slider-container">
+                    <label for="angularAcceleration">Angular Acceleration (\(\alpha\)): <span id="angAccValue" class="value-display">0.0 rad/s²</span></label>
+                    <input type="range" id="angularAcceleration" min="-1" max="1" step="0.1" value="0">
+                </div>
+
+                <div class="slider-container">
+                    <label for="stringLength">String Length: <span id="lengthValue" class="value-display">150 px</span></label>
+                    <input type="range" id="stringLength" min="50" max="200" step="10" value="150">
+                </div>
             </div>
-            
-            <div class="control-group">
-                <label for="angularAcceleration">Angular Acceleration (\(\alpha\)): <span id="angAccValue">0.0</span> rad/s²</label>
-                <input type="range" id="angularAcceleration" min="-1" max="1" step="0.1" value="0">
-            </div>
-            
-            <div class="control-group">
-                <label for="stringLength">String Length: <span id="lengthValue">150</span> px</label>
-                <input type="range" id="stringLength" min="50" max="200" step="10" value="150">
-            </div>
-            
-            <div class="control-group">
+
+            <div class="checkbox-group">
                 <label><input type="checkbox" id="showTension" checked> Show String Tension</label>
                 <label><input type="checkbox" id="showVelocity" checked> Show Velocity Vector</label>
                 <label><input type="checkbox" id="showAccelerations" checked> Show Accelerations</label>
                 <label><input type="checkbox" id="showTotalAcceleration"> Show Total Acceleration</label>
             </div>
         </div>
-        
+
         <div style="display: flex; justify-content: center; gap: 10px; margin: 20px 0;">
             <button id="cutString">Cut String</button>
             <button id="resetSimulation">Reset</button>
             <button id="pauseSimulation">Pause</button>
-        </div>
-        
-        <div class="key-point">
-            <strong>Simulation Legend:</strong>
-            <ul>
-                <li><span style="color: #0066ff;">Blue Arrow</span>: String Tension (Centripetal Force)</li>
-                <li><span style="color: #00cc00;">Green Arrow</span>: Velocity Vector</li>
-                <li><span style="color: #ff0066;">Red Arrow</span>: Centripetal Acceleration</li>
-                <li><span style="color: #ff9900;">Orange Arrow</span>: Tangential Acceleration</li>
-                <li><span style="color: #9900ff;">Purple Arrow</span>: Total Acceleration (vector sum)</li>
-            </ul>
         </div>
     </div>
 
@@ -446,7 +545,7 @@
             let isPaused = false;
             let centerX, centerY;
             let trailPoints = [];
-            let mass = 0.1; // kg (for display purposes)
+            let mass = 1.0; // kg (default 1kg)
             
             p.setup = function() {
                 let canvas = p.createCanvas(p.windowWidth > 800 ? 800 : p.windowWidth - 40, 500);
@@ -598,19 +697,28 @@
                 p.noStroke();
                 p.ellipse(beadPos.x, beadPos.y, 20, 20);
                 
-                // Display values
-                p.fill(0);
-                p.textAlign(p.LEFT);
-                p.textSize(14);
-                p.text(`Current Angular Velocity: ${omega.toFixed(2)} rad/s`, 10, 20);
-                p.text(`Linear Speed: ${Math.abs(omega * radius / 100).toFixed(2)} m/s`, 10, 40);
-                p.text(`Centripetal Acc: ${(omega * omega * radius / 100).toFixed(2)} m/s²`, 10, 60);
-                if (Math.abs(alpha) > 0.01) {
-                    p.text(`Tangential Acc: ${Math.abs(radius * alpha / 100).toFixed(2)} m/s²`, 10, 80);
-                }
+                // Update infobox values (convert px to m, assuming 100px = 1m)
+                let radiusInMeters = radius / 100;
+                let linearSpeed = Math.abs(omega * radiusInMeters);
+                let centripAcc = omega * omega * radiusInMeters;
+                let tangAcc = Math.abs(radius * alpha / 100);
+                let totalAcc = Math.sqrt(centripAcc * centripAcc + tangAcc * tangAcc);
+                let tension = mass * omega * omega * radiusInMeters;
+
+                document.getElementById('omegaInfoValue').textContent = omega.toFixed(2);
+                document.getElementById('alphaInfoValue').textContent = alpha.toFixed(2);
+                document.getElementById('linearSpeedValue').textContent = linearSpeed.toFixed(2);
+                document.getElementById('centripAccValue').textContent = centripAcc.toFixed(2);
+                document.getElementById('tangAccValue').textContent = tangAcc.toFixed(2);
+                document.getElementById('totalAccValue').textContent = totalAcc.toFixed(2);
+                document.getElementById('tensionValue').textContent = tension.toFixed(2);
+
+                // Display STRING CUT message at top centre of canvas if applicable
                 if (stringCut) {
                     p.fill(255, 0, 0);
-                    p.text("STRING CUT - Object moving tangentially", 10, 100);
+                    p.textAlign(p.CENTER);
+                    p.textSize(16);
+                    p.text("STRING CUT - Object moving tangentially", p.width / 2, 30);
                 }
             };
             

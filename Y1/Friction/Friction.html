@@ -163,19 +163,25 @@
           <option value="custom">Custom Values</option>
         </select>
       </div>
-      <div class="control-group" id="customControls" style="display: none;">
-        <label for="staticCoeff">Static Coefficient (μₛ): <span id="staticValue">0.6</span></label>
-        <input type="range" id="staticCoeff" min="0" max="1.5" step="0.01" value="0.6" />
-        <label for="kineticCoeff">Kinetic Coefficient (μₖ): <span id="kineticValue">0.4</span></label>
-        <input type="range" id="kineticCoeff" min="0" max="1.5" step="0.01" value="0.4" />
+      <div class="controls-grid-2col" id="customControls" style="display: none;">
+        <div class="slider-container">
+          <label for="staticCoeff">Static Coefficient (μₛ): <span id="staticValue" class="value-display">0.6</span></label>
+          <input type="range" id="staticCoeff" min="0" max="1.5" step="0.01" value="0.6" />
+        </div>
+        <div class="slider-container">
+          <label for="kineticCoeff">Kinetic Coefficient (μₖ): <span id="kineticValue" class="value-display">0.4</span></label>
+          <input type="range" id="kineticCoeff" min="0" max="1.5" step="0.01" value="0.4" />
+        </div>
       </div>
-      <div class="control-group">
-        <label for="massSlider">Block Mass (kg): <span id="massValue">10</span></label>
-        <input type="range" id="massSlider" min="5" max="50" step="1" value="10" />
-      </div>
-      <div class="control-group">
-        <label for="forceSlider">Applied Force (N): <span id="forceValue">0</span></label>
-        <input type="range" id="forceSlider" min="0" max="150" step="0.5" value="0" />
+      <div class="controls-grid-2col">
+        <div class="slider-container">
+          <label for="massSlider">Block Mass (kg): <span id="massValue" class="value-display">10 kg</span></label>
+          <input type="range" id="massSlider" min="5" max="50" step="1" value="10" />
+        </div>
+        <div class="slider-container">
+          <label for="forceSlider">Applied Force (N): <span id="forceValue" class="value-display">0 N</span></label>
+          <input type="range" id="forceSlider" min="0" max="150" step="0.5" value="0" />
+        </div>
       </div>
     </div>
 
@@ -219,21 +225,23 @@
     <p>Observe the velocity vectors showing the combination of translation and rotation in pure rolling motion.</p>
 
     <div class="interactive-controls">
-      <div class="control-group">
-        <label for="speedSlider">Rolling Speed: <span id="speedValue">1.0</span></label>
-        <input type="range" id="speedSlider" min="0" max="3" step="0.1" value="1.0" />
+      <div class="controls-grid-2col">
+        <div class="slider-container">
+          <label for="speedSlider">Rolling Speed: <span id="speedValue" class="value-display">1.0</span></label>
+          <input type="range" id="speedSlider" min="0" max="3" step="0.1" value="1.0" />
+        </div>
+        <div class="control-group">
+          <label for="vectorMode">Vector Display Mode:</label>
+          <select id="vectorMode">
+            <option value="none">None</option>
+            <option value="translation">Pure Translation (Green)</option>
+            <option value="rotation">Pure Rotation (Red)</option>
+            <option value="purple">Combined Rolling (Purple)</option>
+            <option value="combined" selected>Combined Rolling (All Vectors)</option>
+          </select>
+        </div>
       </div>
-      <div class="control-group">
-        <label for="vectorMode">Vector Display Mode:</label>
-        <select id="vectorMode">
-          <option value="none">None</option>
-          <option value="translation">Pure Translation (Green)</option>
-          <option value="rotation">Pure Rotation (Red)</option>
-          <option value="purple">Combined Rolling (Purple)</option>
-          <option value="combined" selected>Combined Rolling (All Vectors)</option>
-        </select>
-      </div>
-      <div class="control-group">
+      <div class="checkbox-group">
         <label>
           <input type="checkbox" id="showTrace" checked /> Show Contact Point Trace
         </label>

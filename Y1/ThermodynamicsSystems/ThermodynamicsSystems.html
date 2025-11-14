@@ -156,11 +156,6 @@
         </div>
 
         <div id="sketch-holder"></div>
-
-        <div class="results-panel-green" id="system-status">
-            <strong>System Status:</strong>
-            <div id="status-details">Click a system type to begin simulation...</div>
-        </div>
     </div>
 
     <!-- Section 3: Engineering Applications -->
@@ -500,6 +495,13 @@
             let systemMass = 10;
             let time = 0;
 
+            // Info box data
+            let statusTitle = '';
+            let massTransfer = '';
+            let energyTransfer = '';
+            let statusLine1 = '';
+            let statusLine2 = '';
+
             p.setup = function() {
                 let canvas = p.createCanvas(Math.min(900, p.windowWidth - 40), 500);
                 setupControls();
@@ -524,6 +526,9 @@
 
                 // Draw arrows for transfers
                 drawTransferArrows();
+
+                // Draw info box
+                drawInfobox();
             };
 
             function setupControls() {
@@ -752,28 +757,70 @@
                 p.pop();
             }
 
-            function updateSystemStatus() {
-                let statusText = '';
-                if (systemType === 'open') {
-                    statusText = '<strong>Open System (Control Volume)</strong><br>';
-                    statusText += 'Mass Transfer: ✓ YES<br>';
-                    statusText += 'Energy Transfer: ✓ YES<br>';
-                    statusText += 'Mass flow in = Mass flow out (steady state)<br>';
-                    statusText += 'Energy can change due to heat and work transfer';
-                } else if (systemType === 'closed') {
-                    statusText = '<strong>Closed System (Control Mass)</strong><br>';
-                    statusText += 'Mass Transfer: ✗ NO<br>';
-                    statusText += 'Energy Transfer: ✓ YES<br>';
-                    statusText += 'Mass remains constant<br>';
-                    statusText += 'Energy changes due to heat and work transfer';
+            function drawInfobox() {
+                // Draw semi-transparent info box in top-right corner
+                let boxWidth = 320;
+                let boxHeight = 150;
+                let boxX = p.width - boxWidth - 15;
+                let boxY = 15;
+
+                // Background
+                p.fill(255, 255, 255, 230);
+                p.stroke(100);
+                p.strokeWeight(1);
+                p.rect(boxX, boxY, boxWidth, boxHeight, 5);
+
+                // Title
+                p.fill(0);
+                p.noStroke();
+                p.textAlign(p.LEFT, p.TOP);
+                p.textSize(13);
+                p.textStyle(p.BOLD);
+                p.text('System Status:', boxX + 10, boxY + 10);
+
+                // Content
+                p.textStyle(p.NORMAL);
+                p.textSize(11);
+                let yPos = boxY + 30;
+                let lineHeight = 20;
+
+                if (statusTitle) {
+                    p.textStyle(p.BOLD);
+                    p.text(statusTitle, boxX + 10, yPos);
+                    yPos += lineHeight;
+                    p.textStyle(p.NORMAL);
+                    p.text(massTransfer, boxX + 10, yPos);
+                    yPos += lineHeight;
+                    p.text(energyTransfer, boxX + 10, yPos);
+                    yPos += lineHeight;
+                    p.text(statusLine1, boxX + 10, yPos);
+                    yPos += lineHeight;
+                    p.text(statusLine2, boxX + 10, yPos);
                 } else {
-                    statusText = '<strong>Isolated System</strong><br>';
-                    statusText += 'Mass Transfer: ✗ NO<br>';
-                    statusText += 'Energy Transfer: ✗ NO<br>';
-                    statusText += 'Both mass and energy remain constant<br>';
-                    statusText += 'Entropy can only increase (2nd law)';
+                    p.text('Click a system type to begin simulation...', boxX + 10, yPos);
                 }
-                document.getElementById('status-details').innerHTML = statusText;
+            }
+
+            function updateSystemStatus() {
+                if (systemType === 'open') {
+                    statusTitle = 'Open System (Control Volume)';
+                    massTransfer = 'Mass Transfer: YES';
+                    energyTransfer = 'Energy Transfer: YES';
+                    statusLine1 = 'Mass flow in = Mass flow out (steady state)';
+                    statusLine2 = 'Energy can change due to heat and work transfer';
+                } else if (systemType === 'closed') {
+                    statusTitle = 'Closed System (Control Mass)';
+                    massTransfer = 'Mass Transfer: NO';
+                    energyTransfer = 'Energy Transfer: YES';
+                    statusLine1 = 'Mass remains constant';
+                    statusLine2 = 'Energy changes due to heat and work transfer';
+                } else {
+                    statusTitle = 'Isolated System';
+                    massTransfer = 'Mass Transfer: NO';
+                    energyTransfer = 'Energy Transfer: NO';
+                    statusLine1 = 'Both mass and energy remain constant';
+                    statusLine2 = 'Entropy can only increase (2nd law)';
+                }
             }
 
         }, 'sketch-holder');

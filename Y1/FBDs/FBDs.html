@@ -155,18 +155,20 @@
 
         <div class="interactive-controls">
             <h3>Controls</h3>
-            <div class="control-group">
-                <label>Ladder Angle (degrees from horizontal): <span id="angle-value">60</span></label>
-                <div id="ladder-controls"></div>
-            </div>
-            <div class="control-group">
-                <label>Coefficient of Friction at Ground (μ): <span id="mu-value">0.50</span></label>
-            </div>
-            <div class="control-group">
-                <label>Person Mass (kg): <span id="person-mass-value">70</span></label>
-            </div>
-            <div class="control-group">
-                <label>Person Position (% from bottom): <span id="person-pos-value">70</span></label>
+            <div class="controls-grid-2col">
+                <div class="slider-container">
+                    <label>Ladder Angle (degrees from horizontal): <span id="angle-value" class="value-display">60°</span></label>
+                    <div id="ladder-controls"></div>
+                </div>
+                <div class="slider-container">
+                    <label>Coefficient of Friction at Ground (μ): <span id="mu-value" class="value-display">0.50</span></label>
+                </div>
+                <div class="slider-container">
+                    <label>Person Mass (kg): <span id="person-mass-value" class="value-display">70 kg</span></label>
+                </div>
+                <div class="slider-container">
+                    <label>Person Position (% from bottom): <span id="person-pos-value" class="value-display">70%</span></label>
+                </div>
             </div>
             <div class="control-group">
                 <label>Select FBD to display:</label>
@@ -227,8 +229,8 @@
 
         <div class="interactive-controls">
             <h3>Controls</h3>
-            <div class="control-group">
-                <label>Beam Weight (N): <span id="beam-weight-value">500</span></label>
+            <div class="slider-container">
+                <label>Beam Weight (N): <span id="beam-weight-value" class="value-display">500 N</span></label>
                 <div id="pulley-controls"></div>
             </div>
             <div class="control-group">
@@ -258,15 +260,17 @@
 
         <div class="interactive-controls">
             <h3>Controls</h3>
-            <div class="control-group">
-                <label>Spring 1 Stiffness k₁ (N/m): <span id="k1-value">1</span></label>
-                <div id="traffic-controls"></div>
-            </div>
-            <div class="control-group">
-                <label>Spring 2 Stiffness k₂ (N/m): <span id="k2-value">1</span></label>
-            </div>
-            <div class="control-group">
-                <label>Traffic Light Mass (kg): <span id="mass-value">20</span></label>
+            <div class="controls-grid-3col">
+                <div class="slider-container">
+                    <label>Spring 1 Stiffness k₁ (N/m): <span id="k1-value" class="value-display">1 N/m</span></label>
+                    <div id="traffic-controls"></div>
+                </div>
+                <div class="slider-container">
+                    <label>Spring 2 Stiffness k₂ (N/m): <span id="k2-value" class="value-display">1 N/m</span></label>
+                </div>
+                <div class="slider-container">
+                    <label>Traffic Light Mass (kg): <span id="mass-value" class="value-display">20 kg</span></label>
+                </div>
             </div>
         </div>
 
