@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Asteroids</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <style>
         body {
             margin: 0;
@@ -72,6 +75,7 @@
     </style>
 </head>
 <body>
+<button class="leaderboard-button" style="display: none;">Leaderboard</button>
 <div id="controls">
     <div class="control-group">
         <div class="control-btn" id="leftBtn">◄</div>
@@ -103,6 +107,10 @@ let comboTimer = 0;
 let transitionAlpha = 0;
 const LEVEL_TRANSITION_DURATION = 2000; // 2 seconds
 const COMBO_TIMEOUT = 3000; // 3 seconds to maintain combo
+
+// Leaderboard variables
+let scoreAPI;
+let scoreSubmitted = false;
 
 function calculateCanvasSize() {
     canvasWidth = min(windowWidth - 20, 800);
@@ -466,6 +474,11 @@ function startLevel(level) {
 function setup() {
     calculateCanvasSize();
     createCanvas(canvasWidth, canvasHeight);
+
+    // Initialize leaderboard
+    scoreAPI = new HighScoreAPI('asteroids');
+    initLeaderboardModal();
+
     resetGame();
 }
 
@@ -475,6 +488,7 @@ function resetGame() {
     score = 0;
     gameOver = false;
     levelCleared = false;
+    scoreSubmitted = false;
     startLevel(currentLevel);
 }
 
@@ -680,6 +694,17 @@ function draw() {
 
     // Game Over screen
     if (gameOver) {
+        // Submit score once
+        if (!scoreSubmitted) {
+            submitHighScore(scoreAPI, score);
+            scoreSubmitted = true;
+            // Show leaderboard button
+            const leaderboardBtn = document.querySelector('.leaderboard-button');
+            if (leaderboardBtn) {
+                leaderboardBtn.style.display = 'block';
+            }
+        }
+
         textAlign(CENTER);
         textSize(64);
         fill(255);
@@ -692,6 +717,12 @@ function draw() {
             text('Tap Fire or R to Restart', canvasWidth/2, canvasHeight/2 + 100);
         } else {
             text('Press R to Restart', canvasWidth/2, canvasHeight/2 + 100);
+        }
+    } else {
+        // Hide leaderboard button during gameplay
+        const leaderboardBtn = document.querySelector('.leaderboard-button');
+        if (leaderboardBtn) {
+            leaderboardBtn.style.display = 'none';
         }
     }
 }
@@ -719,6 +750,8 @@ function keyPressed() {
         if (gameOver) {
             resetGame();
         }
+    } else if (key === 'l' || key === 'L') {
+        showLeaderboard(scoreAPI);
     }
 }
 
@@ -754,6 +787,14 @@ function setupTouchControls() {
     const thrustBtn = document.getElementById('thrustBtn');
     const brakeBtn = document.getElementById('brakeBtn');
     const fireBtn = document.getElementById('fireBtn');
+    const leaderboardBtn = document.querySelector('.leaderboard-button');
+
+    // Leaderboard button click handler
+    if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', () => {
+            showLeaderboard(scoreAPI);
+        });
+    }
 
     // Left button
     leftBtn.addEventListener('touchstart', (e) => {

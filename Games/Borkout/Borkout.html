@@ -3,6 +3,9 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.min.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <meta charset="utf-8" />
 
     <style>
@@ -38,6 +41,9 @@
         expand: 0,
         slow: 0
     };
+    let scoreAPI;
+    let scoreSubmitted = false;
+    let leaderboardButton;
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
@@ -77,6 +83,17 @@
                 }
             }
         }
+
+        // Initialize leaderboard
+        scoreAPI = new HighScoreAPI('borkout');
+        initLeaderboardModal();
+
+        // Create leaderboard button
+        leaderboardButton = createButton('Leaderboard');
+        leaderboardButton.class('leaderboard-button');
+        leaderboardButton.position(width / 2 - 75, height / 2 + 50);
+        leaderboardButton.mousePressed(() => showLeaderboard(scoreAPI));
+        leaderboardButton.hide(); // Hidden during gameplay
     }
 
     function draw() {
@@ -167,6 +184,15 @@
                 textSize(36);
                 textAlign(CENTER);
                 text("Game Over! Final Score: " + score, width / 2, height / 2);
+                textSize(20);
+                text("Press R to restart or L for leaderboard", width / 2, height / 2 + 100);
+
+                // Submit score and show leaderboard button
+                if (!scoreSubmitted) {
+                    submitHighScore(scoreAPI, score);
+                    scoreSubmitted = true;
+                }
+                leaderboardButton.show();
             }
         }
     }
@@ -411,9 +437,78 @@
         }
     }
 
+    function keyPressed() {
+        // Show leaderboard with L key
+        if (key === 'l' || key === 'L') {
+            showLeaderboard(scoreAPI);
+        }
+        // Restart game with R key
+        if ((key === 'r' || key === 'R') && lives <= 0) {
+            restartGame();
+        }
+    }
+
+    function restartGame() {
+        // Reset game state
+        score = 0;
+        lives = 3;
+        ballIsMoving = false;
+        speedMultiplier = 1.0;
+        lastSpeedIncrease = 0;
+        scoreSubmitted = false;
+        powerups = [];
+        activePowerups.expand = 0;
+        activePowerups.slow = 0;
+
+        // Reset paddle
+        paddle.w = 120;
+        paddle.x = (width - paddle.w) / 2;
+
+        // Reset ball
+        ball.resetOnPaddle(paddle);
+
+        // Rebuild bricks
+        bricks = [];
+        let level = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+        ];
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                if (level[row][col] == 1) {
+                    bricks.push(new Brick(col * brickWidth, row * brickHeight, row));
+                }
+            }
+        }
+
+        // Hide leaderboard button
+        leaderboardButton.hide();
+
+        // Resume game loop
+        loop();
+    }
+
     function windowResized() {
         resizeCanvas(windowWidth, windowHeight);
         paddle.y = height - paddle.h - 30; // Adjust paddle position
+
+        // Update leaderboard button position
+        if (leaderboardButton) {
+            leaderboardButton.position(width / 2 - 75, height / 2 + 50);
+        }
     }
 
     </script>

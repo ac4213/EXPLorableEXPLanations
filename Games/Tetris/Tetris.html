@@ -4,6 +4,9 @@
     <title>Tetris</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <style>
         body {
             margin: 0;
@@ -27,10 +30,19 @@
             font-size: 20px;
             z-index: 1000;
         }
+        #leaderboardBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 1001;
+        }
     </style>
 </head>
 <body>
     <button id="soundToggle">🔊</button>
+    <button id="leaderboardBtn" class="leaderboard-button">🏆 View Leaderboard</button>
 <script>
 // Sound system
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -90,6 +102,10 @@ document.getElementById('soundToggle').addEventListener('click', () => {
     document.getElementById('soundToggle').textContent = isSoundEnabled ? '🔊' : '🔈';
 });
 
+// High Score API Integration
+let scoreAPI;
+let scoreSubmitted = false;
+
 new p5(function(p) {
     let grid = [];
     let currentPiece;
@@ -142,14 +158,25 @@ new p5(function(p) {
     p.setup = function() {
         cellSize = p.min(p.floor(p.windowHeight / 24), p.floor(p.windowWidth / 20));
         let cnv = p.createCanvas(cellSize * 20, cellSize * 24);
-        
+
         startX = cellSize * 2;
         startY = cellSize * 2;
-        
+
+        // Initialize High Score API
+        scoreAPI = new HighScoreAPI('tetris');
+
+        // Initialize leaderboard modal
+        initLeaderboardModal();
+
+        // Add leaderboard button click handler
+        document.getElementById('leaderboardBtn').addEventListener('click', () => {
+            showLeaderboard(scoreAPI);
+        });
+
         for (let i = 0; i < ROWS; i++) {
             grid[i] = new Array(COLS).fill(0);
         }
-        
+
         currentPiece = createPiece();
         nextPiece = createPiece();
         gameSpeed = 800;
@@ -401,6 +428,16 @@ new p5(function(p) {
         p.textSize(cellSize);
         p.text(`Final Score: ${score}`, p.width / 2, p.height / 2 + cellSize);
         p.text('Click to restart', p.width / 2, p.height / 2 + cellSize * 3);
+        p.textSize(cellSize * 0.6);
+        p.text('Press L for Leaderboard', p.width / 2, p.height / 2 + cellSize * 4);
+
+        // Submit score to API
+        if (score > 0 && !scoreSubmitted) {
+            submitTetrisScore();
+        }
+
+        // Show leaderboard button
+        document.getElementById('leaderboardBtn').style.display = 'block';
     }
 
     function drawClearAnimation() {
@@ -446,8 +483,11 @@ new p5(function(p) {
                 }
             }
             return false;
+        } else {
+            // Hide leaderboard button during gameplay
+            document.getElementById('leaderboardBtn').style.display = 'none';
         }
-        
+
         return true;
     }
 
@@ -642,11 +682,17 @@ new p5(function(p) {
     }
 
     p.keyPressed = function() {
+        // Show leaderboard on 'L' key
+        if (p.key === 'l' || p.key === 'L') {
+            showLeaderboard(scoreAPI);
+            return;
+        }
+
         if (gameOver) {
             restartGame();
             return;
         }
-        
+
         if (p.keyCode === p.LEFT_ARROW) {
             movePiece(-1, 0);
         } else if (p.keyCode === p.RIGHT_ARROW) {
@@ -683,6 +729,10 @@ new p5(function(p) {
         levelUpEffect = 0;
         comboCount = 0;
         lastClearTime = 0;
+        scoreSubmitted = false;
+
+        // Hide leaderboard button
+        document.getElementById('leaderboardBtn').style.display = 'none';
     }
 
     p.windowResized = function() {
@@ -691,6 +741,20 @@ new p5(function(p) {
         startX = cellSize * 2;
         startY = cellSize * 2;
     };
+
+    // ============================================================================
+    // High Score API Functions
+    // ============================================================================
+
+    /**
+     * Submit high score to the API
+     */
+    async function submitTetrisScore() {
+        if (score > 0 && !scoreSubmitted) {
+            scoreSubmitted = true;
+            await submitHighScore(scoreAPI, score);
+        }
+    }
 });
 </script>
 </body>

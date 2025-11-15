@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game - Explorable Explanations</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <style>
         :root {
             --primary-color: #ffd700;
@@ -240,6 +243,7 @@
         
         <div class="button-container">
             <button id="restart-btn">Restart</button>
+            <button id="leaderboard-btn" style="display: none;">🏆 View Leaderboard</button>
         </div>
         
         <div class="touch-controls">
@@ -302,6 +306,10 @@
         let canvasWidth = 400;
         let canvasHeight = 400;
         let isMobile = false;
+
+        // High Score API Integration
+        let scoreAPI;
+        let scoreSubmitted = false;
         
         // Check if the device is a mobile device
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
@@ -328,8 +336,15 @@
             // Initialize snake and food
             resetGame();
             
+            // Initialize High Score API
+            scoreAPI = new HighScoreAPI('snake');
+
+            // Initialize leaderboard modal
+            initLeaderboardModal();
+
             // Add event listeners for buttons
             document.getElementById('restart-btn').addEventListener('click', resetGame);
+            document.getElementById('leaderboard-btn').addEventListener('click', () => showLeaderboard(scoreAPI));
             
             // Touch controls event listeners - also unpause the game
             document.getElementById('up-btn').addEventListener('touchstart', () => {
@@ -383,12 +398,19 @@
                 changeDirection(RIGHT_ARROW);
             });
             
-            // Load high score from local storage
+            // Load high score from local storage and API
             const savedHighScore = localStorage.getItem('snakeHighScore');
             if (savedHighScore) {
                 highScore = parseInt(savedHighScore);
-                document.getElementById('high-score').textContent = highScore;
             }
+
+            // Also check API for high score
+            const localHigh = scoreAPI.getLocalHighScore();
+            if (localHigh.score > highScore) {
+                highScore = localHigh.score;
+            }
+
+            document.getElementById('high-score').textContent = highScore;
         }
         
         function draw() {
@@ -488,14 +510,25 @@
             if (gameOver) {
                 fill(0, 0, 0, 200);
                 rect(0, 0, width, height);
-                
+
                 textSize(32);
                 textAlign(CENTER, CENTER);
                 fill(255);
                 text('GAME OVER', width / 2, height / 2 - 20);
-                
+
                 textSize(18);
                 text('Press RESTART to play again', width / 2, height / 2 + 20);
+
+                // Submit score to API
+                if (score > 0 && !scoreSubmitted) {
+                    submitSnakeScore();
+                }
+
+                // Show leaderboard button
+                document.getElementById('leaderboard-btn').style.display = 'inline-block';
+            } else {
+                // Hide leaderboard button during gameplay
+                document.getElementById('leaderboard-btn').style.display = 'none';
             }
             
             // Paused screen
@@ -515,6 +548,17 @@
             if ([UP_ARROW, DOWN_ARROW, LEFT_ARROW, RIGHT_ARROW].includes(keyCode)) {
                 event.preventDefault();
             }
+
+            // Show leaderboard on 'L' key
+            if ((key === 'l' || key === 'L') && gameOver) {
+                showLeaderboard(scoreAPI);
+                return;
+            } else if (key === 'l' || key === 'L') {
+                // Can also view leaderboard during gameplay
+                showLeaderboard(scoreAPI);
+                return;
+            }
+
             changeDirection(keyCode);
         }
         
@@ -775,14 +819,16 @@
             gameSpeed = 10;
             frameRate(gameSpeed);
             specialFoodActive = false;
-            
+            scoreSubmitted = false;
+
             if (specialFoodTimer) {
                 clearTimeout(specialFoodTimer);
             }
-            
+
             // Update UI
             document.getElementById('score').textContent = score;
-            
+            document.getElementById('leaderboard-btn').style.display = 'none';
+
             // Reset the game canvas
             clear();
         }
@@ -814,10 +860,24 @@
                 const screenWidth = window.innerWidth;
                 canvasWidth = Math.min(360, screenWidth - 40);
                 canvasHeight = canvasWidth;
-                
+
                 resizeCanvas(canvasWidth, canvasHeight);
                 cols = floor(width / gridSize);
                 rows = floor(height / gridSize);
+            }
+        }
+
+        // ============================================================================
+        // High Score API Functions
+        // ============================================================================
+
+        /**
+         * Submit high score to the API
+         */
+        async function submitSnakeScore() {
+            if (score > 0 && !scoreSubmitted) {
+                scoreSubmitted = true;
+                await submitHighScore(scoreAPI, score);
             }
         }
     </script>

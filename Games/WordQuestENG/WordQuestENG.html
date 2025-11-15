@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Word Quest ENG - Daily Challenge</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <style>
         * {
             margin: 0;
@@ -222,155 +225,8 @@
             font-size: 12px;
             color: #4a5568;
         }
-        
-        /* Leaderboard Styles */
-        #leaderboardModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        #leaderboardContent {
-            background: white;
-            border-radius: 15px;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        #leaderboardContent h2 {
-            color: #4a5568;
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 24px;
-        }
-        
-        .score-submission {
-            background: #f7fafc;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .score-submission input {
-            padding: 8px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 14px;
-            width: 150px;
-            margin-right: 10px;
-        }
-        
-        .score-submission button {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .score-submission button:disabled {
-            background: #cbd5e0;
-            cursor: not-allowed;
-        }
-        
-        .leaderboard-tabs {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-            gap: 10px;
-        }
-        
-        .leaderboard-tab {
-            padding: 6px 16px;
-            background: #e2e8f0;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        
-        .leaderboard-tab.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .leaderboard-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            margin-bottom: 5px;
-            background: #f7fafc;
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-        
-        .leaderboard-entry:hover {
-            transform: translateX(5px);
-            background: #edf2f7;
-        }
-        
-        .leaderboard-entry.current-user {
-            background: #e6fffa;
-            border: 2px solid #38b2ac;
-        }
-        
-        .leaderboard-entry.top-three {
-            background: linear-gradient(135deg, #ffd700, #ffed4e);
-        }
-        
-        .rank {
-            font-weight: bold;
-            color: #4a5568;
-            width: 30px;
-        }
-        
-        .player-name {
-            flex: 1;
-            margin: 0 10px;
-            color: #2d3748;
-        }
-        
-        .player-score {
-            font-weight: bold;
-            color: #667eea;
-        }
-        
-        .close-leaderboard {
-            display: block;
-            margin: 20px auto 0;
-            padding: 8px 20px;
-            background: #4a5568;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        
-        #leaderboardButton {
+
+        .leaderboard-button {
             padding: 6px 12px;
             background: #38b2ac;
             color: white;
@@ -379,7 +235,7 @@
             cursor: pointer;
             font-size: 12px;
         }
-        
+
         @media (max-height: 700px) {
             h1 { font-size: 20px; margin-bottom: 3px; }
             #gameInfo { font-size: 12px; margin-bottom: 5px; }
@@ -465,41 +321,16 @@
         <div id="bottomActions">
             <span>Best: <span id="bestScore">0</span></span>
             <button onclick="startNewGame()">New Game</button>
-            <button id="leaderboardButton" onclick="showLeaderboard()">🏆 Leaderboard</button>
+            <button id="leaderboardButton" class="leaderboard-button" onclick="handleShowLeaderboard()">🏆 Leaderboard</button>
             <span id="gameMode">Daily Mode</span>
-        </div>
-    </div>
-    
-    <!-- Leaderboard Modal -->
-    <div id="leaderboardModal" onclick="closeLeaderboardModal(event)">
-        <div id="leaderboardContent">
-            <h2>🏆 Daily Leaderboard</h2>
-            
-            <div class="score-submission" id="scoreSubmission" style="display: none;">
-                <div style="margin-bottom: 10px;">
-                    <strong>Your Score: <span id="submitScore">0</span></strong>
-                </div>
-                <input type="text" id="playerName" placeholder="Enter your name" maxlength="15">
-                <button onclick="submitScore()">Submit Score</button>
-            </div>
-            
-            <div class="leaderboard-tabs">
-                <button class="leaderboard-tab active" onclick="switchLeaderboardTab('today')">Today</button>
-                <button class="leaderboard-tab" onclick="switchLeaderboardTab('yesterday')">Yesterday</button>
-                <button class="leaderboard-tab" onclick="switchLeaderboardTab('alltime')">All Time Best</button>
-            </div>
-            
-            <div class="leaderboard-list" id="leaderboardList">
-                <div class="leaderboard-entry">
-                    <span style="text-align: center; width: 100%; color: #718096;">Loading leaderboard...</span>
-                </div>
-            </div>
-            
-            <button class="close-leaderboard" onclick="closeLeaderboard()">Close</button>
         </div>
     </div>
 
     <script>
+    // Leaderboard API
+    let scoreAPI;
+    let scoreSubmitted = false;
+
     // Engineering word lists by length with categories
     const wordLists = {
         4: [
@@ -675,7 +506,7 @@
             const savedDate = localStorage.getItem('wordQuestDate');
             const currentDate = getDailySeed();
             const completedToday = localStorage.getItem('wordQuestCompletedDate');
-            
+
             if (completedToday == currentDate) {
                 // Daily challenge already completed today
                 gameState.isRandomMode = true;
@@ -687,26 +518,29 @@
                     wrongLetter: 0
                 };
                 gameState.lastStreakGuesses = 0;
+                scoreSubmitted = true; // Already submitted for today
                 startRandomMode();
             } else if (saved && savedDate == currentDate && !JSON.parse(saved).dailyCompleted) {
                 // Continue daily challenge
                 gameState = JSON.parse(saved);
+                scoreSubmitted = false; // Not yet submitted
                 updateWordHints();
                 updateUI();
             } else {
                 // New day, start fresh daily challenge
                 localStorage.setItem('wordQuestDate', currentDate);
                 gameState.dailySeed = currentDate;
-                
+                scoreSubmitted = false; // New day, reset flag
+
                 // Give one random power-up to start
                 const powerTypes = ['revealVowel', 'wrongLetter'];
                 const randomPower = powerTypes[Math.floor(Math.random() * powerTypes.length)];
                 gameState.powerUps[randomPower] = 1;
                 gameState.lastStreakGuesses = 0;
-                
+
                 startNextWord();
             }
-            
+
             updateUI();
         }
 
@@ -732,7 +566,7 @@
                 startRandomMode();
                 return;
             }
-            
+
             if (gameState.dailyWordIndex < gameState.totalWords) {
                 const wordData = getDailyWord(gameState.dailyWordIndex);
                 gameState.currentWord = wordData.word;
@@ -745,7 +579,7 @@
                 gameState.usedSwapTry = false;
                 gameState.revealedVowels = [];
                 gameState.eliminatedLetters = [];
-                
+
                 resetKeyboard();
                 updateWordHints();
                 updateUI();
@@ -757,7 +591,10 @@
                 gameState.isRandomMode = true;
                 localStorage.setItem('wordQuestCompletedDate', getDailySeed());
                 saveGameState();
-                setTimeout(() => startRandomMode(), 3000);
+                setTimeout(() => {
+                    scoreSubmitted = false; // Reset for random mode
+                    startRandomMode();
+                }, 3000);
             }
         }
 
@@ -1068,263 +905,32 @@
             if (gameState.score > bestScore) {
                 localStorage.setItem('wordQuestBestScore', gameState.score);
             }
-            
+
             showMessage(`Daily Complete! Score: ${gameState.score}. Play random words!`);
-            
-            // Show leaderboard with submission option
-            setTimeout(() => {
-                showLeaderboard(true);
-            }, 1000);
-        }
-        
-        // LEADERBOARD FUNCTIONS
-        
-        // Backend API configuration
-        // TO CONNECT TO REAL BACKEND:
-        // Replace these URLs with your actual API endpoints
-        const LEADERBOARD_API = {
-            submit: 'https://your-backend.com/api/leaderboard/submit',  // POST endpoint
-            today: 'https://your-backend.com/api/leaderboard/today',     // GET endpoint
-            yesterday: 'https://your-backend.com/api/leaderboard/yesterday', // GET endpoint
-            alltime: 'https://your-backend.com/api/leaderboard/alltime'  // GET endpoint
-        };
-        
-        let currentLeaderboardTab = 'today';
-        let hasSubmittedScore = false;
-        
-        // Show leaderboard modal
-        function showLeaderboard(showSubmission = false) {
-            const modal = document.getElementById('leaderboardModal');
-            const submission = document.getElementById('scoreSubmission');
-            
-            modal.style.display = 'block';
-            
-            // Check if user completed daily challenge today
-            const completedDate = localStorage.getItem('wordQuestCompletedDate');
-            const submittedDate = localStorage.getItem('wordQuestSubmittedDate');
-            const currentDate = getDailySeed();
-            
-            if (showSubmission && completedDate == currentDate && submittedDate != currentDate && !gameState.isRandomMode) {
-                submission.style.display = 'block';
-                document.getElementById('submitScore').textContent = gameState.score;
-                
-                // Load saved name if exists
-                const savedName = localStorage.getItem('wordQuestPlayerName');
-                if (savedName) {
-                    document.getElementById('playerName').value = savedName;
-                }
-            } else {
-                submission.style.display = 'none';
-            }
-            
-            loadLeaderboard('today');
-        }
-        
-        // Close leaderboard modal
-        function closeLeaderboard() {
-            document.getElementById('leaderboardModal').style.display = 'none';
-        }
-        
-        // Close modal when clicking outside
-        function closeLeaderboardModal(event) {
-            if (event.target.id === 'leaderboardModal') {
-                closeLeaderboard();
+
+            // Submit score to leaderboard
+            if (!scoreSubmitted && gameState.score > 0) {
+                scoreSubmitted = true;
+                setTimeout(async () => {
+                    await submitHighScore(scoreAPI, gameState.score);
+                    showLeaderboard(scoreAPI);
+                }, 1000);
             }
         }
-        
-        // Switch leaderboard tabs
-        function switchLeaderboardTab(tab) {
-            currentLeaderboardTab = tab;
-            
-            // Update active tab
-            document.querySelectorAll('.leaderboard-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            loadLeaderboard(tab);
-        }
-        
-        // Load leaderboard data
-        async function loadLeaderboard(type) {
-            const list = document.getElementById('leaderboardList');
-            
-            // FOR REAL IMPLEMENTATION:
-            // Uncomment this code and remove the mock data below
-            /*
-            try {
-                const response = await fetch(LEADERBOARD_API[type]);
-                const data = await response.json();
-                displayLeaderboard(data);
-            } catch (error) {
-                console.error('Failed to load leaderboard:', error);
-                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #e53e3e;">Failed to load leaderboard</span></div>';
-            }
-            */
-            
-            // MOCK DATA for demonstration
-            // Remove this when connecting to real backend
-            const mockData = getMockLeaderboardData(type);
-            displayLeaderboard(mockData);
-        }
-        
-        // Display leaderboard entries
-        function displayLeaderboard(data) {
-            const list = document.getElementById('leaderboardList');
-            const currentPlayerName = localStorage.getItem('wordQuestPlayerName');
-            
-            if (!data || data.length === 0) {
-                list.innerHTML = '<div class="leaderboard-entry"><span style="text-align: center; width: 100%; color: #718096;">No scores yet. Be the first!</span></div>';
-                return;
-            }
-            
-            list.innerHTML = data.map((entry, index) => {
-                const rank = index + 1;
-                const isCurrentUser = entry.name === currentPlayerName && entry.date === getDailySeed();
-                const isTopThree = rank <= 3;
-                
-                let rankDisplay = rank;
-                if (rank === 1) rankDisplay = '🥇';
-                else if (rank === 2) rankDisplay = '🥈';
-                else if (rank === 3) rankDisplay = '🥉';
-                
-                return `
-                    <div class="leaderboard-entry ${isCurrentUser ? 'current-user' : ''} ${isTopThree && !isCurrentUser ? 'top-three' : ''}">
-                        <span class="rank">${rankDisplay}</span>
-                        <span class="player-name">${entry.name}</span>
-                        <span class="player-score">${entry.score}</span>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Submit score to leaderboard
-        async function submitScore() {
-            const playerName = document.getElementById('playerName').value.trim();
-            
-            if (!playerName) {
-                alert('Please enter your name');
-                return;
-            }
-            
-            if (playerName.length < 2) {
-                alert('Name must be at least 2 characters');
-                return;
-            }
-            
-            // Save player name for future
-            localStorage.setItem('wordQuestPlayerName', playerName);
-            localStorage.setItem('wordQuestSubmittedDate', getDailySeed());
-            
-            const scoreData = {
-                name: playerName,
-                score: gameState.score,
-                date: getDailySeed(),
-                words: gameState.dailyWordIndex,
-                timestamp: Date.now()
-            };
-            
-            // FOR REAL IMPLEMENTATION:
-            // Uncomment this code to submit to real backend
-            /*
-            try {
-                const response = await fetch(LEADERBOARD_API.submit, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(scoreData)
-                });
-                
-                if (response.ok) {
-                    document.getElementById('scoreSubmission').style.display = 'none';
-                    hasSubmittedScore = true;
-                    loadLeaderboard('today');
-                    showMessage('Score submitted successfully!');
-                } else {
-                    alert('Failed to submit score. Please try again.');
-                }
-            } catch (error) {
-                console.error('Failed to submit score:', error);
-                alert('Failed to submit score. Please try again.');
-            }
-            */
-            
-            // MOCK IMPLEMENTATION for demonstration
-            // Remove this when connecting to real backend
-            addMockScore(scoreData);
-            document.getElementById('scoreSubmission').style.display = 'none';
-            hasSubmittedScore = true;
-            loadLeaderboard('today');
-            showMessage('Score submitted successfully!');
-        }
-        
-        // MOCK DATA FUNCTIONS - Remove these when implementing real backend
-        function getMockLeaderboardData(type) {
-            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
-            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
-            
-            const today = getDailySeed();
-            const yesterday = today - 1;
-            
-            if (type === 'today') {
-                return allScores.filter(s => s.date === today).sort((a, b) => b.score - a.score).slice(0, 50);
-            } else if (type === 'yesterday') {
-                return allScores.filter(s => s.date === yesterday).sort((a, b) => b.score - a.score).slice(0, 50);
-            } else {
-                // All time best - group by player and take their best score
-                const bestScores = {};
-                allScores.forEach(score => {
-                    if (!bestScores[score.name] || bestScores[score.name].score < score.score) {
-                        bestScores[score.name] = score;
-                    }
-                });
-                return Object.values(bestScores).sort((a, b) => b.score - a.score).slice(0, 50);
-            }
-        }
-        
-        function addMockScore(scoreData) {
-            const storedData = localStorage.getItem('wordQuestMockLeaderboard');
-            let allScores = storedData ? JSON.parse(storedData) : getDefaultMockScores();
-            allScores.push(scoreData);
-            localStorage.setItem('wordQuestMockLeaderboard', JSON.stringify(allScores));
-        }
-        
-        function getDefaultMockScores() {
-            const today = getDailySeed();
-            const yesterday = today - 1;
-            
-            return [
-                // Today's scores
-                { name: 'Dr Arnaldo Delli Carri', score: 385, date: today },
-                { name: 'ac4213@coventry.ac.uk', score: 360, date: today },
-                { name: 'Coventry University', score: 340, date: today },
-                { name: 'GrannySmith', score: 320, date: today },
-                { name: 'Bob', score: 295, date: today },
-                { name: 'Alice', score: 280, date: today },
-                { name: 'Charlie', score: 265, date: today },
-                { name: 'Diana', score: 250, date: today },
-                
-                // Yesterday's scores
-                { name: 'PuzzlePro', score: 390, date: yesterday },
-                { name: 'Emma', score: 375, date: yesterday },
-                { name: 'David', score: 355, date: yesterday },
-                { name: 'Sophie', score: 330, date: yesterday },
-                { name: 'Tom', score: 310, date: yesterday },
-                { name: 'Lucy', score: 290, date: yesterday },
-                
-                // Older scores for all-time
-                { name: 'Champion', score: 410, date: today - 7 },
-                { name: 'Legend27', score: 405, date: today - 14 },
-                { name: 'MasterMind', score: 395, date: today - 21 }
-            ];
+
+        // Handle show leaderboard click
+        function handleShowLeaderboard() {
+            showLeaderboard(scoreAPI);
         }
 
         // Start new game
         function startNewGame() {
             const completedToday = localStorage.getItem('wordQuestCompletedDate');
             const currentDate = getDailySeed();
-            
+
+            // Reset score submission flag
+            scoreSubmitted = false;
+
             if (completedToday == currentDate) {
                 // Can only play random mode today
                 gameState.isRandomMode = true;
@@ -1366,13 +972,13 @@
                     randomWordsPlayed: 0,
                     lastStreakGuesses: 0
                 };
-                
+
                 // Give one random power-up to start
                 const powerTypes = ['revealVowel', 'wrongLetter'];
                 const randomPower = powerTypes[Math.floor(Math.random() * powerTypes.length)];
                 gameState.powerUps[randomPower] = 1;
                 gameState.lastStreakGuesses = 0;
-                
+
                 startNextWord();
             }
         }
@@ -1483,13 +1089,19 @@
             window.myp5 = new p5(sketch);
             initKeyboard();
             loadGameState();
-            
+
+            // Initialize leaderboard API
+            scoreAPI = new HighScoreAPI('wordquesteng');
+            initLeaderboardModal();
+
             // Keyboard input
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     submitGuess();
                 } else if (e.key === 'Backspace') {
                     deleteLetter();
+                } else if (e.key === 'l' || e.key === 'L') {
+                    showLeaderboard(scoreAPI);
                 } else if (e.key.match(/^[a-zA-Z]$/)) {
                     addLetter(e.key.toUpperCase());
                 }

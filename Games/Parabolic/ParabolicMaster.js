@@ -3,6 +3,10 @@ let frameRates = [];
 const FPS_SAMPLE_SIZE = 60;
 let lastFrameTime = 0;
 
+// Leaderboard API
+let scoreAPI;
+let scoreSubmitted = false;
+
 // Define the initial position, velocity, and acceleration
 let gamePaused = false;
 let initialPosition; //initial position vector
@@ -38,6 +42,7 @@ let isTouch = false;
 let hasTouchScreen = false;
 let fireButton;
 let resetButton;
+let leaderboardButton;
 
 // Keep track of last valid position
 let lastValidX;
@@ -96,31 +101,43 @@ function setup() {
   // Set up buttons
   resetButton = select('#reset-button');
   fireButton = select('#fire-button');
+  leaderboardButton = select('#leaderboard-btn');
   scoreContainer = select('#score-container');
   congratsElement = select('#congratulations');
+
+  // Initialize leaderboard
+  scoreAPI = new HighScoreAPI('parabolic');
+  initLeaderboardModal();
   
   // Set up button handlers
   if (hasTouchScreen) {
     console.log("Setting up touch controls");
-    
+
     fireButton.style('display', 'inline-block');
-    
+
     // Ensure buttons work on touch devices
     resetButton.elt.addEventListener('touchend', function(e) {
       e.preventDefault();
       e.stopPropagation();
       reset();
     }, false);
-    
+
     fireButton.elt.addEventListener('touchend', function(e) {
       e.preventDefault();
       e.stopPropagation();
       fireProjectile();
     }, false);
+
+    leaderboardButton.elt.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      showLeaderboard(scoreAPI);
+    }, false);
   } else {
     // Mouse only handlers
     resetButton.mousePressed(reset);
     fireButton.mousePressed(fireProjectile);
+    leaderboardButton.mousePressed(() => showLeaderboard(scoreAPI));
   }
   
   ballColor = color(255, 204, 84);
@@ -148,10 +165,17 @@ function reset(input) {
     if (wasTargetHit) {
       consecutiveHits++;
       scoreContainer.html('Streak: ' + consecutiveHits);
-      
+
       if (consecutiveHits === 3) {
         congratsElement.style('display', 'block');
         gamePaused = true;
+
+        // Show leaderboard button and submit score on game over
+        leaderboardButton.style('display', 'inline-block');
+        if (!scoreSubmitted) {
+          submitHighScore(scoreAPI, consecutiveHits);
+          scoreSubmitted = true;
+        }
       }
       // Create new obstacles and target only after a successful hit
       createObstacles();
@@ -163,11 +187,11 @@ function reset(input) {
       createObstacles();
       createTarget();
     }
-    
+
     isFired = false;
     position = createVector(0, height);
     wasTargetHit = false;  // Reset the hit flag
-    
+
     if (finalPositions.length >= MAX_FINAL_POSITIONS) {
       finalPositions = finalPositions.slice(-MAX_FINAL_POSITIONS);
     }
@@ -183,8 +207,12 @@ function reset(input) {
     consecutiveHits = 0;
     scoreContainer.html('Streak: 0');
     wasTargetHit = false;
+
+    // Reset score submission flag and hide leaderboard button
+    scoreSubmitted = false;
+    leaderboardButton.style('display', 'none');
   }
-  
+
   if (hasTouchScreen) {
     fireButton.style('display', 'inline-block');
   }
@@ -527,5 +555,13 @@ function unpauseGame(e) {
       gamePaused = false;
       congratsElement.style('display', 'none');
       reset(); // Full reset to start new round
+  }
+}
+
+function keyPressed() {
+  // Press 'L' to show leaderboard
+  if (key === 'l' || key === 'L') {
+    showLeaderboard(scoreAPI);
+    return false;
   }
 }

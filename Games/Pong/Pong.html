@@ -3,6 +3,9 @@
 <head>
     <title>PONG Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -22,10 +25,34 @@
             max-width: 100vw;
             max-height: 100vh;
         }
+        .leaderboard-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 1000;
+        }
+        .leaderboard-button:hover {
+            background: #00cc00;
+        }
     </style>
 </head>
 <body>
+<button class="leaderboard-button">View Leaderboard</button>
 <script>
+// Leaderboard variables
+let scoreAPI;
+let scoreSubmitted = false;
+
 let sketch = function(p) {
     let paddle1, paddle2;
     let ball;
@@ -41,6 +68,7 @@ let sketch = function(p) {
     let powerUps = [];
     let rallyCount = 0;
     let maxBallSpeed = 15;
+    const WINNING_SCORE = 11;
 
     p.setup = function() {
         // Make canvas responsive
@@ -48,6 +76,16 @@ let sketch = function(p) {
         let h = w * 0.5;
         scaleFactor = w / 800; // Base scale for all measurements
         p.createCanvas(w, h);
+
+        // Initialize leaderboard
+        scoreAPI = new HighScoreAPI('pong');
+        initLeaderboardModal();
+
+        // Add leaderboard button click handler
+        document.querySelector('.leaderboard-button').addEventListener('click', function() {
+            showLeaderboard(scoreAPI);
+        });
+
         resetGame();
     };
 
@@ -62,7 +100,7 @@ let sketch = function(p) {
     function resetGame() {
         let paddleHeight = 60 * scaleFactor;
         let paddleWidth = 10 * scaleFactor;
-        
+
         paddle1 = {
             x: 30 * scaleFactor,
             y: p.height/2,
@@ -70,7 +108,7 @@ let sketch = function(p) {
             h: paddleHeight,
             speed: baseSpeed * scaleFactor
         };
-        
+
         paddle2 = {
             x: p.width - (30 * scaleFactor),
             y: p.height/2,
@@ -78,7 +116,7 @@ let sketch = function(p) {
             h: paddleHeight,
             speed: baseSpeed * scaleFactor
         };
-        
+
         ball = {
             x: p.width/2,
             y: p.height/2,
@@ -86,7 +124,16 @@ let sketch = function(p) {
             speedX: baseSpeed * scaleFactor,
             speedY: 0
         };
-        
+
+        // Reset game state
+        score1 = 0;
+        score2 = 0;
+        gameState = 'playing';
+        scoreSubmitted = false;
+
+        // Hide leaderboard button
+        document.querySelector('.leaderboard-button').style.display = 'none';
+
         resetBall();
     }
 
@@ -115,6 +162,11 @@ let sketch = function(p) {
     };
 
     function updateGame() {
+        // Don't update if game is over
+        if (gameState === 'gameover') {
+            return;
+        }
+
         // CURSOR TRACKING - No clicking required on desktop
         if (touchY === null) {
             let targetY = p.mouseY;
@@ -234,13 +286,34 @@ let sketch = function(p) {
             rallyCount = 0;
             playScoreSound();
             createParticles(0, ball.y, 30);
-            resetBall();
+            checkGameOver();
+            if (gameState !== 'gameover') {
+                resetBall();
+            }
         } else if (ball.x > p.width) {
             score1++;
             rallyCount = 0;
             playScoreSound();
             createParticles(p.width, ball.y, 30);
-            resetBall();
+            checkGameOver();
+            if (gameState !== 'gameover') {
+                resetBall();
+            }
+        }
+    }
+
+    function checkGameOver() {
+        if (score1 >= WINNING_SCORE || score2 >= WINNING_SCORE) {
+            gameState = 'gameover';
+            // Show leaderboard button
+            document.querySelector('.leaderboard-button').style.display = 'block';
+
+            // Submit score (winner's score)
+            if (!scoreSubmitted) {
+                let finalScore = Math.max(score1, score2);
+                submitHighScore(scoreAPI, finalScore);
+                scoreSubmitted = true;
+            }
         }
     }
 
@@ -491,6 +564,34 @@ let sketch = function(p) {
         p.text('Speed: ' + speedPercent + '%', p.width/2, p.height - 40 * scaleFactor);
 
         p.pop();
+
+        // Draw game over screen
+        if (gameState === 'gameover') {
+            p.push();
+            p.fill(0, 0, 0, 200);
+            p.rect(0, 0, p.width, p.height);
+
+            p.fill(255);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(48 * scaleFactor);
+            p.text('GAME OVER', p.width/2, p.height/2 - 80 * scaleFactor);
+
+            p.textSize(32 * scaleFactor);
+            let winner = score1 >= WINNING_SCORE ? 'Player 1' : 'Player 2';
+            p.fill(score1 >= WINNING_SCORE ? p.color(100, 200, 255) : p.color(255, 100, 100));
+            p.text(winner + ' Wins!', p.width/2, p.height/2 - 20 * scaleFactor);
+
+            p.fill(255);
+            p.textSize(24 * scaleFactor);
+            p.text('Final Score: ' + score1 + ' - ' + score2, p.width/2, p.height/2 + 30 * scaleFactor);
+
+            p.textSize(16 * scaleFactor);
+            p.fill(150, 255, 150);
+            p.text('Press R to Restart', p.width/2, p.height/2 + 90 * scaleFactor);
+            p.fill(255, 255, 150);
+            p.text('Press L for Leaderboard', p.width/2, p.height/2 + 120 * scaleFactor);
+            p.pop();
+        }
     }
 
     // Touch controls
@@ -511,6 +612,18 @@ let sketch = function(p) {
     p.touchEnded = function() {
         touchY = null;
         return false;
+    };
+
+    // Keyboard controls
+    p.keyPressed = function() {
+        // L key - show leaderboard
+        if (p.key === 'l' || p.key === 'L') {
+            showLeaderboard(scoreAPI);
+        }
+        // R key - restart game when game over
+        if ((p.key === 'r' || p.key === 'R') && gameState === 'gameover') {
+            resetGame();
+        }
     };
 };
 

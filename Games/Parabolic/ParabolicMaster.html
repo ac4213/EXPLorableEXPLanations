@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Parabolic Motion Game</title>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
     
     <style>
         * {
@@ -122,6 +125,12 @@
             display: none;
         }
 
+        #leaderboard-btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+            color: #333;
+            display: none;
+        }
+
         .game-button:hover {
             filter: brightness(110%);
         }
@@ -169,6 +178,7 @@
             <button id="reset-button" class="game-button">RESET</button>
             <div id="score-container">Streak: 0</div>
             <button id="fire-button" class="game-button">FIRE!</button>
+            <button id="leaderboard-btn" class="game-button leaderboard-button">🏆 LEADERBOARD</button>
         </div>
         <div id="sketch-holder">
             <div id="congratulations">

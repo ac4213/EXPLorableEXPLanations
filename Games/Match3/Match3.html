@@ -6,6 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <title>Gem Match 3 - Explorable Explanations</title>
+    <link rel="stylesheet" href="/Games/shared/leaderboard.css">
+    <script src="/Games/shared/highscore-api.js"></script>
+    <script src="/Games/shared/leaderboard.js"></script>
     <style>
         :root {
             --primary-color: #ffd700;
@@ -183,6 +186,7 @@
         <div>
             <button id="new-game-btn">New Game</button>
             <button id="help-btn">How to Play</button>
+            <button class="leaderboard-button" style="display: none;">Leaderboard</button>
         </div>
         
         <canvas id="game-canvas" width="500" height="500"></canvas>
@@ -215,7 +219,11 @@
 
     <script>
         'use strict';
-        
+
+        // Leaderboard
+        let scoreAPI;
+        let scoreSubmitted = false;
+
         // Core game constants
         const GRID_SIZE = 8;
         const GEM_TYPES = 5;
@@ -314,6 +322,17 @@
             
             // Load high score
             loadHighScore();
+
+            // Initialize leaderboard
+            scoreAPI = new HighScoreAPI('match3');
+            initLeaderboardModal();
+
+            // Add keyboard listener for leaderboard
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'l' || e.key === 'L') {
+                    showLeaderboard(scoreAPI);
+                }
+            });
         }
         
         function setupInputHandlers() {
@@ -518,10 +537,17 @@
             comboCount = 0;
             comboMultiplier = 1;
             if (comboTimer) clearTimeout(comboTimer);
+            scoreSubmitted = false;
 
             updateDisplay();
             updateComboDisplay();
             gameOverModal.style.display = 'none';
+
+            // Hide leaderboard button
+            const leaderboardButton = document.querySelector('.leaderboard-button');
+            if (leaderboardButton) {
+                leaderboardButton.style.display = 'none';
+            }
             
             // Create new grid
             createInitialBoard();
@@ -1318,7 +1344,19 @@
         
         function gameOver() {
             isAnimating = true;
-            
+
+            // Submit score to leaderboard
+            if (!scoreSubmitted) {
+                submitHighScore(scoreAPI, score);
+                scoreSubmitted = true;
+            }
+
+            // Show leaderboard button
+            const leaderboardButton = document.querySelector('.leaderboard-button');
+            if (leaderboardButton) {
+                leaderboardButton.style.display = 'inline-block';
+            }
+
             // Explode all gems
             for (let y = 0; y < GRID_SIZE; y++) {
                 for (let x = 0; x < GRID_SIZE; x++) {
@@ -1330,7 +1368,7 @@
                     }
                 }
             }
-            
+
             // Show game over modal
             setTimeout(() => {
                 if (finalScoreDisplay) finalScoreDisplay.textContent = score;
