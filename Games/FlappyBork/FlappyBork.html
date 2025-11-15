@@ -3,6 +3,7 @@
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.min.js"></script>
+    <script src="/Games/shared/highscore-api.js"></script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <style>
@@ -21,12 +22,163 @@ canvas {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Leaderboard Modal Styles */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  text-align: center;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 28px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#leaderboard-list {
+  margin: 20px 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 15px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.leaderboard-entry {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  margin: 8px 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  transition: transform 0.2s;
+}
+
+.leaderboard-entry:hover {
+  transform: translateX(5px);
+}
+
+.leaderboard-entry.top3 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-entry.top1 {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  font-size: 1.1em;
+}
+
+.entry-rank {
+  font-weight: bold;
+  color: #667eea;
+  min-width: 40px;
+}
+
+.entry-name {
+  flex: 1;
+  padding: 0 10px;
+  color: #333;
+}
+
+.entry-score {
+  font-weight: bold;
+  color: #764ba2;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.modal-content button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content button:active {
+  transform: translateY(0);
+}
+
+.loading {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, -60%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
     </style>
 
   </head>
   <body>
     <main>
     </main>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal-overlay" onclick="closeLeaderboard()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h2>🏆 Leaderboard 🏆</h2>
+        <div id="leaderboard-list">
+          <div class="loading">Loading...</div>
+        </div>
+        <button onclick="closeLeaderboard()">Close</button>
+      </div>
+    </div>
+
     <script>
         let bird;
 let pipes = [];
@@ -38,6 +190,10 @@ let particles = [];
 let bgHue = 200;
 let shakeAmount = 0;
 let difficulty = 1;
+
+// High Score API Integration
+let scoreAPI;
+let scoreSubmitted = false;
 
 function setup() {
   // Make canvas responsive to screen size
@@ -55,9 +211,18 @@ function setup() {
   bird = new Bird();
   pipes.push(new Pipe());
 
-  // Load high score from localStorage
+  // Initialize High Score API
+  scoreAPI = new HighScoreAPI('flappybork');
+
+  // Load high score from localStorage (backward compatible)
   if (localStorage.getItem('flappyBorkHighScore')) {
     highScore = parseInt(localStorage.getItem('flappyBorkHighScore'));
+  }
+
+  // Also check API for high score
+  const localHigh = scoreAPI.getLocalHighScore();
+  if (localHigh.score > highScore) {
+    highScore = localHigh.score;
   }
 }
 
@@ -174,7 +339,19 @@ function draw() {
     textSize(20 * textScaleFactor);
     fill(200, 60, 90);
     text("Tap to restart", width / 2, height / 2 + 80 * textScaleFactor);
+
+    // Show leaderboard prompt
+    textSize(16 * textScaleFactor);
+    fill(120, 70, 100);
+    text("Press L for Leaderboard", width / 2, height / 2 + 110 * textScaleFactor);
+
     textAlign(LEFT, BASELINE);
+
+    // Submit score to API
+    if (score > 0 && !scoreSubmitted) {
+      submitHighScore();
+    }
+
     noLoop();
   }
 }
@@ -197,7 +374,15 @@ function keyPressed() {
   if (key == ' ' && !gameover) {
     bird.up();
   } else if (gameover) {
-    resetGame();
+    // Show leaderboard on 'L' key
+    if (key === 'l' || key === 'L') {
+      showLeaderboard();
+    } else {
+      resetGame();
+    }
+  } else if (key === 'l' || key === 'L') {
+    // Can also view leaderboard during gameplay
+    showLeaderboard();
   }
 }
 
@@ -220,6 +405,7 @@ function resetGame() {
   gameover = false;
   difficulty = 1;
   shakeAmount = 0;
+  scoreSubmitted = false;
   loop();
 }
 
@@ -286,8 +472,8 @@ class Bird {
 
 class Pipe {
   constructor() {
-    // Ensure gap is at least 2x bird size (64 pixels minimum)
-    let minGap = bird.size * 2;
+    // Ensure gap is at least 2.25x bird size (64 pixels minimum)
+    let minGap = bird.size * 2.25;
     let gap = minGap + random(minGap * 0.5, minGap * 1.5); // Gap between 64-128 pixels
 
     // Calculate available space and randomly position the gap
@@ -373,6 +559,86 @@ class Particle {
   finished() {
     return this.alpha <= 0;
   }
+}
+
+// ============================================================================
+// High Score API Functions
+// ============================================================================
+
+/**
+ * Submit high score to the API
+ */
+async function submitHighScore() {
+  if (score > 0 && !scoreSubmitted) {
+    scoreSubmitted = true;
+
+    // Always prompt for name (allows multiple players per device)
+    const playerName = scoreAPI.promptForScoreSubmission(score);
+
+    // Submit to API
+    const result = await scoreAPI.submitScore(playerName, score);
+
+    if (result.success) {
+      console.log(`✅ Score submitted! Rank: ${result.rank}`);
+      if (result.rank <= 10) {
+        console.log(`🎉 You're in the top 10!`);
+      }
+    } else if (result.fallback) {
+      console.log('⚠️ API unavailable, score saved locally');
+    } else {
+      console.log('❌ Score submission failed:', result.error);
+    }
+  }
+}
+
+/**
+ * Show the leaderboard modal
+ */
+async function showLeaderboard() {
+  const modal = document.getElementById('leaderboard-modal');
+  const listDiv = document.getElementById('leaderboard-list');
+
+  // Show modal with loading state
+  modal.style.display = 'block';
+  listDiv.innerHTML = '<div class="loading">Loading leaderboard...</div>';
+
+  try {
+    // Fetch leaderboard data
+    const leaderboard = await scoreAPI.getLeaderboard(10);
+
+    if (leaderboard.length > 0) {
+      // Build leaderboard HTML
+      let html = '';
+      leaderboard.forEach(entry => {
+        const topClass = entry.rank <= 3 ? 'top3' : '';
+        const top1Class = entry.rank === 1 ? 'top1' : '';
+        const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
+
+        html += `
+          <div class="leaderboard-entry ${topClass} ${top1Class}">
+            <span class="entry-rank">${medal} ${entry.rank}.</span>
+            <span class="entry-name">${entry.player_name}</span>
+            <span class="entry-score">${entry.score}</span>
+          </div>
+        `;
+      });
+
+      listDiv.innerHTML = html;
+    } else {
+      listDiv.innerHTML = '<div class="loading">No scores yet. Be the first!</div>';
+    }
+  } catch (error) {
+    console.error('Failed to load leaderboard:', error);
+    listDiv.innerHTML = '<div class="loading">Failed to load leaderboard. Please try again.</div>';
+  }
+}
+
+/**
+ * Close the leaderboard modal
+ */
+function closeLeaderboard() {
+  const modal = document.getElementById('leaderboard-modal');
+  modal.style.display = 'none';
 }
 
     </script>

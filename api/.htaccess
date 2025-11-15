@@ -1,0 +1,49 @@
+# ============================================================================
+# High Score API Security Configuration
+# ============================================================================
+
+# Disable directory browsing
+Options -Indexes
+
+# Prevent access to configuration files
+<FilesMatch "^(config\.php|database\.php)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Prevent access to error logs
+<FilesMatch "\.(log|txt)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Only allow access to API endpoints
+<FilesMatch "^(submit_score\.php|get_leaderboard\.php)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>
+
+# Force HTTPS (uncomment after SSL certificate is installed)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Prevent clickjacking
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "DENY"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP security settings
+<IfModule mod_php7.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log /home/user/EXPLorableEXPLanations/api/error.log
+</IfModule>
+
+# Limit request size (prevent DoS attacks)
+LimitRequestBody 10240
+
+# Set proper content type for PHP files
+AddType application/x-httpd-php .php
