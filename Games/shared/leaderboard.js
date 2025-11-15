@@ -56,12 +56,11 @@ async function showLeaderboard(scoreAPI, limit = 10) {
       // Build leaderboard HTML
       let html = '';
       leaderboard.forEach(entry => {
-        const topClass = entry.rank <= 3 ? 'top3' : '';
-        const top1Class = entry.rank === 1 ? 'top1' : '';
+        const topClass = entry.rank === 1 ? 'top1' : entry.rank === 2 ? 'top2' : entry.rank === 3 ? 'top3' : '';
         const medal = entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : '';
 
         html += `
-          <div class="leaderboard-entry ${topClass} ${top1Class}">
+          <div class="leaderboard-entry ${topClass}">
             <span class="entry-rank">${medal} ${entry.rank}.</span>
             <span class="entry-name">${entry.player_name}</span>
             <span class="entry-score">${entry.score}</span>

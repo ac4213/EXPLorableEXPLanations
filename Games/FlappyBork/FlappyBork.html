@@ -184,6 +184,11 @@ function draw() {
     textSize(20 * textScaleFactor);
     fill(60, 80, 100);
     text("Best: " + highScore, 10, 60 * textScaleFactor);
+
+    // Hide leaderboard button during gameplay
+    if (leaderboardBtn) {
+      leaderboardBtn.style('display', 'none');
+    }
   } else {
     // Show final bird position
     bird.show();
@@ -230,11 +235,6 @@ function draw() {
     }
 
     noLoop();
-  } else {
-    // Hide leaderboard button during gameplay
-    if (leaderboardBtn) {
-      leaderboardBtn.style('display', 'none');
-    }
   }
 }
 

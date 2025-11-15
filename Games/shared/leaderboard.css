@@ -22,7 +22,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+  background: linear-gradient(135deg, #fffbeb 0%, #fff3cd 100%);
   padding: 25px;
   border-radius: 15px;
   max-width: 500px;
@@ -75,16 +75,26 @@
 }
 
 /* Top 3 Highlighting */
-.leaderboard-entry.top3 {
+.leaderboard-entry.top1 {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
   font-weight: bold;
+  font-size: 1.1em;
+  border: 2px solid #cc9900;
   box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
 }
 
-.leaderboard-entry.top1 {
-  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-  font-size: 1.1em;
-  border: 2px solid #cc9900;
+.leaderboard-entry.top2 {
+  background: linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 100%);
+  font-weight: bold;
+  border: 2px solid #a8a8a8;
+  box-shadow: 0 4px 10px rgba(192, 192, 192, 0.4);
+}
+
+.leaderboard-entry.top3 {
+  background: linear-gradient(135deg, #cd7f32 0%, #b87333 100%);
+  font-weight: bold;
+  border: 2px solid #996633;
+  box-shadow: 0 4px 10px rgba(205, 127, 50, 0.4);
 }
 
 /* Entry Components */
@@ -106,6 +116,23 @@
   font-weight: bold;
   color: #b38600;
   font-size: 1.05em;
+}
+
+/* Color overrides for top 2 and 3 */
+.leaderboard-entry.top2 .entry-rank {
+  color: #707070;
+}
+
+.leaderboard-entry.top2 .entry-score {
+  color: #505050;
+}
+
+.leaderboard-entry.top3 .entry-rank {
+  color: #8b5a3c;
+}
+
+.leaderboard-entry.top3 .entry-score {
+  color: #7a4a2c;
 }
 
 /* Modal Buttons */
