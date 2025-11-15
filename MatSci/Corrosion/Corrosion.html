@@ -153,7 +153,7 @@
                 <li>\(\rho\) = density (g/cm³)</li>
                 <li>\(A\) = surface area (cm²)</li>
             </ul>
-            <p>Penetration rate (mm/year): \(\text{CR (mm/y)} = \frac{3.27 \times i_{corr} (µA/cm²) \times M}{n \times \rho}\)</p>
+            <p>Penetration rate (mm/year): \(\text{CR (mm/y)} = \frac{3.27 \times i_{corr} (mA/cm²) \times M}{n \times \rho}\)</p>
         </div>
     </div>
 
@@ -350,7 +350,7 @@
                 <tr>
                     <td>Corrosion Rate</td>
                     <td>\(\text{CR} = \frac{3.27 \times i_{corr} \times M}{n \times \rho}\)</td>
-                    <td>Penetration rate (mm/year)</td>
+                    <td>Penetration rate (mm/year), \(i_{corr}\) in mA/cm²</td>
                 </tr>
                 </tbody>
             </table>
@@ -389,15 +389,15 @@
 
             <p class="toggle-section" onclick="toggleSolution('solution2')">Show Solution</p>
             <div id="solution2" class="hidden">
-                <p>Given: \(i_{corr} = 0.1\) mA/cm² = 100 µA/cm²</p>
+                <p>Given: \(i_{corr} = 0.1\) mA/cm²</p>
                 <p>\(M = 55.85\) g/mol, \(\rho = 7.87\) g/cm³, \(n = 2\)</p>
 
                 <p><strong>Using the corrosion rate equation:</strong></p>
-                <p>\(\text{CR (mm/y)} = \displaystyle \frac{3.27 \times i_{corr} (µA/cm²) \times M}{n \times \rho}\)</p>
+                <p>\(\text{CR (mm/y)} = \displaystyle \frac{3.27 \times i_{corr} (mA/cm²) \times M}{n \times \rho}\)</p>
 
-                <p>\(\text{CR} = \displaystyle \frac{3.27 \times 100 \times 55.85}{2 \times 7.87}\)</p>
+                <p>\(\text{CR} = \displaystyle \frac{3.27 \times 0.1 \times 55.85}{2 \times 7.87}\)</p>
 
-                <p>\(\text{CR} = \displaystyle \frac{18,262.95}{15.74} = 1160.3\) mm/year</p>
+                <p>\(\text{CR} = \displaystyle \frac{18.26}{15.74} = 1.16\) mm/year</p>
 
                 <p><strong>Result:</strong> The corrosion rate is <strong>1.16 mm/year</strong>.</p>
 

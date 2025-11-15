@@ -355,7 +355,7 @@
         let streamlines = [];
 
         // Constants
-        const P_atm = 2000000; // Inlet pressure in Pa (20 bar = 2000 kPa)
+        const P_inlet = 2000000; // Inlet pressure in Pa (20 bar = 2000 kPa) - high pressure system
         const g = 9.81;
         const NUM_STREAMLINES = 10;
         const PARTICLES_PER_STREAMLINE = 5;
@@ -458,7 +458,7 @@
                 const v3 = v1; // Returns to inlet velocity
 
                 // Bernoulli's equation (horizontal pipe, h1 = h2 = h3)
-                const P1 = P_atm;
+                const P1 = P_inlet;
                 let P2 = P1 + 0.5 * fluidDensity * (v1 * v1 - v2 * v2);
 
                 // Check for cavitation (pressure cannot go below zero - vapour pressure limit)
@@ -596,9 +596,9 @@
                 // Calculate gauge heights as deviations from atmospheric pressure
                 // h = centerHeight + (pressure deviation / pressureRange) * maxHeight
                 const centerHeight = maxPressureHeight * 0.5;
-                const h1 = centerHeight + ((P1 - P_atm) / pressureRange) * maxPressureHeight;
-                const h2 = centerHeight + ((P2 - P_atm) / pressureRange) * maxPressureHeight;
-                const h3 = centerHeight + ((P3 - P_atm) / pressureRange) * maxPressureHeight;
+                const h1 = centerHeight + ((P1 - P_inlet) / pressureRange) * maxPressureHeight;
+                const h2 = centerHeight + ((P2 - P_inlet) / pressureRange) * maxPressureHeight;
+                const h3 = centerHeight + ((P3 - P_inlet) / pressureRange) * maxPressureHeight;
 
                 // Helper function to draw a gauge at bottom of pipe
                 function drawGauge(x, pipeBottomY, h, label, pressure, color) {

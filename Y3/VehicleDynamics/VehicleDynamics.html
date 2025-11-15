@@ -101,7 +101,7 @@
 
         <div class="equation-box">
             <p><strong>Understeer Gradient:</strong></p>
-            <p>\[K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\]</p>
+            <p>\[K = \frac{m}{L}\left(\frac{l_r}{C_{\alpha f}} - \frac{l_f}{C_{\alpha r}}\right)\]</p>
             <p>where \(L = l_f + l_r\) is the wheelbase.</p>
             <p><strong>Classification:</strong></p>
             <ul>
@@ -132,7 +132,7 @@
         <h3>Critical Speed</h3>
         <div class="key-point">
             <p><strong>For an oversteering vehicle, there exists a critical speed:</strong></p>
-            <p>\[u_{crit} = \sqrt{\frac{-L}{mK}}\]</p>
+            <p>\[u_{crit} = \sqrt{\frac{L}{-K}}\]</p>
             <p>Above this speed, the vehicle becomes directionally unstable and cannot maintain steady cornering. This is why most production vehicles are designed with understeer.</p>
         </div>
     </div>
@@ -203,6 +203,8 @@
             let r = 0;              // Yaw rate (rad/s)
             let delta = 0;          // Steering angle (rad)
             let latAccel = 0;       // Lateral acceleration (m/s²)
+            let stoppingDistance = 0;  // For braking maneuver (meters)
+            let initialX = 0;       // Initial x position for distance calculation
 
             // Simulation
             let isRunning = false;
@@ -213,6 +215,7 @@
             let vehicleLength = 50;
             let vehicleWidth = 25;
             let path = [];
+            let visualScale = 2;  // Scale factor: pixels per meter (higher = faster visual motion)
 
             // Data history for plots
             let timeHistory = [];
@@ -254,12 +257,15 @@
                 });
 
                 document.getElementById('start-maneuver').addEventListener('click', function() {
-                    isRunning = !isRunning;
-                    if (isRunning) {
+                    if (!isRunning) {
+                        // Starting the simulation - reset with current speed
+                        resetSimulation();
+                        isRunning = true;
                         this.textContent = 'Stop';
                     } else {
+                        // Stopping the simulation
+                        isRunning = false;
                         this.textContent = 'Start Maneuver';
-                        resetSimulation();
                     }
                 });
 
@@ -280,6 +286,8 @@
                 delta = 0;
                 time = 0;
                 path = [];
+                stoppingDistance = 0;
+                initialX = x;
 
                 // Clear history
                 timeHistory = [];
@@ -375,7 +383,8 @@
 
                 // Braking force for braking maneuver
                 let Fx = 0;
-                if (maneuverType === 'braking' && time < 3.0) {
+                if (maneuverType === 'braking' && u > 0.1) {
+                    // Continue braking until vehicle stops
                     Fx = -0.8 * mu * m * 9.81; // 0.8g braking
                     // Weight transfer: DeltaFz = m*ax*h/L
                     let ax_braking = Fx / m;
@@ -444,11 +453,21 @@
                 r += dr * dt;
                 psi += dpsi * dt;
 
+                // For braking maneuver: prevent going backwards
+                if (maneuverType === 'braking' && u < 0) {
+                    u = 0;
+                }
+
                 // Position update (global frame)
                 let vx_global = u * Math.cos(psi) - v * Math.sin(psi);
                 let vy_global = u * Math.sin(psi) + v * Math.cos(psi);
-                x += vx_global * dt;
-                y += vy_global * dt;
+                x += vx_global * dt * visualScale;  // Apply visual scale for canvas motion
+                y += vy_global * dt * visualScale;
+
+                // Calculate stopping distance for braking maneuver
+                if (maneuverType === 'braking') {
+                    stoppingDistance = (x - initialX) / visualScale;  // Convert back to meters
+                }
 
                 // Store path
                 path.push({x: x, y: y});
@@ -480,8 +499,22 @@
                 //document.getElementById('g-force-display').textContent = (latAccel / 9.81).toFixed(2);
                 //document.getElementById('yaw-rate-display').textContent = (r * 180 / Math.PI).toFixed(2);
 
-                // Stop if vehicle goes off screen or after 10 seconds
-                if (x > p.width + 100 || y < -100 || y > p.height + 100 || time > 10) {
+                // Stop conditions
+                let shouldStop = false;
+
+                if (maneuverType === 'braking') {
+                    // For braking: stop when velocity reaches zero
+                    if (u <= 0.01) {
+                        shouldStop = true;
+                    }
+                } else {
+                    // For other maneuvers: stop if off screen or after 10 seconds
+                    if (x > p.width + 100 || y < -100 || y > p.height + 100 || time > 10) {
+                        shouldStop = true;
+                    }
+                }
+
+                if (shouldStop) {
                     isRunning = false;
                     document.getElementById('start-maneuver').textContent = 'Start Maneuver';
                 }
@@ -665,7 +698,19 @@
                 textY += lineH;
 
                 p.text('Time: ' + time.toFixed(2) + ' s', textX, textY);
-                textY += lineH + 5;
+                textY += lineH;
+
+                // Show stopping distance for braking maneuver
+                if (maneuverType === 'braking') {
+                    p.textStyle(p.BOLD);
+                    p.fill(0, 100, 200);
+                    p.text('Stop Distance: ' + stoppingDistance.toFixed(1) + ' m', textX, textY);
+                    p.fill(0);
+                    p.textStyle(p.NORMAL);
+                    textY += lineH;
+                }
+
+                textY += 5;
 
                 // Maneuver info
                 p.textStyle(p.BOLD);
@@ -838,7 +883,7 @@
                 </tr>
                 <tr>
                     <td>Understeer Gradient</td>
-                    <td>\(K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\)</td>
+                    <td>\(K = \frac{m}{L}\left(\frac{l_r}{C_{\alpha f}} - \frac{l_f}{C_{\alpha r}}\right)\)</td>
                     <td>Steady-state handling characteristic</td>
                 </tr>
                 <tr>
@@ -866,13 +911,13 @@
             <p class="toggle-section" onclick="toggleSolution('solution1')">Show Solution</p>
             <div id="solution1" class="hidden">
                 <p><strong>Calculate understeer gradient:</strong></p>
-                <p>\[K = \frac{m}{L}\left(\frac{l_f}{C_{\alpha r}} - \frac{l_r}{C_{\alpha f}}\right)\]</p>
-                <p>\[K = \frac{1500}{2.7}\left(\frac{1.2}{60000} - \frac{1.5}{60000}\right)\]</p>
-                <p>\[K = 555.6 \times (0.00002 - 0.000025)\]</p>
-                <p>\[K = 555.6 \times (-0.000005) = -0.00278 \text{ rad}^{-1}\]</p>
+                <p>\[K = \frac{m}{L}\left(\frac{l_r}{C_{\alpha f}} - \frac{l_f}{C_{\alpha r}}\right)\]</p>
+                <p>\[K = \frac{1500}{2.7}\left(\frac{1.5}{60000} - \frac{1.2}{60000}\right)\]</p>
+                <p>\[K = 555.6 \times (0.000025 - 0.00002)\]</p>
+                <p>\[K = 555.6 \times (0.000005) = +0.00278 \text{ rad}^{-1}\]</p>
 
-                <p><strong>Classification:</strong> K < 0, therefore the vehicle is <strong>oversteering</strong>.</p>
-                <p>This rear-weight-biased configuration (lr > lf with equal cornering stiffnesses) creates oversteer, which is less stable but more responsive. Production vehicles typically avoid this by using higher front cornering stiffness or different weight distribution.</p>
+                <p><strong>Classification:</strong> K > 0, therefore the vehicle is <strong>understeering</strong>.</p>
+                <p>This rear-weight-biased configuration (lr > lf with equal cornering stiffnesses) creates understeer, which is stable and predictable. Production vehicles typically use this weight distribution or adjust cornering stiffnesses to achieve understeer for safety.</p>
             </div>
         </div>
 
