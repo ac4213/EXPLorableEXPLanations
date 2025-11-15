@@ -29,7 +29,7 @@
 // CHANGE THESE VALUES BEFORE DEPLOYMENT!
 define('DB_HOST', 'localhost');  // Usually 'localhost' on cPanel
 define('DB_NAME', 'arncoven_hiscores');  // CHANGE THIS!
-define('DB_USER', 'arncoven_scoreapi ');          // CHANGE THIS!
+define('DB_USER', 'arncoven_scoreapi');          // CHANGE THIS!
 define('DB_PASS', 'WL3Ee7q8uuQVQRp4vLJV');               // CHANGE THIS!
 define('DB_CHARSET', 'utf8mb4');
 
